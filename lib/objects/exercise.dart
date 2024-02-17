@@ -11,7 +11,6 @@ class Exercise{
     sets.add(Set(weight: weight, amount: amount));
   }
 
-
 }
 
 class Set{
