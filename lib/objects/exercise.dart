@@ -1,24 +1,37 @@
 class Exercise{
 
   String name;
-  List<Set> sets = [];
+  List<Set> sets;
+  String? originalName;
 
   Exercise({
     this.name = "",
-  });
+    this.sets = const []
+  }){
+    this.name = name;
+    if (sets.isEmpty){
+      sets = [];
+      addSet();
+    }
+  }
 
-  void addSet(int weight, int amount){
+  Exercise.clone(Exercise ex): this(
+      name: ex.name,
+      sets: List.from(ex.sets.map((set) => Set(weight: set.weight, amount: set.amount)))
+  );
+
+  void addSet({int? weight, int? amount}){
     sets.add(Set(weight: weight, amount: amount));
   }
 
 }
 
 class Set{
-  int weight;
-  int amount;
+  int? weight;
+  int? amount;
 
   Set({
-    required this.weight,
-    required this.amount
+    this.weight,
+    this.amount
   });
 }
