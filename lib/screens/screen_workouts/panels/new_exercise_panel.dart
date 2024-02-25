@@ -20,7 +20,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   Key listViewKey = UniqueKey();
   ScrollController scrollController = ScrollController();
-  late List<List<GlobalKey>> keys = cnNewExercise.exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+  // late List<List<GlobalKey>> keys = cnNewExercise.exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -65,9 +65,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   children: [
                     const Text("Exercise", textScaleFactor: 1.5),
                     const SizedBox(height: 10,),
+
+                    /// Exercise name
                     Form(
                       key: cnNewExercise._formKey,
                       child: TextFormField(
+                        maxLength: 30,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Enter Exercise name';
@@ -78,12 +81,65 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                         decoration: InputDecoration(
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                           labelText: 'Name',
+                          counterText: "",
                         ),
                         onChanged: (value){
                           value = value.trim();
                           cnNewExercise.exercise.name = value;
                         },
                       ),
+                    ),
+                    const SizedBox(height: 25,),
+                    Row(
+                      children: [
+
+                        /// Rest in Seconds
+                        Expanded(
+                          child: TextField(
+                            controller: cnNewExercise.restController,
+                            keyboardType: TextInputType.number,
+                            maxLength: 3,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              labelText: 'Rest In Seconds',
+                              counterText: "",
+                            ),
+                            onChanged: (value){
+                              value = value.trim();
+                              if (value.isNotEmpty){
+                                cnNewExercise.exercise.restInSeconds = int.parse(value);
+                              }
+                              else{
+                                cnNewExercise.exercise.restInSeconds = 0;
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 25,),
+
+                        /// Seat level
+                        Expanded(
+                          child: TextField(
+                            controller: cnNewExercise.seatLevelController,
+                            maxLength: 2,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              labelText: 'Seat Level',
+                              counterText: "",
+                            ),
+                            onChanged: (value){
+                              value = value.trim();
+                              if (value.isNotEmpty){
+                                cnNewExercise.exercise.seatLevel = int.parse(value);
+                              }
+                              else{
+                                cnNewExercise.exercise.seatLevel = null;
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 25,),
                     Container(width: double.maxFinite, height: 2, color: Colors.grey[400],),
@@ -156,16 +212,17 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                     height: 40,
                                     color: Colors.transparent,
                                     child: TextField(
-                                      key: keys[index][0],
+                                      key: cnNewExercise.ensureVisibleKeys[index][0],
+                                      maxLength: 3,
                                       onTap: ()async{
                                         if(MediaQuery.of(context).viewInsets.bottom == 0) {
                                           await Future.delayed(const Duration(milliseconds: 300));
                                         }
                                         Scrollable.ensureVisible(
-                                            keys[index][0].currentContext!,
+                                            cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
                                             duration: const Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
-                                            alignment: 0.3
+                                            alignment: 0.2
                                         );
                                       },
                                       controller: cnNewExercise.controllers[index][0],
@@ -184,7 +241,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                           cnNewExercise.exercise.sets[index].weight = null;
                                         }
                                       },
-                                      maxLength: 3,
                                     ),
                                   ),
 
@@ -194,16 +250,17 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                     height: 40,
                                     color: Colors.transparent,
                                     child: TextField(
-                                      key: keys[index][1],
+                                      key: cnNewExercise.ensureVisibleKeys[index][1],
+                                      maxLength: 3,
                                       onTap: ()async{
                                         if(MediaQuery.of(context).viewInsets.bottom == 0) {
                                           await Future.delayed(const Duration(milliseconds: 300));
                                         }
                                         Scrollable.ensureVisible(
-                                            keys[index][1].currentContext!,
+                                            cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
                                             duration: const Duration(milliseconds: 300),
                                             curve: Curves.easeInOut,
-                                          alignment: 0.3
+                                          alignment: 0.2
                                         );
                                       },
                                       controller: cnNewExercise.controllers[index][1],
@@ -222,7 +279,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                           cnNewExercise.exercise.sets[index].amount = null;
                                         }
                                       },
-                                      maxLength: 3,
                                     ),
                                   ),
                                 ],
@@ -240,20 +296,18 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
                               // A pane can dismiss the Slidable.
                               dismissible: DismissiblePane(onDismissed: () {
-                                setState(() {
-                                  cnNewExercise.exercise.sets.removeAt(index);
-                                  cnNewExercise.controllers.removeAt(index);
-                                  keys.removeAt(index);
-                                  listViewKey = UniqueKey();
-                                });
+                                dismiss(index);
                               }),
 
                               // All actions are defined in the children parameter.
-                              children: const [
+                              children: [
                                 // A SlidableAction can have an icon and/or a label.
                                 SlidableAction(
-                                  onPressed: null,
-                                  backgroundColor: Color(0xFFFE4A49),
+                                  onPressed: (BuildContext context){
+                                    dismiss(index);
+                                  },
+                                  // backgroundColor: Color(0xFFFE4A49),
+                                  backgroundColor: const Color(0xFFA12D2C),
                                   foregroundColor: Colors.white,
                                   icon: Icons.delete,
                                   // label: 'Delete',
@@ -294,12 +348,21 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
+  void dismiss(int index){
+    setState(() {
+      cnNewExercise.exercise.sets.removeAt(index);
+      cnNewExercise.controllers.removeAt(index);
+      cnNewExercise.ensureVisibleKeys.removeAt(index);
+      listViewKey = UniqueKey();
+    });
+  }
+
   void addSet(){
     if(cnNewExercise.exercise.sets.last.amount != null &&cnNewExercise.exercise.sets.last.weight != null) {
       setState(() {
         cnNewExercise.exercise.addSet();
         cnNewExercise.controllers.add([TextEditingController(),TextEditingController()]);
-        keys.add([GlobalKey(), GlobalKey()]);
+        cnNewExercise.ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
       });
     }
     else{
@@ -319,6 +382,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
         cnNewExercise.closePanel(doClear: true);
         cnNewWorkout.refresh();
+        print(cnNewExercise.exercise.seatLevel);
+        print(cnNewWorkout.workout.exercises.first.seatLevel);
       }
     }
   }
@@ -326,17 +391,25 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
-  final PanelController panelController = PanelController();
-  Exercise exercise = Exercise();
-  late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
-  TextEditingController exerciseNameController = TextEditingController();
-  Key key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
+  final PanelController panelController = PanelController();
+
+  Key key = UniqueKey();
+  Exercise exercise = Exercise();
+  TextEditingController exerciseNameController = TextEditingController();
+  TextEditingController restController = TextEditingController();
+  TextEditingController seatLevelController = TextEditingController();
+
+  late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
+  late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
 
   void setExercise(Exercise ex){
     exercise = ex;
     controllers = exercise.sets.map((e) => ([TextEditingController(text: "${e.weight}"), TextEditingController(text: "${e.amount}")])).toList();
+    ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
+    restController = TextEditingController(text: ex.restInSeconds > 0? ex.restInSeconds.toString() : "");
+    seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
   }
 
   void openPanel(){
@@ -363,7 +436,10 @@ class CnNewExercisePanel extends ChangeNotifier {
     exercise = Exercise();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
+    restController = TextEditingController();
+    seatLevelController = TextEditingController();
     key = UniqueKey();
+    ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     // _formKey = GlobalKey<FormState>();
     refresh();
   }

@@ -1,0 +1,97 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "2:2510276494793380538",
+      "lastPropertyId": "7:7754348514525411391",
+      "name": "ObExercise",
+      "properties": [
+        {
+          "id": "1:9168677633838207019",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:5921422946981106093",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "4:587912730100271835",
+          "name": "amounts",
+          "type": 27
+        },
+        {
+          "id": "5:5749807508740524100",
+          "name": "weights",
+          "type": 27
+        },
+        {
+          "id": "6:2424955615328354415",
+          "name": "restInSeconds",
+          "type": 6
+        },
+        {
+          "id": "7:7754348514525411391",
+          "name": "seatLevel",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:6190945827968541021",
+      "lastPropertyId": "3:8413082881233068640",
+      "name": "ObWorkout",
+      "properties": [
+        {
+          "id": "1:6360518187727305876",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:8119469040078393535",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:8413082881233068640",
+          "name": "date",
+          "type": 9
+        }
+      ],
+      "relations": [
+        {
+          "id": "3:979565396682663220",
+          "name": "exercises",
+          "targetId": "2:2510276494793380538"
+        }
+      ]
+    }
+  ],
+  "lastEntityId": "3:6190945827968541021",
+  "lastIndexId": "0:0",
+  "lastRelationId": "3:979565396682663220",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [
+    4145133195816181644
+  ],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    204025455119346967,
+    7663215118549214280,
+    5422671899604002301,
+    425489130545911071
+  ],
+  "retiredRelationUids": [
+    1856206922338472012,
+    8918878201698632752
+  ],
+  "version": 1
+}

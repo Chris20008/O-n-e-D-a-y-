@@ -13,9 +13,9 @@ bool objectboxIsInitialized = false;
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
     // DeviceOrientation.landscapeLeft,
+    // DeviceOrientation.portraitUp,
+    // DeviceOrientation.portraitDown,
   ]).then((value) {
     runApp(const MyApp());
   });

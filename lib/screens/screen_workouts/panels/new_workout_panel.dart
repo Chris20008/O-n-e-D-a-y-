@@ -5,14 +5,15 @@ import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.da
 import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../objectbox.g.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../widgets/bottom_menu.dart';
-import 'package:intl/intl.dart';
 
 import '../../../widgets/exerciseRow.dart';
 import '../screen_workouts.dart';
@@ -157,7 +158,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       onPressed: (BuildContext context){
                                         dismiss(index);
                                       },
-                                      backgroundColor: Color(0xFFFE4A49),
+                                      // backgroundColor: Color(0xFFFE4A49),
+                                      backgroundColor: Color(0xFFA12D2C),
                                       foregroundColor: Colors.white,
                                       icon: Icons.delete,
                                       // label: 'Delete',
@@ -193,7 +195,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       onPressed: (BuildContext context){
                                         cloneExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
                                       },
-                                      backgroundColor: Color(0xFF8BB5FE),
+                                      // backgroundColor: Color(0xFF8BB5FE),
+                                      backgroundColor: Color(0xFF617EB1),
                                       foregroundColor: Colors.white,
                                       icon: Icons.copy,
                                       // label: 'Delete',
@@ -202,7 +205,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       onPressed: (BuildContext context){
                                         editExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
                                       },
-                                      backgroundColor: Color(0xFFFEB349),
+                                      // backgroundColor: const Color(0xFFFEB349),
+                                      backgroundColor: const Color(0xFFAE7B32),
                                       foregroundColor: Colors.white,
                                       icon: Icons.edit,
                                       // label: 'Delete',
@@ -217,59 +221,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   textScaleFactor: 1.3,
                                   padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                                 ),
-                                // child: Padding(
-                                //   padding: EdgeInsets.only(top: 15, bottom: 15),
-                                //   child: Row(
-                                //     children: [
-                                //       Expanded(
-                                //           flex:3,
-                                //           child: Text(cnNewWorkout.workout.exercises[index].name)
-                                //       ),
-                                //       Expanded(
-                                //         flex: 7,
-                                //         child: SizedBox(
-                                //           height: 60,
-                                //           child: ListView(
-                                //               physics: const BouncingScrollPhysics(),
-                                //               scrollDirection: Axis.horizontal,
-                                //               children: [
-                                //                 for (var set in cnNewWorkout.workout.exercises[index].sets)
-                                //                   Padding(
-                                //                     padding: const EdgeInsets.only(left: 3, right: 3),
-                                //                     child: Stack(
-                                //                       alignment: Alignment.center,
-                                //                       children: [
-                                //                         Container(
-                                //                           width: 30,
-                                //                           decoration: BoxDecoration(
-                                //                               color: Colors.grey[100],
-                                //                               borderRadius: BorderRadius.circular(5),
-                                //                               border: Border.all(color: Colors.black, width: 1)
-                                //                             // border: BoxBorder
-                                //                           ),
-                                //                         ),
-                                //                         Column(
-                                //                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                //                           children: [
-                                //                             Text("${set.weight}"),
-                                //                             Container(
-                                //                               color: Colors.grey[900],
-                                //                               height: 1,
-                                //                               width: 15,
-                                //                             ),
-                                //                             Text("${set.amount}")
-                                //                           ],
-                                //                         )
-                                //                       ],
-                                //                     ),
-                                //                   ),
-                                //               ]
-                                //           ),
-                                //         ),
-                                //       )
-                                //     ],
-                                //   ),
-                                // ),
                               );
                             }
                             return child;
@@ -286,9 +237,19 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                               },
                               icon: Icon(Icons.close)
                           ),
+                          if(cnNewWorkout.isUpdating)
+                            IconButton(
+                                onPressed: () {
+                                  deleteWorkout();
+                                  cnNewWorkout.closePanel(doClear: true);
+                                  cnNewExercisePanel.clear();
+                                },
+                                icon: Icon(Icons.delete_forever)
+                            ),
                           IconButton(
                               onPressed: () {
-                                saveWorkout();
+                                // saveWorkout();
+                                saveOrUpdateWorkout();
                               },
                               icon: Icon(Icons.check)
                           ),
@@ -314,6 +275,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   void onPanelSlide(value){
     if(value < 0.05 && !cnBottomMenu.isVisible){
+      SystemChrome.setPreferredOrientations([]);
       cnBottomMenu.setVisibility(true);
     }
     else if(value > 0.05 && cnBottomMenu.isVisible){
@@ -345,13 +307,31 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
   }
 
-  void saveWorkout() async{
-    List<ObExercise> exercises = cnNewWorkout.workout.exercises.map((e) => ObExercise(
-        name: e.name,
-        weights: e.sets.map((sets) => sets.weight!).toList(),
-        amounts: e.sets.map((sets) => sets.amount!).toList())).toList();
+  void saveOrUpdateWorkout(){
+    /// checks if workout exists
+    ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(cnNewWorkout.workout.id)).build().findUnique();
 
-    ObWorkout workout = ObWorkout(name: cnNewWorkout.workout.name?? "test", date: DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now()));
+    /// workout already exists
+    if(w != null){
+      /// find and delete all exercises from this workout
+      List<ObExercise> obExercises = w.exercises;
+      objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
+
+      ///change name of saved workout to name of new workout and the save the workout
+      w.name = cnNewWorkout.workout.name;
+      saveWorkout(workout: w);
+    }
+
+    /// otherwise build an new ObWorkout from the workout and save it
+    else{
+      saveWorkout();
+    }
+  }
+
+  void saveWorkout({ObWorkout? workout}) async{
+    List<ObExercise> exercises = cnNewWorkout.workout.exercises.map((e) => e.toObExercise()).toList();
+
+    workout = workout?? cnNewWorkout.workout.toObWorkout();
     workout.exercises.addAll(exercises);
     objectbox.workoutBox.put(workout);
     objectbox.exerciseBox.putMany(exercises);
@@ -359,8 +339,16 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnWorkouts.refreshAllWorkouts();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
+  }
 
-    print("SAVED");
+  void deleteWorkout(){
+    ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(cnNewWorkout.workout.id)).build().findUnique();
+    if(w != null){
+      List<ObExercise> obExercises = w.exercises;
+      objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
+      objectbox.workoutBox.remove(w.id);
+      cnWorkouts.refreshAllWorkouts();
+    }
   }
 
 }
@@ -369,8 +357,11 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   final PanelController panelController = PanelController();
   Workout workout = Workout();
   TextEditingController workoutNameController = TextEditingController();
+  bool isUpdating = false;
 
   void openPanel(){
+    print("------------------------ open panel");
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 300),
@@ -379,20 +370,28 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void closePanel({bool doClear = false}){
+    print("------------------------ close panel");
     panelController.animatePanelToPosition(
         0,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut
     ).then((value) => {
+      SystemChrome.setPreferredOrientations([]),
       if(doClear){
         clear()
       }
     });
   }
 
+  void setWorkout(Workout w){
+    workout = w;
+    workoutNameController = TextEditingController(text: w.name);
+  }
+
   void clear(){
     workout = Workout();
     workoutNameController = TextEditingController();
+    isUpdating = false;
     refresh();
   }
 

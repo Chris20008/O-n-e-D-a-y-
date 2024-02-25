@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:quiver/iterables.dart';
 
 import '../util/objectbox/ob_workout.dart';
@@ -6,32 +7,45 @@ import 'exercise.dart';
 
 class Workout{
 
-  String? name;
+  String name;
   List<Exercise> exercises;
   Color c = Colors.blue[300] ?? Colors.blue;
-
-  // Workout({
-  //   this.name,
-  // });
+  String date;
+  int id;
 
   Workout({
     this.name = "",
-    this.exercises = const []
+    this.exercises = const [],
+    this.date = "",
+    this.id = -100
   }){
-    this.name = name;
+    // name = name;
     if (exercises.isEmpty){
       exercises = [];
+    }
+    if(date.isEmpty){
+      date = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
     }
   }
   
   Workout.fromObWorkout(ObWorkout w): this(
-    name: w.name,
-    exercises: List.from(w.exercises.map((e) => Exercise(
-        name: e.name,
-        // sets: [Set(weight: 10, amount: 10), Set(weight: 20, amount: 10)]
-        sets: List.from(zip([e.weights, e.amounts]).map((set) => Set(weight: set[0], amount: set[1])))
-    )))
+      name: w.name,
+      exercises: List.from(w.exercises.map((e) => Exercise(
+          name: e.name,
+          sets: List.from(zip([e.weights, e.amounts]).map((set) => Set(weight: set[0], amount: set[1]))),
+          restInSeconds: e.restInSeconds,
+          seatLevel: e.seatLevel
+      ))),
+      date: w.date,
+      id: w.id
   );
+
+  ObWorkout toObWorkout() {
+    return ObWorkout(
+      name: name,
+      date: date,
+    );
+  }
 
   void addOrUpdateExercise(Exercise exercise){
     List<String> existingExercises = exercises.map((e) => e.name).toList();
@@ -45,6 +59,4 @@ class Workout{
       );
     }
   }
-
-
 }
