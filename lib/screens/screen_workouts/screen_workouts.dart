@@ -34,6 +34,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
             addAutomaticKeepAlives: true,
             physics: const BouncingScrollPhysics(),
             key: cnWorkouts.key,
+            controller: cnWorkouts.scrollController,
             itemCount: cnWorkouts.workouts.length+1,
             itemBuilder: (BuildContext context, int index) {
               if (index == cnWorkouts.workouts.length){
@@ -71,7 +72,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                             ),
                             IconButton(
                                 onPressed: (){
-                                  editWorkout(cnWorkouts.workouts[index]);
+                                  editWorkout(Workout.clone(cnWorkouts.workouts[index]));
                                 },
                                 icon: Icon(Icons.edit,
                                 color: Colors.grey.withOpacity(0.4),
@@ -153,9 +154,14 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   }
 
   void editWorkout(Workout workout){
-    cnNewWorkout.isUpdating = true;
-    cnNewWorkout.setWorkout(workout);
-    cnNewWorkout.openPanel();
+    if(cnNewWorkout.isUpdating && cnNewWorkout.workout.id == workout.id){
+      cnNewWorkout.openPanel();
+    }
+    else{
+      cnNewWorkout.isUpdating = true;
+      cnNewWorkout.setWorkout(workout);
+      cnNewWorkout.openPanel();
+    }
   }
 }
 
@@ -163,22 +169,35 @@ class CnWorkouts extends ChangeNotifier {
   List<Workout> workouts = [];
   Key key = UniqueKey();
   List<bool> opened = [];
+  ScrollController scrollController = ScrollController();
 
   void refreshAllWorkouts(){
+    double pos1 = scrollController.position.pixels;
+    print("--------------------------- POSITION $pos1");
+
     List<ObWorkout> obWorkouts = objectbox.workoutBox.getAll();
     workouts.clear();
-    opened.clear();
+    List<bool> newOpened = [];
     for(ObWorkout obWorkout in obWorkouts){
       workouts.add(Workout.fromObWorkout(obWorkout));
-      opened.add(false);
+      newOpened.add(false);
     }
-    key = UniqueKey();
-    refresh();
-  }
 
-  // void clear(){
-  //   refresh();
-  // }
+    /// Exercise has been added
+    if(opened.length < newOpened.length){
+      /// keep opened state of current ExpansionsTiles and add new ones with opened = false
+      opened = opened + newOpened.sublist(opened.length);
+    }
+    /// Exercise could have been removed
+    else{
+      opened = opened.sublist(0, obWorkouts.length);
+    }
+    double pos = scrollController.position.pixels;
+    print("--------------------------- POSITION $pos");
+    // key = UniqueKey();
+    refresh();
+    scrollController.jumpTo(pos);
+  }
 
   void refresh(){
     notifyListeners();

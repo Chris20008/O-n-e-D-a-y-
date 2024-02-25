@@ -27,6 +27,13 @@ class Workout{
       date = DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.now());
     }
   }
+
+  Workout.clone(Workout w): this(
+    name: w.name,
+    exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
+    date: w.date,
+    id: w.id
+  );
   
   Workout.fromObWorkout(ObWorkout w): this(
       name: w.name,
