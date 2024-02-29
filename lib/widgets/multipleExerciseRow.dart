@@ -59,7 +59,7 @@ class MultipleExerciseRow extends StatelessWidget {
                                         else if (ex.restInSeconds < 60)
                                           Text("${ex.restInSeconds}s", textScaleFactor: 0.9,)
                                         else if (ex.restInSeconds % 60 != 0)
-                                          Text("${(ex.restInSeconds/60).round()}:${ex.restInSeconds%60}m", textScaleFactor: 0.9,)
+                                          Text("${(ex.restInSeconds/60).floor()}:${ex.restInSeconds%60}m", textScaleFactor: 0.9,)
                                         else
                                           Text("${(ex.restInSeconds/60).round()}m", textScaleFactor: 0.9,),
                                         SizedBox(width: 10,)

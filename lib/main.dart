@@ -1,5 +1,6 @@
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
@@ -26,26 +27,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      themeMode: ThemeMode.dark,
-      title: 'Flutter Demo',
-      darkTheme: ThemeData.dark().copyWith(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-          useMaterial3: true,
-          splashFactory: InkSparkle.splashFactory
-      ),
-      // theme: ThemeData(
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-      //   useMaterial3: true,
-      // ),
-      home: MultiProvider(
-          providers:[
-            ChangeNotifierProvider(create: (context) => CnBottomMenu()),
-            ChangeNotifierProvider(create: (context) => CnWorkouts()),
-            ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel()),
-            ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
-          ],
-          child: const MyHomePage(title: 'Flutter Demo Home Page')
+    return MultiProvider(
+      providers:[
+        ChangeNotifierProvider(create: (context) => CnBottomMenu()),
+        ChangeNotifierProvider(create: (context) => CnWorkouts()),
+        ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel()),
+        ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
+        ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
+      ],
+      child: MaterialApp(
+        themeMode: ThemeMode.dark,
+        // title: 'Flutter Demo',
+        darkTheme: ThemeData.dark().copyWith(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+            useMaterial3: true,
+            splashFactory: InkSparkle.splashFactory
+        ),
+        // theme: ThemeData(
+        //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+        //   useMaterial3: true,
+        // ),
+        home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
   }

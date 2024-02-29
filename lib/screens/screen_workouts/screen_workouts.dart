@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/multipleExerciseRow.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnWorkouts cnWorkouts;
 
   @override
@@ -62,13 +64,23 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         },
                         initiallyExpanded: cnWorkouts.opened[index],
                         title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               cnWorkouts.workouts[index].name,
                               textScaleFactor: 1.7,
                               style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
                               // style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber[800]!.withOpacity(0.45)),
+                            ),
+                            const Expanded(child: SizedBox()),
+                            IconButton(
+                                onPressed: (){
+                                  cnRunningWorkout.openRunningWorkout(context, Workout.clone(cnWorkouts.workouts[index]));
+                                  // editWorkout(Workout.clone(cnWorkouts.workouts[index]));
+                                },
+                                icon: Icon(Icons.play_arrow,
+                                  color: Colors.grey.withOpacity(0.4),
+                                )
                             ),
                             IconButton(
                                 onPressed: (){
