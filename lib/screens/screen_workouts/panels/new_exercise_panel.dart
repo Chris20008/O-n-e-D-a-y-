@@ -30,8 +30,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
     return WillPopScope(
       onWillPop: () async{
-        cnNewExercise.closePanel(doClear: false);
-        return false;
+        if (cnNewExercise.panelController.isPanelOpen){
+          cnNewExercise.closePanel(doClear: false);
+          return false;
+        }
+        return true;
       },
       child: SlidingUpPanel(
         key: cnNewExercise.key,
@@ -421,6 +424,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void closePanel({bool doClear = false}){
+    print("close panel exercise");
     panelController.animatePanelToPosition(
         0,
         duration: const Duration(milliseconds: 300),

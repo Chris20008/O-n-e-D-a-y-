@@ -42,8 +42,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
     return WillPopScope(
       onWillPop: () async{
-        cnNewWorkout.closePanel();
-        return false;
+        if (cnNewWorkout.panelController.isPanelOpen){
+          cnNewWorkout.closePanel(doClear: false);
+          return false;
+        }
+        return true;
       },
       child: SlidingUpPanel(
         controller: cnNewWorkout.panelController,
