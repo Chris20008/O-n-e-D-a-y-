@@ -18,7 +18,7 @@ class NewExercisePanel extends StatefulWidget {
 class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
-  Key listViewKey = UniqueKey();
+  // Key listViewKey = UniqueKey();
   ScrollController scrollController = ScrollController();
   // late List<List<GlobalKey>> keys = cnNewExercise.exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
 
@@ -162,7 +162,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                         controller: scrollController,
                         padding: const EdgeInsets.all(0),
                         shrinkWrap: true,
-                        key: listViewKey,
+                        // key: listViewKey,
                         itemCount: cnNewExercise.exercise.sets.length+1,
                         itemBuilder: (BuildContext context, int index) {
                           Widget? child;
@@ -177,16 +177,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                     Expanded(
                                       child: IconButton(
                                           color: Colors.amber[800],
-                                          iconSize: 30,
                                           style: ButtonStyle(
                                               backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                              shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10)))
+                                              shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                           ),
                                           onPressed: () {
                                             addSet();
                                           },
                                           icon: const Icon(
-                                              Icons.add
+                                            Icons.add,
+                                            size: 20,
                                           )
                                       ),
                                     ),
@@ -289,37 +289,33 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             );
                           }
                           return Slidable(
-                            // Specify a key if the Slidable is dismissible.
-                            key: const ValueKey(0),
-
-                            // The start action pane is the one at the left or the top side.
+                            key: UniqueKey(),
                             startActionPane: ActionPane(
-                              // A motion is a widget used to control how the pane animates.
                               motion: const ScrollMotion(),
-
-                              // A pane can dismiss the Slidable.
-                              dismissible: DismissiblePane(onDismissed: () {
-                                dismiss(index);
-                              }),
-
-                              // All actions are defined in the children parameter.
+                              dismissible: DismissiblePane(
+                                  onDismissed: () {
+                                    dismiss(index);
+                                  }),
                               children: [
-                                // A SlidableAction can have an icon and/or a label.
                                 SlidableAction(
+                                  flex:10,
                                   onPressed: (BuildContext context){
                                     dismiss(index);
                                   },
-                                  // backgroundColor: Color(0xFFFE4A49),
+                                  borderRadius: BorderRadius.circular(15),
                                   backgroundColor: const Color(0xFFA12D2C),
                                   foregroundColor: Colors.white,
                                   icon: Icons.delete,
-                                  // label: 'Delete',
+                                ),
+                                SlidableAction(
+                                  flex: 1,
+                                  onPressed: (BuildContext context){},
+                                  backgroundColor: Colors.transparent,
+                                  foregroundColor: Colors.transparent,
+                                  label: '',
                                 ),
                               ],
                             ),
-
-                            // The child of the Slidable is what the user sees when the
-                            // component is not dragged.
                             child: child
                           );
                         },
@@ -356,7 +352,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
       cnNewExercise.exercise.sets.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
       cnNewExercise.ensureVisibleKeys.removeAt(index);
-      listViewKey = UniqueKey();
+      // listViewKey = UniqueKey();
     });
   }
 
@@ -374,20 +370,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   }
 
   void closePanelAndSaveExercise(){
-    if (cnNewExercise._formKey.currentState!.validate()) {
-      if(cnNewExercise.exercise.name.isNotEmpty && cnNewExercise.exercise.sets.first.amount != null &&cnNewExercise.exercise.sets.first.weight != null){
-        List<Set> sets = List.from(cnNewExercise.exercise.sets);
-        for (Set set in sets){
-          if (set.amount == null || set.weight == null){
-            cnNewExercise.exercise.sets.remove(set);
-          }
-        }
-        cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
-        cnNewExercise.closePanel(doClear: true);
-        cnNewWorkout.refresh();
-        print(cnNewExercise.exercise.seatLevel);
-        print(cnNewWorkout.workout.exercises.first.seatLevel);
-      }
+    if (cnNewExercise._formKey.currentState!.validate()
+        && cnNewExercise.exercise.name.isNotEmpty
+        && cnNewExercise.exercise.sets.first.amount != null
+        && cnNewExercise.exercise.sets.first.weight != null
+    ) {
+      cnNewExercise.exercise.clearEmptySets();
+      cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
+      cnNewExercise.closePanel(doClear: true);
+      cnNewWorkout.refresh();
+      // }
     }
   }
 

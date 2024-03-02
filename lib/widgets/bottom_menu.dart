@@ -1,5 +1,9 @@
+import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../screens/screen_workout_history/screen_workout_history.dart';
+import '../screens/screen_workouts/screen_workouts.dart';
 
 class BottomMenu extends StatefulWidget {
   const BottomMenu({super.key});
@@ -9,6 +13,9 @@ class BottomMenu extends StatefulWidget {
 }
 
 class _BottomMenuState extends State<BottomMenu> {
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
 
   @override
@@ -59,44 +66,18 @@ class _BottomMenuState extends State<BottomMenu> {
               ],
               currentIndex: cnBottomMenu._selectedIndex,
               selectedItemColor: Colors.amber[800],
-              onTap: cnBottomMenu._changeIndex,
+              onTap: changeIndex,
         ),
       ),
     );
+  }
 
-    // return Column(
-    //     children: [
-    //       Padding(
-    //         padding: const EdgeInsets.only(left: 20, right: 20),
-    //         child: Container(
-    //           width: double.maxFinite,
-    //           height: 1,
-    //           color: Colors.grey[600],
-    //         ),
-    //       ),
-    //       BottomNavigationBar(
-    //         showSelectedLabels: true,
-    //         showUnselectedLabels: false,
-    //         items: const <BottomNavigationBarItem>[
-    //           BottomNavigationBarItem(
-    //             icon: Icon(Icons.history),
-    //             label: 'History',
-    //           ),
-    //           BottomNavigationBarItem(
-    //             icon: Icon(Icons.sports_martial_arts),
-    //             label: 'Workouts',
-    //           ),
-    //           BottomNavigationBarItem(
-    //             icon: Icon(Icons.scatter_plot),
-    //             label: 'Statistics',
-    //           ),
-    //         ],
-    //         currentIndex: cnBottomMenu._selectedIndex,
-    //         selectedItemColor: Colors.amber[800],
-    //         onTap: cnBottomMenu._changeIndex,
-    //       ),
-    //     ],
-    // );
+  void changeIndex(int index){
+    cnBottomMenu._changeIndex(index);
+    print("Index $index");
+    if(index == 0) cnWorkoutHistory.refreshAllWorkouts();
+    else if(index == 1) cnWorkouts.refreshAllWorkouts();
+    cnHomepage.refresh();
   }
 }
 
@@ -108,6 +89,8 @@ class CnBottomMenu extends ChangeNotifier {
     _selectedIndex = index;
     refresh();
   }
+
+  int get index => _selectedIndex;
 
   void setVisibility(bool visible){
     isVisible = visible;

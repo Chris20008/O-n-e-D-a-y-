@@ -7,7 +7,7 @@ class ObWorkout{
   int id;
 
   String name;
-  String date;
+  DateTime date;
   // Color c;
 
   ObWorkout({

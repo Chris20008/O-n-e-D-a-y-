@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../util/objectbox/ob_exercise.dart';
 
 class Exercise{
@@ -17,7 +19,6 @@ class Exercise{
     this.seatLevel,
     this.originalName
   }){
-    // this.name = name;
     if (sets.isEmpty){
       sets = [];
       addSet();
@@ -48,8 +49,20 @@ class Exercise{
     );
   }
 
+  List<Key> generateKeyForEachSet(){
+    return sets.map((e) => UniqueKey()).toList();
+  }
+
   void addSet({int? weight, int? amount}){
     sets.add(Set(weight: weight, amount: amount));
+  }
+
+  void resetSets(){
+    sets = sets.map((e) => Set(weight:-1, amount:-1)).toList();
+  }
+
+  void clearEmptySets(){
+    sets = sets.where((e) => e.weight != null && e.amount != null && e.weight! >= 0 && e.amount! > 0).toList();
   }
 
 }

@@ -1,21 +1,18 @@
 import 'dart:ui';
 
-import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
-import 'package:fitness_app/util/objectbox/ob_exercise.dart';
-import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../objectbox.g.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../widgets/bottom_menu.dart';
 
 import '../../../widgets/exerciseRow.dart';
+import '../../screen_workout_history/screen_workout_history.dart';
 import '../screen_workouts.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
@@ -30,9 +27,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
 
-  Key listViewKey = UniqueKey();
-  Key akey = UniqueKey();
+  // Key listViewKey = UniqueKey();
+  // Key slideableKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +40,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
     return WillPopScope(
       onWillPop: () async{
-        if (cnNewWorkout.panelController.isPanelOpen){
+        if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
           cnNewWorkout.closePanel(doClear: false);
           return false;
         }
@@ -101,9 +99,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       Expanded(
                         child: ListView.builder(
                           controller: ScrollController(),
+                          physics: const BouncingScrollPhysics(),
                           padding: const EdgeInsets.all(0),
                           shrinkWrap: true,
-                          key: listViewKey,
+                          // key: listViewKey,
                           itemCount: cnNewWorkout.workout.exercises.length+1,
                           itemBuilder: (BuildContext context, int index) {
                             Widget? child;
@@ -114,24 +113,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
                                   Row(
                                     children: [
-                                      const SizedBox(width: 30,),
                                       Expanded(
                                         child: IconButton(
                                             color: Colors.amber[800],
-                                            iconSize: 30,
                                             style: ButtonStyle(
                                                 backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10)))
+                                                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                             ),
                                             onPressed: () {
                                               addExercise();
                                             },
                                             icon: const Icon(
-                                                Icons.add
+                                              Icons.add,
+                                              size: 20,
                                             )
                                         ),
                                       ),
-                                      const SizedBox(width: 30,)
                                     ],
                                   ),
                                   SizedBox(height: MediaQuery.of(context).viewInsets.bottom-50 > 0? MediaQuery.of(context).viewInsets.bottom-50 : 0)
@@ -140,79 +137,68 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             }
                             else{
                               child = Slidable(
-                                key: akey,
-                                // Specify a key if the Slidable is dismissible.
-                                // key: const ValueKey(0),
-
-                                // The start action pane is the one at the left or the top side.
+                                key: UniqueKey(),
                                 startActionPane: ActionPane(
-                                  // A motion is a widget used to control how the pane animates.
                                   motion: const ScrollMotion(),
-
-                                  // A pane can dismiss the Slidable.
                                   dismissible: DismissiblePane(
                                       onDismissed: () {dismiss(index);
                                   }),
-
-                                  // All actions are defined in the children parameter.
                                   children: [
-                                    // A SlidableAction can have an icon and/or a label.
                                     SlidableAction(
+                                      flex:10,
                                       onPressed: (BuildContext context){
                                         dismiss(index);
                                       },
-                                      // backgroundColor: Color(0xFFFE4A49),
+                                      borderRadius: BorderRadius.circular(15),
                                       backgroundColor: Color(0xFFA12D2C),
                                       foregroundColor: Colors.white,
                                       icon: Icons.delete,
-                                      // label: 'Delete',
+                                    ),
+                                    SlidableAction(
+                                      flex: 1,
+                                      onPressed: (BuildContext context){},
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.transparent,
+                                      label: '',
                                     ),
                                   ],
                                 ),
 
                                 endActionPane: ActionPane(
-                                  // A motion is a widget used to control how the pane animates.
                                   motion: const ScrollMotion(),
-
-                                  // A pane can dismiss the Slidable.
                                   dismissible: DismissiblePane(
                                       confirmDismiss: ()async {
                                         editExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
-                                        Future.delayed(const Duration(milliseconds: 500), (){
-                                          print("now");
-                                          akey = UniqueKey();
-                                          setState(() {
-
-                                          });
-                                        });
                                         return false;
                                       },
-                                      onDismissed: () {
-                                    // dismiss(index);
-                                  }),
-
-                                  // All actions are defined in the children parameter.
+                                      onDismissed: () {}),
                                   children: [
-                                    // A SlidableAction can have an icon and/or a label.
                                     SlidableAction(
+                                      flex:10,
                                       onPressed: (BuildContext context){
                                         cloneExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
                                       },
-                                      // backgroundColor: Color(0xFF8BB5FE),
+                                      borderRadius: BorderRadius.circular(15),
                                       backgroundColor: Color(0xFF617EB1),
                                       foregroundColor: Colors.white,
                                       icon: Icons.copy,
-                                      // label: 'Delete',
                                     ),
                                     SlidableAction(
+                                      flex: 1,
+                                      onPressed: (BuildContext context){},
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.transparent,
+                                      label: '',
+                                    ),
+                                    SlidableAction(
+                                      flex:10,
                                       onPressed: (BuildContext context){
                                         editExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
                                       },
-                                      // backgroundColor: const Color(0xFFFEB349),
+                                      borderRadius: BorderRadius.circular(15),
                                       backgroundColor: const Color(0xFFAE7B32),
                                       foregroundColor: Colors.white,
                                       icon: Icons.edit,
-                                      // label: 'Delete',
                                     ),
                                   ],
                                 ),
@@ -234,27 +220,17 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                              onPressed: () {
-                                cnNewWorkout.closePanel(doClear: true);
-                                cnNewExercisePanel.clear();
-                              },
-                              icon: Icon(Icons.close)
+                              onPressed: onCancel,
+                              icon: const Icon(Icons.close)
                           ),
                           if(cnNewWorkout.isUpdating)
                             IconButton(
-                                onPressed: () {
-                                  deleteWorkout();
-                                  cnNewWorkout.closePanel(doClear: true);
-                                  cnNewExercisePanel.clear();
-                                },
-                                icon: Icon(Icons.delete_forever)
+                                onPressed: onDelete,
+                                icon: const Icon(Icons.delete_forever)
                             ),
                           IconButton(
-                              onPressed: () {
-                                // saveWorkout();
-                                saveOrUpdateWorkout();
-                              },
-                              icon: Icon(Icons.check)
+                              onPressed: onConfirm,
+                              icon: const Icon(Icons.check)
                           ),
                         ],
                       )
@@ -272,7 +248,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   void dismiss(int index){
     setState(() {
       cnNewWorkout.workout.exercises.removeAt(index);
-      listViewKey = UniqueKey();
+      // listViewKey = UniqueKey();
     });
   }
 
@@ -310,48 +286,25 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
   }
 
-  void saveOrUpdateWorkout(){
-    /// checks if workout exists
-    ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(cnNewWorkout.workout.id)).build().findUnique();
-
-    /// workout already exists
-    if(w != null){
-      /// find and delete all exercises from this workout
-      List<ObExercise> obExercises = w.exercises;
-      objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
-
-      ///change name of saved workout to name of new workout and the save the workout
-      w.name = cnNewWorkout.workout.name;
-      saveWorkout(workout: w);
-    }
-
-    /// otherwise build an new ObWorkout from the workout and save it
-    else{
-      saveWorkout();
-    }
-  }
-
-  void saveWorkout({ObWorkout? workout}) async{
-    List<ObExercise> exercises = cnNewWorkout.workout.exercises.map((e) => e.toObExercise()).toList();
-
-    workout = workout?? cnNewWorkout.workout.toObWorkout();
-    workout.exercises.addAll(exercises);
-    objectbox.workoutBox.put(workout);
-    objectbox.exerciseBox.putMany(exercises);
-
-    cnWorkouts.refreshAllWorkouts();
+  void onCancel(){
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
   }
 
-  void deleteWorkout(){
-    ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(cnNewWorkout.workout.id)).build().findUnique();
-    if(w != null){
-      List<ObExercise> obExercises = w.exercises;
-      objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
-      objectbox.workoutBox.remove(w.id);
-      cnWorkouts.refreshAllWorkouts();
-    }
+  void onDelete(){
+    cnNewWorkout.workout.deleteFromDatabase();
+    cnWorkouts.refreshAllWorkouts();
+    cnWorkoutHistory.refreshAllWorkouts();
+    cnNewWorkout.closePanel(doClear: true);
+    cnNewExercisePanel.clear();
+  }
+
+  void onConfirm(){
+    cnNewWorkout.workout.saveToDatabase();
+    cnWorkouts.refreshAllWorkouts();
+    cnWorkoutHistory.refreshAllWorkouts();
+    cnNewWorkout.closePanel(doClear: true);
+    cnNewExercisePanel.clear();
   }
 
 }

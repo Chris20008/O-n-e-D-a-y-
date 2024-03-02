@@ -79,7 +79,7 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 8413082881233068640),
             name: 'date',
-            type: 9,
+            type: 10,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[
@@ -204,11 +204,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
         },
         objectToFB: (ObWorkout object, fb.Builder fbb) {
           final nameOffset = fbb.writeString(object.name);
-          final dateOffset = fbb.writeString(object.date);
           fbb.startTable(4);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
-          fbb.addOffset(2, dateOffset);
+          fbb.addInt64(2, object.date.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -219,8 +218,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
           final nameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 6, '');
-          final dateParam = const fb.StringReader(asciiOptimization: true)
-              .vTableGet(buffer, rootOffset, 8, '');
+          final dateParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
           final object =
               ObWorkout(id: idParam, name: nameParam, date: dateParam);
           obx_int.InternalToManyAccess.setRelInfo<ObWorkout>(object.exercises,
@@ -271,7 +270,7 @@ class ObWorkout_ {
 
   /// see [ObWorkout.date]
   static final date =
-      obx.QueryStringProperty<ObWorkout>(_entities[1].properties[2]);
+      obx.QueryDateProperty<ObWorkout>(_entities[1].properties[2]);
 
   /// see [ObWorkout.exercises]
   static final exercises =
