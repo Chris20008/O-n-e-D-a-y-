@@ -83,7 +83,6 @@ class Workout{
         emptyExercises.add(e);
       }
     }
-    // exercises = exercises.where((ex) => !emptyExercises.contains(ex)).toList();
   }
 
   void addOrUpdateExercise(Exercise exercise){
