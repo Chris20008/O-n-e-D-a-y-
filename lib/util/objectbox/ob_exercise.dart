@@ -19,7 +19,4 @@ class ObExercise{
     required this.restInSeconds,
     this.seatLevel
   });
-
-  // final workout = ToMany<ObWorkout>(); // Beziehung zu Workout
-
 }

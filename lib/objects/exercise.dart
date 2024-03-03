@@ -36,6 +36,7 @@ class Exercise{
   ObExercise toObExercise(){
     List<int> weights = [];
     List<int> amounts = [];
+    sets = sets.where((set) => set.weight != null && set.amount != null).toList();
     for (Set set in sets){
       weights.add(set.weight!);
       amounts.add(set.amount!);

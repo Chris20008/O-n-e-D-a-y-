@@ -168,18 +168,39 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   motion: const ScrollMotion(),
                                   dismissible: DismissiblePane(
                                       confirmDismiss: ()async {
-                                        editExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
+                                        openExercise(cnNewWorkout.workout.exercises[index]);
                                         return false;
                                       },
                                       onDismissed: () {}),
                                   children: [
                                     SlidableAction(
+                                      padding: const EdgeInsets.all(0),
                                       flex:10,
                                       onPressed: (BuildContext context){
-                                        cloneExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
+                                        // openExercise(cnNewWorkout.workout.exercises[index], copied: true);
+                                      },
+                                      borderRadius: BorderRadius.circular(15),
+                                      backgroundColor: Color(0xFF5F9561),
+                                      // backgroundColor: Colors.white.withOpacity(0.1),
+                                      foregroundColor: Colors.white,
+                                      icon: Icons.add_link,
+                                    ),
+                                    SlidableAction(
+                                      flex: 1,
+                                      onPressed: (BuildContext context){},
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: Colors.transparent,
+                                      label: '',
+                                    ),
+                                    SlidableAction(
+                                      padding: const EdgeInsets.all(0),
+                                      flex:10,
+                                      onPressed: (BuildContext context){
+                                        openExercise(cnNewWorkout.workout.exercises[index], copied: true);
                                       },
                                       borderRadius: BorderRadius.circular(15),
                                       backgroundColor: Color(0xFF617EB1),
+                                      // backgroundColor: Colors.white.withOpacity(0.1),
                                       foregroundColor: Colors.white,
                                       icon: Icons.copy,
                                     ),
@@ -191,20 +212,19 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       label: '',
                                     ),
                                     SlidableAction(
+                                      padding: const EdgeInsets.all(0),
                                       flex:10,
                                       onPressed: (BuildContext context){
-                                        editExercise(Exercise.clone(cnNewWorkout.workout.exercises[index]));
+                                        openExercise(cnNewWorkout.workout.exercises[index]);
                                       },
                                       borderRadius: BorderRadius.circular(15),
                                       backgroundColor: const Color(0xFFAE7B32),
+                                      // backgroundColor: Colors.white.withOpacity(0.1),
                                       foregroundColor: Colors.white,
                                       icon: Icons.edit,
                                     ),
                                   ],
                                 ),
-
-                                // The child of the Slidable is what the user sees when the
-                                // component is not dragged.
                                 child: exerciseRow(
                                   exercise: cnNewWorkout.workout.exercises[index],
                                   textScaleFactor: 1.3,
@@ -247,19 +267,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   void dismiss(int index){
     setState(() {
+      print("DISMISS");
       cnNewWorkout.workout.exercises.removeAt(index);
-      // listViewKey = UniqueKey();
+      print(cnNewWorkout.workout.exercises.length);
     });
-  }
-
-  void onPanelSlide(value){
-    if(value < 0.05 && !cnBottomMenu.isVisible){
-      SystemChrome.setPreferredOrientations([]);
-      cnBottomMenu.setVisibility(true);
-    }
-    else if(value > 0.05 && cnBottomMenu.isVisible){
-      cnBottomMenu.setVisibility(false);
-    }
   }
 
   void addExercise(){
@@ -268,19 +279,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
   }
 
-  void editExercise(Exercise ex){
-    if(cnNewWorkout.panelController.isPanelOpen){
-      cnNewExercisePanel.setExercise(ex);
-      cnNewExercisePanel.exercise.originalName = ex.name;
-      cnNewExercisePanel.openPanel();
-      cnNewExercisePanel.refresh();
-    }
-  }
+  void openExercise(Exercise ex, {bool copied = false}){
+    /// Clone exercise to prevent directly change settings in original exercise before saving
+    /// f.e. when user goes back or just slides down panel
+    Exercise clonedEx = Exercise.clone(ex);
 
-  void cloneExercise(Exercise ex){
+    if(copied) {
+      /// If copied means a copy of the original exercise is made to create a completely new exercise
+      clonedEx.name = "";
+    } else {
+      /// Otherwise the user is editing the exercise so we keep track of the origina name in case
+      /// the user changes the exercises name
+      clonedEx.originalName = ex.name;
+    }
+
     if(cnNewWorkout.panelController.isPanelOpen){
-      ex.name = "";
-      cnNewExercisePanel.setExercise(ex);
+      cnNewExercisePanel.setExercise(clonedEx);
       cnNewExercisePanel.openPanel();
       cnNewExercisePanel.refresh();
     }
@@ -300,11 +314,26 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onConfirm(){
+    if(!cnNewWorkout.isUpdating){
+      cnNewWorkout.workout.isTemplate = true;
+    } else{
+      print("is updating");
+    }
     cnNewWorkout.workout.saveToDatabase();
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
+  }
+
+  void onPanelSlide(value){
+    if(value < 0.05 && !cnBottomMenu.isVisible){
+      SystemChrome.setPreferredOrientations([]);
+      cnBottomMenu.setVisibility(true);
+    }
+    else if(value > 0.05 && cnBottomMenu.isVisible){
+      cnBottomMenu.setVisibility(false);
+    }
   }
 
 }
@@ -316,7 +345,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   bool isUpdating = false;
 
   void openPanel(){
-    print("------------------------ open panel");
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(
         1,
@@ -326,7 +354,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void closePanel({bool doClear = false}){
-    print("------------------------ close panel");
     panelController.animatePanelToPosition(
         0,
         duration: const Duration(milliseconds: 300),

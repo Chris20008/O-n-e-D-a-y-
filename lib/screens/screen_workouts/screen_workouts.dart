@@ -9,6 +9,7 @@ import 'package:fitness_app/widgets/multipleExerciseRow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../objectbox.g.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
 
@@ -134,15 +135,10 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                       child: IconButton(
                           iconSize: 30,
                           style: ButtonStyle(
-                              // backgroundColor: MaterialStateProperty.all(Colors.grey[400]),
-                              // backgroundColor: MaterialStateProperty.all(Colors.amber[200]),
                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
                               shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                           ),
                           onPressed: () {
-                            // objectbox.workoutBox.query(ObWorkout_.name.equals("Test2")).build().remove();
-                            // objectbox.workoutBox.remove(id);
-                            // cnWorkouts.refreshAllWorkouts();
                             if(cnNewWorkout.isUpdating){
                               cnNewWorkout.clear();
                             }
@@ -188,45 +184,64 @@ class CnWorkouts extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
 
   void refreshAllWorkouts(){
-    List<ObWorkout> obWorkouts = objectbox.workoutBox.getAll();
+    List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();
     workouts.clear();
-    // List<bool> newOpened = [];
 
-    Map<String, ObWorkout> filteredWorkouts = {};
-    for(ObWorkout obWorkout in obWorkouts){
-      if(filteredWorkouts.containsKey(obWorkout.name)){
-        filteredWorkouts[obWorkout.name] = (obWorkout.date.isAfter(filteredWorkouts[obWorkout.name]!.date)? obWorkout : filteredWorkouts[obWorkout.name])!;
-      }
-      else{
-        filteredWorkouts[obWorkout.name] = obWorkout;
-      }
-      // workouts = filteredWorkouts.entries.map((entry) => Workout.fromObWorkout(entry as ObWorkout)).toList();
-      // workouts.add(Workout.fromObWorkout(obWorkout));
-      // newOpened.add(false);
+    // Map<String, ObWorkout> filteredWorkouts = {};
+    // for(ObWorkout obWorkout in obWorkouts){
+    //   if(filteredWorkouts.containsKey(obWorkout.name)){
+    //     filteredWorkouts[obWorkout.name] = (obWorkout.date.isAfter(filteredWorkouts[obWorkout.name]!.date)? obWorkout : filteredWorkouts[obWorkout.name])!;
+    //   }
+    //   else{
+    //     filteredWorkouts[obWorkout.name] = obWorkout;
+    //   }
+    // }
+    // filteredWorkouts.forEach((k, v) => workouts.add(Workout.fromObWorkout(v)));
+    for (var w in obWorkouts) {
+      workouts.add(Workout.fromObWorkout(w));
     }
-    print("LÄNGE found: ${obWorkouts.length}");
-    print("LÄNGE filtered: ${filteredWorkouts.length}");
-    filteredWorkouts.forEach((k, v) => workouts.add(Workout.fromObWorkout(v)));
     opened = workouts.map((e) => false).toList();
-
-
-    // newOpened = workouts.map((e) => false).toList();
-    //
-    // /// Exercise has been added
-    // if(opened.length < newOpened.length){
-    //   /// keep opened state of current ExpansionsTiles and add new ones with opened = false
-    //   opened = opened + newOpened.sublist(opened.length);
-    // }
-    // /// Exercise could have been removed
-    // else{
-    //   opened = opened.sublist(0, obWorkouts.length);
-    // }
-
-
-    // double pos = scrollController.position.pixels;
     refresh();
-    // scrollController.jumpTo(pos);
   }
+
+  // void refreshAllWorkouts(){
+  //   List<ObWorkout> obWorkouts = objectbox.workoutBox.getAll();
+  //   workouts.clear();
+  //   // List<bool> newOpened = [];
+  //
+  //   Map<String, ObWorkout> filteredWorkouts = {};
+  //   for(ObWorkout obWorkout in obWorkouts){
+  //     if(filteredWorkouts.containsKey(obWorkout.name)){
+  //       filteredWorkouts[obWorkout.name] = (obWorkout.date.isAfter(filteredWorkouts[obWorkout.name]!.date)? obWorkout : filteredWorkouts[obWorkout.name])!;
+  //     }
+  //     else{
+  //       filteredWorkouts[obWorkout.name] = obWorkout;
+  //     }
+  //     // workouts = filteredWorkouts.entries.map((entry) => Workout.fromObWorkout(entry as ObWorkout)).toList();
+  //     // workouts.add(Workout.fromObWorkout(obWorkout));
+  //     // newOpened.add(false);
+  //   }
+  //   filteredWorkouts.forEach((k, v) => workouts.add(Workout.fromObWorkout(v)));
+  //   opened = workouts.map((e) => false).toList();
+  //
+  //
+  //   // newOpened = workouts.map((e) => false).toList();
+  //   //
+  //   // /// Exercise has been added
+  //   // if(opened.length < newOpened.length){
+  //   //   /// keep opened state of current ExpansionsTiles and add new ones with opened = false
+  //   //   opened = opened + newOpened.sublist(opened.length);
+  //   // }
+  //   // /// Exercise could have been removed
+  //   // else{
+  //   //   opened = opened.sublist(0, obWorkouts.length);
+  //   // }
+  //
+  //
+  //   // double pos = scrollController.position.pixels;
+  //   refresh();
+  //   // scrollController.jumpTo(pos);
+  // }
 
   void refresh(){
     notifyListeners();
