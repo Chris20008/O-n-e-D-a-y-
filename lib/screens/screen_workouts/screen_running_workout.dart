@@ -402,6 +402,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     cnRunningWorkout.workout.clearAllExercisesEmptySets();
     if(cnRunningWorkout.workout.exercises.any((ex) => ex.sets.isNotEmpty)){
       cnRunningWorkout.workout.saveToDatabase();
+      cnRunningWorkout.workout.updateTemplate();
       cnWorkouts.refreshAllWorkouts();
     }
     Navigator.of(context).pop();

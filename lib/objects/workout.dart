@@ -14,14 +14,15 @@ class Workout{
   Color c = Colors.blue[300] ?? Colors.blue;
   DateTime? date;
   int id;
+  bool isTemplate;
 
   Workout({
     this.name = "",
     this.exercises = const [],
     this.date,
-    this.id = -100
+    this.id = -100,
+    this.isTemplate = false
   }){
-    // name = name;
     if (exercises.isEmpty){
       exercises = [];
     }
@@ -32,7 +33,8 @@ class Workout{
     name: w.name,
     exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
     date: w.date,
-    id: w.id
+    id: w.id,
+    isTemplate: w.isTemplate
   );
 
   Workout.copy(Workout w): this(
@@ -51,6 +53,20 @@ class Workout{
       date: w.date,
       id: w.id
   );
+  
+  void updateTemplate(){
+    ObWorkout? template = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true).and(ObWorkout_.name.equals(name))).build().findUnique();
+    if(template != null){
+
+      template.deleteAllExercises();
+
+      template.addExercises(exercises.map((e) => e.toObExercise()).toList());
+      print("TEMPLATE ID");
+      print(template.id);
+      template.save();
+    }
+  }
+
 
   void refreshDate(){
     date = DateTime.now();
@@ -58,7 +74,9 @@ class Workout{
 
   List<Key> generateKeysTotalAmountSets(){
     List<Key> keys = [];
-    exercises.forEach((ex) => keys.addAll(ex.generateKeyForEachSet()));
+    for (var ex in exercises) {
+      keys.addAll(ex.generateKeyForEachSet());
+    }
     return keys;
   }
 
@@ -66,6 +84,7 @@ class Workout{
     return ObWorkout(
       name: name,
       date: date!,
+      isTemplate: isTemplate
     );
   }
 
@@ -83,7 +102,6 @@ class Workout{
         emptyExercises.add(e);
       }
     }
-    // exercises = exercises.where((ex) => !emptyExercises.contains(ex)).toList();
   }
 
   void addOrUpdateExercise(Exercise exercise){

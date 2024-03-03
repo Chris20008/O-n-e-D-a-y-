@@ -63,7 +63,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 6190945827968541021),
       name: 'ObWorkout',
-      lastPropertyId: const obx_int.IdUid(3, 8413082881233068640),
+      lastPropertyId: const obx_int.IdUid(4, 2684771545934192254),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -80,6 +80,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(3, 8413082881233068640),
             name: 'date',
             type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 2684771545934192254),
+            name: 'isTemplate',
+            type: 1,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[
@@ -204,10 +209,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         },
         objectToFB: (ObWorkout object, fb.Builder fbb) {
           final nameOffset = fbb.writeString(object.name);
-          fbb.startTable(4);
+          fbb.startTable(5);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addInt64(2, object.date.millisecondsSinceEpoch);
+          fbb.addBool(3, object.isTemplate);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -220,8 +226,13 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .vTableGet(buffer, rootOffset, 6, '');
           final dateParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
-          final object =
-              ObWorkout(id: idParam, name: nameParam, date: dateParam);
+          final isTemplateParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false);
+          final object = ObWorkout(
+              id: idParam,
+              name: nameParam,
+              date: dateParam,
+              isTemplate: isTemplateParam);
           obx_int.InternalToManyAccess.setRelInfo<ObWorkout>(object.exercises,
               store, obx_int.RelInfo<ObWorkout>.toMany(3, object.id));
           return object;
@@ -271,6 +282,10 @@ class ObWorkout_ {
   /// see [ObWorkout.date]
   static final date =
       obx.QueryDateProperty<ObWorkout>(_entities[1].properties[2]);
+
+  /// see [ObWorkout.isTemplate]
+  static final isTemplate =
+      obx.QueryBooleanProperty<ObWorkout>(_entities[1].properties[3]);
 
   /// see [ObWorkout.exercises]
   static final exercises =
