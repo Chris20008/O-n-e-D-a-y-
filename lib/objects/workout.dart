@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
@@ -15,16 +17,21 @@ class Workout{
   DateTime? date;
   int id;
   bool isTemplate;
+  Map linkedExercises;
 
   Workout({
     this.name = "",
     this.exercises = const [],
     this.date,
     this.id = -100,
-    this.isTemplate = false
+    this.isTemplate = false,
+    this.linkedExercises = const {}
   }){
-    if (exercises.isEmpty){
+    if(exercises.isEmpty){
       exercises = [];
+    }
+    if(linkedExercises.isEmpty){
+      linkedExercises = {};
     }
     date ??= DateTime.now();
   }
@@ -34,12 +41,14 @@ class Workout{
     exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
     date: w.date,
     id: w.id,
-    isTemplate: w.isTemplate
+    isTemplate: w.isTemplate,
+    linkedExercises: Map.from(w.linkedExercises)
   );
 
   Workout.copy(Workout w): this(
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
+      linkedExercises: Map.from(w.linkedExercises)
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
@@ -51,7 +60,8 @@ class Workout{
           seatLevel: e.seatLevel
       ))),
       date: w.date,
-      id: w.id
+      id: w.id,
+      linkedExercises:json.decode(w.linkedExercises)
   );
   
   void updateTemplate(){
@@ -84,7 +94,8 @@ class Workout{
     return ObWorkout(
       name: name,
       date: date!,
-      isTemplate: isTemplate
+      isTemplate: isTemplate,
+      linkedExercises: json.encode(linkedExercises)
     );
   }
 
@@ -127,10 +138,13 @@ class Workout{
       List<ObExercise> oldObExercises = existingObWorkout.exercises;
       objectbox.exerciseBox.removeMany(oldObExercises.map((e) => e.id).toList());
       existingObWorkout.name = name;
+      existingObWorkout.linkedExercises = json.encode(linkedExercises);
     }
+
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
+    print("linked exercises string in save ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);
     objectbox.exerciseBox.putMany(newObExercises);
   }

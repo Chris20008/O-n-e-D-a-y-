@@ -1,5 +1,4 @@
 import 'package:fitness_app/main.dart';
-// import 'package:fitness_app/util/objectbox/ob_link_exercise.dart';
 import 'package:objectbox/objectbox.dart';
 import 'ob_exercise.dart';
 
@@ -12,16 +11,17 @@ class ObWorkout{
   @Property(type: PropertyType.date)
   DateTime date;
   bool isTemplate;
+  String linkedExercises;
 
   ObWorkout({
     this.id = 0,
     required this.name,
     required this.date,
-    required this.isTemplate
+    required this.isTemplate,
+    this.linkedExercises = ""
   });
 
   final exercises = ToMany<ObExercise>();
-  // final linkExercises = ToMany<ObLinkExercise>();
 
   void deleteAllExercises(){
     List<int> obExercises = exercises.map((ex) => ex.id).toList();

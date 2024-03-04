@@ -75,8 +75,12 @@ class _BottomMenuState extends State<BottomMenu> {
   void changeIndex(int index){
     cnBottomMenu._changeIndex(index);
     print("Index $index");
-    if(index == 0) cnWorkoutHistory.refreshAllWorkouts();
-    else if(index == 1) cnWorkouts.refreshAllWorkouts();
+    if(index == 0) {
+      cnWorkoutHistory.refreshAllWorkouts();
+    } else if(index == 1) {
+      cnWorkouts.refreshAllWorkouts();
+      print("REFRESH ALL WORKOUTS");
+    }
     cnHomepage.refresh();
   }
 }

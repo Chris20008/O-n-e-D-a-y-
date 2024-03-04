@@ -44,7 +44,7 @@
     },
     {
       "id": "3:6190945827968541021",
-      "lastPropertyId": "4:2684771545934192254",
+      "lastPropertyId": "5:2715976310809358031",
       "name": "ObWorkout",
       "properties": [
         {
@@ -67,6 +67,11 @@
           "id": "4:2684771545934192254",
           "name": "isTemplate",
           "type": 1
+        },
+        {
+          "id": "5:2715976310809358031",
+          "name": "linkedExercises",
+          "type": 9
         }
       ],
       "relations": [

@@ -88,6 +88,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                               ),
                               IconButton(
                                   onPressed: (){
+                                    print(cnWorkouts.workouts[index].linkedExercises);
                                     editWorkout(Workout.clone(cnWorkouts.workouts[index]));
                                   },
                                   icon: Icon(Icons.edit,
@@ -167,13 +168,16 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 
   void editWorkout(Workout workout){
     if(cnNewWorkout.isUpdating && cnNewWorkout.workout.id == workout.id){
+      print("just open");
       cnNewWorkout.openPanel();
     }
     else{
+      print("open and set workout");
       cnNewWorkout.isUpdating = true;
       cnNewWorkout.setWorkout(workout);
       cnNewWorkout.openPanel();
     }
+    print("linked exercies in edit workout ${workout.linkedExercises}");
   }
 }
 
@@ -187,19 +191,10 @@ class CnWorkouts extends ChangeNotifier {
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();
     workouts.clear();
 
-    // Map<String, ObWorkout> filteredWorkouts = {};
-    // for(ObWorkout obWorkout in obWorkouts){
-    //   if(filteredWorkouts.containsKey(obWorkout.name)){
-    //     filteredWorkouts[obWorkout.name] = (obWorkout.date.isAfter(filteredWorkouts[obWorkout.name]!.date)? obWorkout : filteredWorkouts[obWorkout.name])!;
-    //   }
-    //   else{
-    //     filteredWorkouts[obWorkout.name] = obWorkout;
-    //   }
-    // }
-    // filteredWorkouts.forEach((k, v) => workouts.add(Workout.fromObWorkout(v)));
     for (var w in obWorkouts) {
       workouts.add(Workout.fromObWorkout(w));
     }
+    print("Linked exercises in refresh${workouts.first.linkedExercises}");
     opened = workouts.map((e) => false).toList();
     refresh();
   }

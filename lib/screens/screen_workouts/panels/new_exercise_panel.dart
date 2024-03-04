@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ class NewExercisePanel extends StatefulWidget {
 class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   // Key listViewKey = UniqueKey();
   ScrollController scrollController = ScrollController();
   // late List<List<GlobalKey>> keys = cnNewExercise.exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -377,6 +379,9 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     ) {
       cnNewExercise.exercise.clearEmptySets();
       cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
+      if(cnNewExercise.linkedExercise != null){
+        cnNewWorkout.workout.linkedExercises["${cnNewWorkout.workout.linkedExercises.length}"] = [cnNewExercise.linkedExercise!.name, cnNewExercise.exercise.name];
+      }
       cnNewExercise.closePanel(doClear: true);
       cnNewWorkout.refresh();
       // }
@@ -394,6 +399,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController exerciseNameController = TextEditingController();
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
+  Exercise? linkedExercise;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -436,6 +442,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     seatLevelController = TextEditingController();
     key = UniqueKey();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+    linkedExercise = null;
     // _formKey = GlobalKey<FormState>();
     refresh();
   }

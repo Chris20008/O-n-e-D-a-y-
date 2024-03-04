@@ -105,7 +105,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           // key: listViewKey,
                           itemCount: cnNewWorkout.workout.exercises.length+1,
                           itemBuilder: (BuildContext context, int index) {
+                            print(cnNewWorkout.workout.linkedExercises.values.expand((element) => element));
                             Widget? child;
+
                             if (index == cnNewWorkout.workout.exercises.length){
                               child = Column(
                                 children: [
@@ -135,7 +137,15 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                 ],
                               );
                             }
+
+
                             else{
+                              String? linkValue;
+                              for (var entry in cnNewWorkout.workout.linkedExercises.entries) {
+                                if (entry.value.contains(cnNewWorkout.workout.exercises[index].name)) {
+                                  linkValue = entry.key;
+                                }
+                              }
                               child = Slidable(
                                 key: UniqueKey(),
                                 startActionPane: ActionPane(
@@ -178,6 +188,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       flex:10,
                                       onPressed: (BuildContext context){
                                         // openExercise(cnNewWorkout.workout.exercises[index], copied: true);
+                                        addExercise();
+                                        cnNewExercisePanel.linkedExercise = cnNewWorkout.workout.exercises[index];
                                       },
                                       borderRadius: BorderRadius.circular(15),
                                       backgroundColor: Color(0xFF5F9561),
@@ -225,10 +237,21 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     ),
                                   ],
                                 ),
-                                child: exerciseRow(
-                                  exercise: cnNewWorkout.workout.exercises[index],
-                                  textScaleFactor: 1.3,
-                                  padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                child: Stack(
+                                  children: [
+                                    exerciseRow(
+                                      exercise: cnNewWorkout.workout.exercises[index],
+                                      textScaleFactor: 1.3,
+                                      padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                                    ),
+                                    if(linkValue != null)
+                                      Row(
+                                        children: [
+                                          Icon(Icons.link_outlined, size: 15, color: Color(0xFF7BC37E)),
+                                          Text(linkValue, textScaleFactor: 0.8,)
+                                        ],
+                                      )
+                                  ],
                                 ),
                               );
                             }
@@ -268,6 +291,13 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   void dismiss(int index){
     setState(() {
       print("DISMISS");
+      print(cnNewWorkout.workout.exercises);
+      cnNewWorkout.workout.linkedExercises.forEach((key, value) {
+        value.remove(cnNewWorkout.workout.exercises[index].name);
+      });
+      print(cnNewWorkout.workout.exercises);
+      cnNewWorkout.workout.linkedExercises.removeWhere((key, value) => value.length < 2);
+      print(cnNewWorkout.workout.exercises);
       cnNewWorkout.workout.exercises.removeAt(index);
       print(cnNewWorkout.workout.exercises.length);
     });
@@ -351,6 +381,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut
     );
+    print("open panel ${workout.linkedExercises}");
   }
 
   void closePanel({bool doClear = false}){
@@ -372,7 +403,9 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void clear(){
+    print("DO CLEAR");
     workout = Workout();
+    print(workout.linkedExercises);
     workoutNameController = TextEditingController();
     isUpdating = false;
     refresh();

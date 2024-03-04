@@ -402,7 +402,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     cnRunningWorkout.workout.clearAllExercisesEmptySets();
     if(cnRunningWorkout.workout.exercises.any((ex) => ex.sets.isNotEmpty)){
       cnRunningWorkout.workout.saveToDatabase();
-      cnRunningWorkout.workout.updateTemplate();
+      // cnRunningWorkout.workout.updateTemplate();
       cnWorkouts.refreshAllWorkouts();
     }
     Navigator.of(context).pop();
@@ -442,6 +442,8 @@ class CnRunningWorkout extends ChangeNotifier {
 
     workout = Workout.copy(lastWorkout);
     workout.resetAllExercisesSets();
+    print("workout ${workout.linkedExercises}");
+    print("lastWorkout ${workout.linkedExercises}");
 
     slideableKeys = {
       for (var e in workout.exercises)
