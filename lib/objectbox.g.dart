@@ -24,7 +24,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 2510276494793380538),
       name: 'ObExercise',
-      lastPropertyId: const obx_int.IdUid(7, 7754348514525411391),
+      lastPropertyId: const obx_int.IdUid(8, 4909574619532409130),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -56,6 +56,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(7, 7754348514525411391),
             name: 'seatLevel',
             type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 4909574619532409130),
+            name: 'linkName',
+            type: 9,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -63,7 +68,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 6190945827968541021),
       name: 'ObWorkout',
-      lastPropertyId: const obx_int.IdUid(5, 2715976310809358031),
+      lastPropertyId: const obx_int.IdUid(6, 8375506305716248786),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -87,9 +92,9 @@ final _entities = <obx_int.ModelEntity>[
             type: 1,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 2715976310809358031),
+            id: const obx_int.IdUid(6, 8375506305716248786),
             name: 'linkedExercises',
-            type: 9,
+            type: 30,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[
@@ -146,7 +151,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         204025455119346967,
         7663215118549214280,
         5422671899604002301,
-        425489130545911071
+        425489130545911071,
+        2715976310809358031
       ],
       retiredRelationUids: const [1856206922338472012, 8918878201698632752],
       modelVersion: 5,
@@ -166,13 +172,17 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final nameOffset = fbb.writeString(object.name);
           final amountsOffset = fbb.writeListInt64(object.amounts);
           final weightsOffset = fbb.writeListInt64(object.weights);
-          fbb.startTable(8);
+          final linkNameOffset = object.linkName == null
+              ? null
+              : fbb.writeString(object.linkName!);
+          fbb.startTable(9);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addOffset(3, amountsOffset);
           fbb.addOffset(4, weightsOffset);
           fbb.addInt64(5, object.restInSeconds);
           fbb.addInt64(6, object.seatLevel);
+          fbb.addOffset(7, linkNameOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -193,13 +203,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 14, 0);
           final seatLevelParam =
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 16);
+          final linkNameParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGetNullable(buffer, rootOffset, 18);
           final object = ObExercise(
               id: idParam,
               name: nameParam,
               weights: weightsParam,
               amounts: amountsParam,
               restInSeconds: restInSecondsParam,
-              seatLevel: seatLevelParam);
+              seatLevel: seatLevelParam,
+              linkName: linkNameParam);
 
           return object;
         }),
@@ -214,13 +227,15 @@ obx_int.ModelDefinition getObjectBoxModel() {
         },
         objectToFB: (ObWorkout object, fb.Builder fbb) {
           final nameOffset = fbb.writeString(object.name);
-          final linkedExercisesOffset = fbb.writeString(object.linkedExercises);
-          fbb.startTable(6);
+          final linkedExercisesOffset = fbb.writeList(object.linkedExercises
+              .map(fbb.writeString)
+              .toList(growable: false));
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addInt64(2, object.date.millisecondsSinceEpoch);
           fbb.addBool(3, object.isTemplate);
-          fbb.addOffset(4, linkedExercisesOffset);
+          fbb.addOffset(5, linkedExercisesOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -235,9 +250,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
           final isTemplateParam =
               const fb.BoolReader().vTableGet(buffer, rootOffset, 10, false);
-          final linkedExercisesParam =
-              const fb.StringReader(asciiOptimization: true)
-                  .vTableGet(buffer, rootOffset, 12, '');
+          final linkedExercisesParam = const fb.ListReader<String>(
+                  fb.StringReader(asciiOptimization: true),
+                  lazy: false)
+              .vTableGet(buffer, rootOffset, 14, []);
           final object = ObWorkout(
               id: idParam,
               name: nameParam,
@@ -278,6 +294,10 @@ class ObExercise_ {
   /// see [ObExercise.seatLevel]
   static final seatLevel =
       obx.QueryIntegerProperty<ObExercise>(_entities[0].properties[5]);
+
+  /// see [ObExercise.linkName]
+  static final linkName =
+      obx.QueryStringProperty<ObExercise>(_entities[0].properties[6]);
 }
 
 /// [ObWorkout] entity fields to define ObjectBox queries.
@@ -300,7 +320,7 @@ class ObWorkout_ {
 
   /// see [ObWorkout.linkedExercises]
   static final linkedExercises =
-      obx.QueryStringProperty<ObWorkout>(_entities[1].properties[4]);
+      obx.QueryStringVectorProperty<ObWorkout>(_entities[1].properties[4]);
 
   /// see [ObWorkout.exercises]
   static final exercises =

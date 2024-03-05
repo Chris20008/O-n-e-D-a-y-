@@ -89,8 +89,8 @@ class MultipleExerciseRow extends StatelessWidget {
                                   child: Text(
                                       ex.name,
                                       textScaleFactor: ex.name.length > 20 ? 0.8
-                                          : ex.name.length > 15 ? 1.1
-                                          : ex.name.length > 10 ? 1.3
+                                          : ex.name.length > 14 ? 1.1
+                                          : ex.name.length > 9 ? 1.3
                                           : ex.name.length > 5 ? 1.4
                                           : 1.5
                                   )

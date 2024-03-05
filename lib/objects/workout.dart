@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
@@ -17,7 +15,7 @@ class Workout{
   DateTime? date;
   int id;
   bool isTemplate;
-  Map linkedExercises;
+  List<String> linkedExercises;
 
   Workout({
     this.name = "",
@@ -25,13 +23,13 @@ class Workout{
     this.date,
     this.id = -100,
     this.isTemplate = false,
-    this.linkedExercises = const {}
+    this.linkedExercises = const []
   }){
     if(exercises.isEmpty){
       exercises = [];
     }
     if(linkedExercises.isEmpty){
-      linkedExercises = {};
+      linkedExercises = [];
     }
     date ??= DateTime.now();
   }
@@ -42,26 +40,26 @@ class Workout{
     date: w.date,
     id: w.id,
     isTemplate: w.isTemplate,
-    linkedExercises: Map.from(w.linkedExercises)
+    linkedExercises: List.from(w.linkedExercises)
   );
 
   Workout.copy(Workout w): this(
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
-      linkedExercises: Map.from(w.linkedExercises)
+      linkedExercises: List.from(w.linkedExercises)
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
       name: w.name,
       exercises: List.from(w.exercises.map((e) => Exercise(
           name: e.name,
-          sets: List.from(zip([e.weights, e.amounts]).map((set) => Set(weight: set[0], amount: set[1]))),
+          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0], amount: set[1]))),
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel
       ))),
       date: w.date,
       id: w.id,
-      linkedExercises:json.decode(w.linkedExercises)
+      linkedExercises: List.from(w.linkedExercises)
   );
   
   void updateTemplate(){
@@ -95,7 +93,7 @@ class Workout{
       name: name,
       date: date!,
       isTemplate: isTemplate,
-      linkedExercises: json.encode(linkedExercises)
+      linkedExercises: List.from(linkedExercises)
     );
   }
 
@@ -120,6 +118,13 @@ class Workout{
 
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       exercises[existingExercises.indexOf(exercise.originalName!)] = exercise;
+      // Exercise currentExercise = exercises[existingExercises.indexOf(exercise.originalName!)];
+      // currentExercise.name = (exercise.name).toString();
+      // currentExercise.sets = List.from(exercise.sets);
+      // currentExercise.restInSeconds = exercise.restInSeconds;
+      // currentExercise.seatLevel = exercise.seatLevel;
+      // currentExercise.originalName = exercise.originalName;
+      // currentExercise.linkName = exercise.linkName;
     }
     else{
       exercises.add(
@@ -138,7 +143,7 @@ class Workout{
       List<ObExercise> oldObExercises = existingObWorkout.exercises;
       objectbox.exerciseBox.removeMany(oldObExercises.map((e) => e.id).toList());
       existingObWorkout.name = name;
-      existingObWorkout.linkedExercises = json.encode(linkedExercises);
+      existingObWorkout.linkedExercises = List.from(linkedExercises);
     }
 
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();

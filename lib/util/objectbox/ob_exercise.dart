@@ -10,6 +10,8 @@ class ObExercise{
   List<int> amounts;
   int restInSeconds;
   int? seatLevel;
+  // int? orderId;
+  String? linkName;
 
   ObExercise({
     this.id = 0,
@@ -17,6 +19,8 @@ class ObExercise{
     required this.weights,
     required this.amounts,
     required this.restInSeconds,
-    this.seatLevel
+    this.seatLevel,
+    // this.orderId,
+    this.linkName
   });
 }

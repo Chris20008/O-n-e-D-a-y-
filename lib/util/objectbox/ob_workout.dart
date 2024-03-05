@@ -11,15 +11,19 @@ class ObWorkout{
   @Property(type: PropertyType.date)
   DateTime date;
   bool isTemplate;
-  String linkedExercises;
+  List<String> linkedExercises;
 
   ObWorkout({
     this.id = 0,
     required this.name,
     required this.date,
     required this.isTemplate,
-    this.linkedExercises = ""
-  });
+    this.linkedExercises = const []
+  }){
+    if(linkedExercises.isEmpty){
+      linkedExercises = [];
+    }
+  }
 
   final exercises = ToMany<ObExercise>();
 

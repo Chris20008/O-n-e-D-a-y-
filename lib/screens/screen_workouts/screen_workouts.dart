@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../objectbox.g.dart';
+import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
 
@@ -26,6 +27,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnWorkouts cnWorkouts;
+
+  bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -65,35 +68,63 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                           tilePadding: const EdgeInsets.only(left: 10, right: 20),
                           onExpansionChanged: (bool isOpen){
                             cnWorkouts.opened[index] = isOpen;
+                            setState(() => {});
                           },
                           initiallyExpanded: cnWorkouts.opened[index],
-                          title: Row(
-                            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          title: Column(
                             children: [
-                              Text(
-                                cnWorkouts.workouts[index].name,
-                                textScaleFactor: 1.7,
-                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                                // style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber[800]!.withOpacity(0.45)),
-                              ),
-                              const Expanded(child: SizedBox()),
-                              IconButton(
-                                  onPressed: (){
-                                    cnRunningWorkout.openRunningWorkout(context, Workout.copy(cnWorkouts.workouts[index]));
-                                    // editWorkout(Workout.clone(cnWorkouts.workouts[index]));
-                                  },
-                                  icon: Icon(Icons.play_arrow,
-                                    color: Colors.grey.withOpacity(0.4),
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    cnWorkouts.workouts[index].name,
+                                    textScaleFactor: 1.7,
+                                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                                    // style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber[800]!.withOpacity(0.45)),
+                                  ),
+                                  const Expanded(child: SizedBox()),
+                                  IconButton(
+                                      onPressed: (){
+                                        cnRunningWorkout.openRunningWorkout(context, Workout.copy(cnWorkouts.workouts[index]));
+                                        // editWorkout(Workout.clone(cnWorkouts.workouts[index]));
+                                      },
+                                      icon: Icon(Icons.play_arrow,
+                                        color: Colors.grey.withOpacity(0.4),
+                                      )
+                                  ),
+                                  IconButton(
+                                      onPressed: (){
+                                        print(cnWorkouts.workouts[index].linkedExercises);
+                                        editWorkout(Workout.clone(cnWorkouts.workouts[index]));
+                                        cnNewWorkout.updateExercisesAndLinksList();
+                                        /// TODO: implement method in cnNewWorkout to order exercises and especially links right when initializing the exercisesAndLinkList
+                                      },
+                                      icon: Icon(Icons.edit,
+                                      color: Colors.grey.withOpacity(0.4),
+                                      )
                                   )
+                                ],
                               ),
-                              IconButton(
-                                  onPressed: (){
-                                    print(cnWorkouts.workouts[index].linkedExercises);
-                                    editWorkout(Workout.clone(cnWorkouts.workouts[index]));
-                                  },
-                                  icon: Icon(Icons.edit,
-                                  color: Colors.grey.withOpacity(0.4),
-                                  )
+                              AnimatedCrossFade(
+                                  firstChild: SizedBox(
+                                    width: double.maxFinite,
+                                    child: Wrap(
+                                      alignment: WrapAlignment.start,
+                                      runAlignment: WrapAlignment.start,
+                                      children: [
+                                        for (Exercise ex in cnWorkouts.workouts[index].exercises)
+                                          if(ex == cnWorkouts.workouts[index].exercises.last)
+                                            Text(ex.name, style: const TextStyle(color: Colors.white))
+                                          else
+                                            Text("${ex.name}, ", style: const TextStyle(color: Colors.white))
+                                      ],
+                                    ),
+                                  ),
+                                  secondChild: const SizedBox(width: double.maxFinite),
+                                  crossFadeState: !cnWorkouts.opened[index]?
+                                  CrossFadeState.showFirst:
+                                  CrossFadeState.showSecond,
+                                  duration: const Duration(milliseconds: 200)
                               )
                             ],
                           ),
@@ -194,7 +225,6 @@ class CnWorkouts extends ChangeNotifier {
     for (var w in obWorkouts) {
       workouts.add(Workout.fromObWorkout(w));
     }
-    print("Linked exercises in refresh${workouts.first.linkedExercises}");
     opened = workouts.map((e) => false).toList();
     refresh();
   }

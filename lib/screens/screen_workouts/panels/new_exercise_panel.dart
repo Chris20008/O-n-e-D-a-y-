@@ -296,13 +296,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               motion: const ScrollMotion(),
                               dismissible: DismissiblePane(
                                   onDismissed: () {
-                                    dismiss(index);
+                                    dismissExercise(index);
                                   }),
                               children: [
                                 SlidableAction(
                                   flex:10,
                                   onPressed: (BuildContext context){
-                                    dismiss(index);
+                                    dismissExercise(index);
                                   },
                                   borderRadius: BorderRadius.circular(15),
                                   backgroundColor: const Color(0xFFA12D2C),
@@ -349,7 +349,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
-  void dismiss(int index){
+  void dismissExercise(int index){
     setState(() {
       cnNewExercise.exercise.sets.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
@@ -379,10 +379,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     ) {
       cnNewExercise.exercise.clearEmptySets();
       cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
-      if(cnNewExercise.linkedExercise != null){
-        cnNewWorkout.workout.linkedExercises["${cnNewWorkout.workout.linkedExercises.length}"] = [cnNewExercise.linkedExercise!.name, cnNewExercise.exercise.name];
-      }
+      // if(cnNewExercise.linkedExercise != null){
+      //   cnNewWorkout.workout.linkedExercises["${cnNewWorkout.workout.linkedExercises.length}"] = [cnNewExercise.linkedExercise!.name, cnNewExercise.exercise.name];
+      // }
       cnNewExercise.closePanel(doClear: true);
+      cnNewWorkout.refreshExercise(cnNewExercise.exercise);
+      cnNewWorkout.updateExercisesAndLinksList();
+      cnNewWorkout.updateExercisesLinks();
       cnNewWorkout.refresh();
       // }
     }
@@ -399,7 +402,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController exerciseNameController = TextEditingController();
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
-  Exercise? linkedExercise;
+  // Exercise? linkedExercise;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -442,7 +445,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     seatLevelController = TextEditingController();
     key = UniqueKey();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
-    linkedExercise = null;
+    // linkedExercise = null;
     // _formKey = GlobalKey<FormState>();
     refresh();
   }

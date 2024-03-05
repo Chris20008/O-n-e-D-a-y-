@@ -5,11 +5,12 @@ import '../util/objectbox/ob_exercise.dart';
 class Exercise{
 
   String name;
-  List<Set> sets;
+  List<SingleSet> sets;
   int restInSeconds;
   int? seatLevel;
 
   String? originalName;
+  String? linkName;
 
 
   Exercise({
@@ -17,7 +18,8 @@ class Exercise{
     this.sets = const [],
     this.restInSeconds = 0,
     this.seatLevel,
-    this.originalName
+    this.originalName,
+    this.linkName
   }){
     if (sets.isEmpty){
       sets = [];
@@ -28,16 +30,17 @@ class Exercise{
   /// Don't clone the original name
   Exercise.clone(Exercise ex): this(
       name: ex.name,
-      sets: List.from(ex.sets.map((set) => Set(weight: set.weight, amount: set.amount))),
+      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
+      linkName: ex.linkName
   );
 
   ObExercise toObExercise(){
     List<int> weights = [];
     List<int> amounts = [];
     sets = sets.where((set) => set.weight != null && set.amount != null).toList();
-    for (Set set in sets){
+    for (SingleSet set in sets){
       weights.add(set.weight!);
       amounts.add(set.amount!);
     }
@@ -46,7 +49,8 @@ class Exercise{
         weights: weights,
         amounts: amounts,
         restInSeconds: restInSeconds,
-        seatLevel: seatLevel
+        seatLevel: seatLevel,
+        linkName: linkName
     );
   }
 
@@ -55,11 +59,11 @@ class Exercise{
   }
 
   void addSet({int? weight, int? amount}){
-    sets.add(Set(weight: weight, amount: amount));
+    sets.add(SingleSet(weight: weight, amount: amount));
   }
 
   void resetSets(){
-    sets = sets.map((e) => Set(weight:-1, amount:-1)).toList();
+    sets = sets.map((e) => SingleSet(weight:-1, amount:-1)).toList();
   }
 
   void clearEmptySets(){
@@ -68,11 +72,11 @@ class Exercise{
 
 }
 
-class Set{
+class SingleSet{
   int? weight;
   int? amount;
 
-  Set({
+  SingleSet({
     this.weight,
     this.amount
   });

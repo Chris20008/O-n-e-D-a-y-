@@ -136,7 +136,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                     );
                                   }
 
-                                  Set set = lastEx.sets[indexSet];
+                                  SingleSet set = lastEx.sets[indexSet];
                                   Widget? child;
                                   child = Padding(
                                     padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
