@@ -94,10 +94,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                                   ),
                                   IconButton(
                                       onPressed: (){
-                                        print(cnWorkouts.workouts[index].linkedExercises);
                                         editWorkout(Workout.clone(cnWorkouts.workouts[index]));
-                                        cnNewWorkout.updateExercisesAndLinksList();
-                                        /// TODO: implement method in cnNewWorkout to order exercises and especially links right when initializing the exercisesAndLinkList
                                       },
                                       icon: Icon(Icons.edit,
                                       color: Colors.grey.withOpacity(0.4),
@@ -199,16 +196,15 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 
   void editWorkout(Workout workout){
     if(cnNewWorkout.isUpdating && cnNewWorkout.workout.id == workout.id){
-      print("just open");
       cnNewWorkout.openPanel();
     }
     else{
-      print("open and set workout");
       cnNewWorkout.isUpdating = true;
       cnNewWorkout.setWorkout(workout);
+      cnNewWorkout.updateExercisesAndLinksList();
+      cnNewWorkout.initializeCorrectOrder();
       cnNewWorkout.openPanel();
     }
-    print("linked exercies in edit workout ${workout.linkedExercises}");
   }
 }
 

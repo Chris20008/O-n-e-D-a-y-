@@ -704,6 +704,17 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     exercisesAndLinks = List.from(exercisesAndLinks.toSet());
   }
 
+  void initializeCorrectOrder(){
+    final List<String> links = exercisesAndLinks.whereType<String>().toList();
+    for (final link in links){
+      exercisesAndLinks.remove(link);
+      final index = exercisesAndLinks.indexWhere((element) => element is Exercise && element.linkName == link);
+      if(index >= 0){
+        exercisesAndLinks.insert(index, link);
+      }
+    }
+  }
+
   void refreshExercise(Exercise ex){
     final index = exercisesAndLinks.indexWhere((element) => element is Exercise && (element.name == ex.originalName || element.name == ex.name));
     if(index >= 0){
@@ -757,11 +768,10 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void clear(){
-    print("DO CLEAR");
     workout = Workout();
-    print(workout.linkedExercises);
     workoutNameController = TextEditingController();
     isUpdating = false;
+    exercisesAndLinks = [];
     refresh();
   }
 
