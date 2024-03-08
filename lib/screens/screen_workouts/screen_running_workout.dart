@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
+import '../../util/constants.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -74,51 +75,32 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                           );
                         },
                         itemCount: cnRunningWorkout.groupedExercises.length,
-                        itemBuilder: (BuildContext context, int index) {
+                        itemBuilder: (BuildContext context, int indexExercise) {
                           Widget? child;
-                          // String dropdownValue = "";
-                          dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[index].value;
-                          print(newEx);
+                          dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
                           if(newEx is! Exercise){
-                            print("Key: ${cnRunningWorkout.groupedExercises.entries.toList()[index].key}");
-                            print(cnRunningWorkout.selectedIndexes);
-                            newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[index].key]];
-                            // dropdownValue = groupedExercises[index].first.name;
-                            // dropdownValue = newEx.name;
-                          }
-                          print(newEx.name);
-                          for(final ex in cnRunningWorkout.lastWorkout.exercises){
-                            print(ex.name);
+                            newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                           }
                           Exercise lastEx = cnRunningWorkout.lastWorkout.exercises.where((element) => element.name == newEx.name).first;
                           child = Column(
                             children: [
                               Align(
                                   alignment: Alignment.centerLeft,
-                                  child: cnRunningWorkout.groupedExercises.entries.toList()[index].value is Exercise?
-                                    Text(newEx.name, textScaleFactor: 1.2,):
+                                  child: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
+                                    // Text(newEx.name, textScaleFactor: 1.2,):
+                                    ExerciseNameText(newEx.name):
                                     DropdownMenu<String>(
                                       initialSelection: newEx.name,
                                       onSelected: (String? value) {
-                                        // This is called when the user selects an item.
                                         setState(() {
-                                          // dropdownValue = value!;
                                           final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>); ///.whereType<List>();
-                                          print(lists);
-                                          print(value);
                                           final t = lists.map((element) => element.value.indexWhere((ex) {
-                                            print(ex.name);
-                                            print(value);
-
-                                            print(ex.name == value);
-                                            print("");
                                             return ex.name == value;
                                           })).toList().firstWhere((element) => element >=0);
-                                          print(t);
-                                          cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[index].key] = t;
+                                          cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
                                         });
                                       },
-                                      dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[index].value.map<DropdownMenuEntry<String>>((Exercise value) {
+                                      dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
                                         return DropdownMenuEntry<String>(value: value.name, label: value.name);
                                       }).toList(),
                                     )
@@ -335,7 +317,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                             ],
                           );
 
-                          if (index == 0){
+                          /// Top Spacer
+                          if (indexExercise == 0){
                             child = Column(
                               children: [
                                 const SizedBox(height: 110,),
@@ -344,7 +327,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                             );
                           }
 
-                          if (index == cnRunningWorkout.groupedExercises.length-1){
+                          /// Bottom Spacer
+                          if (indexExercise == cnRunningWorkout.groupedExercises.length-1){
                             child = Column(
                               children: [
                                 child,
@@ -448,12 +432,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   void finishWorkout(){
     cnRunningWorkout.workout.refreshDate();
-    cnRunningWorkout.workout.clearAllExercisesEmptySets();
-    if(cnRunningWorkout.workout.exercises.any((ex) => ex.sets.isNotEmpty)){
+    cnRunningWorkout.removeNotSelectedExercises();
+    cnRunningWorkout.workout.removeEmptyExercises();
+    if(cnRunningWorkout.workout.exercises.isNotEmpty){
       cnRunningWorkout.workout.saveToDatabase();
       // cnRunningWorkout.workout.updateTemplate();
       cnWorkouts.refreshAllWorkouts();
     }
+    // if(cnRunningWorkout.workout.exercises.any((ex) => ex.sets.isNotEmpty)){
+    //   cnRunningWorkout.workout.saveToDatabase();
+    //   // cnRunningWorkout.workout.updateTemplate();
+    //   cnWorkouts.refreshAllWorkouts();
+    // }
     cnRunningWorkout.clear();
     Navigator.of(context).pop();
   }
@@ -473,7 +463,12 @@ class CnRunningWorkout extends ChangeNotifier {
       e.name :
       e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
   };
+  /// Contains all Excercises - linked and non linked ones - as a Map
+  /// linked exercises are saved as another Map with key = linkName
+  /// non linked Excercises are saved as the exercise itself with the ex.name as the key
   Map groupedExercises = {};
+  /// Contains for each linked exercise the currently selected index for getting the right one
+  /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
 
   void openRunningWorkout(BuildContext context, Workout w){
@@ -483,6 +478,14 @@ class CnRunningWorkout extends ChangeNotifier {
         MaterialPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
+  }
+  
+  void removeNotSelectedExercises(){
+    for (MapEntry entry in List.from(groupedExercises.entries)){
+      if(entry.value is Exercise) continue;
+      groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
+    }
+    workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
   }
 
   // void closeRunningWorkout(BuildContext context){
@@ -527,12 +530,6 @@ class CnRunningWorkout extends ChangeNotifier {
         e.name :
         e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
     };
-
-    // textControllers = {
-    //   for (var entry in groupedExercises.entries)
-    //     entry.key :
-    //     entry.value is List? entry.value.map((e) => ([TextEditingController(), TextEditingController()])).toList() : [TextEditingController(), TextEditingController()]
-    // };
   }
 
   void clear(){

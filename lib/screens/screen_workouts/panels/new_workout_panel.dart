@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,22 +36,26 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   @override
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
+    print("REBUILD NEW WOKROUT PANEL");
 
     final size = MediaQuery.of(context).size;
 
     return WillPopScope(
       onWillPop: () async{
         if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
-          cnNewWorkout.closePanel(doClear: false);
+          // cnNewWorkout.closePanel(doClear: false);
+          cnNewWorkout.panelController.close();
           return false;
         }
         return true;
       },
       child: SlidingUpPanel(
+        // padding: EdgeInsets.only(bottom: cnBottomMenu.maxHeightBottomMenu - cnBottomMenu.heightOfBottomMenu),
+        // padding: EdgeInsets.only(bottom: cnBottomMenu.maxHeightBottomMenu),
         controller: cnNewWorkout.panelController,
         defaultPanelState: PanelState.CLOSED,
         maxHeight: size.height-50,
-        minHeight: 0,
+        minHeight: cnNewWorkout.minPanelHeight,
         isDraggable: true,
         borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
         backdropEnabled: true,
@@ -301,7 +306,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                                   child: SizedBox(
                                                     // padding: EdgeInsets.all(2),
                                                     height: 30,
-                                                    child: Text(cnNewWorkout.exercisesAndLinks[index], textScaleFactor: 1.7),
+                                                    child: AutoSizeText(cnNewWorkout.exercisesAndLinks[index], textScaleFactor: 1.7, maxLines: 1,),
                                                   ),
                                                 ),
                                               ],
@@ -340,171 +345,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             ],
                           )
                       ),
-
-
-                      // Expanded(
-                      //   child: ListView.builder(
-                      //     controller: ScrollController(),
-                      //     physics: const BouncingScrollPhysics(),
-                      //     padding: const EdgeInsets.all(0),
-                      //     shrinkWrap: true,
-                      //     // key: listViewKey,
-                      //     itemCount: cnNewWorkout.workout.exercises.length+1,
-                      //     itemBuilder: (BuildContext context, int index) {
-                      //       print(cnNewWorkout.workout.linkedExercises.values.expand((element) => element));
-                      //       Widget? child;
-                      //
-                      //       if (index == cnNewWorkout.workout.exercises.length){
-                      //         child = Column(
-                      //           children: [
-                      //             const SizedBox(height: 15,),
-                      //
-                      //             Row(
-                      //               children: [
-                      //                 Expanded(
-                      //                   child: IconButton(
-                      //                       color: Colors.amber[800],
-                      //                       style: ButtonStyle(
-                      //                           backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                      //                           shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                      //                       ),
-                      //                       onPressed: () {
-                      //                         addExercise();
-                      //                       },
-                      //                       icon: const Icon(
-                      //                         Icons.add,
-                      //                         size: 20,
-                      //                       )
-                      //                   ),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //             SizedBox(height: MediaQuery.of(context).viewInsets.bottom-50 > 0? MediaQuery.of(context).viewInsets.bottom-50 : 0)
-                      //           ],
-                      //         );
-                      //       }
-                      //
-                      //
-                      //       else{
-                      //         String? linkValue;
-                      //         for (var entry in cnNewWorkout.workout.linkedExercises.entries) {
-                      //           if (entry.value.contains(cnNewWorkout.workout.exercises[index].name)) {
-                      //             linkValue = entry.key;
-                      //           }
-                      //         }
-                      //         child = Slidable(
-                      //           key: UniqueKey(),
-                      //           startActionPane: ActionPane(
-                      //             motion: const ScrollMotion(),
-                      //             dismissible: DismissiblePane(
-                      //                 onDismissed: () {dismissExercise(index);
-                      //             }),
-                      //             children: [
-                      //               SlidableAction(
-                      //                 flex:10,
-                      //                 onPressed: (BuildContext context){
-                      //                   dismissExercise(index);
-                      //                 },
-                      //                 borderRadius: BorderRadius.circular(15),
-                      //                 backgroundColor: Color(0xFFA12D2C),
-                      //                 foregroundColor: Colors.white,
-                      //                 icon: Icons.delete,
-                      //               ),
-                      //               SlidableAction(
-                      //                 flex: 1,
-                      //                 onPressed: (BuildContext context){},
-                      //                 backgroundColor: Colors.transparent,
-                      //                 foregroundColor: Colors.transparent,
-                      //                 label: '',
-                      //               ),
-                      //             ],
-                      //           ),
-                      //
-                      //           endActionPane: ActionPane(
-                      //             motion: const ScrollMotion(),
-                      //             dismissible: DismissiblePane(
-                      //                 confirmDismiss: ()async {
-                      //                   openExercise(cnNewWorkout.workout.exercises[index]);
-                      //                   return false;
-                      //                 },
-                      //                 onDismissed: () {}),
-                      //             children: [
-                      //               SlidableAction(
-                      //                 padding: const EdgeInsets.all(0),
-                      //                 flex:10,
-                      //                 onPressed: (BuildContext context){
-                      //                   // openExercise(cnNewWorkout.workout.exercises[index], copied: true);
-                      //                   addExercise();
-                      //                   cnNewExercisePanel.linkedExercise = cnNewWorkout.workout.exercises[index];
-                      //                 },
-                      //                 borderRadius: BorderRadius.circular(15),
-                      //                 backgroundColor: Color(0xFF5F9561),
-                      //                 // backgroundColor: Colors.white.withOpacity(0.1),
-                      //                 foregroundColor: Colors.white,
-                      //                 icon: Icons.add_link,
-                      //               ),
-                      //               SlidableAction(
-                      //                 flex: 1,
-                      //                 onPressed: (BuildContext context){},
-                      //                 backgroundColor: Colors.transparent,
-                      //                 foregroundColor: Colors.transparent,
-                      //                 label: '',
-                      //               ),
-                      //               SlidableAction(
-                      //                 padding: const EdgeInsets.all(0),
-                      //                 flex:10,
-                      //                 onPressed: (BuildContext context){
-                      //                   openExercise(cnNewWorkout.workout.exercises[index], copied: true);
-                      //                 },
-                      //                 borderRadius: BorderRadius.circular(15),
-                      //                 backgroundColor: Color(0xFF617EB1),
-                      //                 // backgroundColor: Colors.white.withOpacity(0.1),
-                      //                 foregroundColor: Colors.white,
-                      //                 icon: Icons.copy,
-                      //               ),
-                      //               SlidableAction(
-                      //                 flex: 1,
-                      //                 onPressed: (BuildContext context){},
-                      //                 backgroundColor: Colors.transparent,
-                      //                 foregroundColor: Colors.transparent,
-                      //                 label: '',
-                      //               ),
-                      //               SlidableAction(
-                      //                 padding: const EdgeInsets.all(0),
-                      //                 flex:10,
-                      //                 onPressed: (BuildContext context){
-                      //                   openExercise(cnNewWorkout.workout.exercises[index]);
-                      //                 },
-                      //                 borderRadius: BorderRadius.circular(15),
-                      //                 backgroundColor: const Color(0xFFAE7B32),
-                      //                 // backgroundColor: Colors.white.withOpacity(0.1),
-                      //                 foregroundColor: Colors.white,
-                      //                 icon: Icons.edit,
-                      //               ),
-                      //             ],
-                      //           ),
-                      //           child: Stack(
-                      //             children: [
-                      //               exerciseRow(
-                      //                 exercise: cnNewWorkout.workout.exercises[index],
-                      //                 textScaleFactor: 1.3,
-                      //                 padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                      //               ),
-                      //               if(linkValue != null)
-                      //                 Row(
-                      //                   children: [
-                      //                     Icon(Icons.link_outlined, size: 15, color: Color(0xFF7BC37E)),
-                      //                     Text(linkValue, textScaleFactor: 0.8,)
-                      //                   ],
-                      //                 )
-                      //             ],
-                      //           ),
-                      //         );
-                      //       }
-                      //       return child;
-                      //     },
-                      //   ),
-                      // ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -607,12 +447,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onConfirm(){
-    cnNewWorkout.updateExercisesOrder();
+    cnNewWorkout.updateExercisesOrderInWorkoutObject();
     if(!cnNewWorkout.isUpdating){
       cnNewWorkout.workout.isTemplate = true;
-    } else{
-      print("is updating");
     }
+    cnNewWorkout.removeEmptyLinksFromWorkout();
     cnNewWorkout.workout.saveToDatabase();
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
@@ -621,13 +460,23 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onPanelSlide(value){
+    cnBottomMenu.heightOfBottomMenu = cnBottomMenu.maxHeightBottomMenu * value;
+    // if(value >= 0.99 || value <= 0.01){
+    //
+    //   cnNewWorkout.refresh();
+    // }
+    // if(value == 0.0){
+    //   cnNewWorkout.refresh();
+    // }
     if(value < 0.05 && !cnBottomMenu.isVisible){
       SystemChrome.setPreferredOrientations([]);
-      cnBottomMenu.setVisibility(true);
+      // cnBottomMenu.setVisibility(true);
     }
     else if(value > 0.05 && cnBottomMenu.isVisible){
-      cnBottomMenu.setVisibility(false);
+      // cnBottomMenu.setVisibility(false);
     }
+    cnBottomMenu.refresh();
+    // cnNewWorkout.delayedRefresh();
   }
 
 }
@@ -644,6 +493,16 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     const Color(0xFF558FDF),
     const Color(0xFFF48E40)
   ];
+  double minPanelHeight = 0;
+  bool isCurrentlyRebuilding = false;
+
+  void delayedRefresh() async{
+    if (isCurrentlyRebuilding) return;
+    isCurrentlyRebuilding = true;
+    refresh();
+    await Future.delayed(const Duration(milliseconds: 100), () {});
+    isCurrentlyRebuilding = false;
+  }
 
   Color? getLinkColor(String linkName){
     int index = workout.linkedExercises.indexOf(linkName);
@@ -654,12 +513,14 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void openPanel(){
+    minPanelHeight = 180;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut
     );
+    refresh();
     print("open panel ${workout.linkedExercises}");
   }
 
@@ -723,11 +584,18 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     }
   }
 
-  void updateExercisesOrder(){
-    dynamic tempCopy = List.from(exercisesAndLinks);
-    List<Exercise> orderedExercises = List<Exercise>.from(tempCopy.where((element) => element is Exercise).toList());
+  void updateExercisesOrderInWorkoutObject(){
+    // List tempCopy = List.from(exercisesAndLinks);
+    List<Exercise> orderedExercises = exercisesAndLinks.whereType<Exercise>().toList();
+    // List<Exercise> orderedExercises = List<Exercise>.from(tempCopy.where((element) => element is Exercise).toList());
     workout.exercises.clear();
     workout.exercises.addAll(orderedExercises);
+  }
+
+  void removeEmptyLinksFromWorkout(){
+    workout.linkedExercises = workout.linkedExercises.where((linkName) {
+      return workout.exercises.any((exercise) => exercise.linkName == linkName);
+    }).toList();
   }
 
   void updateExercisesLinks(){
@@ -750,16 +618,30 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void closePanel({bool doClear = false}){
-    panelController.animatePanelToPosition(
-        0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut
-    ).then((value) => {
-      SystemChrome.setPreferredOrientations([]),
-      if(doClear){
-        clear()
-      }
+    minPanelHeight = 0;
+    refresh();
+    Future.delayed(const Duration(milliseconds: 50), (){
+      panelController.animatePanelToPosition(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut
+      ).then((value) => {
+        SystemChrome.setPreferredOrientations([]),
+        if(doClear){
+          clear()
+        }
+      });
     });
+    // panelController.animatePanelToPosition(
+    //     0,
+    //     duration: const Duration(milliseconds: 500),
+    //     curve: Curves.easeOut
+    // ).then((value) => {
+    //   SystemChrome.setPreferredOrientations([]),
+    //   if(doClear){
+    //     clear()
+    //   }
+    // });
   }
 
   void setWorkout(Workout w){

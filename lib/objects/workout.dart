@@ -104,14 +104,11 @@ class Workout{
     }
   }
 
-  void clearAllExercisesEmptySets(){
-    List<Exercise> emptyExercises = [];
-    for (Exercise e in exercises){
-      e.clearEmptySets();
-      if(e.sets.isEmpty){
-        emptyExercises.add(e);
-      }
-    }
+  void removeEmptyExercises(){
+    exercises = exercises.where((e) {
+      e.removeEmptySets();
+      return e.sets.isNotEmpty;
+    }).toList();
   }
 
   void addOrUpdateExercise(Exercise exercise){
@@ -150,7 +147,7 @@ class Workout{
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
-    print("linked exercises string in save ${newObWorkout.linkedExercises}");
+    print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);
     objectbox.exerciseBox.putMany(newObExercises);
   }

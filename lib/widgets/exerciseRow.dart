@@ -1,3 +1,4 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
@@ -9,7 +10,7 @@ class exerciseRow extends StatelessWidget {
   const exerciseRow({
     super.key,
     required this.exercise,
-    this.textScaleFactor = 1,
+    this.textScaleFactor = 1.5,
     this.padding
   });
 
@@ -21,7 +22,7 @@ class exerciseRow extends StatelessWidget {
         children: [
           Expanded(
               flex:3,
-              child: Text(exercise.name, textScaleFactor: textScaleFactor,)
+              child: ExerciseNameText(exercise.name)
           ),
           Expanded(
             flex: 7,

@@ -184,9 +184,15 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ),
 
               /// Space to be over bottom navigation bar
-              const SizedBox(height: 65)
+              const SizedBox(height: 65),
             ],
           ),
+          // Column(
+          //   children: [
+          //     const NewWorkOutPanel(),
+          //     // const SizedBox(height: 65),
+          //   ],
+          // ),
           const NewWorkOutPanel(),
           const NewExercisePanel(),
         ],

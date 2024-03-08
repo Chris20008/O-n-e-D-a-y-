@@ -377,7 +377,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         && cnNewExercise.exercise.sets.first.amount != null
         && cnNewExercise.exercise.sets.first.weight != null
     ) {
-      cnNewExercise.exercise.clearEmptySets();
+      cnNewExercise.exercise.removeEmptySets();
       cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
       // if(cnNewExercise.linkedExercise != null){
       //   cnNewWorkout.workout.linkedExercises["${cnNewWorkout.workout.linkedExercises.length}"] = [cnNewExercise.linkedExercise!.name, cnNewExercise.exercise.name];

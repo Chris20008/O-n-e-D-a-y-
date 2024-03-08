@@ -26,47 +26,54 @@ class _BottomMenuState extends State<BottomMenu> {
       return const SizedBox();
     }
 
-    return Container(
-      height: 60,
-      // decoration: BoxDecoration(
-      //     gradient: LinearGradient(
-      //         begin: Alignment.bottomCenter,
-      //         end: Alignment.topCenter,
-      //         colors: [
-      //           Colors.black.withOpacity(0.6),
-      //           Colors.amber[500]!.withOpacity(0.0),
-      //         ]
-      //     )
-      // ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.amber[800]!.withOpacity(0.25),
-          // focusColor: Colors.transparent,
-          // hoverColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: BottomNavigationBar(
-              backgroundColor: Color(0xffffff),
-              elevation: 0,
-              showSelectedLabels: true,
-              showUnselectedLabels: false,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.history),
-                  label: 'History',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.sports_martial_arts),
-                  label: 'Workouts',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.scatter_plot),
-                  label: 'Statistics',
-                ),
-              ],
-              currentIndex: cnBottomMenu._selectedIndex,
-              selectedItemColor: Colors.amber[800],
-              onTap: changeIndex,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 0), // Animationsdauer
+      transform: Matrix4.translationValues(0, cnBottomMenu.heightOfBottomMenu, 0),
+      curve: Curves.easeInOut,
+      child: Container(
+        // height: cnBottomMenu.heightOfBottomMenu,
+        height: cnBottomMenu.maxHeightBottomMenu,
+        // decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //         begin: Alignment.bottomCenter,
+        //         end: Alignment.topCenter,
+        //         colors: [
+        //           Colors.black.withOpacity(0.6),
+        //           Colors.amber[500]!.withOpacity(0.0),
+        //         ]
+        //     )
+        // ),
+        child: Theme(
+          data: Theme.of(context).copyWith(
+            splashColor: Colors.amber[800]!.withOpacity(0.25),
+            // focusColor: Colors.transparent,
+            // hoverColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+          ),
+          child: BottomNavigationBar(
+                // backgroundColor: Color(0xffffff),
+            backgroundColor: Color(0xFF151515),
+                elevation: 0,
+                showSelectedLabels: true,
+                showUnselectedLabels: false,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.history),
+                    label: 'History',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.sports_martial_arts),
+                    label: 'Workouts',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.scatter_plot),
+                    label: 'Statistics',
+                  ),
+                ],
+                currentIndex: cnBottomMenu._selectedIndex,
+                selectedItemColor: Colors.amber[800],
+                onTap: changeIndex,
+          ),
         ),
       ),
     );
@@ -88,6 +95,8 @@ class _BottomMenuState extends State<BottomMenu> {
 class CnBottomMenu extends ChangeNotifier {
   int _selectedIndex = 0;
   bool isVisible = true;
+  double heightOfBottomMenu = 0;
+  final double maxHeightBottomMenu = 60;
 
   void _changeIndex(int index) {
     _selectedIndex = index;

@@ -63,10 +63,10 @@ class Exercise{
   }
 
   void resetSets(){
-    sets = sets.map((e) => SingleSet(weight:-1, amount:-1)).toList();
+    sets = sets.map((e) => SingleSet(weight:null, amount:null)).toList();
   }
 
-  void clearEmptySets(){
+  void removeEmptySets(){
     sets = sets.where((e) => e.weight != null && e.amount != null && e.weight! >= 0 && e.amount! > 0).toList();
   }
 
