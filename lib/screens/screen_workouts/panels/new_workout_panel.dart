@@ -704,16 +704,22 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         }
       });
     });
-    // panelController.animatePanelToPosition(
-    //     0,
-    //     duration: const Duration(milliseconds: 500),
-    //     curve: Curves.easeOut
-    // ).then((value) => {
-    //   SystemChrome.setPreferredOrientations([]),
-    //   if(doClear){
-    //     clear()
-    //   }
-    // });
+  }
+
+  void editWorkout(Workout workout){
+    Workout w = Workout.clone(workout);
+    print("WORKOUT ID in history: ${workout.id}");
+    if(isUpdating && this.workout.id == w.id){
+      openPanel();
+    }
+    else{
+      clear(doRefresh: false);
+      isUpdating = true;
+      setWorkout(w);
+      updateExercisesAndLinksList();
+      initializeCorrectOrder();
+      openPanel();
+    }
   }
 
   void setWorkout(Workout w){
@@ -721,13 +727,15 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     workoutNameController = TextEditingController(text: w.name);
   }
 
-  void clear(){
+  void clear({bool doRefresh = true}){
     workout = Workout();
     workoutNameController = TextEditingController();
     linkNameController = TextEditingController();
     isUpdating = false;
     exercisesAndLinks = [];
-    refresh();
+    if(doRefresh){
+      refresh();
+    }
   }
 
   void refresh(){

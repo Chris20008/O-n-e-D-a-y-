@@ -140,12 +140,11 @@ class _MyHomePageState extends State<MyHomePage> {
               //   const ScreenWorkout(),
               AnimatedCrossFade(
                   firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-                  // firstChild: Container(height: 50, width: 50,),
                   secondChild: ScreenWorkout(key: UniqueKey()),
                   crossFadeState: cnBottomMenu.index == 0?
                   CrossFadeState.showFirst:
                   CrossFadeState.showSecond,
-                  duration: const Duration(milliseconds: 300)
+                  duration: const Duration(milliseconds: 200)
               ),
               const NewWorkOutPanel(),
               const NewExercisePanel(),
