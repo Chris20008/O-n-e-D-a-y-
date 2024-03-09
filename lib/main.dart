@@ -5,6 +5,7 @@ import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart'
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnHomepage()),
+        ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
       ],
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -130,11 +132,28 @@ class _MyHomePageState extends State<MyHomePage> {
                   ]
               )
           ),
-          // child: const ScreenWorkout()
-          // child: const ScreenWorkoutHistory()
-          child: cnBottomMenu.index == 0?
-          const ScreenWorkoutHistory():
-          const ScreenWorkout()
+          child: Stack(
+            children: [
+
+              // cnBottomMenu.index == 0?
+              //   const ScreenWorkoutHistory():
+              //   const ScreenWorkout(),
+              AnimatedCrossFade(
+                  firstChild: ScreenWorkoutHistory(key: UniqueKey()),
+                  // firstChild: Container(height: 50, width: 50,),
+                  secondChild: ScreenWorkout(key: UniqueKey()),
+                  crossFadeState: cnBottomMenu.index == 0?
+                  CrossFadeState.showFirst:
+                  CrossFadeState.showSecond,
+                  duration: const Duration(milliseconds: 300)
+              ),
+              const NewWorkOutPanel(),
+              const NewExercisePanel(),
+
+              const StandardPopUp()
+            ],
+          ),
+
         // child: AnimatedCrossFade(
         //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
         //     // firstChild: Container(height: 50, width: 50,),
@@ -146,14 +165,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // ),
       ),
       bottomNavigationBar: const BottomMenu(),
-      // Column(
-      //   children: [
-          // Expanded(
-          //     child: Container()
-          // ),
-          // BottomMenu()
-        // ],
-      // )
     );
   }
 }

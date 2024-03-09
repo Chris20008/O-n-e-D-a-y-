@@ -12,7 +12,8 @@ import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../widgets/bottom_menu.dart';
 
-import '../../../widgets/exerciseRow.dart';
+import '../../../widgets/exercise_row.dart';
+import '../../../widgets/standard_popup.dart';
 import '../../screen_workout_history/screen_workout_history.dart';
 import '../screen_workouts.dart';
 
@@ -29,6 +30,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
 
   // Key listViewKey = UniqueKey();
   // Key slideableKey = UniqueKey();
@@ -74,14 +76,26 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               child: GestureDetector(
                 onTap: () {
                   FocusScope.of(context).unfocus();
+                  if(cnNewWorkout.panelController.isPanelClosed){
+                    cnNewWorkout.panelController.open();
+                  }
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.only(bottom: 20.0, right: 20.0, left: 20.0, top: 10),
                   height: double.maxFinite,
                   width: double.maxFinite,
                   color: Colors.transparent,
                   child: Column(
                     children: [
+                      Container(
+                        height: 2,
+                        width: 40,
+                        decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(2)
+                        ),
+                      ),
+                      SizedBox(height: 10,),
                       const Text("Workout", textScaleFactor: 1.5),
                       const SizedBox(height: 10,),
                       Row(
@@ -90,6 +104,13 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             child: SizedBox(
                               height: 50,
                               child: TextField(
+                                onTap: ()async{
+                                  if(cnNewWorkout.panelController.isPanelClosed){
+                                    Future.delayed(const Duration(milliseconds: 300), (){
+                                      cnNewWorkout.panelController.open();
+                                    });
+                                  }
+                                },
                                 controller: cnNewWorkout.workoutNameController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -106,9 +127,42 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             width: 50,
                             height: 50,
                             child: IconButton(
-                                onPressed: (){
+                                onPressed: ()async{
+                                  if(cnNewWorkout.panelController.isPanelClosed){
+                                    await cnNewWorkout.panelController.open();
+                                  }
+                                  cnStandardPopUp.open(
+                                      child: TextField(
+                                        maxLength: 15,
+                                        textAlignVertical: TextAlignVertical.center,
+                                        keyboardType: TextInputType.text,
+                                        controller: cnNewWorkout.linkNameController,
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          isDense: true,
+                                          labelText: 'Group Name',
+                                          counterText: "",
+                                        ),
+                                        onChanged: (value){
+
+                                        },
+                                      ),
+                                    onConfirm: (){
+                                        final linkName = cnNewWorkout.linkNameController.text;
+                                        if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
+                                          cnNewWorkout.workout.linkedExercises.add(linkName);
+                                          cnNewWorkout.updateExercisesAndLinksList();
+                                          cnNewWorkout.updateExercisesLinks();
+                                          cnNewWorkout.refresh();
+                                        }
+                                        cnNewWorkout.linkNameController.clear();
+                                    },
+                                    onCancel: (){
+                                        cnNewWorkout.linkNameController.clear();
+                                    }
+                                  );
                                   // setState(() {
-                                    addLink("Bench");
+                                  //   addLink("Bench");
                                   // });
                                 },
                                 icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
@@ -236,7 +290,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                           ),
                                           child: Stack(
                                             children: [
-                                              exerciseRow(
+                                              ExerciseRow(
                                                 exercise: cnNewWorkout.exercisesAndLinks[index],
                                                 textScaleFactor: 1.3,
                                                 padding: const EdgeInsets.only(left: 20, right: 10, bottom: 10),
@@ -354,7 +408,20 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           ),
                           if(cnNewWorkout.isUpdating)
                             IconButton(
-                                onPressed: onDelete,
+                                onPressed: (){
+                                  cnStandardPopUp.open(
+                                      child: const Text(
+                                        "Do you really want to Delete this workout?",
+                                        textAlign: TextAlign.center,
+                                        textScaleFactor: 1.2,
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onConfirm: (){
+                                        onDelete();
+                                      },
+                                      onCancel: (){}
+                                  );
+                                },
                                 icon: const Icon(Icons.delete_forever)
                             ),
                           IconButton(
@@ -395,6 +462,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     if(cnNewWorkout.panelController.isPanelOpen){
       cnNewExercisePanel.openPanel();
     }
+  }
+
+  void openLinkPopUp(){
+
   }
 
   void addLink(String linkName){
@@ -485,6 +556,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   final PanelController panelController = PanelController();
   Workout workout = Workout();
   TextEditingController workoutNameController = TextEditingController();
+  TextEditingController linkNameController = TextEditingController();
   bool isUpdating = false;
   List<dynamic> exercisesAndLinks = [];
   List<Color> linkColors = [
@@ -652,6 +724,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   void clear(){
     workout = Workout();
     workoutNameController = TextEditingController();
+    linkNameController = TextEditingController();
     isUpdating = false;
     exercisesAndLinks = [];
     refresh();

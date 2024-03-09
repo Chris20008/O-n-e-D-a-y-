@@ -1,10 +1,7 @@
-import 'dart:ui';
-
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
-import 'package:fitness_app/widgets/multipleExerciseRow.dart';
+import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../objects/workout.dart';
@@ -100,8 +97,8 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 );
               }
           ),
-          const NewWorkOutPanel(),
-          const NewExercisePanel(),
+          // const NewWorkOutPanel(),
+          // const NewExercisePanel(),
         ],
       ),
     );

@@ -2,12 +2,12 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
-class exerciseRow extends StatelessWidget {
+class ExerciseRow extends StatelessWidget {
   final Exercise exercise;
   final double textScaleFactor;
   final EdgeInsetsGeometry? padding;
 
-  const exerciseRow({
+  const ExerciseRow({
     super.key,
     required this.exercise,
     this.textScaleFactor = 1.5,

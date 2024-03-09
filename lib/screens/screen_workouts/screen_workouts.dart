@@ -1,13 +1,10 @@
 import 'dart:ui';
-
 import 'package:fitness_app/main.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
-import 'package:fitness_app/widgets/multipleExerciseRow.dart';
+import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../objectbox.g.dart';
 import '../../objects/exercise.dart';
@@ -184,7 +181,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ),
 
               /// Space to be over bottom navigation bar
-              const SizedBox(height: 65),
+              const SizedBox(height: 75),
             ],
           ),
           // Column(
@@ -193,8 +190,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
           //     // const SizedBox(height: 65),
           //   ],
           // ),
-          const NewWorkOutPanel(),
-          const NewExercisePanel(),
+          // const NewWorkOutPanel(),
+          // const NewExercisePanel(),
         ],
       ),
     );
