@@ -20,9 +20,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  // Key listViewKey = UniqueKey();
   ScrollController scrollController = ScrollController();
-  // late List<List<GlobalKey>> keys = cnNewExercise.exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -47,9 +45,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         color: Colors.black.withOpacity(0.0),
         isDraggable: true,
         borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-        // backdropEnabled: true,
-        // backdropColor: Color(0xff000000),
-        // onPanelSlide: onPanelSlide,
         panel: ClipRRect(
           borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
           child: BackdropFilter(
@@ -354,7 +349,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
       cnNewExercise.exercise.sets.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
       cnNewExercise.ensureVisibleKeys.removeAt(index);
-      // listViewKey = UniqueKey();
     });
   }
 
@@ -379,9 +373,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     ) {
       cnNewExercise.exercise.removeEmptySets();
       cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
-      // if(cnNewExercise.linkedExercise != null){
-      //   cnNewWorkout.workout.linkedExercises["${cnNewWorkout.workout.linkedExercises.length}"] = [cnNewExercise.linkedExercise!.name, cnNewExercise.exercise.name];
-      // }
       cnNewExercise.closePanel(doClear: true);
       cnNewWorkout.refreshExercise(cnNewExercise.exercise);
       cnNewWorkout.updateExercisesAndLinksList();
@@ -402,7 +393,6 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController exerciseNameController = TextEditingController();
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
-  // Exercise? linkedExercise;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -445,8 +435,6 @@ class CnNewExercisePanel extends ChangeNotifier {
     seatLevelController = TextEditingController();
     key = UniqueKey();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
-    // linkedExercise = null;
-    // _formKey = GlobalKey<FormState>();
     refresh();
   }
 

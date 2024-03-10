@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 
 Widget ExerciseNameText(
     String name,
-    {int maxLines = 2})
+    {
+      int maxLines = 2,
+      double fontsize = 17,
+      double minFontSize = 10
+    })
 {
   return AutoSizeText(
     name,
     maxLines: maxLines,
-    style: const TextStyle(fontSize: 17),
-    minFontSize: 10,
+    style: TextStyle(fontSize: fontsize, color: Colors.white),
+    minFontSize: minFontSize,
     overflow: TextOverflow.ellipsis,
   );
 }

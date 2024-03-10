@@ -60,6 +60,7 @@ class Workout{
       ))),
       date: w.date,
       id: w.id,
+      isTemplate: w.isTemplate,
       linkedExercises: List.from(w.linkedExercises)
   );
   

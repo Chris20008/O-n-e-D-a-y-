@@ -50,98 +50,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                     padding: EdgeInsets.only(top: index == 0? 30 : 10, left: 20, right: 20, bottom: 10),
                     onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                     initiallyExpanded: cnWorkouts.opened[index],
-                    showStartWorkout: true,
                 );
-                // return Padding(
-                //   padding: EdgeInsets.only(top: index == 0? 30 : 10, left: 20, right: 20, bottom: 10),
-                //   child: ClipRRect(
-                //     borderRadius: BorderRadius.circular(15),
-                //     child: Container(
-                //       color: Colors.black.withOpacity(0.3),
-                //       child: Theme(
-                //         data: Theme.of(context).copyWith(
-                //           splashColor: Colors.transparent,
-                //           highlightColor: Colors.transparent,
-                //           dividerColor: Colors.transparent,
-                //         ),
-                //         child: ExpansionTile(
-                //           tilePadding: const EdgeInsets.only(left: 10, right: 20),
-                //           onExpansionChanged: (bool isOpen){
-                //             cnWorkouts.opened[index] = isOpen; // setState(() => {});
-                //           },
-                //           initiallyExpanded: cnWorkouts.opened[index],
-                //           title: Column(
-                //             children: [
-                //               Row(
-                //                 children: [
-                //                   Text(
-                //                     cnWorkouts.workouts[index].name,
-                //                     textScaleFactor: 1.7,
-                //                     style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                //                   ),
-                //                   const Expanded(child: SizedBox()),
-                //                   IconButton(
-                //                       onPressed: (){
-                //                         cnRunningWorkout.openRunningWorkout(context, Workout.copy(cnWorkouts.workouts[index]));
-                //                         // editWorkout(Workout.clone(cnWorkouts.workouts[index]));
-                //                       },
-                //                       icon: Icon(Icons.play_arrow,
-                //                         color: Colors.grey.withOpacity(0.4),
-                //                       )
-                //                   ),
-                //                   IconButton(
-                //                       onPressed: (){
-                //                         cnNewWorkout.editWorkout(cnWorkouts.workouts[index]);
-                //                       },
-                //                       icon: Icon(Icons.edit,
-                //                       color: Colors.grey.withOpacity(0.4),
-                //                       )
-                //                   )
-                //                 ],
-                //               ),
-                //               AnimatedCrossFade(
-                //                   firstChild: SizedBox(
-                //                     width: double.maxFinite,
-                //                     child: Wrap(
-                //                       alignment: WrapAlignment.start,
-                //                       runAlignment: WrapAlignment.start,
-                //                       children: [
-                //                         for (Exercise ex in cnWorkouts.workouts[index].exercises)
-                //                           if(ex == cnWorkouts.workouts[index].exercises.last)
-                //                             Text(ex.name, style: const TextStyle(color: Colors.white))
-                //                           else
-                //                             Text("${ex.name}, ", style: const TextStyle(color: Colors.white))
-                //                       ],
-                //                     ),
-                //                   ),
-                //                   secondChild: const SizedBox(width: double.maxFinite),
-                //                   crossFadeState: !cnWorkouts.opened[index]?
-                //                   CrossFadeState.showFirst:
-                //                   CrossFadeState.showSecond,
-                //                   duration: const Duration(milliseconds: 200)
-                //               )
-                //             ],
-                //           ),
-                //           children: [
-                //             Column(
-                //               crossAxisAlignment: CrossAxisAlignment.start,
-                //               children: [
-                //                 LimitedBox(
-                //                   maxHeight: 1000,
-                //                   child: MultipleExerciseRow(
-                //                       exercises: cnWorkouts.workouts[index].exercises,
-                //                       textScaleFactor: 1.3,
-                //                       padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                //                   )
-                //                 )
-                //               ],
-                //             ),
-                //           ]
-                //         ),
-                //       ),
-                //     ),
-                //   ),
-                // );
               }
           ),
           Column(
@@ -167,6 +76,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                             if(cnNewWorkout.isUpdating){
                               cnNewWorkout.clear();
                             }
+                            cnNewWorkout.workout.isTemplate = true;
                             cnNewWorkout.openPanel();
                           },
                           icon: Icon(
@@ -187,21 +97,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
       ),
     );
   }
-
-  // void editWorkout(Workout workout){
-  //   print("WORKOUT ID in templates: ${workout.id}");
-  //   if(cnNewWorkout.isUpdating && cnNewWorkout.workout.id == workout.id){
-  //     cnNewWorkout.openPanel();
-  //   }
-  //   else{
-  //     cnNewWorkout.clear(doRefresh: false);
-  //     cnNewWorkout.isUpdating = true;
-  //     cnNewWorkout.setWorkout(workout);
-  //     cnNewWorkout.updateExercisesAndLinksList();
-  //     cnNewWorkout.initializeCorrectOrder();
-  //     cnNewWorkout.openPanel();
-  //   }
-  // }
 }
 
 class CnWorkouts extends ChangeNotifier {
@@ -220,45 +115,6 @@ class CnWorkouts extends ChangeNotifier {
     opened = workouts.map((e) => false).toList();
     refresh();
   }
-
-  // void refreshAllWorkouts(){
-  //   List<ObWorkout> obWorkouts = objectbox.workoutBox.getAll();
-  //   workouts.clear();
-  //   // List<bool> newOpened = [];
-  //
-  //   Map<String, ObWorkout> filteredWorkouts = {};
-  //   for(ObWorkout obWorkout in obWorkouts){
-  //     if(filteredWorkouts.containsKey(obWorkout.name)){
-  //       filteredWorkouts[obWorkout.name] = (obWorkout.date.isAfter(filteredWorkouts[obWorkout.name]!.date)? obWorkout : filteredWorkouts[obWorkout.name])!;
-  //     }
-  //     else{
-  //       filteredWorkouts[obWorkout.name] = obWorkout;
-  //     }
-  //     // workouts = filteredWorkouts.entries.map((entry) => Workout.fromObWorkout(entry as ObWorkout)).toList();
-  //     // workouts.add(Workout.fromObWorkout(obWorkout));
-  //     // newOpened.add(false);
-  //   }
-  //   filteredWorkouts.forEach((k, v) => workouts.add(Workout.fromObWorkout(v)));
-  //   opened = workouts.map((e) => false).toList();
-  //
-  //
-  //   // newOpened = workouts.map((e) => false).toList();
-  //   //
-  //   // /// Exercise has been added
-  //   // if(opened.length < newOpened.length){
-  //   //   /// keep opened state of current ExpansionsTiles and add new ones with opened = false
-  //   //   opened = opened + newOpened.sublist(opened.length);
-  //   // }
-  //   // /// Exercise could have been removed
-  //   // else{
-  //   //   opened = opened.sublist(0, obWorkouts.length);
-  //   // }
-  //
-  //
-  //   // double pos = scrollController.position.pixels;
-  //   refresh();
-  //   // scrollController.jumpTo(pos);
-  // }
 
   void refresh(){
     notifyListeners();

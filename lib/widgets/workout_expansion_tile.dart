@@ -1,15 +1,16 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
 import '../screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/screen_workouts/screen_running_workout.dart';
+import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
 
 class WorkoutExpansionTile extends StatefulWidget {
-  // final Function onEdit;
-  final bool showStartWorkout;
   final Function? onExpansionChange;
   final EdgeInsets padding;
   final bool initiallyExpanded;
@@ -17,11 +18,9 @@ class WorkoutExpansionTile extends StatefulWidget {
 
   const WorkoutExpansionTile({
     super.key,
-    this.showStartWorkout = false,
     this.onExpansionChange,
     this.initiallyExpanded = false,
     this.padding = const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 10),
-    // required this.onEdit,
     required this.workout
   });
 
@@ -32,6 +31,7 @@ class WorkoutExpansionTile extends StatefulWidget {
 class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -51,23 +51,38 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
             child: ExpansionTile(
                 tilePadding: const EdgeInsets.only(left: 10, right: 20),
                 onExpansionChanged: (bool isOpen) {
-                  if(widget.onExpansionChange != null){
-                    widget.onExpansionChange!(isOpen);
-                  }
-                  isOpened = isOpen;
+                  setState(() {
+                    if(widget.onExpansionChange != null){
+                      widget.onExpansionChange!(isOpen);
+                    }
+                    isOpened = isOpen;
+                  });
                 },
                 initiallyExpanded: widget.initiallyExpanded,
                 title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          widget.workout.name,
-                          textScaleFactor: 1.7,
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                    if(!widget.workout.isTemplate)
+                      Text(
+                        DateFormat('E. d. MMMM').format(widget.workout.date!),
+                        textScaleFactor: 0.8,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w100
                         ),
-                        const Expanded(child: SizedBox()),
-                        if(widget.showStartWorkout)
+                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                            child: ExerciseNameText(
+                                widget.workout.name,
+                                maxLines: 1,
+                                fontsize: 26,
+                                minFontSize: 20
+                            )
+                        ),
+                        if(widget.workout.isTemplate)
                           IconButton(
                               onPressed: () {
                                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
@@ -87,19 +102,24 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                       ],
                     ),
                     AnimatedCrossFade(
-                        firstChild: SizedBox(
-                          width: double.maxFinite,
-                          child: Wrap(
-                            alignment: WrapAlignment.start,
-                            runAlignment: WrapAlignment.start,
-                            children: [
-                              for (Exercise ex in widget.workout.exercises)
-                                if(ex == widget.workout.exercises.last)
-                                  Text(ex.name, style: const TextStyle(color: Colors.white))
-                                else
-                                  Text("${ex.name}, ", style: const TextStyle(color: Colors.white))
-                            ],
-                          ),
+                        firstChild: Row(
+                          children: [
+                            const Spacer(flex: 1,),
+                            Expanded(
+                              flex: 3,
+                              child: Wrap(
+                                alignment: WrapAlignment.end,
+                                runAlignment: WrapAlignment.end,
+                                children: [
+                                  for (Exercise ex in widget.workout.exercises)
+                                    if(ex == widget.workout.exercises.last)
+                                      Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                    else
+                                      Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         secondChild: const SizedBox(width: double.maxFinite),
                         crossFadeState: !isOpened?

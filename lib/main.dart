@@ -101,43 +101,18 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          // decoration: BoxDecoration(
-          //   gradient: LinearGradient(
-          //     begin: Alignment.topCenter,
-          //     end: Alignment.bottomCenter,
-          //     colors: [
-          //       Colors.amber[900]!.withOpacity(0.4),
-          //       Colors.amber[500]!.withOpacity(0.3),
-          //       Colors.amber[400]!.withOpacity(0.25),
-          //       Colors.amber[400]!.withOpacity(0.2),
-          //     ]
-          //   )
-          // ),
           decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    // Colors.amber[900]!.withOpacity(0.9),
-                    Color(0xff84490b),
-                    // Colors.black.withOpacity(0.75),
-                    // Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(1),
+                    const Color(0xff84490b),
                     Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(1),
-                    // Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(0.75),
-                    // Colors.amber[400]!.withOpacity(0.25),
-                    // Colors.amber[900]!.withOpacity(0.8),
                   ]
               )
           ),
           child: Stack(
             children: [
-
-              // cnBottomMenu.index == 0?
-              //   const ScreenWorkoutHistory():
-              //   const ScreenWorkout(),
               AnimatedCrossFade(
                   firstChild: ScreenWorkoutHistory(key: UniqueKey()),
                   secondChild: ScreenWorkout(key: UniqueKey()),
@@ -148,7 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const NewWorkOutPanel(),
               const NewExercisePanel(),
-
               const StandardPopUp()
             ],
           ),
