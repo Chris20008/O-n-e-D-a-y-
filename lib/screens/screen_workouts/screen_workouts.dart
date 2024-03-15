@@ -36,6 +36,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
       child: Stack(
         children: [
           ListView.builder(
+              padding: EdgeInsets.zero,
               addAutomaticKeepAlives: true,
               physics: const BouncingScrollPhysics(),
               key: cnWorkouts.key,
@@ -47,7 +48,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkouts.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? 30 : 10, left: 20, right: 20, bottom: 10),
+                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:50 : 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                     initiallyExpanded: cnWorkouts.opened[index],
                 );

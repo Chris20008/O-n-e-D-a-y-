@@ -101,7 +101,7 @@ class CnBottomMenu extends ChangeNotifier {
   bool isVisible = true;
   double heightOfBottomMenu = 0;
   final double maxHeightBottomMenu = 60;
-  Color backgroundColor = Colors.transparent;
+  // Color backgroundColor = Colors.transparent;
 
   void _changeIndex(int index) {
     _selectedIndex = index;

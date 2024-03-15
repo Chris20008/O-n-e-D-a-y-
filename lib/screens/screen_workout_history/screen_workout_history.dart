@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
 import '../../widgets/workout_expansion_tile.dart';
+import '../screen_workouts/screen_running_workout.dart';
 
 class ScreenWorkoutHistory extends StatefulWidget {
   const ScreenWorkoutHistory({super.key});
@@ -17,6 +18,7 @@ class ScreenWorkoutHistory extends StatefulWidget {
 class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory;
 
   @override
@@ -29,6 +31,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       child: Stack(
         children: [
           ListView.builder(
+              padding: EdgeInsets.zero,
               addAutomaticKeepAlives: true,
               physics: const BouncingScrollPhysics(),
               key: cnWorkoutHistory.key,
@@ -40,7 +43,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkoutHistory.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? 30 : 10, left: 20, right: 20, bottom: 10),
+                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:50 : 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
                     initiallyExpanded: cnWorkoutHistory.opened[index]
                 );

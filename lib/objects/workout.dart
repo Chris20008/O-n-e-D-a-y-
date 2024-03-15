@@ -67,12 +67,22 @@ class Workout{
   void updateTemplate(){
     ObWorkout? template = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true).and(ObWorkout_.name.equals(name))).build().findUnique();
     if(template != null){
+      List<Exercise> newExercises = exercises.where((ex) => !template.exercises.map((element) => element.name).contains(ex.name)).toList();
 
-      template.deleteAllExercises();
+      for (ObExercise ex in template.exercises){
+        if(exercises.map((e) => e.name).toList().contains(ex.name)) {
+          ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
+          ex.amounts = newExercise.amounts;
+          ex.weights = newExercise.weights;
+          objectbox.exerciseBox.put(ex, mode: PutMode.update);
+        }
+      }
+      for (Exercise ex in newExercises){
+        ObExercise obExercise = ex.toObExercise();
+        template.exercises.add(obExercise);
+        objectbox.exerciseBox.put(obExercise);
+      }
 
-      template.addExercises(exercises.map((e) => e.toObExercise()).toList());
-      print("TEMPLATE ID");
-      print(template.id);
       template.save();
     }
   }

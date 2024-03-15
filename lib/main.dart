@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
@@ -73,6 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnHomepage cnHomepage;
 
   @override
@@ -111,19 +114,80 @@ class _MyHomePageState extends State<MyHomePage> {
                   ]
               )
           ),
-          child: Stack(
+          child: Column(
             children: [
-              AnimatedCrossFade(
-                  firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-                  secondChild: ScreenWorkout(key: UniqueKey()),
-                  crossFadeState: cnBottomMenu.index == 0?
-                  CrossFadeState.showFirst:
-                  CrossFadeState.showSecond,
-                  duration: const Duration(milliseconds: 200)
+              if (cnRunningWorkout.isRunning)
+                Stack(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: double.maxFinite,
+                      // color: Colors.black,
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Color(0xff44260b),
+                                Colors.black,
+                              ]
+                          )
+                      ),
+                    ),
+                    SafeArea(
+                      bottom: false,
+                      // child: Container(height: 10, width: 10, color: Colors.green,),
+                      child: GestureDetector(
+                        onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
+                        child: Container(
+                          height: 50,
+                          width: double.maxFinite,
+                          // color: Color(0xff44260b),
+                          decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerRight,
+                                  end: Alignment.centerLeft,
+                                  colors: [
+                                    Color(0xff55300a),
+                                    Color(0xff44260b),
+                                  ]
+                              ),
+                            // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  cnRunningWorkout.workout.name,
+                                textScaleFactor: 1.6,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                SizedBox(height: 0,),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    AnimatedCrossFade(
+                        firstChild: ScreenWorkoutHistory(key: UniqueKey()),
+                        secondChild: ScreenWorkout(key: UniqueKey()),
+                        crossFadeState: cnBottomMenu.index == 0?
+                        CrossFadeState.showFirst:
+                        CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 200)
+                    ),
+                    const NewWorkOutPanel(),
+                    const NewExercisePanel(),
+                    const StandardPopUp()
+                  ],
+                ),
               ),
-              const NewWorkOutPanel(),
-              const NewExercisePanel(),
-              const StandardPopUp()
             ],
           ),
 

@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 
+import '../../main.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/constants.dart';
+import '../../widgets/standard_popup.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -20,6 +22,8 @@ class ScreenRunningWorkout extends StatefulWidget {
 
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout;
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
@@ -31,8 +35,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
     return WillPopScope(
       onWillPop: () async{
-        cnRunningWorkout.clear();
+        // openPopUpFinishWorkout();
         Navigator.of(context).pop();
+        cnHomepage.refresh();
+        // cnRunningWorkout.clear();
+        // Navigator.of(context).pop();
         return false;
       },
       child: MaterialApp(
@@ -136,9 +143,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                               ListView.builder(
                                   physics: const BouncingScrollPhysics(),
                                   shrinkWrap: true,
-                                  // separatorBuilder: (BuildContext context, int index) {
-                                  //   return const SizedBox(height: 15,);
-                                  // },
                                   itemCount: newEx.sets.length+1,
                                   itemBuilder: (BuildContext context, int indexSet) {
                                     if(indexSet == newEx.sets.length){
@@ -400,10 +404,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   left: 20,
                   right: 20,
                   child: ElevatedButton(
-                      onPressed: finishWorkout,
+                      onPressed: openPopUpFinishWorkout,
                       child: const Text("Finish")
                   ),
-                )
+                ),
+              const StandardPopUp()
             ],
           ),
         ),
@@ -430,28 +435,64 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     });
   }
 
-  void finishWorkout(){
+  void openPopUpFinishWorkout(){
+    cnStandardPopUp.open(
+        child: Column(
+          children: [
+            const Text(
+                "Finish Workout?",
+              textAlign: TextAlign.center,
+              textScaleFactor: 1.2,
+              style: TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 20,),
+            SizedBox(
+              height: 40,
+              width: double.maxFinite,
+              child: ElevatedButton(
+                  onPressed: () => finishWorkout(doUpdate: true),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                  ),
+                  child: const Text(
+                    "Finish And Update Template"
+                  ),
+              ),
+            ),
+            Container(
+              height: 0.5,
+              width: double.maxFinite,
+              color: Colors.grey[700]!.withOpacity(0.5),
+            ),
+          ],
+      ),
+      confirmText: "Finish",
+      onConfirm: finishWorkout,
+      padding: const EdgeInsets.only(top: 20)
+    );
+  }
+
+  void finishWorkout({bool doUpdate = false}){
+    cnStandardPopUp.clear();
     cnRunningWorkout.workout.refreshDate();
     cnRunningWorkout.removeNotSelectedExercises();
     cnRunningWorkout.workout.removeEmptyExercises();
     if(cnRunningWorkout.workout.exercises.isNotEmpty){
       cnRunningWorkout.workout.saveToDatabase();
-      // cnRunningWorkout.workout.updateTemplate();
+      cnRunningWorkout.workout.updateTemplate();
       cnWorkouts.refreshAllWorkouts();
     }
-    // if(cnRunningWorkout.workout.exercises.any((ex) => ex.sets.isNotEmpty)){
-    //   cnRunningWorkout.workout.saveToDatabase();
-    //   // cnRunningWorkout.workout.updateTemplate();
-    //   cnWorkouts.refreshAllWorkouts();
-    // }
     cnRunningWorkout.clear();
     Navigator.of(context).pop();
+    cnHomepage.refresh();
   }
 }
 
 class CnRunningWorkout extends ChangeNotifier {
   Workout workout = Workout();
   Workout lastWorkout = Workout();
+  bool isRunning = false;
   ScrollController scrollController = ScrollController();
   late Map<String, List<Key>> slideableKeys = {
     for (var e in workout.exercises)
@@ -473,6 +514,15 @@ class CnRunningWorkout extends ChangeNotifier {
 
   void openRunningWorkout(BuildContext context, Workout w){
     setLastWorkout(w);
+    isRunning = true;
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => const ScreenRunningWorkout()
+        ));
+  }
+
+  void reopenRunningWorkout(BuildContext context){
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -512,7 +562,7 @@ class CnRunningWorkout extends ChangeNotifier {
         0
     };
 
-    // groupedExercises = {};
+    groupedExercises.clear();
     for (Exercise ex in workout.exercises){
       if (ex.linkName == null){
         groupedExercises[ex.name] = ex;
@@ -540,6 +590,7 @@ class CnRunningWorkout extends ChangeNotifier {
     selectedIndexes.clear();
     groupedExercises.clear();
     scrollController = ScrollController();
+    isRunning = false;
     refresh();
   }
 
