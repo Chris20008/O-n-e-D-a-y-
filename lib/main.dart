@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
@@ -7,10 +5,12 @@ import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart'
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
 bool objectboxIsInitialized = false;
@@ -81,7 +81,13 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     initObjectBox();
+    connectToSpotify();
     super.initState();
+  }
+
+  void connectToSpotify()async{
+    bool result = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+    print("CONNECTED SPOTIFY: $result");
   }
 
   void initObjectBox() async{
@@ -182,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         CrossFadeState.showSecond,
                         duration: const Duration(milliseconds: 200)
                     ),
+                    SpotifyBar(),
                     const NewWorkOutPanel(),
                     const NewExercisePanel(),
                     const StandardPopUp()

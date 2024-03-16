@@ -40,10 +40,13 @@ android {
         applicationId "christian.range.fitnessapp.fitness_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+//        manifestPlaceholders = [
+//                'appAuthRedirectScheme': 'fitness-app://' // Add this also using your application ID URI as the based for all your derived URi
+//        ]
     }
 
     buildTypes {
