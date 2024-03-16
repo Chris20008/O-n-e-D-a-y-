@@ -86,7 +86,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void connectToSpotify()async{
-    bool result = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+    bool result = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback").then((value)  {
+      cnHomepage.refresh();
+      return true;
+    });
     print("CONNECTED SPOTIFY: $result");
   }
 

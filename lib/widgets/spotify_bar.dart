@@ -21,88 +21,95 @@ class _SpotifyBarState extends State<SpotifyBar> {
       child: SafeArea(
         child: Align(
           alignment: Alignment.bottomCenter,
-          child: ClipRRect(
-            child: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 10.0,
-                sigmaY: 10.0,
-              ),
-              child: Container(
-                height: 50,
-                width: double.maxFinite,
-                color: Colors.black.withOpacity(0.4),
-                child: StreamBuilder<PlayerState>(
-                  stream: SpotifySdk.subscribePlayerState(),
-                  builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
-                    var track = snapshot.data?.track;
-                    currentTrackImageUri = track?.imageUri;
+          child: Padding(
+            padding: const EdgeInsets.only(left:5, right: 5, bottom: 3),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 40.0,
+                  sigmaY: 40.0,
+                ),
+                child: Container(
+                  color: Colors.black.withOpacity(0.4),
+                  height: 54,
+                  width: double.maxFinite,
+                  child: StreamBuilder<PlayerState>(
+                    stream: SpotifySdk.subscribePlayerState(),
+                    builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
+                      var track = snapshot.data?.track;
+                      currentTrackImageUri = track?.imageUri;
 
-                    return snapshot.data == null? const SizedBox() : Row(
-                      children: [
-                        spotifyImageWidget(currentTrackImageUri?? ImageUri("None")),
-                        const Spacer(flex:1),
-                        IconButton(
-                            iconSize: 30,
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () async{
-                              skipPrevious();
-                            },
-                            icon: Icon(
-                              Icons.skip_previous,
-                              color: Colors.amber[800],
-                            )
-                        ),
-                        const Spacer(flex:1),
-                        IconButton(
-                            iconSize: 30,
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () async{
-                              snapshot.data!.isPaused? resume() : pause();
-                            },
-                            icon: Icon(
-                              snapshot.data!.isPaused? Icons.play_arrow : Icons.pause,
-                              color: Colors.amber[800],
-                            )
-                        ),
-                        const Spacer(flex:1),
-                        IconButton(
-                            iconSize: 30,
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () async{
-                              skipNext(); //.then((value) => setState(() => {}));
-                            },
-                            icon: Icon(
-                              Icons.skip_next,
-                              color: Colors.amber[800],
-                            )
-                        ),
-                        const Spacer(flex:6),
-                        IconButton(
-                            iconSize: 20,
-                            style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () async{
-                              disconnect().then((value) => setState(() => {}));
-                            },
-                            icon: Icon(
-                              Icons.cancel,
-                              color: Colors.amber[800],
-                            )
-                        ),
-                      ],
-                    );
-                  },
+                      return snapshot.data == null? const SizedBox() : Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5),
+                              child: spotifyImageWidget(currentTrackImageUri?? ImageUri("None"))
+                          ),
+                          const Spacer(flex:1),
+                          IconButton(
+                              iconSize: 30,
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                  // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              ),
+                              onPressed: () async{
+                                skipPrevious();
+                              },
+                              icon: Icon(
+                                Icons.skip_previous,
+                                color: Colors.amber[800],
+                              )
+                          ),
+                          const Spacer(flex:1),
+                          IconButton(
+                              iconSize: 30,
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                  // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              ),
+                              onPressed: () async{
+                                snapshot.data!.isPaused? resume() : pause();
+                              },
+                              icon: Icon(
+                                snapshot.data!.isPaused? Icons.play_arrow : Icons.pause,
+                                color: Colors.amber[800],
+                              )
+                          ),
+                          const Spacer(flex:1),
+                          IconButton(
+                              iconSize: 30,
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                  // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              ),
+                              onPressed: () async{
+                                skipNext(); //.then((value) => setState(() => {}));
+                              },
+                              icon: Icon(
+                                Icons.skip_next,
+                                color: Colors.amber[800],
+                              )
+                          ),
+                          const Spacer(flex:6),
+                          IconButton(
+                              iconSize: 20,
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                  // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              ),
+                              onPressed: () async{
+                                disconnect().then((value) => setState(() => {}));
+                              },
+                              icon: Icon(
+                                Icons.cancel,
+                                color: Colors.amber[800],
+                              )
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -120,11 +127,14 @@ class _SpotifyBarState extends State<SpotifyBar> {
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
           if (snapshot.hasData) {
-            return Image.memory(
-              snapshot.data!,
-              height: 50,
-              width: 50,
-              gaplessPlayback: true,
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: Image.memory(
+                snapshot.data!,
+                height: 44,
+                width: 44,
+                gaplessPlayback: true,
+              ),
             );
           }
           else{
