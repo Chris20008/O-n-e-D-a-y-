@@ -10,7 +10,6 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
 bool objectboxIsInitialized = false;
@@ -41,19 +40,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnHomepage()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
+        ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
       ],
       child: MaterialApp(
         themeMode: ThemeMode.dark,
-        // title: 'Flutter Demo',
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             useMaterial3: true,
             splashFactory: InkSparkle.splashFactory
         ),
-        // theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-        //   useMaterial3: true,
-        // ),
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
@@ -76,21 +71,14 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnHomepage cnHomepage;
 
   @override
   void initState() {
     initObjectBox();
-    connectToSpotify();
+    cnSpotifyBar.connectToSpotify();
     super.initState();
-  }
-
-  void connectToSpotify()async{
-    bool result = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback").then((value)  {
-      cnHomepage.refresh();
-      return true;
-    });
-    print("CONNECTED SPOTIFY: $result");
   }
 
   void initObjectBox() async{
