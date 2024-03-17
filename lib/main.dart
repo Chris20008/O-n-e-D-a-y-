@@ -5,6 +5,8 @@ import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart'
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/spotify_bar.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -37,19 +39,16 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnHomepage()),
+        ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
+        ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
       ],
       child: MaterialApp(
         themeMode: ThemeMode.dark,
-        // title: 'Flutter Demo',
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             useMaterial3: true,
             splashFactory: InkSparkle.splashFactory
         ),
-        // theme: ThemeData(
-        //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-        //   useMaterial3: true,
-        // ),
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
     );
@@ -71,11 +70,14 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnHomepage cnHomepage;
 
   @override
   void initState() {
     initObjectBox();
+    cnSpotifyBar.connectToSpotify();
     super.initState();
   }
 
@@ -99,42 +101,94 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          // decoration: BoxDecoration(
-          //   gradient: LinearGradient(
-          //     begin: Alignment.topCenter,
-          //     end: Alignment.bottomCenter,
-          //     colors: [
-          //       Colors.amber[900]!.withOpacity(0.4),
-          //       Colors.amber[500]!.withOpacity(0.3),
-          //       Colors.amber[400]!.withOpacity(0.25),
-          //       Colors.amber[400]!.withOpacity(0.2),
-          //     ]
-          //   )
-          // ),
           decoration: BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    // Colors.amber[900]!.withOpacity(0.9),
-                    Color(0xff84490b),
-                    // Colors.black.withOpacity(0.75),
-                    // Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(1),
+                    const Color(0xff84490b),
                     Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(1),
-                    // Colors.black.withOpacity(0.9),
-                    // Colors.black.withOpacity(0.75),
-                    // Colors.amber[400]!.withOpacity(0.25),
-                    // Colors.amber[900]!.withOpacity(0.8),
                   ]
               )
           ),
-          // child: const ScreenWorkout()
-          // child: const ScreenWorkoutHistory()
-          child: cnBottomMenu.index == 0?
-          const ScreenWorkoutHistory():
-          const ScreenWorkout()
+          child: Column(
+            children: [
+              if (cnRunningWorkout.isRunning)
+                Stack(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: double.maxFinite,
+                      // color: Colors.black,
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Color(0xff44260b),
+                                Colors.black,
+                              ]
+                          )
+                      ),
+                    ),
+                    SafeArea(
+                      bottom: false,
+                      // child: Container(height: 10, width: 10, color: Colors.green,),
+                      child: GestureDetector(
+                        onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
+                        child: Container(
+                          height: 50,
+                          width: double.maxFinite,
+                          // color: Color(0xff44260b),
+                          decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                  begin: Alignment.centerRight,
+                                  end: Alignment.centerLeft,
+                                  colors: [
+                                    Color(0xff55300a),
+                                    Color(0xff44260b),
+                                  ]
+                              ),
+                            // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                  cnRunningWorkout.workout.name,
+                                textScaleFactor: 1.6,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                SizedBox(height: 0,),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.topCenter,
+                  children: [
+                    AnimatedCrossFade(
+                        firstChild: ScreenWorkoutHistory(key: UniqueKey()),
+                        secondChild: ScreenWorkout(key: UniqueKey()),
+                        crossFadeState: cnBottomMenu.index == 0?
+                        CrossFadeState.showFirst:
+                        CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 200)
+                    ),
+                    SpotifyBar(),
+                    const NewWorkOutPanel(),
+                    const NewExercisePanel(),
+                    const StandardPopUp()
+                  ],
+                ),
+              ),
+            ],
+          ),
+
         // child: AnimatedCrossFade(
         //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
         //     // firstChild: Container(height: 50, width: 50,),
@@ -146,14 +200,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // ),
       ),
       bottomNavigationBar: const BottomMenu(),
-      // Column(
-      //   children: [
-          // Expanded(
-          //     child: Container()
-          // ),
-          // BottomMenu()
-        // ],
-      // )
     );
   }
 }

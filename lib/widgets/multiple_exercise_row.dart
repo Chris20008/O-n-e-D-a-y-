@@ -89,8 +89,8 @@ class MultipleExerciseRow extends StatelessWidget {
                                   child: Text(
                                       ex.name,
                                       textScaleFactor: ex.name.length > 20 ? 0.8
-                                          : ex.name.length > 15 ? 1.1
-                                          : ex.name.length > 10 ? 1.3
+                                          : ex.name.length > 14 ? 1.1
+                                          : ex.name.length > 9 ? 1.3
                                           : ex.name.length > 5 ? 1.4
                                           : 1.5
                                   )
@@ -104,52 +104,6 @@ class MultipleExerciseRow extends StatelessWidget {
             ),
             const SizedBox(width: 10,),
 
-            // /// If in any exercise the seat level or rest time is defined, add an extra column
-            // if(exercises.any((exercise) => exercise.seatLevel != null) || exercises.any((exercise) => exercise.restInSeconds > 0))
-            //   Row(
-            //     children: [
-            //       Column(
-            //         mainAxisSize: MainAxisSize.min,
-            //         children: [
-            //           for (Exercise ex in exercises)
-            //             Container(
-            //               height: height + (2*topBottomPadding),
-            //               width: 65,
-            //               child: Column(
-            //                 crossAxisAlignment: CrossAxisAlignment.start,
-            //                 mainAxisSize: MainAxisSize.min,
-            //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //                 children: [
-            //
-            //                   if(ex.restInSeconds > 0)
-            //                   Row(
-            //                     children: [
-            //                       const Icon(Icons.timer, size: 20,),
-            //                       const SizedBox(width: 2,),
-            //                       if (ex.restInSeconds >= 10)
-            //                         Text("${(ex.restInSeconds/60).round()}:${ex.restInSeconds%60}m")
-            //                       else
-            //                         Text("${ex.restInSeconds}s")
-            //                     ],
-            //                   ),
-            //
-            //                   if(ex.seatLevel != null)
-            //                     Row(
-            //                       children: [
-            //                         const Icon(Icons.airline_seat_recline_normal, size: 20,),
-            //                         const SizedBox(width: 2,),
-            //                         Text(ex.seatLevel.toString())
-            //                       ],
-            //                     )
-            //                 ],
-            //               ),
-            //             ),
-            //         ],
-            //       ),
-            //       const SizedBox(width: 10,),
-            //     ],
-            //   ),
-
             Expanded(
               flex: 7,
               child: SingleChildScrollView(
@@ -160,51 +114,6 @@ class MultipleExerciseRow extends StatelessWidget {
                 /// Column for all Exercises
                 child: Row(
                   children: [
-                    /// If in any exercise the seat level or rest time is defined, add an extra column
-                    // if(exercises.any((exercise) => exercise.seatLevel != null) || exercises.any((exercise) => exercise.restInSeconds > 0))
-                    //   Row(
-                    //     children: [
-                    //       Column(
-                    //         mainAxisSize: MainAxisSize.min,
-                    //         children: [
-                    //           for (Exercise ex in exercises)
-                    //             Container(
-                    //               height: height + (2*topBottomPadding),
-                    //               width: 65,
-                    //               child: Column(
-                    //                 crossAxisAlignment: CrossAxisAlignment.start,
-                    //                 mainAxisSize: MainAxisSize.min,
-                    //                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    //                 children: [
-                    //
-                    //                   if(ex.restInSeconds > 0)
-                    //                     Row(
-                    //                       children: [
-                    //                         const Icon(Icons.timer, size: 20,),
-                    //                         const SizedBox(width: 2,),
-                    //                         if (ex.restInSeconds >= 10)
-                    //                           Text("${(ex.restInSeconds/60).round()}:${ex.restInSeconds%60}m")
-                    //                         else
-                    //                           Text("${ex.restInSeconds}s")
-                    //                       ],
-                    //                     ),
-                    //
-                    //                   if(ex.seatLevel != null)
-                    //                     Row(
-                    //                       children: [
-                    //                         const Icon(Icons.airline_seat_recline_normal, size: 20,),
-                    //                         const SizedBox(width: 2,),
-                    //                         Text(ex.seatLevel.toString())
-                    //                       ],
-                    //                     )
-                    //                 ],
-                    //               ),
-                    //             ),
-                    //         ],
-                    //       ),
-                    //       const SizedBox(width: 10,),
-                    //     ],
-                    //   ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,62 +177,5 @@ class MultipleExerciseRow extends StatelessWidget {
         ),
       ),
     );
-
-    // return Padding(
-    //   padding: padding?? const EdgeInsets.all(0),
-    //   child: Row(
-    //     children: [
-    //       Expanded(
-    //           flex:3,
-    //           child: Text(exercises.name, textScaleFactor: textScaleFactor,)
-    //       ),
-    //       Expanded(
-    //         flex: 7,
-    //         child: SizedBox(
-    //           height: 60,
-    //           child: ListView(
-    //               physics: const BouncingScrollPhysics(),
-    //               scrollDirection: Axis.horizontal,
-    //               children: [
-    //                 for (var set in exercises.sets)
-    //                   ClipRRect(
-    //                     borderRadius: BorderRadius.circular(5),
-    //                     child: Padding(
-    //                       padding: const EdgeInsets.only(left: 3, right: 3),
-    //                       child: Stack(
-    //                         alignment: Alignment.center,
-    //                         children: [
-    //                           Container(
-    //                             width: 30,
-    //                             decoration: BoxDecoration(
-    //                               color: Colors.grey[500]!.withOpacity(0.2),
-    //                               borderRadius: BorderRadius.circular(5),
-    //                               // border: Border.all(color: Colors.black, width: 1)
-    //                               // border: BoxBorder
-    //                             ),
-    //                           ),
-    //                           Column(
-    //                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //                             children: [
-    //                               Text("${set.weight}"),
-    //                               Container(
-    //                                 color: Colors.grey[900],
-    //                                 height: 1,
-    //                                 width: 15,
-    //                               ),
-    //                               Text("${set.amount}")
-    //                             ],
-    //                           )
-    //                         ],
-    //                       ),
-    //                     ),
-    //                   ),
-    //               ]
-    //           ),
-    //         ),
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }
