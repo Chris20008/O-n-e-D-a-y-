@@ -38,7 +38,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
     print("REBUILD NEW WOKROUT PANEL");
-    print(cnNewWorkout.workout.isTemplate);
 
     return WillPopScope(
       onWillPop: () async{

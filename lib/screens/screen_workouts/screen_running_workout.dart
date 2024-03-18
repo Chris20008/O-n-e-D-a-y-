@@ -9,6 +9,7 @@ import '../../main.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/constants.dart';
+import '../../widgets/spotify_bar.dart';
 import '../../widgets/standard_popup.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
@@ -24,6 +25,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout;
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
@@ -37,7 +39,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       onWillPop: () async{
         // openPopUpFinishWorkout();
         Navigator.of(context).pop();
-        cnHomepage.refresh();
+        cnHomepage.refresh(refreshSpotifyBar: true);
+        // Future.delayed(const Duration(seconds: 2), (){
+        //   cnSpotifyBar.refresh();
+        // });
         // cnRunningWorkout.clear();
         // Navigator.of(context).pop();
         return false;
@@ -400,13 +405,55 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               ),
               if(MediaQuery.of(context).viewInsets.bottom < 50)
                 Positioned(
-                  bottom: 10,
-                  left: 20,
-                  right: 20,
-                  child: ElevatedButton(
-                      onPressed: openPopUpFinishWorkout,
-                      child: const Text("Finish")
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: ClipRRect(
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 15.0,
+                        sigmaY: 15.0,
+                      ),
+                      child: Container(
+                        height: 40,
+                        // color: Colors.black.withOpacity(0.5),
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withOpacity(0.4),
+                                  Colors.black.withOpacity(0.8),
+                                ]
+                            )
+                        ),
+                        child: ElevatedButton(
+                            onPressed: openPopUpFinishWorkout,
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                // foregroundColor: MaterialStateProperty.all(Colors.transparent),
+                                // overlayColor: MaterialStateProperty.all(Colors.transparent),
+                                shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                            ),
+                            child: const Text("Finish"),
+                        ),
+                      ),
+                    ),
                   ),
+                ),
+              if(MediaQuery.of(context).viewInsets.bottom < 50)
+                const Positioned(
+                    bottom: 40,
+                    left: 0,
+                    right: 0,
+                    // child: cnSpotifyBar.bar,
+                    child: SpotifyBar(),
+                    // child: Hero(
+                    //     tag: "SpotifyBar",
+                    //     child: SpotifyBar()
+                    // )
                 ),
               const StandardPopUp()
             ],

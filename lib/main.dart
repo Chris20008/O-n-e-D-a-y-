@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
@@ -10,6 +12,8 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:spotify_sdk/models/player_state.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
 bool objectboxIsInitialized = false;
@@ -41,6 +45,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnHomepage()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
+        ChangeNotifierProvider(create: (context) => PlayerStateStream())
       ],
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -77,7 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     initObjectBox();
-    cnSpotifyBar.connectToSpotify();
+    // cnSpotifyBar.connectToSpotify();
     super.initState();
   }
 
@@ -93,6 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
+    cnHomepage.initSpotifyBar(cnSpotifyBar);
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
@@ -179,7 +185,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         CrossFadeState.showSecond,
                         duration: const Duration(milliseconds: 200)
                     ),
-                    SpotifyBar(),
+                    // const Hero(
+                    //     tag: "SpotifyBar",
+                    //     child: SpotifyBar()
+                    // ),
+                    const SpotifyBar(),
+                    // cnSpotifyBar.bar,
                     const NewWorkOutPanel(),
                     const NewExercisePanel(),
                     const StandardPopUp()
@@ -205,8 +216,28 @@ class _MyHomePageState extends State<MyHomePage> {
 }
 
 class CnHomepage extends ChangeNotifier {
+  late CnSpotifyBar cnSpotifyBar;
+  bool isInitialized = false;
 
-  void refresh(){
-    notifyListeners();
+  void initSpotifyBar(CnSpotifyBar cn){
+    if(!isInitialized){
+      cnSpotifyBar = cn;
+      isInitialized = true;
+    }
   }
+
+  void refresh({bool refreshSpotifyBar = false}){
+    notifyListeners();
+    if(refreshSpotifyBar){
+      Future.delayed(const Duration(milliseconds: 500), (){
+        cnSpotifyBar.refresh();
+        print("REFRESH SPOTIFY BAR IN HOMEPAGE");
+      });
+    }
+  }
+}
+
+// Klasse zur Verwaltung des Player-Zustands
+class PlayerStateStream extends ChangeNotifier {
+  Stream<PlayerState> get stream => SpotifySdk.subscribePlayerState();
 }

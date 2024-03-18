@@ -46,7 +46,8 @@ class Workout{
   Workout.copy(Workout w): this(
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
-      linkedExercises: List.from(w.linkedExercises)
+      linkedExercises: List.from(w.linkedExercises),
+      date: w.date
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
