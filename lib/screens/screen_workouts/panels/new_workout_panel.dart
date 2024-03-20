@@ -33,6 +33,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  final deleteWorkoutKey = GlobalKey();
+  final addLinkKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +128,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   width: 50,
                                   height: 50,
                                   child: IconButton(
+                                    key: addLinkKey,
                                     onPressed: ()async{
                                       if(cnNewWorkout.panelController.isPanelClosed){
                                         await cnNewWorkout.panelController.open();
@@ -157,6 +160,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                           cnNewWorkout.linkNameController.clear();
                                         },
                                         onCancel: cnNewWorkout.linkNameController.clear,
+                                        animationKey: addLinkKey
                                       );
                                     },
                                     icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
@@ -400,20 +404,46 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   icon: const Icon(Icons.close)
                               ),
                               if(cnNewWorkout.isUpdating)
-                                IconButton(
-                                    onPressed: (){
-                                      cnStandardPopUp.open(
-                                          child: const Text(
-                                            "Do you really want to Delete this workout?",
-                                            textAlign: TextAlign.center,
-                                            textScaleFactor: 1.2,
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                          onConfirm: onDelete,
-                                          onCancel: (){}
-                                      );
-                                    },
-                                    icon: const Icon(Icons.delete_forever)
+                                Listener(
+                                  onPointerUp: (PointerUpEvent details){
+                                    // RenderBox? box = k.currentContext?.findRenderObject() as RenderBox;
+                                    //
+                                    // final width = box.size.width;
+                                    // final height = box.size.height;
+                                    // print(details.position.dx);
+                                    // print(details.position.dy);
+                                    // print("");
+                                    // print(details.localPosition.dx);
+                                    // print(details.localPosition.dy);
+                                    // print("");
+                                    // print(details.position.dx - details.localPosition.dx + width/2);
+                                    // print(details.position.dy - details.localPosition.dy + height/2);
+                                    // print("");
+                                  },
+                                  child: IconButton(
+                                      key: deleteWorkoutKey,
+                                      onPressed: (){
+                                        // RenderBox? box = k.currentContext?.findRenderObject() as RenderBox;
+                                        // final width = box.size.width;
+                                        // final height = box.size.height;
+                                        // Offset position = box.localToGlobal(Offset.zero);
+                                        // print(position.dx + width/2);
+                                        // print(position.dy + height/2);
+                                        cnStandardPopUp.open(
+                                            child: const Text(
+                                              "Do you really want to Delete this workout?",
+                                              textAlign: TextAlign.center,
+                                              textScaleFactor: 1.2,
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                            onConfirm: onDelete,
+                                            onCancel: (){},
+                                            animationKey: deleteWorkoutKey
+                                            // pos: Offset(position.dx + width/2, position.dy + height/2)
+                                        );
+                                      },
+                                      icon: const Icon(Icons.delete_forever)
+                                  ),
                                 ),
                               IconButton(
                                   onPressed: onConfirm,

@@ -13,8 +13,15 @@ class StandardPopUp extends StatefulWidget {
   State<StandardPopUp> createState() => _StandardPopUpState();
 }
 
-class _StandardPopUpState extends State<StandardPopUp> {
-
+class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  );
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.fastOutSlowIn,
+  );
   late CnStandardPopUp cnStandardPopUp;
 
   @override
@@ -23,86 +30,134 @@ class _StandardPopUpState extends State<StandardPopUp> {
 
     final size = MediaQuery.of(context).size;
 
-    return AnimatedCrossFade(
-        firstChild: Container(),
-        secondChild: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: size.width,
-              height: size.height,
-              color: Colors.black.withOpacity(0.5),
-            ),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 10.0,
-                  sigmaY: 10.0,
+    if(cnStandardPopUp.isVisible){
+      _controller.forward();
+    } else{
+      _controller.reverse();
+    }
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        AnimatedCrossFade(
+          layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: <Widget>[
+                Positioned(
+                  key: bottomChildKey,
+                  // left: 0,
+                  // top: 0.0,
+                  // right: 0,
+                  // bottom: 0,
+                  child: bottomChild,
                 ),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                      maxWidth: 300.0,
-                      maxHeight: 200
-                  ),
-                  child: Container(
-                      width: size.width*0.65,
-                      color: Colors.grey[800]!.withOpacity(0.6),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: cnStandardPopUp.padding,
-                            child: SingleChildScrollView(
-                              padding: const EdgeInsets.all(0.0),
-                                child: cnStandardPopUp.child
-                            ),
-                          ),
-                          SizedBox(
-                            height: 40,
-                            child: Row(
-                              children: [
-                                Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: cnStandardPopUp.confirm,
-                                        style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        ),
-                                        child: Text(cnStandardPopUp.confirmText)
-                                    )
-                                ),
-                                Container(
-                                  height: double.maxFinite,
-                                  width: 0.5,
-                                  color: Colors.grey[700]!.withOpacity(0.5),
-                                ),
-                                Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: cnStandardPopUp.cancel,
-                                        style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        ),
-                                        child: const Text("Cancel")
-                                    )
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                  ),
+                Positioned(
+                  key: topChildKey,
+                  // left: 0,
+                  // right: 0,
+                  child: topChild,
                 ),
+              ],
+            );
+          },
+            firstChild: SizedBox(),
+            secondChild: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 5.0,
+                sigmaY: 5.0,
+              ),
+              child: Container(
+                height: size.height,
+                width: size.width,
+                color: Colors.black.withOpacity(0.4),
               ),
             ),
-          ],
+            crossFadeState: !cnStandardPopUp.isVisible?
+              CrossFadeState.showFirst:
+              CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 200),
         ),
-        crossFadeState: !cnStandardPopUp.isVisible?
-        CrossFadeState.showFirst:
-        CrossFadeState.showSecond,
-        duration: const Duration(milliseconds: 200)
+        AnimatedContainer(
+          alignment: Alignment.center,
+          duration: Duration(milliseconds: cnStandardPopUp.jump? 0 : 200), // Animationsdauer
+          transform: Matrix4.translationValues(!cnStandardPopUp.isVisible && cnStandardPopUp.pos != null? cnStandardPopUp.pos!.dx - size.width/2 : 0, !cnStandardPopUp.isVisible? (cnStandardPopUp.pos?.dy?? size.height) - size.height/2 : 0, 0),
+          // curve: cnStandardPopUp.isVisible? Curves.decelerate: Curves.easeInBack,
+          child: ScaleTransition(
+            scale: _animation,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                      sigmaX: 10.0,
+                      sigmaY: 10.0,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                          maxWidth: 300.0,
+                          maxHeight: 200
+                      ),
+                      child: Container(
+                          width: size.width*0.65,
+                          color: Colors.grey[800]!.withOpacity(0.6),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: cnStandardPopUp.padding,
+                                child: SingleChildScrollView(
+                                    padding: const EdgeInsets.all(0.0),
+                                    child: cnStandardPopUp.child
+                                ),
+                              ),
+                              SizedBox(
+                                height: 40,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: ElevatedButton(
+                                            onPressed: cnStandardPopUp.confirm,
+                                            style: ButtonStyle(
+                                                backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                            ),
+                                            child: Text(cnStandardPopUp.confirmText)
+                                        )
+                                    ),
+                                    Container(
+                                      height: double.maxFinite,
+                                      width: 0.5,
+                                      color: Colors.grey[700]!.withOpacity(0.5),
+                                    ),
+                                    Expanded(
+                                        child: ElevatedButton(
+                                            onPressed: cnStandardPopUp.cancel,
+                                            style: ButtonStyle(
+                                                backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                            ),
+                                            child: const Text("Cancel")
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          )
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -115,6 +170,8 @@ class CnStandardPopUp extends ChangeNotifier {
   EdgeInsets padding = const EdgeInsets.all(20);
   String confirmText = "Ok";
   String cancelText = "Cancel";
+  Offset? pos;
+  bool jump = true;
 
   void open({
     required Widget child,
@@ -122,16 +179,33 @@ class CnStandardPopUp extends ChangeNotifier {
     Function? onCancel,
     EdgeInsets? padding,
     String confirmText = "Ok",
-    String cancelText = "Cancel"
+    String cancelText = "Cancel",
+    GlobalKey? animationKey,
   }){
+    jump = true;
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;
     this.child = child;
     this.padding = padding?? const EdgeInsets.all(20);
     this.confirmText = confirmText;
     this.cancelText = cancelText;
-    isVisible = true;
+
+    if(animationKey != null){
+      RenderBox? box = animationKey.currentContext?.findRenderObject() as RenderBox;
+      final width = box.size.width;
+      final height = box.size.height;
+      Offset position = box.localToGlobal(Offset.zero);
+      pos = Offset(position.dx + width/2, position.dy + height/2);
+    } else{
+      pos = null;
+    }
     refresh();
+
+    Future.delayed(const Duration(milliseconds: 50), (){
+      jump = false;
+      isVisible = true;
+      refresh();
+    });
   }
 
   void confirm(){
