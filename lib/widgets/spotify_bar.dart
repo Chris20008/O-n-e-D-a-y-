@@ -19,13 +19,14 @@ class SpotifyBar extends StatefulWidget {
 class _SpotifyBarState extends State<SpotifyBar> {
   late ImageUri? currentTrackImageUri;
   late CnSpotifyBar cnSpotifyBar;
+  final width = WidgetsBinding.instance.window.physicalSize.width;
   double paddingLeftRight = 5;
 
   @override
   Widget build(BuildContext context) {
     print("Rebuild SPOTIFY BAR");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-    final size = MediaQuery.of(context).size;
+    // final size = MediaQuery.of(context).size;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 0),
@@ -51,7 +52,8 @@ class _SpotifyBarState extends State<SpotifyBar> {
                         color: Colors.black.withOpacity(0.4),
                         height: 54,
                         // width: constraints.maxWidth,
-                        width: size.width - paddingLeftRight*2,
+                        // width: size.width - paddingLeftRight*2,
+                        width: width - paddingLeftRight*2,
                         child: Consumer<PlayerStateStream>(
                           builder: (context, playerStateStream, _) {
                             return StreamBuilder<PlayerState>(
