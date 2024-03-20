@@ -8,6 +8,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../main.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../widgets/bottom_menu.dart';
@@ -44,7 +45,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     return WillPopScope(
       onWillPop: () async{
         if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
-          // cnNewWorkout.closePanel(doClear: false);
           cnNewWorkout.panelController.close();
           return false;
         }
@@ -965,6 +965,12 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   ];
   double minPanelHeight = 0;
   bool isCurrentlyRebuilding = false;
+  double keepShowingPanelHeight = 212;
+  late CnHomepage cnHomepage;
+
+  CnNewWorkOutPanel(BuildContext context){
+    cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  }
 
   void delayedRefresh() async{
     if (isCurrentlyRebuilding) return;
@@ -983,7 +989,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void openPanel(){
-    minPanelHeight = 180;
+    minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(
         1,
@@ -992,6 +998,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     );
     refresh();
     print("open panel ${workout.linkedExercises}");
+    cnHomepage.refresh();
   }
 
   void addToExercisesAndLinksList(dynamic item){
@@ -1102,6 +1109,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         }
       });
     });
+    cnHomepage.refresh();
   }
 
   void editWorkout(Workout workout){

@@ -38,14 +38,14 @@ class MyApp extends StatelessWidget {
       providers:[
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
-        ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnHomepage()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
-        ChangeNotifierProvider(create: (context) => PlayerStateStream())
+        ChangeNotifierProvider(create: (context) => PlayerStateStream()),
+        ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -77,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnHomepage cnHomepage;
 
   @override
@@ -120,27 +121,27 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               if (cnRunningWorkout.isRunning)
-                Stack(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: double.maxFinite,
-                      // color: Colors.black,
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Color(0xff44260b),
-                                Colors.black,
-                              ]
-                          )
-                      ),
+                Container(
+                  width: double.maxFinite,
+                  height: 110,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: [
+                          Color(0xff55300a),
+                          Color(0xff44260b),
+                        ]
                     ),
-                    SafeArea(
-                      bottom: false,
-                      // child: Container(height: 10, width: 10, color: Colors.green,),
-                      child: GestureDetector(
+                    // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+                  ),
+                  child: Column(
+                    children: [
+                      const SafeArea(
+                        bottom: false,
+                        child: SizedBox(),
+                      ),
+                      GestureDetector(
                         onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
                         child: Container(
                           height: 50,
@@ -168,8 +169,8 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 )
               else
                 SizedBox(height: 0,),
@@ -189,7 +190,16 @@ class _MyHomePageState extends State<MyHomePage> {
                     //     tag: "SpotifyBar",
                     //     child: SpotifyBar()
                     // ),
-                    const SpotifyBar(),
+                    AnimatedContainer(
+                        duration: const Duration(milliseconds: 300), // Animationsdauer
+                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+                        curve: Curves.easeInOut,
+                        child: const SpotifyBar()
+                        // child: const Hero(
+                        //     tag: "SpotifyBar",
+                        //     child: SpotifyBar()
+                        // ),
+                    ),
                     // cnSpotifyBar.bar,
                     const NewWorkOutPanel(),
                     const NewExercisePanel(),

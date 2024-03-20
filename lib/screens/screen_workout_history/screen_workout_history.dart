@@ -43,7 +43,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkoutHistory.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:50 : 10, left: 20, right: 20, bottom: 0),
+                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
                     initiallyExpanded: cnWorkoutHistory.opened[index]
                 );

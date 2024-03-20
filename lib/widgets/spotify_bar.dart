@@ -45,8 +45,8 @@ class _SpotifyBarState extends State<SpotifyBar> {
                     borderRadius: BorderRadius.circular(10),
                     child: BackdropFilter(
                       filter: ImageFilter.blur(
-                        sigmaX: 40.0,
-                        sigmaY: 40.0,
+                        sigmaX: 30.0,
+                        sigmaY: 30.0,
                       ),
                       child: Container(
                         color: Colors.black.withOpacity(0.4),
@@ -343,7 +343,15 @@ class CnSpotifyBar extends ChangeNotifier {
       isTryingToConnect = true;
       // accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback") : accessToken;
       // print("ACCES TOKEN: $accessToken");
-      isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+      accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback") : accessToken;
+      try{
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken);
+      } on Exception catch (_) {
+        accessToken = await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback");
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken);
+      }
+
+      //isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback");
       print("CONNECTED SPOTIFY: $isConnected");
       refresh();
       isTryingToConnect = false;
