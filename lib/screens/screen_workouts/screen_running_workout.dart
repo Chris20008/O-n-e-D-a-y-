@@ -36,17 +36,19 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
 
-    return WillPopScope(
-      onWillPop: () async{
+    return PopScope(
+      onPopInvoked: (doPop) async{
         // openPopUpFinishWorkout();
-        Navigator.of(context).pop();
-        cnHomepage.refresh(refreshSpotifyBar: true);
+        // Navigator.of(context).pop();
+        if(doPop){
+          cnHomepage.refresh(refreshSpotifyBar: true);
+        }
         // Future.delayed(const Duration(seconds: 2), (){
         //   cnSpotifyBar.refresh();
         // });
         // cnRunningWorkout.clear();
         // Navigator.of(context).pop();
-        return false;
+        // return false;
       },
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -56,7 +58,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
             useMaterial3: true,
             splashFactory: InkSparkle.splashFactory
         ),
-
         home: Scaffold(
           body: Stack(
             alignment: Alignment.center,
