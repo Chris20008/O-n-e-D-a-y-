@@ -443,11 +443,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         ),
                       ),
                       if(MediaQuery.of(context).viewInsets.bottom < 50)
-                        const SpotifyBar(),
-                        // const Hero(
-                        //     tag: "SpotifyBar",
-                        //     child: SpotifyBar()
-                        // ),
+                        // const SpotifyBar(),
+                        const Hero(
+                            transitionOnUserGestures: true,
+                            tag: "SpotifyBar",
+                            child: SpotifyBar()
+                        ),
                       Container(
                         height: double.maxFinite,
                         width: double.maxFinite,
@@ -602,7 +603,7 @@ class CnRunningWorkout extends ChangeNotifier {
     isRunning = true;
     Navigator.push(
         context,
-        MaterialPageRoute(
+        CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
   }
@@ -610,7 +611,7 @@ class CnRunningWorkout extends ChangeNotifier {
   void reopenRunningWorkout(BuildContext context){
     Navigator.push(
         context,
-        MaterialPageRoute(
+        CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
   }

@@ -18,7 +18,6 @@ class SpotifyBar extends StatefulWidget {
 }
 
 class _SpotifyBarState extends State<SpotifyBar> {
-  late ImageUri? currentTrackImageUri;
   late CnSpotifyBar cnSpotifyBar;
   final width = WidgetsBinding.instance.window.physicalSize.width;
   double paddingLeftRight = 5;
@@ -60,12 +59,12 @@ class _SpotifyBarState extends State<SpotifyBar> {
                             return StreamBuilder<PlayerState>(
                                 stream: playerStateStream.stream,
                                 builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
-                                  var track = snapshot.data?.track;
-                                  currentTrackImageUri = track?.imageUri;
-                                  // if(snapshot.data == null && cnSpotifyBar.isConnected){
-                                  //   cnSpotifyBar.delayedReconnect();
-                                  // }
-                                  return snapshot.data == null?
+                                  final data = snapshot.data;
+                                  if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
+                                    cnSpotifyBar.imageGotUpdated = true;
+                                  }
+                                  cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                                  return cnSpotifyBar.data == null?
                                   GestureDetector(
                                       onTap: cnSpotifyBar.connectToSpotify,
                                       child: Container(
@@ -79,7 +78,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                     children: [
                                       Padding(
                                           padding: const EdgeInsets.all(5),
-                                          child: spotifyImageWidget(currentTrackImageUri?? ImageUri("None"))
+                                          child: spotifyImageWidget(cnSpotifyBar.data?.track?.imageUri?? ImageUri("None"))
                                       ),
                                       const Spacer(flex:1),
                                       IconButton(
@@ -103,10 +102,10 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                             backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                           ),
                                           onPressed: () async{
-                                            snapshot.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
+                                            cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
                                           },
                                           icon: Icon(
-                                            snapshot.data!.isPaused? Icons.play_arrow : Icons.pause,
+                                            cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
                                             color: Colors.amber[800],
                                           )
                                       ),
@@ -144,91 +143,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                             );
                           }
                         ),
-                        // child: StreamBuilder<PlayerState>(
-                        //   stream: SpotifySdk.subscribePlayerState(),
-                        //   builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
-                        //     var track = snapshot.data?.track;
-                        //     currentTrackImageUri = track?.imageUri;
-                        //     if(snapshot.data == null && cnSpotifyBar.isConnected){
-                        //       cnSpotifyBar.delayedReconnect();
-                        //     }
-                        //     return snapshot.data == null?
-                        //     GestureDetector(
-                        //         onTap: cnSpotifyBar.connectToSpotify,
-                        //         child: Container(
-                        //           height: 54,
-                        //           width: double.maxFinite,
-                        //           color: Colors.transparent,
-                        //         )
-                        //     ) :
-                        //     Row(
-                        //       mainAxisSize: MainAxisSize.min,
-                        //       children: [
-                        //         Padding(
-                        //             padding: const EdgeInsets.all(5),
-                        //             child: spotifyImageWidget(currentTrackImageUri?? ImageUri("None"))
-                        //         ),
-                        //         const Spacer(flex:1),
-                        //         IconButton(
-                        //             iconSize: 30,
-                        //             style: ButtonStyle(
-                        //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        //               // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                        //             ),
-                        //             onPressed: () async{
-                        //               cnSpotifyBar.skipPrevious();
-                        //             },
-                        //             icon: Icon(
-                        //               Icons.skip_previous,
-                        //               color: Colors.amber[800],
-                        //             )
-                        //         ),
-                        //         const Spacer(flex:1),
-                        //         IconButton(
-                        //             iconSize: 30,
-                        //             style: ButtonStyle(
-                        //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        //             ),
-                        //             onPressed: () async{
-                        //               snapshot.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
-                        //             },
-                        //             icon: Icon(
-                        //               snapshot.data!.isPaused? Icons.play_arrow : Icons.pause,
-                        //               color: Colors.amber[800],
-                        //             )
-                        //         ),
-                        //         const Spacer(flex:1),
-                        //         IconButton(
-                        //             iconSize: 30,
-                        //             style: ButtonStyle(
-                        //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        //             ),
-                        //             onPressed: () async{
-                        //               cnSpotifyBar.skipNext(); //.then((value) => setState(() => {}));
-                        //             },
-                        //             icon: Icon(
-                        //               Icons.skip_next,
-                        //               color: Colors.amber[800],
-                        //             )
-                        //         ),
-                        //         const Spacer(flex:6),
-                        //         IconButton(
-                        //             iconSize: 20,
-                        //             style: ButtonStyle(
-                        //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        //             ),
-                        //             onPressed: () async{
-                        //               cnSpotifyBar.disconnect();
-                        //             },
-                        //             icon: Icon(
-                        //               Icons.cancel,
-                        //               color: Colors.amber[800],
-                        //             )
-                        //         ),
-                        //       ],
-                        //     );
-                        //   },
-                        // ),
                       ),
                     ),
                   ),
@@ -294,7 +208,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
           if (snapshot.hasData) {
-            return ClipRRect(
+            cnSpotifyBar.lastImage = ClipRRect(
               borderRadius: BorderRadius.circular(7),
               child: Image.memory(
                 snapshot.data!,
@@ -303,16 +217,22 @@ class _SpotifyBarState extends State<SpotifyBar> {
                 gaplessPlayback: true,
               ),
             );
+            return cnSpotifyBar.lastImage;
           }
           else{
-            return ClipRRect(
+            print("in else");
+            if(cnSpotifyBar.imageGotUpdated){
+              cnSpotifyBar.imageGotUpdated = false;
+              return ClipRRect(
               borderRadius: BorderRadius.circular(7),
-              child: Container(
-                height: 44,
-                width: 44,
-                color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
-              ),
-            );
+                child: Container(
+                    height: 44,
+                    width: 44,
+                    color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
+                ),
+              );
+            }
+            return cnSpotifyBar.lastImage;
           }
         }
       );
@@ -326,6 +246,16 @@ class CnSpotifyBar extends ChangeNotifier {
   bool isTryingToConnect = false;
   bool isRebuilding = false;
   String accessToken = "";
+  PlayerState? data;
+  bool imageGotUpdated = false;
+  Widget lastImage = ClipRRect(
+    borderRadius: BorderRadius.circular(7),
+    child: Container(
+        height: 44,
+        width: 44,
+        color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
+    ),
+  );
   // final stream = SpotifySdk.subscribePlayerState();
   // late AsyncSnapshot<PlayerState> snapshot;
   // late BuildContext parentContext;
