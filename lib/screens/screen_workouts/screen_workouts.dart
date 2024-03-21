@@ -1,7 +1,7 @@
-import 'dart:ui';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
+import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +51,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkouts.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
+                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20+110:70 : 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                     initiallyExpanded: cnWorkouts.opened[index],
                 );
@@ -98,6 +98,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ],
             ),
           ),
+          const BannerRunningWorkout()
         ],
       ),
     );

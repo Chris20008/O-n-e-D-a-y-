@@ -120,60 +120,60 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           child: Column(
             children: [
-              if (cnRunningWorkout.isRunning)
-                Container(
-                  width: double.maxFinite,
-                  height: 110,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                        colors: [
-                          Color(0xff55300a),
-                          Color(0xff44260b),
-                        ]
-                    ),
-                    // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-                  ),
-                  child: Column(
-                    children: [
-                      const SafeArea(
-                        bottom: false,
-                        child: SizedBox(),
-                      ),
-                      GestureDetector(
-                        onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
-                        child: Container(
-                          height: 50,
-                          width: double.maxFinite,
-                          // color: Color(0xff44260b),
-                          decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                  begin: Alignment.centerRight,
-                                  end: Alignment.centerLeft,
-                                  colors: [
-                                    Color(0xff55300a),
-                                    Color(0xff44260b),
-                                  ]
-                              ),
-                            // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                  cnRunningWorkout.workout.name,
-                                textScaleFactor: 1.6,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                SizedBox(height: 0,),
+              // if (cnRunningWorkout.isRunning)
+              //   Container(
+              //     width: double.maxFinite,
+              //     height: 110,
+              //     decoration: const BoxDecoration(
+              //       gradient: LinearGradient(
+              //           begin: Alignment.centerRight,
+              //           end: Alignment.centerLeft,
+              //           colors: [
+              //             Color(0xff55300a),
+              //             Color(0xff44260b),
+              //           ]
+              //       ),
+              //       // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+              //     ),
+              //     child: Column(
+              //       children: [
+              //         const SafeArea(
+              //           bottom: false,
+              //           child: SizedBox(),
+              //         ),
+              //         GestureDetector(
+              //           onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
+              //           child: Container(
+              //             height: 50,
+              //             width: double.maxFinite,
+              //             // color: Color(0xff44260b),
+              //             decoration: const BoxDecoration(
+              //                 gradient: LinearGradient(
+              //                     begin: Alignment.centerRight,
+              //                     end: Alignment.centerLeft,
+              //                     colors: [
+              //                       Color(0xff55300a),
+              //                       Color(0xff44260b),
+              //                     ]
+              //                 ),
+              //               // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+              //             ),
+              //             child: Row(
+              //               mainAxisAlignment: MainAxisAlignment.center,
+              //               children: [
+              //                 Text(
+              //                     cnRunningWorkout.workout.name,
+              //                   textScaleFactor: 1.6,
+              //                 ),
+              //               ],
+              //             ),
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   )
+              // else
+              //   SizedBox(height: 0,),
               Expanded(
                 child: Stack(
                   alignment: Alignment.topCenter,
