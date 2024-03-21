@@ -44,15 +44,25 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             key: cnNewExercise.key,
             controller: cnNewExercise.panelController,
             defaultPanelState: PanelState.CLOSED,
-            maxHeight: cnRunningWorkout.isRunning? constraints.maxHeight :constraints.maxHeight - 50,
+            maxHeight: constraints.maxHeight - 50,
             minHeight: 0,
-            color: Colors.black.withOpacity(0.95),
+            color: Colors.transparent,
             isDraggable: true,
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
               child: Container(
-                padding: const EdgeInsets.all(20.0),
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: [
+                          Color(0xff160d05),
+                          Color(0xff0a0604),
+                        ]
+                    )
+                ),
+                padding: const EdgeInsets.all(30.0),
                 // height: double.maxFinite,
                 // width: double.maxFinite,
                 // color: Colors.black.withOpacity(0.3),

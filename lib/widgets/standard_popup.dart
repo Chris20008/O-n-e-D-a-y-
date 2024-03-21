@@ -47,31 +47,27 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
               children: <Widget>[
                 Positioned(
                   key: bottomChildKey,
-                  // left: 0,
-                  // top: 0.0,
-                  // right: 0,
-                  // bottom: 0,
                   child: bottomChild,
                 ),
                 Positioned(
                   key: topChildKey,
-                  // left: 0,
-                  // right: 0,
                   child: topChild,
                 ),
               ],
             );
           },
-            firstChild: SizedBox(),
+            firstChild: const SizedBox(),
             secondChild: BackdropFilter(
               filter: ImageFilter.blur(
                 sigmaX: 5.0,
                 sigmaY: 5.0,
               ),
+              // blendMode: BlendMode.,
               child: Container(
                 height: size.height,
                 width: size.width,
-                color: Colors.black.withOpacity(0.4),
+                // color: Colors.black.withOpacity(0.4),
+                color: Colors.transparent,
               ),
             ),
             crossFadeState: !cnStandardPopUp.isVisible?
@@ -82,7 +78,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
         AnimatedContainer(
           alignment: Alignment.center,
           duration: Duration(milliseconds: cnStandardPopUp.jump? 0 : 200), // Animationsdauer
-          transform: Matrix4.translationValues(!cnStandardPopUp.isVisible && cnStandardPopUp.pos != null? cnStandardPopUp.pos!.dx - size.width/2 : 0, !cnStandardPopUp.isVisible? (cnStandardPopUp.pos?.dy?? size.height) - size.height/2 : 0, 0),
+          transform: Matrix4.translationValues(!cnStandardPopUp.isVisible && cnStandardPopUp.pos != null? cnStandardPopUp.pos!.dx - size.width/2 : 0, !cnStandardPopUp.isVisible? (cnStandardPopUp.pos?.dy?? size.height) - size.height/2 : 0, cnStandardPopUp.isVisible? 100 : 0),
           // curve: cnStandardPopUp.isVisible? Curves.decelerate: Curves.easeInBack,
           child: ScaleTransition(
             scale: _animation,
@@ -93,8 +89,8 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                   borderRadius: BorderRadius.circular(15),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: 10.0,
-                      sigmaY: 10.0,
+                      sigmaX: 30.0,
+                      sigmaY: 30.0,
                     ),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(
@@ -103,7 +99,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                       ),
                       child: Container(
                           width: size.width*0.65,
-                          color: Colors.grey[800]!.withOpacity(0.6),
+                          color: cnStandardPopUp.color.withOpacity(0.23),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -115,6 +111,11 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                     child: cnStandardPopUp.child
                                 ),
                               ),
+                              Container(
+                                height: 0.5,
+                                width: double.maxFinite,
+                                color: Colors.grey[700]!.withOpacity(0.5),
+                              ),
                               SizedBox(
                                 height: 40,
                                 child: Row(
@@ -123,7 +124,10 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                         child: ElevatedButton(
                                             onPressed: cnStandardPopUp.confirm,
                                             style: ButtonStyle(
-                                                backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                                shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                                surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                             ),
                                             child: Text(cnStandardPopUp.confirmText)
@@ -138,7 +142,10 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                         child: ElevatedButton(
                                             onPressed: cnStandardPopUp.cancel,
                                             style: ButtonStyle(
-                                                backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                                shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                                surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                             ),
                                             child: const Text("Cancel")
@@ -146,7 +153,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                     ),
                                   ],
                                 ),
-                              )
+                              ),
                             ],
                           )
                       ),
@@ -172,6 +179,7 @@ class CnStandardPopUp extends ChangeNotifier {
   String cancelText = "Cancel";
   Offset? pos;
   bool jump = true;
+  Color color = Colors.black;
 
   void open({
     required Widget child,
@@ -181,6 +189,7 @@ class CnStandardPopUp extends ChangeNotifier {
     String confirmText = "Ok",
     String cancelText = "Cancel",
     GlobalKey? animationKey,
+    Color? color
   }){
     jump = true;
     this.onConfirm = onConfirm;
@@ -189,6 +198,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.padding = padding?? const EdgeInsets.all(20);
     this.confirmText = confirmText;
     this.cancelText = cancelText;
+    this.color = color?? Colors.black;
 
     if(animationKey != null){
       RenderBox? box = animationKey.currentContext?.findRenderObject() as RenderBox;
