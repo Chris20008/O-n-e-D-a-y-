@@ -28,6 +28,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   Widget build(BuildContext context) {
     cnNewExercise = Provider.of<CnNewExercisePanel>(context);
 
+    final insetsBottom = MediaQuery.of(context).viewInsets.bottom;
+
     return WillPopScope(
       onWillPop: () async{
         if (cnNewExercise.panelController.isPanelOpen){
@@ -44,25 +46,25 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             defaultPanelState: PanelState.CLOSED,
             maxHeight: cnRunningWorkout.isRunning? constraints.maxHeight :constraints.maxHeight - 50,
             minHeight: 0,
-            color: Colors.black.withOpacity(0.0),
+            color: Colors.black.withOpacity(0.5),
             isDraggable: true,
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: 30.0,
-                  sigmaY: 30.0,
+                  sigmaX: 5.0,
+                  sigmaY: 5.0,
                 ),
-                child: GestureDetector(
-                  onTap: () {
-                    FocusScope.of(context).unfocus();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(20.0),
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(20.0),
+                  // height: double.maxFinite,
+                  // width: double.maxFinite,
+                  // color: Colors.black.withOpacity(0.3),
+                  child: GestureDetector(
+                    onTap: () {
+                      FocusScope.of(context).unfocus();
+                    },
                     child: Column(
                       children: [
                         const Text("Exercise", textScaleFactor: 1.5),
@@ -192,7 +194,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                         const SizedBox(width: 30,)
                                       ],
                                     ),
-                                    SizedBox(height: MediaQuery.of(context).viewInsets.bottom-50 > 0? MediaQuery.of(context).viewInsets.bottom-50 : 0)
+                                    SizedBox(height: insetsBottom-50 > 0? insetsBottom-50 : 0)
                                   ],
                                 );
                               }
@@ -217,7 +219,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                           key: cnNewExercise.ensureVisibleKeys[index][0],
                                           maxLength: 3,
                                           onTap: ()async{
-                                            if(MediaQuery.of(context).viewInsets.bottom == 0) {
+                                            if(insetsBottom == 0) {
                                               await Future.delayed(const Duration(milliseconds: 300));
                                             }
                                             Scrollable.ensureVisible(
@@ -255,7 +257,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                           key: cnNewExercise.ensureVisibleKeys[index][1],
                                           maxLength: 3,
                                           onTap: ()async{
-                                            if(MediaQuery.of(context).viewInsets.bottom == 0) {
+                                            if(insetsBottom == 0) {
                                               await Future.delayed(const Duration(milliseconds: 300));
                                             }
                                             Scrollable.ensureVisible(

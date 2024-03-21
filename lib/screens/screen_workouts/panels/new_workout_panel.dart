@@ -61,17 +61,17 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             backdropEnabled: true,
             backdropColor: Colors.black,
-            color: Colors.black.withOpacity(0.0),
+            color: Colors.black.withOpacity(0.7),
             onPanelSlide: onPanelSlide,
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
               child: BackdropFilter(
                 filter: ImageFilter.blur(
-                  sigmaX: 30.0,
-                  sigmaY: 30.0,
+                  sigmaX: 5.0,
+                  sigmaY: 5.0,
                 ),
                 child: Container(
-                  color: Colors.black.withOpacity(0.1),
+                  // color: Colors.black.withOpacity(0.3),
                   child: GestureDetector(
                     behavior: HitTestBehavior.translucent,
                     onTap: () {
