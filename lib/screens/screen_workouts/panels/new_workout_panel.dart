@@ -61,7 +61,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             backdropEnabled: true,
             backdropColor: Colors.black,
-            color: Colors.black.withOpacity(0.7),
+            color: Colors.black.withOpacity(0.5),
             onPanelSlide: onPanelSlide,
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
