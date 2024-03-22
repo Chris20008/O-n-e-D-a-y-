@@ -9,6 +9,7 @@ import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'dart:io' show Platform;
 
 import '../main.dart';
+import 'background_image.dart';
 
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
@@ -20,6 +21,8 @@ class SpotifyBar extends StatefulWidget {
 class _SpotifyBarState extends State<SpotifyBar> {
   late CnSpotifyBar cnSpotifyBar;
   final width = WidgetsBinding.instance.window.physicalSize.width;
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   double paddingLeftRight = 5;
 
   @override
@@ -78,7 +81,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                     children: [
                                       Padding(
                                           padding: const EdgeInsets.all(5),
-                                          child: spotifyImageWidget(cnSpotifyBar.data?.track?.imageUri?? ImageUri("None"))
+                                          child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
                                       ),
                                       const Spacer(flex:1),
                                       IconButton(
@@ -199,44 +202,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
       ),
     );
   }
-
-  Widget spotifyImageWidget(ImageUri image) {
-    return FutureBuilder(
-        future: SpotifySdk.getImage(
-          imageUri: image,
-          dimension: ImageDimension.xSmall,
-        ),
-        builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
-          if (snapshot.hasData) {
-            cnSpotifyBar.lastImage = ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-              child: Image.memory(
-                snapshot.data!,
-                height: 44,
-                width: 44,
-                gaplessPlayback: true,
-              ),
-            );
-            return cnSpotifyBar.lastImage;
-          }
-          else{
-            print("in else");
-            if(cnSpotifyBar.imageGotUpdated){
-              cnSpotifyBar.imageGotUpdated = false;
-              return ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-                child: Container(
-                    height: 44,
-                    width: 44,
-                    color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
-                ),
-              );
-            }
-            return cnSpotifyBar.lastImage;
-          }
-        }
-      );
-    }
 }
 
 class CnSpotifyBar extends ChangeNotifier {
@@ -256,9 +221,49 @@ class CnSpotifyBar extends ChangeNotifier {
         color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
     ),
   );
-  // final stream = SpotifySdk.subscribePlayerState();
-  // late AsyncSnapshot<PlayerState> snapshot;
-  // late BuildContext parentContext;
+
+  Widget spotifyImageWidget(CnBackgroundImage cn) {
+    ImageUri image = data?.track?.imageUri?? ImageUri("None");
+    return FutureBuilder(
+        future: SpotifySdk.getImage(
+          imageUri: image,
+          dimension: ImageDimension.large,
+        ),
+        builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
+          if (snapshot.hasData) {
+            lastImage = ClipRRect(
+              borderRadius: BorderRadius.circular(7),
+              child: Image.memory(
+                snapshot.data!,
+                height: 1000,
+                // width: 1500,
+                gaplessPlayback: true,
+                fit: BoxFit.fill,
+              ),
+            );
+            Future.delayed(const Duration(milliseconds: 50), (){
+              cn.refresh();
+            });
+            return lastImage;
+          }
+          else{
+            print("in else");
+            if(imageGotUpdated){
+              imageGotUpdated = false;
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(7),
+                child: Container(
+                    height: 44,
+                    width: 44,
+                    color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
+                ),
+              );
+            }
+            return lastImage;
+          }
+        }
+    );
+  }
 
   void delayedReconnect() async{
     if(!isTryingReconnect){

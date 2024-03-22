@@ -10,6 +10,7 @@ import '../../main.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/constants.dart';
+import '../../widgets/background_image.dart';
 import '../../widgets/spotify_bar.dart';
 import '../../widgets/standard_popup.dart';
 
@@ -36,19 +37,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
 
-    return PopScope(
-      onPopInvoked: (doPop) async{
-        // openPopUpFinishWorkout();
-        // Navigator.of(context).pop();
-        if(doPop){
-          cnHomepage.refresh(refreshSpotifyBar: true);
-        }
-        // Future.delayed(const Duration(seconds: 2), (){
-        //   cnSpotifyBar.refresh();
-        // });
-        // cnRunningWorkout.clear();
-        // Navigator.of(context).pop();
-        // return false;
+    return WillPopScope(
+      onWillPop: () async{
+        // if(doPop){
+        cnHomepage.refresh(refreshSpotifyBar: true);
+        // }
+        return true;
       },
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -97,6 +91,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   },
                   child: Stack(
                     children: [
+                      const BackgroundImage(),
+                      // ImageFiltered(
+                      //     imageFilter: ImageFilter.blur(
+                      //       sigmaX: 50.0,
+                      //       sigmaY: 50.0,
+                      //     ),
+                      //     child: cnSpotifyBar.lastImage
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(top:0,bottom: 0,left: 20, right: 20),
                         child: Column(
@@ -498,6 +500,30 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       ),
     );
   }
+
+  // Widget getPop(Widget child){
+  //   if(Platform.isAndroid){
+  //
+  //   }
+  //   else{
+  //     return PopScope{
+  //       onPopInvoked: (doPop) async{
+  //         // openPopUpFinishWorkout();
+  //         // Navigator.of(context).pop();
+  //         if(doPop){
+  //           cnHomepage.refresh(refreshSpotifyBar: true);
+  //         }
+  //         // Future.delayed(const Duration(seconds: 2), (){
+  //         //   cnSpotifyBar.refresh();
+  //         // });
+  //         // cnRunningWorkout.clear();
+  //         // Navigator.of(context).pop();
+  //         // return false;
+  //       },
+  //     child: child
+  //     };
+  //   }
+  // }
 
   void addSet(Exercise ex, Exercise lastEx){
     setState(() {

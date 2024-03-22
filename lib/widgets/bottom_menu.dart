@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -36,14 +34,14 @@ class _BottomMenuState extends State<BottomMenu> {
       curve: Curves.easeInOut,
       height: cnBottomMenu.maxHeightBottomMenu,
       decoration: const BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-              colors: [
-                Color(0xff160d05),
-                Color(0xff0a0604),
-              ]
-          )
+          // gradient: LinearGradient(
+          //     begin: Alignment.centerRight,
+          //     end: Alignment.centerLeft,
+          //     colors: [
+          //       Color(0xff160d05),
+          //       Color(0xff0a0604),
+          //     ]
+          // )
       ),
       child: Theme(
         data: Theme.of(context).copyWith(

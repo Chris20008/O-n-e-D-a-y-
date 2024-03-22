@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
+import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
+        ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
@@ -109,101 +110,49 @@ class _MyHomePageState extends State<MyHomePage> {
       // ),
       body: Container(
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    const Color(0xff84490b),
-                    Colors.black.withOpacity(0.9),
-                  ]
-              )
+              // gradient: LinearGradient(
+              //     begin: Alignment.topRight,
+              //     end: Alignment.bottomLeft,
+              //     colors: [
+              //       const Color(0xff84490b),
+              //       Colors.black.withOpacity(0.9),
+              //     ]
+              // )
           ),
-          child: Column(
+          child: Stack(
+            alignment: Alignment.topCenter,
             children: [
-              // if (cnRunningWorkout.isRunning)
-              //   Container(
-              //     width: double.maxFinite,
-              //     height: 110,
-              //     decoration: const BoxDecoration(
-              //       gradient: LinearGradient(
-              //           begin: Alignment.centerRight,
-              //           end: Alignment.centerLeft,
-              //           colors: [
-              //             Color(0xff55300a),
-              //             Color(0xff44260b),
-              //           ]
-              //       ),
-              //       // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+              // ImageFiltered(
+              //     imageFilter: ImageFilter.blur(
+              //       sigmaX: 50.0,
+              //       sigmaY: 50.0,
               //     ),
-              //     child: Column(
-              //       children: [
-              //         const SafeArea(
-              //           bottom: false,
-              //           child: SizedBox(),
-              //         ),
-              //         GestureDetector(
-              //           onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
-              //           child: Container(
-              //             height: 50,
-              //             width: double.maxFinite,
-              //             // color: Color(0xff44260b),
-              //             decoration: const BoxDecoration(
-              //                 gradient: LinearGradient(
-              //                     begin: Alignment.centerRight,
-              //                     end: Alignment.centerLeft,
-              //                     colors: [
-              //                       Color(0xff55300a),
-              //                       Color(0xff44260b),
-              //                     ]
-              //                 ),
-              //               // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-              //             ),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 Text(
-              //                     cnRunningWorkout.workout.name,
-              //                   textScaleFactor: 1.6,
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   )
-              // else
-              //   SizedBox(height: 0,),
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    AnimatedCrossFade(
-                        firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-                        secondChild: ScreenWorkout(key: UniqueKey()),
-                        crossFadeState: cnBottomMenu.index == 0?
-                        CrossFadeState.showFirst:
-                        CrossFadeState.showSecond,
-                        duration: const Duration(milliseconds: 200)
-                    ),
-                    AnimatedContainer(
-                        duration: const Duration(milliseconds: 300), // Animationsdauer
-                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
-                        curve: Curves.easeInOut,
-                        // child: const SpotifyBar()
-                        child: const Hero(
-                            transitionOnUserGestures: true,
-                            tag: "SpotifyBar",
-                            child: SpotifyBar()
-                        ),
-                    ),
-                    // cnSpotifyBar.bar,
-                    const NewWorkOutPanel(),
-                    const NewExercisePanel(),
-                    const StandardPopUp()
-                  ],
-                ),
+              //     child: cnSpotifyBar.lastImage
+              // ),
+              const BackgroundImage(),
+              AnimatedCrossFade(
+                  firstChild: ScreenWorkoutHistory(key: UniqueKey()),
+                  secondChild: ScreenWorkout(key: UniqueKey()),
+                  crossFadeState: cnBottomMenu.index == 0?
+                  CrossFadeState.showFirst:
+                  CrossFadeState.showSecond,
+                  duration: const Duration(milliseconds: 200)
               ),
+              AnimatedContainer(
+                  duration: const Duration(milliseconds: 300), // Animationsdauer
+                  transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+                  curve: Curves.easeInOut,
+                  // child: const SpotifyBar()
+                  child: const Hero(
+                      transitionOnUserGestures: true,
+                      tag: "SpotifyBar",
+                      child: SpotifyBar()
+                  ),
+              ),
+              // cnSpotifyBar.bar,
+              const NewWorkOutPanel(),
+              const NewExercisePanel(),
+              const StandardPopUp()
             ],
           ),
 
