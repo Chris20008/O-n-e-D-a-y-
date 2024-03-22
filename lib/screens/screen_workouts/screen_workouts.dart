@@ -1,13 +1,14 @@
-import 'dart:ui';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
+import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../objectbox.g.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
+import '../../widgets/spotify_bar.dart';
 import '../../widgets/workout_expansion_tile.dart';
 
 class ScreenWorkout extends StatefulWidget {
@@ -22,6 +23,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts;
 
   bool isVisible = true;
@@ -48,52 +51,54 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkouts.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:50 : 10, left: 20, right: 20, bottom: 0),
+                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20+110:70 : 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                     initiallyExpanded: cnWorkouts.opened[index],
                 );
               }
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Center(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(
-                      sigmaX: 5.0,
-                      sigmaY: 5.0,
-                    ),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.3),
-                      child: IconButton(
-                          iconSize: 30,
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                          ),
-                          onPressed: () {
-                            if(cnNewWorkout.isUpdating){
-                              cnNewWorkout.clear();
-                            }
-                            cnNewWorkout.workout.isTemplate = true;
-                            cnNewWorkout.openPanel();
-                          },
-                          icon: Icon(
-                              Icons.add,
-                            color: Colors.amber[800],
-                          )
+          Container(
+            height: double.maxFinite,
+            width: double.maxFinite,
+            padding: EdgeInsets.only(right: 5, bottom: 54),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                SizedBox(
+                  width: 54,
+                  height: 54,
+                  child: IconButton(
+                      iconSize: 25,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
                       ),
-                    ),
+                      onPressed: () {
+                        if(cnNewWorkout.isUpdating){
+                          cnNewWorkout.clear();
+                        }
+                        cnNewWorkout.workout.isTemplate = true;
+                        cnNewWorkout.openPanel();
+                        cnHomepage.refresh();
+                      },
+                      icon: Icon(
+                          Icons.add,
+                        color: Colors.amber[800],
+                      )
                   ),
                 ),
-              ),
 
-              /// Space to be over bottom navigation bar
-              const SizedBox(height: 75),
-            ],
+                /// Space to be over bottom navigation bar
+                const SafeArea(
+                    top: false,
+                    left: false,
+                    right: false,
+                    child: SizedBox()
+                ),
+              ],
+            ),
           ),
+          const BannerRunningWorkout()
         ],
       ),
     );
