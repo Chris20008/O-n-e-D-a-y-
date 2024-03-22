@@ -41,11 +41,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
-        ChangeNotifierProvider(create: (context) => CnHomepage()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
@@ -79,6 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  // late CnBackgroundImage cnBackgroundImage;
   late CnHomepage cnHomepage;
 
   @override
@@ -100,7 +101,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
-    cnHomepage.initSpotifyBar(cnSpotifyBar);
+    // cnHomepage.initSpotifyBar(cnSpotifyBar);
+    // cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
+
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
@@ -173,14 +176,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class CnHomepage extends ChangeNotifier {
   late CnSpotifyBar cnSpotifyBar;
-  bool isInitialized = false;
+  // bool isInitialized = false;
 
-  void initSpotifyBar(CnSpotifyBar cn){
-    if(!isInitialized){
-      cnSpotifyBar = cn;
-      isInitialized = true;
-    }
+  CnHomepage(BuildContext context){
+    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   }
+
+  // void initSpotifyBar(CnSpotifyBar cn){
+  //   if(!isInitialized){
+  //     cnSpotifyBar = cn;
+  //     isInitialized = true;
+  //   }
+  // }
 
   void refresh({bool refreshSpotifyBar = false}){
     notifyListeners();

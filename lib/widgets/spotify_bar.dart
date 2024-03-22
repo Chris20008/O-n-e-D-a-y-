@@ -1,12 +1,14 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/image_uri.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show Platform, zlib;
 
 import '../main.dart';
 import 'background_image.dart';
@@ -213,38 +215,35 @@ class CnSpotifyBar extends ChangeNotifier {
   String accessToken = "";
   PlayerState? data;
   bool imageGotUpdated = false;
-  Widget lastImage = ClipRRect(
-    borderRadius: BorderRadius.circular(7),
-    child: Container(
-        height: 44,
-        width: 44,
-        color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
-    ),
-  );
+  late Image lastImage;
+  Color? mainColor;
+  int waitCounter = 0;
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
     ImageUri image = data?.track?.imageUri?? ImageUri("None");
     return FutureBuilder(
         future: SpotifySdk.getImage(
           imageUri: image,
-          dimension: ImageDimension.large,
+          dimension: ImageDimension.xSmall,
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
           if (snapshot.hasData) {
-            lastImage = ClipRRect(
-              borderRadius: BorderRadius.circular(7),
-              child: Image.memory(
-                snapshot.data!,
-                height: 1000,
-                // width: 1500,
-                gaplessPlayback: true,
-                fit: BoxFit.fill,
-              ),
+
+            lastImage = Image.memory(
+              snapshot.data!,
+              height: 1000,
+              // height: 44,
+              // width: 44,
+              gaplessPlayback: true,
+              fit: BoxFit.fitHeight,
             );
+
+            // setMainColor(lastImage.image, cn);
+
             Future.delayed(const Duration(milliseconds: 50), (){
               cn.refresh();
             });
-            return lastImage;
+            // return lastImage;
           }
           else{
             print("in else");
@@ -253,17 +252,54 @@ class CnSpotifyBar extends ChangeNotifier {
               return ClipRRect(
                 borderRadius: BorderRadius.circular(7),
                 child: Container(
-                    height: 44,
-                    width: 44,
+                    height: 300,
+                    width: 300,
                     color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
                 ),
               );
             }
-            return lastImage;
+            // return lastImage;
           }
+          return ClipRRect(
+
+            borderRadius: BorderRadius.circular(7),
+            child: lastImage,
+          );
         }
     );
   }
+
+  // Future setMainColor (ImageProvider imageProvider, CnBackgroundImage cn) async {
+  //   final PaletteGenerator paletteGenerator = await PaletteGenerator
+  //       .fromImageProvider(imageProvider);
+  //   // print(paletteGenerator.dominantColor?.color);
+  //   waitCounter += 1;
+  //   // print("Enter $waitCounter");
+  //   final c = await compute(computeColor, paletteGenerator);
+  //   Future.delayed(const Duration(milliseconds: 100), (){
+  //     waitCounter -= 1;
+  //     // print("GOT $waitCounter");
+  //     if(waitCounter == 0){
+  //       // print("--------------------- REFRESH ---------------------");
+  //       mainColor = c;
+  //       cn.setColor(mainColor);
+  //     }
+  //   });
+
+    // mainColor = paletteGenerator.lightVibrantColor?.color??
+    //     paletteGenerator.lightMutedColor?.color??
+    //     paletteGenerator.darkVibrantColor?.color
+    //     ;
+    // mainColor = await compute(computeColor, imageProvider);
+  //
+  // }
+
+  // static Future<Color?> computeColor(PaletteGenerator paletteGenerator)async{
+  //   final color = paletteGenerator.lightVibrantColor?.color??
+  //       paletteGenerator.lightMutedColor?.color??
+  //       paletteGenerator.darkVibrantColor?.color;
+  //   return color;
+  // }
 
   void delayedReconnect() async{
     if(!isTryingReconnect){

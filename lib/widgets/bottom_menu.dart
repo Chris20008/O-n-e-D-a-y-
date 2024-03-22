@@ -33,15 +33,15 @@ class _BottomMenuState extends State<BottomMenu> {
       transform: Matrix4.translationValues(0, cnBottomMenu.heightOfBottomMenu, 0),
       curve: Curves.easeInOut,
       height: cnBottomMenu.maxHeightBottomMenu,
-      decoration: const BoxDecoration(
-          // gradient: LinearGradient(
-          //     begin: Alignment.centerRight,
-          //     end: Alignment.centerLeft,
-          //     colors: [
-          //       Color(0xff160d05),
-          //       Color(0xff0a0604),
-          //     ]
-          // )
+      decoration: BoxDecoration(
+          gradient: cnNewWorkout.minPanelHeight > 0? const LinearGradient(
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+              colors: [
+                Color(0xff160d05),
+                Color(0xff0a0604),
+              ]
+          ) : null
       ),
       child: Theme(
         data: Theme.of(context).copyWith(

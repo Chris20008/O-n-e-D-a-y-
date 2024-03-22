@@ -41,7 +41,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withOpacity(0.5),
           child: Theme(
             data: Theme.of(context).copyWith(
               splashColor: Colors.transparent,
