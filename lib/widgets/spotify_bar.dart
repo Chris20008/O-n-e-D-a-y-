@@ -31,168 +31,163 @@ class _SpotifyBarState extends State<SpotifyBar> {
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
     // final size = MediaQuery.of(context).size;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 0),
-      child: SafeArea(
-        child: Align(
-          alignment: Alignment.bottomRight,
-          child: Padding(
-              padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
-              child: AnimatedCrossFade(
-                secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
-                // secondCurve: Curves.fastOutSlowIn,
-                // secondCurve: Curves.fastLinearToSlowEaseIn,
-                //   sizeCurve: Curves.easeInOutBack,
-                sizeCurve: Curves.easeInOut,
-                  firstChild: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Container(
-                      color: Colors.black.withOpacity(0.8),
-                      height: 54,
-                      // width: constraints.maxWidth,
-                      // width: size.width - paddingLeftRight*2,
-                      width: width - paddingLeftRight*2,
-                      child: Consumer<PlayerStateStream>(
-                        builder: (context, playerStateStream, _) {
-                          return StreamBuilder<PlayerState>(
-                              stream: playerStateStream.stream,
-                              builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
-                                final data = snapshot.data;
-                                if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
-                                  cnSpotifyBar.imageGotUpdated = true;
-                                }
-                                cnSpotifyBar.data = data?? cnSpotifyBar.data;
-                                return cnSpotifyBar.data == null?
-                                GestureDetector(
-                                    onTap: cnSpotifyBar.connectToSpotify,
-                                    child: Container(
-                                      height: 54,
-                                      width: double.maxFinite,
-                                      color: Colors.transparent,
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+          padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
+          child: AnimatedCrossFade(
+            secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
+            // secondCurve: Curves.fastOutSlowIn,
+            // secondCurve: Curves.fastLinearToSlowEaseIn,
+            //   sizeCurve: Curves.easeInOutBack,
+            sizeCurve: Curves.easeInOut,
+              firstChild: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  color: Colors.black.withOpacity(0.8),
+                  height: cnSpotifyBar.height,
+                  // width: constraints.maxWidth,
+                  // width: size.width - paddingLeftRight*2,
+                  width: width - paddingLeftRight*2,
+                  child: Consumer<PlayerStateStream>(
+                    builder: (context, playerStateStream, _) {
+                      return StreamBuilder<PlayerState>(
+                          stream: playerStateStream.stream,
+                          builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
+                            final data = snapshot.data;
+                            if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
+                              cnSpotifyBar.imageGotUpdated = true;
+                            }
+                            cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                            return cnSpotifyBar.data == null?
+                            GestureDetector(
+                                onTap: cnSpotifyBar.connectToSpotify,
+                                child: Container(
+                                  height: cnSpotifyBar.height,
+                                  width: double.maxFinite,
+                                  color: Colors.transparent,
+                                )
+                            ) :
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Padding(
+                                    padding: const EdgeInsets.all(5),
+                                    child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                                ),
+                                const Spacer(flex:1),
+                                IconButton(
+                                    iconSize: 30,
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                      // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                                    ),
+                                    onPressed: () async{
+                                      cnSpotifyBar.skipPrevious();
+                                    },
+                                    icon: Icon(
+                                      Icons.skip_previous,
+                                      color: Colors.amber[800],
                                     )
-                                ) :
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Padding(
-                                        padding: const EdgeInsets.all(5),
-                                        child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                                ),
+                                const Spacer(flex:1),
+                                IconButton(
+                                    iconSize: 30,
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                     ),
-                                    const Spacer(flex:1),
-                                    IconButton(
-                                        iconSize: 30,
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                          // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                                        ),
-                                        onPressed: () async{
-                                          cnSpotifyBar.skipPrevious();
-                                        },
-                                        icon: Icon(
-                                          Icons.skip_previous,
-                                          color: Colors.amber[800],
-                                        )
+                                    onPressed: () async{
+                                      cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
+                                    },
+                                    icon: Icon(
+                                      cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
+                                      color: Colors.amber[800],
+                                    )
+                                ),
+                                const Spacer(flex:1),
+                                IconButton(
+                                    iconSize: 30,
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                     ),
-                                    const Spacer(flex:1),
-                                    IconButton(
-                                        iconSize: 30,
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                        ),
-                                        onPressed: () async{
-                                          cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
-                                        },
-                                        icon: Icon(
-                                          cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
-                                          color: Colors.amber[800],
-                                        )
+                                    onPressed: () async{
+                                      cnSpotifyBar.skipNext(); //.then((value) => setState(() => {}));
+                                    },
+                                    icon: Icon(
+                                      Icons.skip_next,
+                                      color: Colors.amber[800],
+                                    )
+                                ),
+                                const Spacer(flex:6),
+                                IconButton(
+                                    iconSize: 20,
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                     ),
-                                    const Spacer(flex:1),
-                                    IconButton(
-                                        iconSize: 30,
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                        ),
-                                        onPressed: () async{
-                                          cnSpotifyBar.skipNext(); //.then((value) => setState(() => {}));
-                                        },
-                                        icon: Icon(
-                                          Icons.skip_next,
-                                          color: Colors.amber[800],
-                                        )
-                                    ),
-                                    const Spacer(flex:6),
-                                    IconButton(
-                                        iconSize: 20,
-                                        style: ButtonStyle(
-                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                        ),
-                                        onPressed: () async{
-                                          cnSpotifyBar.disconnect();
-                                        },
-                                        icon: Icon(
-                                          Icons.cancel,
-                                          color: Colors.amber[800],
-                                        )
-                                    ),
-                                  ],
-                                );
-                              }
-                          );
-                        }
-                      ),
-                    ),
+                                    onPressed: () async{
+                                      cnSpotifyBar.disconnect();
+                                    },
+                                    icon: Icon(
+                                      Icons.cancel,
+                                      color: Colors.amber[800],
+                                    )
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                    }
                   ),
-                  secondChild: SizedBox(
-                    height: 54,
-                    width: 54,
-                    child: IconButton(
-                        iconSize: 25,
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                          // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                        ),
-                        onPressed: () async{
-                          cnSpotifyBar.connectToSpotify();
-                        },
-                        icon: Icon(
-                          MyIcons.spotify,
-                          color: Colors.amber[800],
-                        )
+                ),
+              ),
+              secondChild: SizedBox(
+                height: cnSpotifyBar.height,
+                width: cnSpotifyBar.height,
+                child: IconButton(
+                    iconSize: 25,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                     ),
-                  ),
-                  crossFadeState: cnSpotifyBar.isConnected?
-                  CrossFadeState.showFirst :
-                  CrossFadeState.showSecond,
-                  duration: Duration(milliseconds: cnSpotifyBar.animationTimeSpotifyBar),
-                  layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        Positioned(
-                          key: bottomChildKey,
-                          // left: 0.0,
-                          // top: 0.0,
-                          // right: 0.0,
-                          bottom: 0,
-                          child: bottomChild,
-                        ),
-                        Positioned(
-                          key: topChildKey,
-                          // left: 0.0,
-                          // top: 0.0,
-                          // right: 0.0,
-                          // bottom: 0,
-                          // right: 0,
-                          child: topChild,
-                        ),
-                      ],
-                    );
-                  },
-              )
-          ),
-        ),
+                    onPressed: () async{
+                      cnSpotifyBar.connectToSpotify();
+                    },
+                    icon: Icon(
+                      MyIcons.spotify,
+                      color: Colors.amber[800],
+                    )
+                ),
+              ),
+              crossFadeState: cnSpotifyBar.isConnected?
+              CrossFadeState.showFirst :
+              CrossFadeState.showSecond,
+              duration: Duration(milliseconds: cnSpotifyBar.animationTimeSpotifyBar),
+              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      key: bottomChildKey,
+                      // left: 0.0,
+                      // top: 0.0,
+                      // right: 0.0,
+                      bottom: 0,
+                      child: bottomChild,
+                    ),
+                    Positioned(
+                      key: topChildKey,
+                      // left: 0.0,
+                      // top: 0.0,
+                      // right: 0.0,
+                      // bottom: 0,
+                      // right: 0,
+                      child: topChild,
+                    ),
+                  ],
+                );
+              },
+          )
       ),
     );
   }
@@ -210,6 +205,7 @@ class CnSpotifyBar extends ChangeNotifier {
   late Image lastImage;
   Color? mainColor;
   int waitCounter = 0;
+  double height = 54;
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
     ImageUri image = data?.track?.imageUri?? ImageUri("None");

@@ -39,17 +39,25 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
 
-    return PopScope(
-      onPopInvoked: (doPop) async{
-        if(doPop){
-          cnRunningWorkout.isVisible = false;
-          // cnHomepage.refresh(refreshSpotifyBar: true);
-          cnSpotifyBar.refresh();
-          cnWorkouts.refresh();
-          cnBottomMenu.refresh();
-        }
-        // return true;
+    return WillPopScope(
+      onWillPop: () async{
+        cnRunningWorkout.isVisible = false;
+        // cnHomepage.refresh(refreshSpotifyBar: true);
+        cnSpotifyBar.refresh();
+        cnWorkouts.refresh();
+        cnBottomMenu.refresh();
+        return true;
       },
+      // onPopInvoked: (doPop) async{
+      //   if(doPop){
+      //     cnRunningWorkout.isVisible = false;
+      //     // cnHomepage.refresh(refreshSpotifyBar: true);
+      //     cnSpotifyBar.refresh();
+      //     cnWorkouts.refresh();
+      //     cnBottomMenu.refresh();
+      //   }
+      //   // return true;
+      // },
       child: MaterialApp(
         themeMode: ThemeMode.dark,
         title: 'Flutter Demo',
@@ -454,49 +462,119 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         ),
                       ),
                       if(MediaQuery.of(context).viewInsets.bottom < 50)
-                        // const SpotifyBar(),
-                        const Hero(
-                            transitionOnUserGestures: true,
-                            tag: "SpotifyBar",
-                            child: SpotifyBar()
-                        ),
-                      Container(
-                        height: double.maxFinite,
-                        width: double.maxFinite,
-                        padding: EdgeInsets.only(right: 5, bottom: 54),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              width: 54,
-                              height: 54,
-                              child: IconButton(
-                                  iconSize: 25,
-                                  style: ButtonStyle(
-                                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    cnHomepage.refresh(refreshSpotifyBar: true);
-                                  },
-                                  icon: Icon(
-                                    Icons.fullscreen_exit,
-                                    color: Colors.amber[800],
-                                  )
+                        SafeArea(
+                          child: Column(
+                            // mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            verticalDirection: VerticalDirection.up,
+                            children: [
+                              const Hero(
+                                  transitionOnUserGestures: true,
+                                  tag: "SpotifyBar",
+                                  child: SpotifyBar()
                               ),
-                            ),
-
-                            /// Space to be over bottom navigation bar
-                            const SafeArea(
-                                top: false,
-                                left: false,
-                                right: false,
-                                child: SizedBox()
-                            ),
-                          ],
-                        ),
-                      ),
+                              Container(
+                                width: cnSpotifyBar.height,
+                                height: cnSpotifyBar.height,
+                                padding: const EdgeInsets.only(right: 10),
+                                child: IconButton(
+                                    iconSize: 25,
+                                    style: ButtonStyle(
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                    ),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      cnHomepage.refresh(refreshSpotifyBar: true);
+                                    },
+                                    icon: Icon(
+                                      Icons.fullscreen_exit,
+                                      color: Colors.amber[800],
+                                    )
+                                ),
+                              ),
+                              // Container(
+                              //   // height: double.maxFinite,
+                              //   // width: double.maxFinite,
+                              //   // padding: EdgeInsets.only(right: 5, bottom: cnSpotifyBar.height*2),
+                              //   child: Column(
+                              //     mainAxisAlignment: MainAxisAlignment.end,
+                              //     crossAxisAlignment: CrossAxisAlignment.end,
+                              //     children: [
+                              //       SizedBox(
+                              //         width: cnSpotifyBar.height,
+                              //         height: cnSpotifyBar.height,
+                              //         child: IconButton(
+                              //             iconSize: 25,
+                              //             style: ButtonStyle(
+                              //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              //             ),
+                              //             onPressed: () {
+                              //               Navigator.of(context).pop();
+                              //               cnHomepage.refresh(refreshSpotifyBar: true);
+                              //             },
+                              //             icon: Icon(
+                              //               Icons.fullscreen_exit,
+                              //               color: Colors.amber[800],
+                              //             )
+                              //         ),
+                              //       ),
+                              //
+                              //       /// Space to be over bottom navigation bar
+                              //       const SafeArea(
+                              //           top: false,
+                              //           left: false,
+                              //           right: false,
+                              //           child: SizedBox()
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        )
+                        // const SpotifyBar(),
+                        // const Hero(
+                        //     transitionOnUserGestures: true,
+                        //     tag: "SpotifyBar",
+                        //     child: SpotifyBar()
+                        // ),
+                      // Container(
+                      //   height: double.maxFinite,
+                      //   width: double.maxFinite,
+                      //   padding: EdgeInsets.only(right: 5, bottom: cnSpotifyBar.height*2),
+                      //   child: Column(
+                      //     mainAxisAlignment: MainAxisAlignment.end,
+                      //     crossAxisAlignment: CrossAxisAlignment.end,
+                      //     children: [
+                      //       SizedBox(
+                      //         width: cnSpotifyBar.height,
+                      //         height: cnSpotifyBar.height,
+                      //         child: IconButton(
+                      //             iconSize: 25,
+                      //             style: ButtonStyle(
+                      //               backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      //             ),
+                      //             onPressed: () {
+                      //               Navigator.of(context).pop();
+                      //               cnHomepage.refresh(refreshSpotifyBar: true);
+                      //             },
+                      //             icon: Icon(
+                      //               Icons.fullscreen_exit,
+                      //               color: Colors.amber[800],
+                      //             )
+                      //         ),
+                      //       ),
+                      //
+                      //       /// Space to be over bottom navigation bar
+                      //       const SafeArea(
+                      //           top: false,
+                      //           left: false,
+                      //           right: false,
+                      //           child: SizedBox()
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

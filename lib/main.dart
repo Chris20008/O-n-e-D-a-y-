@@ -147,10 +147,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
                   curve: Curves.easeInOut,
                   // child: const SpotifyBar()
-                  child: const Hero(
-                      transitionOnUserGestures: true,
-                      tag: "SpotifyBar",
-                      child: SpotifyBar()
+                  child: const SafeArea(
+                    top: false,
+                    child: Hero(
+                        transitionOnUserGestures: true,
+                        tag: "SpotifyBar",
+                        child: SpotifyBar()
+                    ),
                   ),
               ),
               // cnSpotifyBar.bar,
