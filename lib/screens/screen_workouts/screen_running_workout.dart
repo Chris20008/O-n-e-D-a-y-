@@ -41,15 +41,22 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
 
-    return WillPopScope(
-      onWillPop: () async{
+    return PopScope(
+      onPopInvoked: (doPop){
         cnRunningWorkout.isVisible = false;
         // cnHomepage.refresh(refreshSpotifyBar: true);
         cnSpotifyBar.refresh();
         cnWorkouts.refresh();
         cnBottomMenu.refresh();
-        return true;
       },
+      // onWillPop: () async{
+      //   cnRunningWorkout.isVisible = false;
+      //   // cnHomepage.refresh(refreshSpotifyBar: true);
+      //   cnSpotifyBar.refresh();
+      //   cnWorkouts.refresh();
+      //   cnBottomMenu.refresh();
+      //   return true;
+      // },
       child: Scaffold(
         body: Stack(
           alignment: Alignment.center,

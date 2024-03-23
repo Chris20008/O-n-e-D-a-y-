@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'animated_column.dart';
@@ -153,9 +154,10 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                             cnStopwatchWidget.isRunning?
                               getTimeString() :
                               "00:00,00",
-                            style: const TextStyle(
-                              fontSize: 80,
-                              color: Colors.white54
+                            style: TextStyle(
+                              fontSize: 60,
+                              color: Colors.white54,
+                              fontFamily: GoogleFonts.robotoMono().fontFamily
                             )
                           ),
                         )
