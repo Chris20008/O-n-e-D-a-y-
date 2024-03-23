@@ -10,6 +10,8 @@ import '../../main.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/constants.dart';
+import '../../widgets/background_image.dart';
+import '../../widgets/bottom_menu.dart';
 import '../../widgets/spotify_bar.dart';
 import '../../widgets/standard_popup.dart';
 
@@ -27,6 +29,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout;
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
@@ -38,17 +41,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
     return PopScope(
       onPopInvoked: (doPop) async{
-        // openPopUpFinishWorkout();
-        // Navigator.of(context).pop();
         if(doPop){
-          cnHomepage.refresh(refreshSpotifyBar: true);
+          cnRunningWorkout.isVisible = false;
+          // cnHomepage.refresh(refreshSpotifyBar: true);
+          cnSpotifyBar.refresh();
+          cnWorkouts.refresh();
+          cnBottomMenu.refresh();
         }
-        // Future.delayed(const Duration(seconds: 2), (){
-        //   cnSpotifyBar.refresh();
-        // });
-        // cnRunningWorkout.clear();
-        // Navigator.of(context).pop();
-        // return false;
+        // return true;
       },
       child: MaterialApp(
         themeMode: ThemeMode.dark,
@@ -65,38 +65,48 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               Scaffold(
                 extendBody: true,
                 // resizeToAvoidBottomInset: false,
-                bottomNavigationBar: ClipRRect(
+                bottomNavigationBar: MediaQuery.of(context).viewInsets.bottom < 50? ClipRRect(
                   child: BackdropFilter(
                     filter: ImageFilter.blur(
-                      sigmaX: 15.0,
-                      sigmaY: 15.0,
+                      sigmaX: 10.0,
+                      sigmaY: 10.0,
+                      tileMode: TileMode.mirror
                     ),
                     child: GestureDetector(
                       onTap: openPopUpFinishWorkout,
                       child: Container(
                         height: 70,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.3),
-                                  Colors.black.withOpacity(0.6),
-                                  Colors.black.withOpacity(1),
-                                ]
-                            )
-                        ),
+                        color: Colors.black.withOpacity(0.5),
+                        // decoration: BoxDecoration(
+                        //     gradient: LinearGradient(
+                        //         begin: Alignment.topCenter,
+                        //         end: Alignment.bottomCenter,
+                        //         colors: [
+                        //           Colors.black.withOpacity(0.3),
+                        //           Colors.black.withOpacity(0.6),
+                        //           Colors.black.withOpacity(1),
+                        //         ]
+                        //     )
+                        // ),
                         child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaleFactor: 1.4,)),
                       ),
                     ),
                   ),
-                ),
+                ): const SizedBox(),
                 body: GestureDetector(
                   onTap: (){
                     FocusScope.of(context).unfocus();
                   },
                   child: Stack(
                     children: [
+                      // const BackgroundImage(),
+                      // ImageFiltered(
+                      //     imageFilter: ImageFilter.blur(
+                      //       sigmaX: 50.0,
+                      //       sigmaY: 50.0,
+                      //     ),
+                      //     child: cnSpotifyBar.lastImage
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(top:0,bottom: 0,left: 20, right: 20),
                         child: Column(
@@ -393,25 +403,25 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                       ClipRRect(
                         // borderRadius: BorderRadius.circular(15),
                         child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10, tileMode: TileMode.mirror),
                             child: Container(
                               // margin: const EdgeInsets.only(bottom: 30),
                               height: 130,
                               width: double.maxFinite,
-                              // color: Colors.black.withOpacity(0.5),
-                              decoration: BoxDecoration(
-                                // color: Colors.black.withOpacity(0.5),
-                                // borderRadius: BorderRadius.circular(10),
-                                  gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        // Colors.black.withOpacity(0.4),
-                                        Colors.black.withOpacity(1),
-                                        Colors.black.withOpacity(0.3),
-                                      ]
-                                  )
-                              ),
+                              color: Colors.black.withOpacity(0.5),
+                              // decoration: BoxDecoration(
+                              //   // color: Colors.black.withOpacity(0.5),
+                              //   // borderRadius: BorderRadius.circular(10),
+                              //     gradient: LinearGradient(
+                              //         begin: Alignment.topCenter,
+                              //         end: Alignment.bottomCenter,
+                              //         colors: [
+                              //           // Colors.black.withOpacity(0.4),
+                              //           Colors.black.withOpacity(1),
+                              //           Colors.black.withOpacity(0.3),
+                              //         ]
+                              //     )
+                              // ),
                               child: Column(
                                 children: [
                                   const SafeArea(
@@ -499,6 +509,30 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     );
   }
 
+  // Widget getPop(Widget child){
+  //   if(Platform.isAndroid){
+  //
+  //   }
+  //   else{
+  //     return PopScope{
+  //       onPopInvoked: (doPop) async{
+  //         // openPopUpFinishWorkout();
+  //         // Navigator.of(context).pop();
+  //         if(doPop){
+  //           cnHomepage.refresh(refreshSpotifyBar: true);
+  //         }
+  //         // Future.delayed(const Duration(seconds: 2), (){
+  //         //   cnSpotifyBar.refresh();
+  //         // });
+  //         // cnRunningWorkout.clear();
+  //         // Navigator.of(context).pop();
+  //         // return false;
+  //       },
+  //     child: child
+  //     };
+  //   }
+  // }
+
   void addSet(Exercise ex, Exercise lastEx){
     setState(() {
       ex.addSet();
@@ -560,19 +594,21 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   void finishWorkout({bool doUpdate = false}){
     cnStandardPopUp.clear();
-    cnRunningWorkout.workout.refreshDate();
-    cnRunningWorkout.removeNotSelectedExercises();
-    cnRunningWorkout.workout.removeEmptyExercises();
-    if(cnRunningWorkout.workout.exercises.isNotEmpty){
-      cnRunningWorkout.workout.saveToDatabase();
-      if(doUpdate){
-        cnRunningWorkout.workout.updateTemplate();
+    Future.delayed(const Duration(milliseconds: 500), (){
+      cnRunningWorkout.workout.refreshDate();
+      cnRunningWorkout.removeNotSelectedExercises();
+      cnRunningWorkout.workout.removeEmptyExercises();
+      if(cnRunningWorkout.workout.exercises.isNotEmpty){
+        cnRunningWorkout.workout.saveToDatabase();
+        if(doUpdate){
+          cnRunningWorkout.workout.updateTemplate();
+        }
+        cnWorkouts.refreshAllWorkouts();
       }
-      cnWorkouts.refreshAllWorkouts();
-    }
-    cnRunningWorkout.clear();
-    Navigator.of(context).pop();
-    cnHomepage.refresh();
+      cnRunningWorkout.clear();
+      Navigator.of(context).pop();
+      cnHomepage.refresh();
+    });
   }
 }
 
@@ -580,6 +616,7 @@ class CnRunningWorkout extends ChangeNotifier {
   Workout workout = Workout();
   Workout lastWorkout = Workout();
   bool isRunning = false;
+  bool isVisible = false;
   ScrollController scrollController = ScrollController();
   late Map<String, List<Key>> slideableKeys = {
     for (var e in workout.exercises)
@@ -607,6 +644,7 @@ class CnRunningWorkout extends ChangeNotifier {
         CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
+    isVisible = true;
   }
 
   void reopenRunningWorkout(BuildContext context){
@@ -615,6 +653,7 @@ class CnRunningWorkout extends ChangeNotifier {
         CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
+    isVisible = true;
   }
   
   void removeNotSelectedExercises(){

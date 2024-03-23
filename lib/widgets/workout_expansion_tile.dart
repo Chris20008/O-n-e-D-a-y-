@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../main.dart';
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
 import '../screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/screen_workouts/screen_running_workout.dart';
+import '../screens/screen_workouts/screen_workouts.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
 
@@ -32,6 +34,8 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -41,7 +45,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          color: Colors.black.withOpacity(0.3),
+          color: Colors.black.withOpacity(0.5),
           child: Theme(
             data: Theme.of(context).copyWith(
               splashColor: Colors.transparent,
@@ -85,6 +89,15 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                         if(widget.workout.isTemplate)
                           IconButton(
                               onPressed: () {
+                                cnRunningWorkout.isVisible = true;
+                                cnBottomMenu.refresh();
+                                if(cnRunningWorkout.isRunning){
+                                  cnWorkouts.refresh();
+                                }else{
+                                  Future.delayed(const Duration(milliseconds: 1000), (){
+                                    cnWorkouts.refresh();
+                                  });
+                                }
                                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                               },
                               icon: Icon(Icons.play_arrow,

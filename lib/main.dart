@@ -1,11 +1,11 @@
 import 'dart:async';
-
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
+import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
@@ -41,13 +41,15 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
-        ChangeNotifierProvider(create: (context) => CnHomepage()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
+        ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
+        // showPerformanceOverlay: true,
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
@@ -78,6 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  // late CnBackgroundImage cnBackgroundImage;
   late CnHomepage cnHomepage;
 
   @override
@@ -99,7 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
-    cnHomepage.initSpotifyBar(cnSpotifyBar);
+    // cnHomepage.initSpotifyBar(cnSpotifyBar);
+    // cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
+
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
@@ -108,102 +113,50 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    const Color(0xff84490b),
-                    Colors.black.withOpacity(0.9),
-                  ]
-              )
-          ),
-          child: Column(
+          // decoration: BoxDecoration(
+          //     gradient: LinearGradient(
+          //         begin: Alignment.topRight,
+          //         end: Alignment.bottomLeft,
+          //         colors: [
+          //           const Color(0xff84490b),
+          //           Colors.black.withOpacity(0.9),
+          //         ]
+          //     )
+          // ),
+          child: Stack(
+            alignment: Alignment.topCenter,
             children: [
-              // if (cnRunningWorkout.isRunning)
-              //   Container(
-              //     width: double.maxFinite,
-              //     height: 110,
-              //     decoration: const BoxDecoration(
-              //       gradient: LinearGradient(
-              //           begin: Alignment.centerRight,
-              //           end: Alignment.centerLeft,
-              //           colors: [
-              //             Color(0xff55300a),
-              //             Color(0xff44260b),
-              //           ]
-              //       ),
-              //       // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
+              // ImageFiltered(
+              //     imageFilter: ImageFilter.blur(
+              //       sigmaX: 50.0,
+              //       sigmaY: 50.0,
               //     ),
-              //     child: Column(
-              //       children: [
-              //         const SafeArea(
-              //           bottom: false,
-              //           child: SizedBox(),
-              //         ),
-              //         GestureDetector(
-              //           onTap: () => cnRunningWorkout.reopenRunningWorkout(context),
-              //           child: Container(
-              //             height: 50,
-              //             width: double.maxFinite,
-              //             // color: Color(0xff44260b),
-              //             decoration: const BoxDecoration(
-              //                 gradient: LinearGradient(
-              //                     begin: Alignment.centerRight,
-              //                     end: Alignment.centerLeft,
-              //                     colors: [
-              //                       Color(0xff55300a),
-              //                       Color(0xff44260b),
-              //                     ]
-              //                 ),
-              //               // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-              //             ),
-              //             child: Row(
-              //               mainAxisAlignment: MainAxisAlignment.center,
-              //               children: [
-              //                 Text(
-              //                     cnRunningWorkout.workout.name,
-              //                   textScaleFactor: 1.6,
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   )
-              // else
-              //   SizedBox(height: 0,),
-              Expanded(
-                child: Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    AnimatedCrossFade(
-                        firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-                        secondChild: ScreenWorkout(key: UniqueKey()),
-                        crossFadeState: cnBottomMenu.index == 0?
-                        CrossFadeState.showFirst:
-                        CrossFadeState.showSecond,
-                        duration: const Duration(milliseconds: 200)
-                    ),
-                    AnimatedContainer(
-                        duration: const Duration(milliseconds: 300), // Animationsdauer
-                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
-                        curve: Curves.easeInOut,
-                        // child: const SpotifyBar()
-                        child: const Hero(
-                            transitionOnUserGestures: true,
-                            tag: "SpotifyBar",
-                            child: SpotifyBar()
-                        ),
-                    ),
-                    // cnSpotifyBar.bar,
-                    const NewWorkOutPanel(),
-                    const NewExercisePanel(),
-                    const StandardPopUp()
-                  ],
-                ),
+              //     child: cnSpotifyBar.lastImage
+              // ),
+              const BackgroundImage(),
+              AnimatedCrossFade(
+                  firstChild: const ScreenWorkoutHistory(),
+                  secondChild: const ScreenWorkout(),
+                  crossFadeState: cnBottomMenu.index == 0?
+                  CrossFadeState.showFirst:
+                  CrossFadeState.showSecond,
+                  duration: const Duration(milliseconds: 200)
               ),
+              AnimatedContainer(
+                  duration: const Duration(milliseconds: 300), // Animationsdauer
+                  transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+                  curve: Curves.easeInOut,
+                  // child: const SpotifyBar()
+                  child: const Hero(
+                      transitionOnUserGestures: true,
+                      tag: "SpotifyBar",
+                      child: SpotifyBar()
+                  ),
+              ),
+              // cnSpotifyBar.bar,
+              const NewWorkOutPanel(),
+              const NewExercisePanel(),
+              const StandardPopUp()
             ],
           ),
 
@@ -224,14 +177,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class CnHomepage extends ChangeNotifier {
   late CnSpotifyBar cnSpotifyBar;
-  bool isInitialized = false;
+  // bool isInitialized = false;
 
-  void initSpotifyBar(CnSpotifyBar cn){
-    if(!isInitialized){
-      cnSpotifyBar = cn;
-      isInitialized = true;
-    }
+  CnHomepage(BuildContext context){
+    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   }
+
+  // void initSpotifyBar(CnSpotifyBar cn){
+  //   if(!isInitialized){
+  //     cnSpotifyBar = cn;
+  //     isInitialized = true;
+  //   }
+  // }
 
   void refresh({bool refreshSpotifyBar = false}){
     notifyListeners();
