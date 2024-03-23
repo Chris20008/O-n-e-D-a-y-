@@ -98,7 +98,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ],
             ),
           ),
-          const BannerRunningWorkout()
+          BannerRunningWorkout()
         ],
       ),
     );

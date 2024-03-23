@@ -49,6 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
+        // showPerformanceOverlay: true,
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
@@ -112,16 +113,16 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          decoration: BoxDecoration(
-              // gradient: LinearGradient(
-              //     begin: Alignment.topRight,
-              //     end: Alignment.bottomLeft,
-              //     colors: [
-              //       const Color(0xff84490b),
-              //       Colors.black.withOpacity(0.9),
-              //     ]
-              // )
-          ),
+          // decoration: BoxDecoration(
+          //     gradient: LinearGradient(
+          //         begin: Alignment.topRight,
+          //         end: Alignment.bottomLeft,
+          //         colors: [
+          //           const Color(0xff84490b),
+          //           Colors.black.withOpacity(0.9),
+          //         ]
+          //     )
+          // ),
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
@@ -134,8 +135,8 @@ class _MyHomePageState extends State<MyHomePage> {
               // ),
               const BackgroundImage(),
               AnimatedCrossFade(
-                  firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-                  secondChild: ScreenWorkout(key: UniqueKey()),
+                  firstChild: const ScreenWorkoutHistory(),
+                  secondChild: const ScreenWorkout(),
                   crossFadeState: cnBottomMenu.index == 0?
                   CrossFadeState.showFirst:
                   CrossFadeState.showSecond,

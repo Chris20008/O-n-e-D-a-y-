@@ -74,28 +74,40 @@ class _BackgroundImageState extends State<BackgroundImage> {
     //       )
     //   ),
     // );
-    return FutureBuilder(
-      future: getBlurredImage(cnSpotifyBar),
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-        Widget child;
-          if (snapshot.hasData) {
-            child = snapshot.data!;
-          } else {
-            child = Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      const Color(0xff84490b),
-                      Colors.black.withOpacity(0.9),
-                    ]
-                )
-              ),
-            );
-          }
-          return ClipRRect(child: child);
-        }
+    return Container(
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [
+                const Color(0xff84490b),
+                Colors.black.withOpacity(0.9),
+              ]
+          )
+      ),
+    );
+    // return FutureBuilder(
+    //   future: getBlurredImage(cnSpotifyBar),
+    //     builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+    //     Widget child;
+    //       // if (snapshot.hasData) {
+    //       //   child = snapshot.data!;
+    //       // } else {
+    //         child = Container(
+    //           decoration: BoxDecoration(
+    //             gradient: LinearGradient(
+    //                 begin: Alignment.topRight,
+    //                 end: Alignment.bottomLeft,
+    //                 colors: [
+    //                   const Color(0xff84490b),
+    //                   Colors.black.withOpacity(0.9),
+    //                 ]
+    //             )
+    //           ),
+    //         );
+    //       // }
+    //       return ClipRRect(child: child);
+    //     }
       // child: ImageFiltered(
       //     imageFilter: ImageFilter.blur(
       //       sigmaX: 50.0,
@@ -112,26 +124,28 @@ class _BackgroundImageState extends State<BackgroundImage> {
       //         ]
       //     )
       // ),
-    );
+    // );
   }
-
-  static Future<Widget> getBlurredImage(CnSpotifyBar cn)async{
-    return await compute(computeBlurredImage, cn.lastImage);
-  }
-
-  static Widget computeBlurredImage(Image im){
-    return ImageFiltered(
-        imageFilter: ImageFilter.blur(
-          sigmaX: 500.0,
-          sigmaY: 500.0,
-        ),
-        child: Stack(
-            children: [
-              im
-            ]
-        )
-    );
-  }
+  //
+  // static Future<Widget> getBlurredImage(CnSpotifyBar cn)async{
+  //   return await compute(computeBlurredImage, cn.lastImage);
+  // }
+  //
+  // static Widget computeBlurredImage(Image im){
+  //   print("________________calc blur________________");
+  //   return ImageFiltered(
+  //       imageFilter: ImageFilter.blur(
+  //         sigmaX: 200.0,
+  //         sigmaY: 200.0,
+  //         tileMode: TileMode.decal
+  //       ),
+  //       child: Stack(
+  //           children: [
+  //             im
+  //           ]
+  //       )
+  //   );
+  // }
 
 }
 

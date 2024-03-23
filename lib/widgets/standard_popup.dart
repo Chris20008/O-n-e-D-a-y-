@@ -99,7 +99,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                       ),
                       child: Container(
                           width: size.width*0.65,
-                          color: cnStandardPopUp.color.withOpacity(0.23),
+                          color: cnStandardPopUp.color.withOpacity(0.6),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
