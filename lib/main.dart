@@ -5,10 +5,12 @@ import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dar
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
+import 'package:fitness_app/widgets/animated_column.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -42,9 +44,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
-        ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
+        ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
+        ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
