@@ -148,9 +148,9 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                           // "00:00",
                           cnStopwatchWidget.isRunning?
                             getTimeString() :
-                            "00:00,00",
+                            "00:00",
                           style: TextStyle(
-                            fontSize: 60,
+                            fontSize: 80,
                             color: Colors.white54,
                             fontFamily: GoogleFonts.robotoMono().fontFamily
                           )
@@ -228,13 +228,14 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     String seconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
     seconds = seconds.length==1? "0$seconds" : seconds;
 
-    String milliseconds = (cnStopwatchWidget.stopwatch.elapsed.inMilliseconds%1000).toString();
-    milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
-    milliseconds = milliseconds.length==2? "0$milliseconds" : milliseconds;
-    milliseconds = milliseconds.substring(0,  milliseconds.length>=2 ? 2 : milliseconds.length);
-    milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
+    // String milliseconds = (cnStopwatchWidget.stopwatch.elapsed.inMilliseconds%1000).toString();
+    // milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
+    // milliseconds = milliseconds.length==2? "0$milliseconds" : milliseconds;
+    // milliseconds = milliseconds.substring(0,  milliseconds.length>=2 ? 2 : milliseconds.length);
+    // milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
 
-    return "$minutes:$seconds,$milliseconds";
+    // return "$minutes:$seconds,$milliseconds";
+    return "$minutes:$seconds";
   }
 }
 
@@ -293,7 +294,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   }
 
   void intervallRefresh(){
-    Future.delayed(const Duration(milliseconds: 1), (){
+    Future.delayed(const Duration(milliseconds: 200), (){
       if(isRunning){
         if(isOpened){
           refresh();
