@@ -37,150 +37,144 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
             sizeCurve: Curves.easeInOut,
             firstChild: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                  sigmaX: 5.0,
-                  sigmaY: 5.0,
-                ),
-                child: Container(
-                  color: Colors.black.withOpacity(0.8),
-                  height: cnStopwatchWidget.heightOfTimer,
-                  width: width - paddingLeftRight*2,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 20),
-                            child: SizedBox(
-                              width: double.maxFinite,
-                              height: 70,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  AnimatedCrossFade(
-                                      layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-                                        return Stack(
-                                          clipBehavior: Clip.none,
-                                          alignment: Alignment.center,
-                                          children: <Widget>[
-                                            Positioned(
-                                              key: bottomChildKey,
-                                              top: 0.0,
-                                              child: bottomChild,
-                                            ),
-                                            Positioned(
-                                              key: topChildKey,
-                                              child: topChild,
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                      firstChild: Row(
-                                        children: [
-                                          const SizedBox(
-                                            width: 70,
+              child: Container(
+                color: Colors.black,
+                height: cnStopwatchWidget.heightOfTimer,
+                width: width - paddingLeftRight*2,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 20),
+                          child: SizedBox(
+                            width: double.maxFinite,
+                            height: 70,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                AnimatedCrossFade(
+                                    layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                                      return Stack(
+                                        clipBehavior: Clip.none,
+                                        alignment: Alignment.center,
+                                        children: <Widget>[
+                                          Positioned(
+                                            key: bottomChildKey,
+                                            top: 0.0,
+                                            child: bottomChild,
                                           ),
-                                          ClipRRect(
-                                            borderRadius: BorderRadius.circular(35),
-                                            child: Material(
-                                              color: const Color(0xff333333),
-                                              child: InkWell(
-                                                onTap: cnStopwatchWidget.cancelTimer,
-                                                child: const SizedBox(
-                                                  height: 70,
-                                                  width: 70,
-                                                  child: Center(
-                                                    child: Text(
-                                                      "Löschen",
-                                                      style: TextStyle(color: Color(
-                                                          0xfffdfdfd)),
-                                                    ),
+                                          Positioned(
+                                            key: topChildKey,
+                                            child: topChild,
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                    firstChild: Row(
+                                      children: [
+                                        const SizedBox(
+                                          width: 70,
+                                        ),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(35),
+                                          child: Material(
+                                            color: const Color(0xff333333),
+                                            child: InkWell(
+                                              onTap: cnStopwatchWidget.cancelTimer,
+                                              child: const SizedBox(
+                                                height: 70,
+                                                width: 70,
+                                                child: Center(
+                                                  child: Text(
+                                                    "Löschen",
+                                                    style: TextStyle(color: Color(
+                                                        0xfffdfdfd)),
                                                   ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(
-                                            width: 70,
-                                          ),
-                                        ],
-                                      ),
-                                      secondChild: const SizedBox(width: 70, height: 70,),
-                                      crossFadeState: cnStopwatchWidget.isRunning?
-                                      CrossFadeState.showFirst:
-                                      CrossFadeState.showSecond,
-                                      duration: Duration(milliseconds: (cnStopwatchWidget.animationTimeStopwatch/2).round())
-                                  ),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(35),
-                                    child: Material(
-                                      color: cnStopwatchWidget.isPaused? const Color(0xff0b2912) :const Color(
-                                          0xff330e0b),
-                                      child: SizedBox(
-                                        height: 70,
-                                        width: 70,
-                                        child: InkWell(
-                                          onTap: cnStopwatchWidget.isPaused? cnStopwatchWidget.startTimer : cnStopwatchWidget.pauseTimer,
-                                          child: Center(
-                                            child: Text(
-                                              cnStopwatchWidget.isPaused? "Start" : "Stopp",
-                                              style: TextStyle(
-                                                color: cnStopwatchWidget.isPaused? const Color(0x9627eb15) : const Color(
-                                                    0xfffd443a)
-                                              ),
+                                        ),
+                                        const SizedBox(
+                                          width: 70,
+                                        ),
+                                      ],
+                                    ),
+                                    secondChild: const SizedBox(width: 70, height: 70,),
+                                    crossFadeState: cnStopwatchWidget.isRunning?
+                                    CrossFadeState.showFirst:
+                                    CrossFadeState.showSecond,
+                                    duration: Duration(milliseconds: (cnStopwatchWidget.animationTimeStopwatch/2).round())
+                                ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(35),
+                                  child: Material(
+                                    color: cnStopwatchWidget.isPaused? const Color(0xff0b2912) :const Color(
+                                        0xff330e0b),
+                                    child: SizedBox(
+                                      height: 70,
+                                      width: 70,
+                                      child: InkWell(
+                                        onTap: cnStopwatchWidget.isPaused? cnStopwatchWidget.startTimer : cnStopwatchWidget.pauseTimer,
+                                        child: Center(
+                                          child: Text(
+                                            cnStopwatchWidget.isPaused? "Start" : "Stopp",
+                                            style: TextStyle(
+                                              color: cnStopwatchWidget.isPaused? const Color(0x9627eb15) : const Color(
+                                                  0xfffd443a)
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(
-                                    width: 70,
-                                  ),
-                                  // const Spacer(flex: 4,),
-                                ],
-                              ),
+                                ),
+                                const SizedBox(
+                                  width: 70,
+                                ),
+                                // const Spacer(flex: 4,),
+                              ],
                             ),
-                          )
-                      ),
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 20),
-                          child: Text(
-                            // "00:00",
-                            cnStopwatchWidget.isRunning?
-                              getTimeString() :
-                              "00:00,00",
-                            style: TextStyle(
-                              fontSize: 60,
-                              color: Colors.white54,
-                              fontFamily: GoogleFonts.robotoMono().fontFamily
-                            )
                           ),
                         )
-                      ),
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                            iconSize: 25,
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () async{
-                              cnStopwatchWidget.close();
-                            },
-                            icon: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Colors.amber[800],
-                            )
+                    ),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          // "00:00",
+                          cnStopwatchWidget.isRunning?
+                            getTimeString() :
+                            "00:00,00",
+                          style: TextStyle(
+                            fontSize: 60,
+                            color: Colors.white54,
+                            fontFamily: GoogleFonts.robotoMono().fontFamily
+                          )
                         ),
                       )
-                    ],
-                  ),
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: IconButton(
+                          iconSize: 25,
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                            // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                          ),
+                          onPressed: () async{
+                            cnStopwatchWidget.close();
+                          },
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.amber[800],
+                          )
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
@@ -291,6 +285,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   }
 
   void cancelTimer(){
+    stopwatch.stop();
     stopwatch.reset();
     isRunning = false;
     isPaused = true;

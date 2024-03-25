@@ -30,30 +30,30 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
       child: Stack(
         alignment: Alignment.bottomRight,
         children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: cnSpotifyBar.height*2),
-            child: AnimatedContainer(
-              duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
-              transform: Matrix4.translationValues(0, cnStopwatchWidget.isOpened? -cnStopwatchWidget.heightOfTimer+cnSpotifyBar.height : -10, 0),
-              width: cnSpotifyBar.height,
-              height: cnSpotifyBar.height,
-              padding: const EdgeInsets.only(right: 10),
-              child: IconButton(
-                  iconSize: 28,
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    cnHomepage.refresh(refreshSpotifyBar: true);
-                  },
-                  icon: Icon(
-                    Icons.fullscreen_exit,
-                    color: Colors.amber[800],
-                  )
-              ),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.only(bottom: cnSpotifyBar.height*2),
+          //   child: AnimatedContainer(
+          //     duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
+          //     transform: Matrix4.translationValues(0, cnStopwatchWidget.isOpened? -cnStopwatchWidget.heightOfTimer+cnSpotifyBar.height : -10, 0),
+          //     width: cnSpotifyBar.height,
+          //     height: cnSpotifyBar.height,
+          //     padding: const EdgeInsets.only(right: 10),
+          //     child: IconButton(
+          //         iconSize: 28,
+          //         style: ButtonStyle(
+          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          //         ),
+          //         onPressed: () {
+          //           Navigator.of(context).pop();
+          //           cnHomepage.refresh(refreshSpotifyBar: true);
+          //         },
+          //         icon: Icon(
+          //           Icons.fullscreen_exit,
+          //           color: Colors.amber[800],
+          //         )
+          //     ),
+          //   ),
+          // ),
           AnimatedContainer(
               duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
               transform: Matrix4.translationValues(

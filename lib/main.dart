@@ -21,6 +21,7 @@ late ObjectBox objectbox;
 bool objectboxIsInitialized = false;
 
 void main() {
+
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
@@ -117,16 +118,16 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          // decoration: BoxDecoration(
-          //     gradient: LinearGradient(
-          //         begin: Alignment.topRight,
-          //         end: Alignment.bottomLeft,
-          //         colors: [
-          //           const Color(0xff84490b),
-          //           Colors.black.withOpacity(0.9),
-          //         ]
-          //     )
-          // ),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    const Color(0xff84490b),
+                    Colors.black.withOpacity(0.9),
+                  ]
+              )
+          ),
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
@@ -137,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
               //     ),
               //     child: cnSpotifyBar.lastImage
               // ),
-              const BackgroundImage(),
+              // const BackgroundImage(),
               AnimatedCrossFade(
                   firstChild: const ScreenWorkoutHistory(),
                   secondChild: const ScreenWorkout(),

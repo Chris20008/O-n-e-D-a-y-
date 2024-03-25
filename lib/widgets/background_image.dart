@@ -26,16 +26,34 @@ class _BackgroundImageState extends State<BackgroundImage> {
     // print(cnBackgroundImage.firstChild);
 
     cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
+
+    return Container(
+      height: double.maxFinite,
+      width: double.maxFinite,
+      color: cnBackgroundImage.colorFirstChild,
+      child: Container(
+        decoration: BoxDecoration(
+            gradient:  const LinearGradient(
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight,
+                colors: [
+                  Colors.black54,
+                  Colors.black38,
+                ]
+            )
+        ),
+      ),
+    );
     // return Stack(
     //   children: [
     //     AnimatedCrossFade(
     //       firstChild: Container(
-    //         // color: cnBackgroundImage.colorFirstChild,
-    //         color: Colors.green,
+    //         color: cnBackgroundImage.colorFirstChild,
+    //         // color: Colors.green,
     //       ),
     //       secondChild:Container(
-    //         // color: cnBackgroundImage.colorSecondChild,
-    //         color: Colors.red,
+    //         color: cnBackgroundImage.colorSecondChild,
+    //         // color: Colors.red,
     //       ),
     //       crossFadeState: cnBackgroundImage.firstChild?
     //       CrossFadeState.showFirst :
@@ -56,6 +74,8 @@ class _BackgroundImageState extends State<BackgroundImage> {
     //     // )
     //   ],
     // );
+
+
     // return ClipRRect(
     //   child: ImageFiltered(
     //       imageFilter: ImageFilter.blur(
@@ -74,18 +94,22 @@ class _BackgroundImageState extends State<BackgroundImage> {
     //       )
     //   ),
     // );
-    return Container(
-      decoration: BoxDecoration(
-          gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                const Color(0xff84490b),
-                Colors.black.withOpacity(0.9),
-              ]
-          )
-      ),
-    );
+
+
+    // return Container(
+    //   decoration: BoxDecoration(
+    //       gradient: LinearGradient(
+    //           begin: Alignment.topRight,
+    //           end: Alignment.bottomLeft,
+    //           colors: [
+    //             const Color(0xff84490b),
+    //             Colors.black.withOpacity(0.9),
+    //           ]
+    //       )
+    //   ),
+    // );
+
+
     // return FutureBuilder(
     //   future: getBlurredImage(cnSpotifyBar),
     //     builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
@@ -150,10 +174,15 @@ class _BackgroundImageState extends State<BackgroundImage> {
 }
 
 class CnBackgroundImage extends ChangeNotifier {
-  // Color? colorFirstChild;
-  // Color? colorSecondChild;
-  // bool isRefreshing = false;
-  // bool firstChild = true;
+  Color? colorFirstChild;
+  Color? colorSecondChild;
+  bool isRefreshing = false;
+  bool firstChild = true;
+
+  setColor(Color? c){
+    colorFirstChild = c;
+    refresh();
+  }
 
   // setColor(Color? c){
   //   if(c != colorFirstChild && c!= colorSecondChild && !isRefreshing){

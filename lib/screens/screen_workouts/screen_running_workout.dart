@@ -471,7 +471,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                     //     ),
                     //   ],
                     // ),
-                      AnimatedColumn(),
+                      const AnimatedColumn(),
                     // SafeArea(
                     //   child: Stack(
                     //     alignment: Alignment.bottomRight,

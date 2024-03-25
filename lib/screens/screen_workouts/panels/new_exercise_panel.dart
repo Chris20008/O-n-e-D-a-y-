@@ -30,14 +30,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
     final insetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
-    return WillPopScope(
-      onWillPop: () async{
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (doPop){
         if (cnNewExercise.panelController.isPanelOpen){
           cnNewExercise.closePanel(doClear: false);
-          return false;
         }
-        return true;
       },
+      // onWillPop: () async{
+      //   if (cnNewExercise.panelController.isPanelOpen){
+      //     cnNewExercise.closePanel(doClear: false);
+      //     return false;
+      //   }
+      //   return true;
+      // },
       child: LayoutBuilder(
         builder: (context, constraints){
           return SlidingUpPanel(
