@@ -295,7 +295,7 @@ class CnStopwatchWidget extends ChangeNotifier {
 
   void intervallRefresh(){
     Future.delayed(const Duration(milliseconds: 200), (){
-      if(isRunning){
+      if(isRunning && !isPaused){
         if(isOpened){
           refresh();
         }
