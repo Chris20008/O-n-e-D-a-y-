@@ -639,28 +639,28 @@ class CnSpotifyBar extends ChangeNotifier {
 
   Future<void> skipPrevious() async {
     try {
-      await SpotifySdk.skipPrevious().then((value) => refresh());
+      await SpotifySdk.skipPrevious(); //..then((value) => refresh());
       // await SpotifySdk.skipPrevious();
     } on Exception catch (_) {}
   }
 
   Future<void> skipNext() async {
     try {
-      await SpotifySdk.skipNext().then((value) => refresh());
+      await SpotifySdk.skipNext(); //..then((value) => refresh());
       // await SpotifySdk.skipNext();
     } on Exception catch (_) {}
   }
 
   Future<void> pause() async {
     try {
-      await SpotifySdk.pause().then((value) => refresh());
+      await SpotifySdk.pause(); //..then((value) => refresh());
       // await SpotifySdk.pause();
     } on Exception catch (_) {}
   }
 
   Future<void> resume() async {
     try {
-      await SpotifySdk.resume().then((value) => refresh());
+      await SpotifySdk.resume(); //.then((value) => refresh());
       // await SpotifySdk.resume();
     } on Exception catch (_) {}
   }
