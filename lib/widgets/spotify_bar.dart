@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,6 +69,9 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                   cnSpotifyBar.imageGotUpdated = true;
                                 }
                                 cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                                if(data != null){
+                                  print("Playback Position ${cnSpotifyBar.data!.playbackPosition} von ${cnSpotifyBar.data!.track?.duration}");
+                                }
                                 return cnSpotifyBar.data == null?
                                 GestureDetector(
                                     onTap: cnSpotifyBar.connectToSpotify,
@@ -202,7 +206,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                   ]
                                                 ),
                                               ),
-                                            )
+                                            ),
                                           ]
                                         ),
                                       ),
@@ -227,6 +231,10 @@ class _SpotifyBarState extends State<SpotifyBar> {
                           );
                         }
                       ),
+                      const Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SpotifyProgressIndicator(),
+                      )
                     ],
                   ),
                 ),
@@ -461,7 +469,7 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> seekToRelative(int milliseconds) async {
     try {
       refresh();
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future.delayed(const Duration(milliseconds: 50));
       await SpotifySdk.seekTo(positionedMilliseconds: data!.playbackPosition + milliseconds);
     } on Exception catch (e) {
       print("Got Exception in seekToRelative: ${e.toString()}");

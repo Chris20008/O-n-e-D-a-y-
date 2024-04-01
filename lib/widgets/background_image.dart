@@ -32,8 +32,8 @@ class _BackgroundImageState extends State<BackgroundImage> {
       width: double.maxFinite,
       color: cnBackgroundImage.colorFirstChild,
       child: Container(
-        decoration: BoxDecoration(
-            gradient:  const LinearGradient(
+        decoration: const BoxDecoration(
+            gradient:  LinearGradient(
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
                 colors: [

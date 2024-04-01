@@ -46,17 +46,6 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                   ]
               ) : null
           ),
-          // decoration: const BoxDecoration(
-          //   gradient: LinearGradient(
-          //       begin: Alignment.centerRight,
-          //       end: Alignment.centerLeft,
-          //       colors: [
-          //         Color(0xff55300a),
-          //         Color(0xff44260b),
-          //       ]
-          //   ),
-          //   // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-          // ),
           child: Column(
             children: [
               const SafeArea(
@@ -74,17 +63,6 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                   height: 50,
                   width: double.maxFinite,
                   color: Colors.black.withOpacity(0.0),
-                  // decoration: const BoxDecoration(
-                  //   gradient: LinearGradient(
-                  //       begin: Alignment.centerRight,
-                  //       end: Alignment.centerLeft,
-                  //       colors: [
-                  //         Color(0xff55300a),
-                  //         Color(0xff44260b),
-                  //       ]
-                  //   ),
-                  //   // borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15), bottomRight: Radius.circular(15))
-                  // ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -96,11 +74,11 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                   ),
                 ),
               ),
-              Container(
-                width: double.maxFinite,
-                height: 1,
-                color: Colors.grey[900]!.withOpacity(0.5),
-              ),
+              // Container(
+              //   width: double.maxFinite,
+              //   height: 1,
+              //   color: Colors.grey[900]!.withOpacity(0.5),
+              // ),
             ],
           ),
         ),
