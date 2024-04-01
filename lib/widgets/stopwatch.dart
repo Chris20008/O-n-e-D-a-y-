@@ -179,8 +179,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
               ),
             ),
             secondChild: SizedBox(
-              height: cnSpotifyBar.height,
-              width: cnSpotifyBar.height,
+              height: cnSpotifyBar.heightOfButton,
+              width: cnSpotifyBar.heightOfButton,
               child: IconButton(
                   iconSize: 28,
                   style: ButtonStyle(
