@@ -32,6 +32,21 @@ class _SpotifyBarState extends State<SpotifyBar> {
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   double paddingLeftRight = 5;
 
+  // void refresh(){
+  //   Future.delayed(const Duration(milliseconds: 200), (){
+  //     // if (doRefresh) {
+  //       setState(() {});
+  //       refresh();
+  //     // }
+  //   });
+  // }
+  //
+  // @override
+  // void initState() {
+  //   refresh();
+  //   super.initState();
+  // }
+
   @override
   Widget build(BuildContext context) {
     print("Rebuild SPOTIFY BAR");
@@ -59,6 +74,178 @@ class _SpotifyBarState extends State<SpotifyBar> {
                   child: Stack(
                     children: [
                       const BackgroundImage(),
+                  // StreamBuilder<PlayerState>(
+                  //     stream: SpotifySdk.subscribePlayerState(),
+                  //     builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
+                  //       final data = snapshot.data;
+                  //       if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
+                  //         cnSpotifyBar.imageGotUpdated = true;
+                  //       }
+                  //       cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                  //       if(data != null){
+                  //         print("Playback Position ${cnSpotifyBar.data!.playbackPosition} von ${cnSpotifyBar.data!.track?.duration}");
+                  //       }
+                  //       return cnSpotifyBar.data == null?
+                  //       GestureDetector(
+                  //           onTap: cnSpotifyBar.connectToSpotify,
+                  //           child: Container(
+                  //             height: cnSpotifyBar.height,
+                  //             width: double.maxFinite,
+                  //             color: Colors.transparent,
+                  //           )
+                  //       ) :
+                  //       Row(
+                  //         mainAxisSize: MainAxisSize.min,
+                  //         children: [
+                  //           Padding(
+                  //               padding: const EdgeInsets.all(5),
+                  //               child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                  //           ),
+                  //           // const Spacer(flex:1),
+                  //           Expanded(
+                  //             child: SizedBox(
+                  //               height: cnSpotifyBar.height,
+                  //               // width: double.maxFinite,
+                  //               child: Stack(
+                  //                   children:[
+                  //                     Align(
+                  //                       alignment: Alignment.topLeft,
+                  //                       child: Container(
+                  //                         padding: EdgeInsets.only(left:12, top:5),
+                  //                         height: cnSpotifyBar.height/2,
+                  //                         child: ExerciseNameText(
+                  //                             cnSpotifyBar.data!.track?.name ?? "",
+                  //                             maxLines: 1,
+                  //                             fontsize: 14,
+                  //                             minFontSize: 12
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                     Align(
+                  //                       alignment: Alignment.bottomLeft,
+                  //                       child: Padding(
+                  //                         padding: const EdgeInsets.only(left: 5, bottom:2),
+                  //                         child: Row(
+                  //                             children:[
+                  //                               // const Spacer(flex:1),
+                  //                               IconButton(
+                  //                                   padding: EdgeInsets.zero,
+                  //                                   constraints: BoxConstraints(minWidth:35, minHeight:35),
+                  //                                   iconSize: 25,
+                  //                                   style: ButtonStyle(
+                  //                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //                                     // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                  //                                   ),
+                  //                                   onPressed: () async{
+                  //                                     cnSpotifyBar.seekToRelative(-15000);
+                  //                                   },
+                  //                                   icon: Icon(
+                  //                                     CupertinoIcons.gobackward_15,
+                  //                                     color: Colors.amber[800],
+                  //                                   )
+                  //                               ),
+                  //                               const Spacer(flex:2),
+                  //                               IconButton(
+                  //                                   padding: EdgeInsets.zero,
+                  //                                   constraints: BoxConstraints(minWidth:35, minHeight:35),
+                  //                                   iconSize: 32,
+                  //                                   style: ButtonStyle(
+                  //                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //                                     // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                  //                                   ),
+                  //                                   onPressed: () async{
+                  //                                     cnSpotifyBar.skipPrevious();
+                  //                                   },
+                  //                                   icon: Icon(
+                  //                                     Icons.skip_previous,
+                  //                                     color: Colors.amber[800],
+                  //                                   )
+                  //                               ),
+                  //                               const Spacer(flex:1),
+                  //                               IconButton(
+                  //                                   padding: EdgeInsets.zero,
+                  //                                   constraints: BoxConstraints(minWidth:35, minHeight:35),
+                  //                                   iconSize: 32,
+                  //                                   style: ButtonStyle(
+                  //                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //                                   ),
+                  //                                   onPressed: () async{
+                  //                                     cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
+                  //                                   },
+                  //                                   icon: Icon(
+                  //                                     cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
+                  //                                     color: Colors.amber[800],
+                  //                                   )
+                  //                               ),
+                  //                               const Spacer(flex:1),
+                  //                               IconButton(
+                  //                                   padding: EdgeInsets.zero,
+                  //                                   constraints: BoxConstraints(minWidth:35, minHeight:35),
+                  //                                   iconSize: 32,
+                  //                                   style: ButtonStyle(
+                  //                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //                                   ),
+                  //                                   onPressed: () async{
+                  //                                     cnSpotifyBar.skipNext(); //.then((value) => setState(() => {}));
+                  //                                   },
+                  //                                   icon: Icon(
+                  //                                     Icons.skip_next,
+                  //                                     color: Colors.amber[800],
+                  //                                   )
+                  //                               ),
+                  //                               const Spacer(flex:2),
+                  //                               IconButton(
+                  //                                   padding: EdgeInsets.zero,
+                  //                                   constraints: BoxConstraints(minWidth:35, minHeight:35),
+                  //                                   iconSize: 25,
+                  //                                   style: ButtonStyle(
+                  //                                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  //                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //                                     // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                  //                                   ),
+                  //                                   onPressed: () async{
+                  //                                     cnSpotifyBar.seekToRelative(15000);
+                  //                                   },
+                  //                                   icon: Icon(
+                  //                                     CupertinoIcons.goforward_15,
+                  //                                     color: Colors.amber[800],
+                  //                                   )
+                  //                               ),
+                  //                               const Spacer(flex:6),
+                  //                             ]
+                  //                         ),
+                  //                       ),
+                  //                     ),
+                  //                     Align(
+                  //                       alignment: Alignment.bottomCenter,
+                  //                       child: SpotifyProgressIndicator(data: cnSpotifyBar.data!),
+                  //                     )
+                  //                   ]
+                  //               ),
+                  //             ),
+                  //           ),
+                  //           IconButton(
+                  //               iconSize: 25,
+                  //               style: ButtonStyle(
+                  //                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  //               ),
+                  //               onPressed: () async{
+                  //                 cnSpotifyBar.disconnect();
+                  //               },
+                  //               icon: Icon(
+                  //                 Icons.cancel,
+                  //                 color: Colors.amber[800],
+                  //               )
+                  //           ),
+                  //           SizedBox(width: 3,)
+                  //         ],
+                  //       );
+                  //     }
+                  // )
                       Consumer<PlayerStateStream>(
                         builder: (context, playerStateStream, _) {
                           return StreamBuilder<PlayerState>(
@@ -69,9 +256,9 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                   cnSpotifyBar.imageGotUpdated = true;
                                 }
                                 cnSpotifyBar.data = data?? cnSpotifyBar.data;
-                                if(data != null){
-                                  print("Playback Position ${cnSpotifyBar.data!.playbackPosition} von ${cnSpotifyBar.data!.track?.duration}");
-                                }
+                                // if(data != null){
+                                //   print("Playback Position ${cnSpotifyBar.data!.playbackPosition} von ${cnSpotifyBar.data!.track?.duration}");
+                                // }
                                 return cnSpotifyBar.data == null?
                                 GestureDetector(
                                     onTap: cnSpotifyBar.connectToSpotify,
@@ -207,6 +394,10 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                 ),
                                               ),
                                             ),
+                                            // Align(
+                                            //   alignment: Alignment.bottomCenter,
+                                            //   child: SpotifyProgressIndicator(data: cnSpotifyBar.data!),
+                                            // )
                                           ]
                                         ),
                                       ),
@@ -231,10 +422,12 @@ class _SpotifyBarState extends State<SpotifyBar> {
                           );
                         }
                       ),
-                      const Align(
-                        alignment: Alignment.bottomCenter,
-                        child: SpotifyProgressIndicator(),
-                      )
+
+                      if(cnSpotifyBar.data != null)
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: SpotifyProgressIndicator(data: cnSpotifyBar.data!),
+                        )
                     ],
                   ),
                 ),
