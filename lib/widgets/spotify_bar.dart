@@ -643,9 +643,9 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> skipPrevious() async {
     try {
       await SpotifySdk.skipPrevious().then((value) => {
-        if(cnRunningWorkout.isVisible){
-          refresh()
-        }
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.skipPrevious();
     } on Exception catch (_) {}
@@ -654,9 +654,9 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> skipNext() async {
     try {
       await SpotifySdk.skipNext().then((value) => {
-        if(cnRunningWorkout.isVisible){
-          refresh()
-        }
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.skipNext();
     } on Exception catch (_) {}
@@ -665,9 +665,9 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> pause() async {
     try {
       await SpotifySdk.pause().then((value) => {
-        if(cnRunningWorkout.isVisible){
-          refresh()
-        }
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.pause();
     } on Exception catch (_) {}
@@ -676,9 +676,9 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> resume() async {
     try {
       await SpotifySdk.resume().then((value) => {
-        if(cnRunningWorkout.isVisible){
-          refresh()
-        }
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.resume();
     } on Exception catch (_) {}
@@ -687,7 +687,11 @@ class CnSpotifyBar extends ChangeNotifier {
   Future<void> seekToRelative(int milliseconds) async {
     if(Platform.isAndroid){
       try {
-        await SpotifySdk.seekToRelativePosition(relativeMilliseconds: milliseconds);
+        await SpotifySdk.seekToRelativePosition(relativeMilliseconds: milliseconds).then((value) => {
+          Future.delayed(const Duration(milliseconds: 150), (){
+            refresh();
+          })
+        });
       } on Exception catch (e) {
         print("Got Exception in seekToRelative ANDROID: ${e.toString()}");
       }
@@ -699,7 +703,7 @@ class CnSpotifyBar extends ChangeNotifier {
         // refresh();
         // await Future.delayed(const Duration(milliseconds: 50));
         if(currentData != null){
-          await SpotifySdk.seekTo(positionedMilliseconds: currentData.playbackPosition + milliseconds);
+          await SpotifySdk.seekTo(positionedMilliseconds: currentData.playbackPosition + milliseconds).then((value) => refresh());
         }
         // await SpotifySdk.seekTo(positionedMilliseconds: data!.playbackPosition + milliseconds);
       } on Exception catch (e) {
