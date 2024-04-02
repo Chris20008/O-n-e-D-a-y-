@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -508,10 +509,12 @@ class CnSpotifyBar extends ChangeNotifier {
   double height = 60;
   double heightOfButton = 54;
   late CnAnimatedColumn cnAnimatedColumn;
+  late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
+    cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   }
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
@@ -639,28 +642,44 @@ class CnSpotifyBar extends ChangeNotifier {
 
   Future<void> skipPrevious() async {
     try {
-      await SpotifySdk.skipPrevious(); //..then((value) => refresh());
+      await SpotifySdk.skipPrevious().then((value) => {
+        if(cnRunningWorkout.isVisible){
+          refresh()
+        }
+      });
       // await SpotifySdk.skipPrevious();
     } on Exception catch (_) {}
   }
 
   Future<void> skipNext() async {
     try {
-      await SpotifySdk.skipNext(); //..then((value) => refresh());
+      await SpotifySdk.skipNext().then((value) => {
+        if(cnRunningWorkout.isVisible){
+          refresh()
+        }
+      });
       // await SpotifySdk.skipNext();
     } on Exception catch (_) {}
   }
 
   Future<void> pause() async {
     try {
-      await SpotifySdk.pause(); //..then((value) => refresh());
+      await SpotifySdk.pause().then((value) => {
+        if(cnRunningWorkout.isVisible){
+          refresh()
+        }
+      });
       // await SpotifySdk.pause();
     } on Exception catch (_) {}
   }
 
   Future<void> resume() async {
     try {
-      await SpotifySdk.resume(); //.then((value) => refresh());
+      await SpotifySdk.resume().then((value) => {
+        if(cnRunningWorkout.isVisible){
+          refresh()
+        }
+      });
       // await SpotifySdk.resume();
     } on Exception catch (_) {}
   }
