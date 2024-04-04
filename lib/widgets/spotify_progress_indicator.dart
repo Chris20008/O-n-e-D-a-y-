@@ -1,5 +1,7 @@
+import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
@@ -18,6 +20,8 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   bool doRefresh = true;
   double? currentWidthPercent;
   int? remainingDuration;
+  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
+  int delay = 250;
 
 
   @override
@@ -25,7 +29,14 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
     if(widget.data != null){
       currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
     }
-    periodicRefresh();
+    // final stoppwatchIsOpen = cnStopwatchWidget.isOpened;
+    if (cnStopwatchWidget.isOpened){
+      print("----------------------- IS OPENED -----------------------");
+      delay = delay + cnStopwatchWidget.animationTimeStopwatch;
+    }
+    Future.delayed(Duration(milliseconds: delay), (){
+      periodicRefresh();
+    });
     super.initState();
   }
 
