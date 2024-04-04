@@ -305,10 +305,10 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                     padding: const EdgeInsets.only(left: 5, bottom:2),
                                                     child: Row(
                                                       children:[
-                                                        // const Spacer(flex:1),
+                                                        const Spacer(flex:1),
                                                         IconButton(
                                                             padding: EdgeInsets.zero,
-                                                            constraints: BoxConstraints(minWidth:35, minHeight:35),
+                                                            constraints: const BoxConstraints(minWidth:35, minHeight:35),
                                                             iconSize: 25,
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -326,7 +326,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                         const Spacer(flex:2),
                                                         IconButton(
                                                             padding: EdgeInsets.zero,
-                                                            constraints: BoxConstraints(minWidth:35, minHeight:35),
+                                                            constraints: const BoxConstraints(minWidth:35, minHeight:35),
                                                             iconSize: 32,
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -344,7 +344,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                         const Spacer(flex:1),
                                                         IconButton(
                                                             padding: EdgeInsets.zero,
-                                                            constraints: BoxConstraints(minWidth:35, minHeight:35),
+                                                            constraints: const BoxConstraints(minWidth:35, minHeight:35),
                                                             iconSize: 32,
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -361,7 +361,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                         const Spacer(flex:1),
                                                         IconButton(
                                                             padding: EdgeInsets.zero,
-                                                            constraints: BoxConstraints(minWidth:35, minHeight:35),
+                                                            constraints: const BoxConstraints(minWidth:35, minHeight:35),
                                                             iconSize: 32,
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -378,7 +378,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                         const Spacer(flex:2),
                                                         IconButton(
                                                             padding: EdgeInsets.zero,
-                                                            constraints: BoxConstraints(minWidth:35, minHeight:35),
+                                                            constraints: const BoxConstraints(minWidth:35, minHeight:35),
                                                             iconSize: 25,
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -421,6 +421,8 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                     Align(
                                       alignment: Alignment.bottomCenter,
                                       child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
+                                      // child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey),
+                                      // child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey),
                                     )
                                   ],
                                 );
@@ -470,19 +472,11 @@ class _SpotifyBarState extends State<SpotifyBar> {
                   children: <Widget>[
                     Positioned(
                       key: bottomChildKey,
-                      // left: 0.0,
-                      // top: 0.0,
-                      // right: 0.0,
                       bottom: 0,
                       child: bottomChild,
                     ),
                     Positioned(
                       key: topChildKey,
-                      // left: 0.0,
-                      // top: 0.0,
-                      // right: 0.0,
-                      // bottom: 0,
-                      // right: 0,
                       child: topChild,
                     ),
                   ],
@@ -621,11 +615,12 @@ class CnSpotifyBar extends ChangeNotifier {
           isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
         }
         else{
-          accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", scope: "user-read-currently-playing user-modify-playback-state user-read-playback-state") : accessToken;
-          isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", scope: "user-read-currently-playing user-modify-playback-state user-read-playback-state", accessToken: accessToken);
+          accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback") : accessToken;
+          isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken);
         }
       }on Exception catch (_) {
         accessToken = "";
+        isTryingToConnect = false;
       }
 
 
