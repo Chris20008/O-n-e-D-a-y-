@@ -1,3 +1,4 @@
+import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   double? currentWidthPercent;
   int? remainingDuration;
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   int delay = 250;
 
 
@@ -42,7 +44,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
 
   void periodicRefresh() async{
     Future.delayed(const Duration(milliseconds: 150), ()async{
-      if(doRefresh){
+      if(doRefresh && cnSpotifyBar.isConnected){
         final data = await SpotifySdk.getPlayerState();
         setState(() {
           if (data != null && !data.isPaused){

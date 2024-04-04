@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
@@ -408,7 +409,8 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                             ),
                                             onPressed: () async{
-                                              cnSpotifyBar.disconnect();
+                                              // cnSpotifyBar.disconnect();
+                                              cnSpotifyBar.close();
                                             },
                                             icon: Icon(
                                               Icons.cancel,
@@ -505,6 +507,7 @@ class CnSpotifyBar extends ChangeNotifier {
   late CnAnimatedColumn cnAnimatedColumn;
   late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
+  bool justClosed = false;
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
@@ -530,7 +533,7 @@ class CnSpotifyBar extends ChangeNotifier {
               fit: BoxFit.fitHeight,
             );
 
-            print("IMAGE ${image.raw}");
+            print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
             setMainColor(lastImage.image, cn);
 
@@ -540,7 +543,7 @@ class CnSpotifyBar extends ChangeNotifier {
             // return lastImage;
           }
           else{
-            print("in else");
+            print("SNAPSHOT HAS NO DATA in else");
             if(imageGotUpdated){
               imageGotUpdated = false;
               return ClipRRect(
@@ -554,6 +557,7 @@ class CnSpotifyBar extends ChangeNotifier {
             }
             // return lastImage;
           }
+          print("AND IMAGE GOT NOT UPDATED");
           return ClipRRect(
 
             borderRadius: BorderRadius.circular(7),
@@ -608,30 +612,39 @@ class CnSpotifyBar extends ChangeNotifier {
   // }
 
   Future connectToSpotify()async{
-    if(!isTryingToConnect){
-      isTryingToConnect = true;
-      try{
-        if(Platform.isAndroid){
-          isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
-        }
-        else{
-          accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback") : accessToken;
-          isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken);
-        }
-      }on Exception catch (_) {
-        accessToken = "";
-        isTryingToConnect = false;
-      }
-
-
-      //isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback");
-      print("CONNECTED SPOTIFY: $isConnected");
+    if(justClosed){
+      isConnected = true;
+      justClosed = false;
       refresh();
-      isTryingToConnect = false;
       Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
         cnAnimatedColumn.refresh();
       });
+      return;
     }
+    // if(!isTryingToConnect){
+    isTryingToConnect = true;
+    try{
+      if(Platform.isAndroid){
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+      }
+      else{
+        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
+      }
+    }on Exception catch (_) {
+      accessToken = "";
+      isTryingToConnect = false;
+    }
+
+
+    //isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback");
+    print("CONNECTED SPOTIFY: $isConnected");
+    refresh();
+    isTryingToConnect = false;
+    Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
+      cnAnimatedColumn.refresh();
+    });
+    // }
 
   }
 
@@ -659,24 +672,35 @@ class CnSpotifyBar extends ChangeNotifier {
 
   Future<void> pause() async {
     try {
-      await SpotifySdk.pause().then((value) => {
+      await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
         Future.delayed(const Duration(milliseconds: 150), (){
           refresh();
         })
       });
       // await SpotifySdk.pause();
-    } on Exception catch (_) {}
+    } on Exception catch (_) {
+      print("PAUSING FAILED");
+      await disconnect();
+    }
   }
 
   Future<void> resume() async {
+    print("IN RESUME");
     try {
-      await SpotifySdk.resume().then((value) => {
+      await SpotifySdk.resume().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
         Future.delayed(const Duration(milliseconds: 150), (){
           refresh();
         })
       });
+
+      print("RESUME DONE");
       // await SpotifySdk.resume();
-    } on Exception catch (_) {}
+    } on Exception catch (_) {
+      print("RESUMING FAILED");
+      await disconnect();
+    }
+
+    print("RESUME DONE DONE ");
   }
 
   Future<void> seekToRelative(int milliseconds) async {
@@ -715,7 +739,17 @@ class CnSpotifyBar extends ChangeNotifier {
   //   }
   // }
 
+  void close(){
+    isConnected = false;
+    justClosed = true;
+    refresh();
+    Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), ()async{
+      cnAnimatedColumn.refresh();
+    });
+  }
+
   Future<void> disconnect() async {
+    print("IN DISCONNECT");
     try {
       isConnected = false;
       refresh();
