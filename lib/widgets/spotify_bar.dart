@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
@@ -290,14 +291,21 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                 Align(
                                                   alignment: Alignment.topLeft,
                                                   child: Container(
-                                                    padding: EdgeInsets.only(left:12, top:5),
+                                                    padding: EdgeInsets.only(left:12, top:2),
                                                     height: cnSpotifyBar.height/2,
-                                                    child: ExerciseNameText(
+                                                    child: AutoSizeText(
                                                       cnSpotifyBar.data!.track?.name ?? "",
                                                       maxLines: 1,
-                                                      fontsize: 14,
-                                                      minFontSize: 12
-                                                    ),
+                                                      style: Theme.of(context).textTheme.titleMedium,//TextStyle(fontSize: fontsize, color: Colors.white),
+                                                      minFontSize: 13,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    )
+                                                    // child: ExerciseNameText(
+                                                    //   cnSpotifyBar.data!.track?.name ?? "",
+                                                    //   maxLines: 1,
+                                                    //   fontsize: 14,
+                                                    //   minFontSize: 12
+                                                    // ),
                                                   ),
                                                 ),
                                                 Align(
