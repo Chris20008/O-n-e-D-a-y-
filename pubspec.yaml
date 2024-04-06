@@ -42,6 +42,8 @@ dependencies:
   spotify_sdk: ^2.3.1
   palette_generator: ^0.3.3+3
   google_fonts: ^6.2.1
+  permission_handler: 11.3.1
+  path_provider: ^2.1.2
 
 
   # The following adds the Cupertino Icons font to your application.

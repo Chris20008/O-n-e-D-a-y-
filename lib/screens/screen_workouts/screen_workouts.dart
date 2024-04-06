@@ -58,14 +58,39 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 );
               }
           ),
+          BannerRunningWorkout(),
           Container(
             height: double.maxFinite,
             width: double.maxFinite,
-            padding: EdgeInsets.only(right: 5, bottom: 54),
+            padding: EdgeInsets.only(right: 5, bottom: 64),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                SafeArea(
+                  bottom: false,
+                  child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          saveBackup();
+                        },
+                        icon: Icon(
+                          Icons.backup,
+                          color: Colors.amber[800],
+                        )
+                    ),
+                  ),
+                ),
+                Spacer(),
+                // SizedBox(
+                //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
+                // ),
                 SizedBox(
                   width: 54,
                   height: 54,
@@ -75,13 +100,13 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         backgroundColor: MaterialStateProperty.all(Colors.transparent),
                       ),
                       onPressed: () {
-                        saveBackup();
-                        // if(cnNewWorkout.isUpdating){
-                        //   cnNewWorkout.clear();
-                        // }
-                        // cnNewWorkout.workout.isTemplate = true;
-                        // cnNewWorkout.openPanel();
-                        // cnHomepage.refresh();
+                        // saveBackup();
+                        if(cnNewWorkout.isUpdating){
+                          cnNewWorkout.clear();
+                        }
+                        cnNewWorkout.workout.isTemplate = true;
+                        cnNewWorkout.openPanel();
+                        cnHomepage.refresh();
                       },
                       icon: Icon(
                           Icons.add,
@@ -100,7 +125,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ],
             ),
           ),
-          BannerRunningWorkout()
         ],
       ),
     );
