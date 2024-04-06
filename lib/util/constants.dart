@@ -31,9 +31,13 @@ Widget ExerciseNameText(
 }
 
 Future<bool> saveBackup() async{
-  // Directory? appDocDir = await getExternalStorageDirectory();
-  Directory? appDocDir = await getApplicationDocumentsDirectory();
-  final path = appDocDir.path;
+  Directory? appDocDir;
+  if(Platform.isAndroid){
+    appDocDir = await getExternalStorageDirectory();
+  } else{
+    appDocDir = await getApplicationDocumentsDirectory();
+  }
+  final path = appDocDir?.path;
   final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
   print("FILE PATH: ${file.path}");
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
