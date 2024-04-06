@@ -30,31 +30,15 @@ class SpotifyBar extends StatefulWidget {
 
 class _SpotifyBarState extends State<SpotifyBar> {
   late CnSpotifyBar cnSpotifyBar;
-  final width = WidgetsBinding.instance.window.physicalSize.width;
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   double paddingLeftRight = 5;
-
-  // void refresh(){
-  //   Future.delayed(const Duration(milliseconds: 200), (){
-  //     // if (doRefresh) {
-  //       setState(() {});
-  //       refresh();
-  //     // }
-  //   });
-  // }
-  //
-  // @override
-  // void initState() {
-  //   refresh();
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
     print("Rebuild SPOTIFY BAR");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-    // final size = MediaQuery.of(context).size;
+    final width = MediaQuery.of(context).size.width;
 
     return Align(
       alignment: Alignment.bottomRight,
@@ -62,19 +46,12 @@ class _SpotifyBarState extends State<SpotifyBar> {
           padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
           child: AnimatedCrossFade(
             secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
-            // secondCurve: Curves.fastOutSlowIn,
-            // secondCurve: Curves.fastLinearToSlowEaseIn,
-            //   sizeCurve: Curves.easeInOutBack,
             sizeCurve: Curves.easeInOut,
               firstChild: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: width - paddingLeftRight*2, maxHeight: cnSpotifyBar.height),
-                  // color: Colors.black.withOpacity(0.8),
-                  // height: cnSpotifyBar.height,
-                  // // width: constraints.maxWidth,
-                  // // width: size.width - paddingLeftRight*2,
-                  // width: width - paddingLeftRight*2,
+                child: SizedBox(
+                  height: cnSpotifyBar.height,
+                  width: width - paddingLeftRight*2,
                   child: Stack(
                     // alignment: Alignment.bottomLeft,
                     children: [
@@ -90,9 +67,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                 }
                                 cnSpotifyBar.data = data?? cnSpotifyBar.data;
                                 cnSpotifyBar.progressIndicatorKey = UniqueKey();
-                                // if(data != null){
-                                //   print("Playback Position ${cnSpotifyBar.data!.playbackPosition} von ${cnSpotifyBar.data!.track?.duration}");
-                                // }
                                 return cnSpotifyBar.data == null?
                                 GestureDetector(
                                     onTap: cnSpotifyBar.connectToSpotify,
@@ -105,7 +79,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                 Stack(
                                   children: [
                                     Row(
-                                      // mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Padding(
                                             padding: const EdgeInsets.all(5),
@@ -125,16 +98,10 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                     child: AutoSizeText(
                                                       cnSpotifyBar.data!.track?.name ?? "",
                                                       maxLines: 1,
-                                                      style: Theme.of(context).textTheme.titleMedium,//TextStyle(fontSize: fontsize, color: Colors.white),
+                                                      style: Theme.of(context).textTheme.titleMedium,
                                                       minFontSize: 13,
                                                       overflow: TextOverflow.ellipsis,
                                                     )
-                                                    // child: ExerciseNameText(
-                                                    //   cnSpotifyBar.data!.track?.name ?? "",
-                                                    //   maxLines: 1,
-                                                    //   fontsize: 14,
-                                                    //   minFontSize: 12
-                                                    // ),
                                                   ),
                                                 ),
                                                 Align(
@@ -151,7 +118,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                                                             ),
                                                             onPressed: () async{
                                                               cnSpotifyBar.seekToRelative(-15000);
@@ -169,7 +135,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                                                             ),
                                                             onPressed: () async{
                                                               cnSpotifyBar.skipPrevious();
@@ -206,7 +171,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                                             ),
                                                             onPressed: () async{
-                                                              cnSpotifyBar.skipNext(); //.then((value) => setState(() => {}));
+                                                              cnSpotifyBar.skipNext();
                                                             },
                                                             icon: Icon(
                                                               Icons.skip_next,
@@ -221,7 +186,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                                             style: ButtonStyle(
                                                               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                                               backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                                                             ),
                                                             onPressed: () async{
                                                               cnSpotifyBar.seekToRelative(15000);
@@ -260,8 +224,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                                     Align(
                                       alignment: Alignment.bottomCenter,
                                       child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
-                                      // child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey),
-                                      // child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey),
                                     )
                                   ],
                                 );
@@ -269,12 +231,6 @@ class _SpotifyBarState extends State<SpotifyBar> {
                           );
                         }
                       ),
-
-                      // if(cnSpotifyBar.data != null)
-                      //   Align(
-                      //     alignment: Alignment.bottomCenter,
-                      //     child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
-                      //   )
                     ],
                   ),
                 ),
@@ -330,7 +286,7 @@ class _SpotifyBarState extends State<SpotifyBar> {
 
 class CnSpotifyBar extends ChangeNotifier {
   bool isConnected = false;
-  int animationTimeSpotifyBar = 3000;
+  int animationTimeSpotifyBar = 250;
   bool isTryingReconnect = false;
   bool isTryingToConnect = false;
   bool isRebuilding = false;

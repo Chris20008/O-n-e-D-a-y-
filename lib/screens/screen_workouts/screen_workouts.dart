@@ -1,6 +1,7 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
@@ -74,12 +75,13 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         backgroundColor: MaterialStateProperty.all(Colors.transparent),
                       ),
                       onPressed: () {
-                        if(cnNewWorkout.isUpdating){
-                          cnNewWorkout.clear();
-                        }
-                        cnNewWorkout.workout.isTemplate = true;
-                        cnNewWorkout.openPanel();
-                        cnHomepage.refresh();
+                        saveBackup();
+                        // if(cnNewWorkout.isUpdating){
+                        //   cnNewWorkout.clear();
+                        // }
+                        // cnNewWorkout.workout.isTemplate = true;
+                        // cnNewWorkout.openPanel();
+                        // cnHomepage.refresh();
                       },
                       icon: Icon(
                           Icons.add,
