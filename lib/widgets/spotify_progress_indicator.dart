@@ -31,9 +31,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
     if(widget.data != null){
       currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
     }
-    // final stoppwatchIsOpen = cnStopwatchWidget.isOpened;
     if (cnStopwatchWidget.isOpened){
-      print("----------------------- IS OPENED -----------------------");
       delay = delay + cnStopwatchWidget.animationTimeStopwatch;
     }
     Future.delayed(Duration(milliseconds: delay), (){
