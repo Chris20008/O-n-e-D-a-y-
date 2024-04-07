@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+
+import 'objectbox/ob_exercise.dart';
 
 final testdata = {
   "Name": "TESTNAME",
@@ -71,13 +74,22 @@ void loadBackup() async{
     print("------- GOT RESULT -------");
     File file = File(result.files.single.path!);
     final contents = await file.readAsString();
-    print(contents);
+    final allWorkoutsAsListString = contents.split(";");
+    final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
+    List<ObWorkout> allObWorkouts = [];
+    List<ObExercise> allObExercises = [];
+    for (Map w in allWorkouts){
+      ObWorkout workout = ObWorkout.fromMap(w);
+      final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
+      workout.addExercises(exs);
+      allObWorkouts.add(workout);
+      allObExercises.addAll(exs);
+    }
+    objectbox.workoutBox.removeAll();
+    objectbox.exerciseBox.removeAll();
+    objectbox.workoutBox.putMany(allObWorkouts);
+    objectbox.exerciseBox.putMany(allObExercises);
   } else {
     // User canceled the picker
   }
-  // Directory? appDocDir = await getDirectory();
-  // final path = appDocDir?.path;
-  // final file = File('$path/Test_Backup.txt');
-  // final contents = await file.readAsString();
-  // print(contents);
 }
