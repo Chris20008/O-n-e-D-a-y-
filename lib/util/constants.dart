@@ -43,8 +43,8 @@ Future<bool> saveBackup() async{
   //   appDocDir = await getApplicationDocumentsDirectory();
   // }
   final path = appDocDir?.path;
-  // final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
-  final file = File('$path/Test_Backup.txt');
+  final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
+  // final file = File('$path/Test_Backup.txt');
   print("FILE PATH: ${file.path}");
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
   // print("Länge nach Split ${resultString.split(";").length}");
