@@ -78,7 +78,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                           backgroundColor: MaterialStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
-                          saveBackup();
+                          // saveBackup();
+                          loadBackup();
                         },
                         icon: Icon(
                           Icons.backup,
