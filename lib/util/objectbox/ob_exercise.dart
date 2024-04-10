@@ -26,9 +26,9 @@ class ObExercise{
       // id: w["id"],
       name: w["name"],
       weights: List.from(w["weights"]?? [0]),
-      amounts: List.from(w["amount"]?? [0]),
+      amounts: List.from(w["amounts"]?? [0]),
       restInSeconds: w["restInSeconds"]?? 0,
-      seatLevel: w["seatLevel"]?? 0,
-      linkName: w["linkName"]?? ""
+      seatLevel: w["seatLevel"],
+      linkName: w["linkName"]
   );
 }

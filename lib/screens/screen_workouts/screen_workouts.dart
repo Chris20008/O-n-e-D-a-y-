@@ -88,6 +88,24 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                     ),
                   ),
                 ),
+                SizedBox(
+                  width: 54,
+                  height: 54,
+                  child: IconButton(
+                      iconSize: 25,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      ),
+                      onPressed: () {
+                        // saveBackup();
+                        loadBackup();
+                      },
+                      icon: Icon(
+                        Icons.cloud_download,
+                        color: Colors.amber[800],
+                      )
+                  ),
+                ),
                 Spacer(),
                 // SizedBox(
                 //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
@@ -101,7 +119,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         backgroundColor: MaterialStateProperty.all(Colors.transparent),
                       ),
                       onPressed: () {
-                        // saveBackup();
                         if(cnNewWorkout.isUpdating){
                           cnNewWorkout.clear();
                         }

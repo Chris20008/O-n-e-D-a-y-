@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
-import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,17 +27,68 @@ class SpotifyBar extends StatefulWidget {
   State<SpotifyBar> createState() => _SpotifyBarState();
 }
 
-class _SpotifyBarState extends State<SpotifyBar> {
+class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnSpotifyBar cnSpotifyBar;
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
+  // double width = 350;
   double paddingLeftRight = 5;
+  Map<String, double> widths = {
+    "portrait": 0,
+    "landscape": 0
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    final orientation = MediaQuery.of(context).orientation;
+    print(orientation.name);
+    // cnSpotifyBar.width = MediaQuery.of(context).size.width;
+    // cnSpotifyBar.refresh();
+    if(cnSpotifyBar.width == 0){
+      widths[orientation.name] = (widths[orientation.name] == 0
+      ? MediaQuery.of(context).size.width
+      : widths[orientation.name])!;
+      cnSpotifyBar.width = widths[orientation.name]!;
+    }
+    else if (orientation != Orientation.landscape) {
+      print("ORIENTATION NOW LANDSCAPE");
+      widths["landscape"] = (widths["landscape"] == 0
+          ? MediaQuery.of(context).size.height
+          : widths["landscape"])!;
+      cnSpotifyBar.width = widths["landscape"]!;
+    }
+    else {
+      print("ORIENTATION NOW PORTRAIT");
+      widths["portrait"] = (widths["portrait"] == 0
+          ? MediaQuery.of(context).size.height
+          : widths["portrait"])!;
+      cnSpotifyBar.width = widths["portrait"]!;
+    }
+    print("WIDTH NOW: ${cnSpotifyBar.width}");
+  }
 
   @override
   Widget build(BuildContext context) {
-    print("Rebuild SPOTIFY BAR");
+    print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-    final width = MediaQuery.of(context).size.width;
+    // print("WIDTH NOW in Build 1: ${cnSpotifyBar.width}");
+    // final width = MediaQuery.of(context).size.width;
+    // cnSpotifyBar.width = cnSpotifyBar.width == 0? MediaQuery.of(context).size.width : cnSpotifyBar.width;
+    // print("WIDTH NOW in Build 2: ${cnSpotifyBar.width}");
+
 
     return Align(
       alignment: Alignment.bottomRight,
@@ -74,7 +124,8 @@ class _SpotifyBarState extends State<SpotifyBar> {
                 borderRadius: BorderRadius.circular(10),
                 child: SizedBox(
                   height: cnSpotifyBar.height,
-                  width: width - paddingLeftRight*2,
+                  width: cnSpotifyBar.width - paddingLeftRight*2,
+                  // width: width - paddingLeftRight*2,
                   child: Stack(
                     // alignment: Alignment.bottomLeft,
                     children: [
@@ -320,6 +371,7 @@ class CnSpotifyBar extends ChangeNotifier {
   Color? mainColor;
   int waitCounter = 0;
   double height = 60;
+  double width = 0;
   double heightOfButton = 54;
   late CnAnimatedColumn cnAnimatedColumn;
   late CnRunningWorkout cnRunningWorkout;
@@ -352,10 +404,10 @@ class CnSpotifyBar extends ChangeNotifier {
 
             print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
-            // if(cn.currentImageUri != image.raw){
-            //   cn.currentImageUri = image.raw;
+            if(cn.currentImageUri != image.raw){
+              cn.currentImageUri = image.raw;
               setMainColor(lastImage.image, cn);
-            // }
+            }
 
             Future.delayed(const Duration(milliseconds: 50), (){
               cn.refresh();
