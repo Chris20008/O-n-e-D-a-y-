@@ -178,6 +178,7 @@ class CnBackgroundImage extends ChangeNotifier {
   Color? colorSecondChild;
   bool isRefreshing = false;
   bool firstChild = true;
+  String currentImageUri = "";
 
   setColor(Color? c){
     colorFirstChild = c;

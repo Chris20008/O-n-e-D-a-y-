@@ -44,7 +44,30 @@ class _SpotifyBarState extends State<SpotifyBar> {
       alignment: Alignment.bottomRight,
       child: Padding(
           padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
-          child: AnimatedCrossFade(
+          // child: !cnSpotifyBar.isConnected?
+          // Padding(
+          //   padding: EdgeInsets.only(top: (cnSpotifyBar.height-cnSpotifyBar.heightOfButton)/2, bottom: (cnSpotifyBar.height-cnSpotifyBar.heightOfButton)/2),
+          //   child: SizedBox(
+          //     height: cnSpotifyBar.heightOfButton,
+          //     width: cnSpotifyBar.heightOfButton,
+          //     child: IconButton(
+          //         iconSize: 25,
+          //         style: ButtonStyle(
+          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          //           // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+          //         ),
+          //         onPressed: () async{
+          //           cnSpotifyBar.connectToSpotify();
+          //         },
+          //         icon: Icon(
+          //           MyIcons.spotify,
+          //           color: Colors.amber[800],
+          //         )
+          //     ),
+          //   ),
+          // ) :
+          child:
+          AnimatedCrossFade(
             secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
             sizeCurve: Curves.easeInOut,
               firstChild: ClipRRect(
@@ -329,7 +352,10 @@ class CnSpotifyBar extends ChangeNotifier {
 
             print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
-            setMainColor(lastImage.image, cn);
+            // if(cn.currentImageUri != image.raw){
+            //   cn.currentImageUri = image.raw;
+              setMainColor(lastImage.image, cn);
+            // }
 
             Future.delayed(const Duration(milliseconds: 50), (){
               cn.refresh();
@@ -373,7 +399,7 @@ class CnSpotifyBar extends ChangeNotifier {
       waitCounter -= 1;
       // print("GOT $waitCounter");
       if(waitCounter == 0){
-        // print("--------------------- REFRESH ---------------------");
+      //   print("--------------------- REFRESH ---------------------");
         mainColor = c;
         cn.setColor(mainColor);
       }
@@ -382,10 +408,10 @@ class CnSpotifyBar extends ChangeNotifier {
     // mainColor = paletteGenerator.lightVibrantColor?.color??
     //     paletteGenerator.lightMutedColor?.color??
     //     paletteGenerator.darkVibrantColor?.color;
-    mainColor = paletteGenerator.darkVibrantColor?.color??
-        paletteGenerator.lightVibrantColor?.color??
-        paletteGenerator.lightMutedColor?.color;
-    mainColor = await compute(computeColor, paletteGenerator);
+    // mainColor = paletteGenerator.darkVibrantColor?.color??
+    //     paletteGenerator.lightVibrantColor?.color??
+    //     paletteGenerator.lightMutedColor?.color;
+    // mainColor = await compute(computeColor, paletteGenerator);
 
   }
 
@@ -546,6 +572,8 @@ class CnSpotifyBar extends ChangeNotifier {
     print("IN DISCONNECT");
     try {
       isConnected = false;
+      justClosed = false;
+      accessToken = "";
       refresh();
       Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), ()async{
         await SpotifySdk.disconnect();
