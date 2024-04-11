@@ -4,6 +4,7 @@ import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/screen_statistics/screen_statistics.dart';
 import '../screens/screen_workout_history/screen_workout_history.dart';
 import '../screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/screen_workouts/screen_running_workout.dart';
@@ -22,6 +23,7 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
 
   @override
@@ -97,12 +99,14 @@ class _BottomMenuState extends State<BottomMenu> {
 
   void changeIndex(int index){
     cnBottomMenu._changeIndex(index);
-    print("Index $index");
     if(index == 0) {
       cnWorkoutHistory.refreshAllWorkouts();
-    } else if(index == 1) {
+    }
+    else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();
-      print("REFRESH ALL WORKOUTS");
+    }
+    else if(index == 2) {
+      cnScreenStatistics.refresh();
     }
     cnHomepage.refresh();
   }

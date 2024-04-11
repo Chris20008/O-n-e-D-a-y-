@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fitness_app/screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
+        ChangeNotifierProvider(create: (context) => CnScreenStatistics()),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
@@ -85,6 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
   // late CnBackgroundImage cnBackgroundImage;
   late CnHomepage cnHomepage;
 
@@ -101,6 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
     print("Obejctbox Initialized");
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
+    cnScreenStatistics.init();
     print("Refreshed All Workouts");
   }
 
@@ -139,28 +143,33 @@ class _MyHomePageState extends State<MyHomePage> {
               //     child: cnSpotifyBar.lastImage
               // ),
               // const BackgroundImage(),
-              AnimatedCrossFade(
-                  firstChild: const ScreenWorkoutHistory(),
-                  secondChild: const ScreenWorkout(),
-                  crossFadeState: cnBottomMenu.index == 0?
-                  CrossFadeState.showFirst:
-                  CrossFadeState.showSecond,
-                  duration: const Duration(milliseconds: 200)
-              ),
-              AnimatedContainer(
-                  duration: const Duration(milliseconds: 300), // Animationsdauer
-                  transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
-                  curve: Curves.easeInOut,
-                  // child: const SpotifyBar()
-                  child: const SafeArea(
-                    top: false,
-                    child: Hero(
-                        transitionOnUserGestures: true,
-                        tag: "SpotifyBar",
-                        child: SpotifyBar()
+              if(cnBottomMenu.index != 2)
+                AnimatedCrossFade(
+                    firstChild: const ScreenWorkoutHistory(),
+                    secondChild: const ScreenWorkout(),
+                    crossFadeState: cnBottomMenu.index == 0?
+                    CrossFadeState.showFirst:
+                    CrossFadeState.showSecond,
+                    duration: const Duration(milliseconds: 200)
+                )
+              else
+                const ScreenStatistics(),
+
+              if(cnBottomMenu.index != 2)
+                AnimatedContainer(
+                    duration: const Duration(milliseconds: 300), // Animationsdauer
+                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+                    curve: Curves.easeInOut,
+                    // child: const SpotifyBar()
+                    child: const SafeArea(
+                      top: false,
+                      child: Hero(
+                          transitionOnUserGestures: true,
+                          tag: "SpotifyBar",
+                          child: SpotifyBar()
+                      ),
                     ),
-                  ),
-              ),
+                ),
               // cnSpotifyBar.bar,
               const NewWorkOutPanel(),
               const NewExercisePanel(),

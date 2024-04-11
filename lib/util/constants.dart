@@ -9,6 +9,28 @@ import 'package:flutter/material.dart';
 
 import 'objectbox/ob_exercise.dart';
 
+final weekdayMapping = {
+  "Mon": 1,
+  "Tue": 2,
+  "Wed": 3,
+  "Thu": 4,
+  "Fri": 5,
+  "Sat": 6,
+  "Sun": 7,
+};
+
+int getMaxDaysOfMonth(int year, int month){
+  final bool isLeapYear = (year%4==0 && ((year%100==0 && year%400==0) || year%100!=0));
+  switch (month){
+    case 4 || 6 || 9 || 11:
+      return 30;
+    case 2:
+      return isLeapYear? 29: 28;
+    default:
+      return 31;
+  }
+}
+
 final testdata = {
   "Name": "TESTNAME",
   "Exercises": {
