@@ -1,5 +1,21 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:fitness_app/main.dart';
+import 'package:fitness_app/util/objectbox/ob_workout.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+
+import 'objectbox/ob_exercise.dart';
+
+final testdata = {
+  "Name": "TESTNAME",
+  "Exercises": {
+    "Dips": [2, 3, 4, 5, 6, 7],
+    "ChestFlys": [7, 6, 5, 4, 3, 2]
+  }
+};
 
 Widget ExerciseNameText(
     String name,
@@ -16,4 +32,64 @@ Widget ExerciseNameText(
     minFontSize: minFontSize,
     overflow: TextOverflow.ellipsis,
   );
+}
+
+Future<bool> saveBackup() async{
+  Directory? appDocDir = await getDirectory();
+  // if(Platform.isAndroid){
+  //   appDocDir = await getExternalStorageDirectory();
+  // }
+  // else{
+  //   appDocDir = await getApplicationDocumentsDirectory();
+  // }
+  final path = appDocDir?.path;
+  final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
+  // final file = File('$path/Test_Backup.txt');
+  print("FILE PATH: ${file.path}");
+  await file.writeAsString(getWorkoutsAsStringList().join("; "));
+  // print("Länge nach Split ${resultString.split(";").length}");
+  print("FINISHED WRITING FILE");
+  return true;
+}
+
+List getWorkoutsAsStringList(){
+  final allObWorkouts = objectbox.workoutBox.getAll();
+  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asJson())));
+  return allWorkouts;
+}
+
+Future<Directory?> getDirectory() async{
+  if(Platform.isAndroid){
+    return await getExternalStorageDirectory();
+  }
+  else{
+    return await getApplicationDocumentsDirectory();
+  }
+}
+
+void loadBackup() async{
+  FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+  if (result != null) {
+    print("------- GOT RESULT -------");
+    File file = File(result.files.single.path!);
+    final contents = await file.readAsString();
+    final allWorkoutsAsListString = contents.split(";");
+    final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
+    List<ObWorkout> allObWorkouts = [];
+    List<ObExercise> allObExercises = [];
+    for (Map w in allWorkouts){
+      ObWorkout workout = ObWorkout.fromMap(w);
+      final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
+      workout.addExercises(exs);
+      allObWorkouts.add(workout);
+      allObExercises.addAll(exs);
+    }
+    objectbox.workoutBox.removeAll();
+    objectbox.exerciseBox.removeAll();
+    objectbox.workoutBox.putMany(allObWorkouts);
+    objectbox.exerciseBox.putMany(allObExercises);
+  } else {
+    // User canceled the picker
+  }
 }

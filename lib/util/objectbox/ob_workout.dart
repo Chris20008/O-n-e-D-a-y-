@@ -25,6 +25,14 @@ class ObWorkout{
     }
   }
 
+  ObWorkout.fromMap(Map w): this(
+      // id: w["id"],
+      name: w["name"],
+      date: DateTime.parse(w["date"]),
+      isTemplate: w["isTemplate"],
+      linkedExercises: List.from(w["linkedExercises"])
+  );
+
   final exercises = ToMany<ObExercise>();
 
   void deleteAllExercises(){
@@ -36,9 +44,9 @@ class ObWorkout{
 
   void addExercises(List<ObExercise> newExercises){
     exercises.addAll(newExercises);
-    exercises.forEach((element) {
-      print(element.id);
-    });
+    // exercises.forEach((element) {
+    //   print(element.id);
+    // });
   }
 
   void save(){
@@ -50,4 +58,24 @@ class ObWorkout{
     print("Exercises length ${exercises.length}");
   }
 
+  Map asJson(){
+    final exs = List<Map>.from(exercises.map((ex) => {
+      "id": ex.id,
+      "name": ex.name,
+      "weights": ex.weights,
+      "amounts": ex.amounts,
+      "restInSeconds": ex.restInSeconds,
+      "seatLevel": ex.seatLevel,
+      "linkName": ex.linkName
+    }));
+    final result = {
+      "id": id,
+      "name": name,
+      "date": date.toString(),
+      "isTemplate": isTemplate,
+      "linkedExercises": linkedExercises,
+      "exercises": exs
+    };
+    return result;
+  }
 }

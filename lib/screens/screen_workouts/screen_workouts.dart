@@ -1,6 +1,7 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
@@ -57,14 +58,58 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 );
               }
           ),
+          BannerRunningWorkout(),
           Container(
             height: double.maxFinite,
             width: double.maxFinite,
-            padding: EdgeInsets.only(right: 5, bottom: 54),
+            padding: EdgeInsets.only(right: 5, bottom: 64),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                SafeArea(
+                  bottom: false,
+                  child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          saveBackup();
+                          // loadBackup();
+                        },
+                        icon: Icon(
+                          Icons.backup,
+                          color: Colors.amber[800],
+                        )
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 54,
+                  height: 54,
+                  child: IconButton(
+                      iconSize: 25,
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      ),
+                      onPressed: () {
+                        // saveBackup();
+                        loadBackup();
+                      },
+                      icon: Icon(
+                        Icons.cloud_download,
+                        color: Colors.amber[800],
+                      )
+                  ),
+                ),
+                Spacer(),
+                // SizedBox(
+                //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
+                // ),
                 SizedBox(
                   width: 54,
                   height: 54,
@@ -98,7 +143,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               ],
             ),
           ),
-          BannerRunningWorkout()
         ],
       ),
     );

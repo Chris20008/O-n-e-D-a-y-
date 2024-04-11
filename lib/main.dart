@@ -5,10 +5,12 @@ import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dar
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
+import 'package:fitness_app/widgets/animated_column.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +21,7 @@ late ObjectBox objectbox;
 bool objectboxIsInitialized = false;
 
 void main() {
+
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
@@ -42,9 +45,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
-        ChangeNotifierProvider(create: (context) => CnSpotifyBar()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
+        ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
+        ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
@@ -113,16 +118,16 @@ class _MyHomePageState extends State<MyHomePage> {
       //   title: Text(widget.title),
       // ),
       body: Container(
-          // decoration: BoxDecoration(
-          //     gradient: LinearGradient(
-          //         begin: Alignment.topRight,
-          //         end: Alignment.bottomLeft,
-          //         colors: [
-          //           const Color(0xff84490b),
-          //           Colors.black.withOpacity(0.9),
-          //         ]
-          //     )
-          // ),
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    const Color(0xff84490b),
+                    Colors.black.withOpacity(0.9),
+                  ]
+              )
+          ),
           child: Stack(
             alignment: Alignment.topCenter,
             children: [
@@ -133,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
               //     ),
               //     child: cnSpotifyBar.lastImage
               // ),
-              const BackgroundImage(),
+              // const BackgroundImage(),
               AnimatedCrossFade(
                   firstChild: const ScreenWorkoutHistory(),
                   secondChild: const ScreenWorkout(),
@@ -147,10 +152,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
                   curve: Curves.easeInOut,
                   // child: const SpotifyBar()
-                  child: const Hero(
-                      transitionOnUserGestures: true,
-                      tag: "SpotifyBar",
-                      child: SpotifyBar()
+                  child: const SafeArea(
+                    top: false,
+                    child: Hero(
+                        transitionOnUserGestures: true,
+                        tag: "SpotifyBar",
+                        child: SpotifyBar()
+                    ),
                   ),
               ),
               // cnSpotifyBar.bar,

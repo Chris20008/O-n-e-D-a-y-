@@ -42,14 +42,20 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
     print("REBUILD NEW WOKROUT PANEL");
 
-    return WillPopScope(
-      onWillPop: () async{
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (doPop){
         if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
           cnNewWorkout.panelController.close();
-          return false;
         }
-        return true;
       },
+      // onWillPop: () async{
+      //   if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
+      //     cnNewWorkout.panelController.close();
+      //     return false;
+      //   }
+      //   return true;
+      // },
       child: LayoutBuilder(
         builder: (context, constraints){
           return SlidingUpPanel(

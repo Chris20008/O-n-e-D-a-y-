@@ -10,7 +10,6 @@ class ObExercise{
   List<int> amounts;
   int restInSeconds;
   int? seatLevel;
-  // int? orderId;
   String? linkName;
 
   ObExercise({
@@ -20,7 +19,16 @@ class ObExercise{
     required this.amounts,
     required this.restInSeconds,
     this.seatLevel,
-    // this.orderId,
     this.linkName
   });
+
+  ObExercise.fromMap(Map w): this(
+      // id: w["id"],
+      name: w["name"],
+      weights: List.from(w["weights"]?? [0]),
+      amounts: List.from(w["amounts"]?? [0]),
+      restInSeconds: w["restInSeconds"]?? 0,
+      seatLevel: w["seatLevel"],
+      linkName: w["linkName"]
+  );
 }
