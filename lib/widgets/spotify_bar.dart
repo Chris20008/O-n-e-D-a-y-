@@ -391,6 +391,7 @@ class CnSpotifyBar extends ChangeNotifier {
           dimension: ImageDimension.xSmall,
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
+          print("GET IMAGE");
           if (snapshot.hasData) {
 
             lastImage = Image.memory(
@@ -404,8 +405,11 @@ class CnSpotifyBar extends ChangeNotifier {
 
             print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
-            if(cn.currentImageUri != image.raw){
-              cn.currentImageUri = image.raw;
+            // if(cn.currentImageUri != image.raw){
+            if(cn.currentImageUri != snapshot.data!.toString()){
+              print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
+              print(lastImage.color);
+              cn.currentImageUri = snapshot.data!.toString();
               setMainColor(lastImage.image, cn);
             }
 
@@ -429,7 +433,6 @@ class CnSpotifyBar extends ChangeNotifier {
             }
             // return lastImage;
           }
-          print("AND IMAGE GOT NOT UPDATED");
           return ClipRRect(
 
             borderRadius: BorderRadius.circular(7),
@@ -451,9 +454,10 @@ class CnSpotifyBar extends ChangeNotifier {
       waitCounter -= 1;
       // print("GOT $waitCounter");
       if(waitCounter == 0){
-      //   print("--------------------- REFRESH ---------------------");
-        mainColor = c;
-        cn.setColor(mainColor);
+        print("--------------------- REFRESH ---------------------");
+        print("WITH COLOR: $c");
+        mainColor = c[0];
+        cn.setColor(mainColor, c[1]);
       }
     });
 
@@ -467,11 +471,16 @@ class CnSpotifyBar extends ChangeNotifier {
 
   }
 
-  static Future<Color?> computeColor(PaletteGenerator paletteGenerator)async{
+  static Future<List<Color?>> computeColor(PaletteGenerator paletteGenerator)async{
     final color = paletteGenerator.lightVibrantColor?.color??
         paletteGenerator.lightMutedColor?.color??
         paletteGenerator.darkVibrantColor?.color;
-    return color;
+    final color2 = paletteGenerator.dominantColor?.color??
+        paletteGenerator.darkVibrantColor?.color??
+        paletteGenerator.lightMutedColor?.color??
+        paletteGenerator.lightVibrantColor?.color;
+
+    return [color, color2];
   }
 
   // void delayedReconnect() async{

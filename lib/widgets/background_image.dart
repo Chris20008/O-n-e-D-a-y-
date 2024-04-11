@@ -30,16 +30,34 @@ class _BackgroundImageState extends State<BackgroundImage> {
     return Container(
       height: double.maxFinite,
       width: double.maxFinite,
-      color: cnBackgroundImage.colorFirstChild,
+      decoration: BoxDecoration(
+          gradient:  LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              // colors: [
+              //   Colors.black54,
+              //   Colors.black38,
+              // ]
+              colors: [
+                cnBackgroundImage.colorSecondChild?? Colors.black38,
+                cnBackgroundImage.colorFirstChild?? Colors.black54,
+              ]
+          )
+      ),
+      // color: cnBackgroundImage.colorFirstChild,
       child: Container(
         decoration: const BoxDecoration(
             gradient:  LinearGradient(
                 begin: Alignment.bottomLeft,
                 end: Alignment.topRight,
                 colors: [
-                  Colors.black54,
                   Colors.black38,
+                  Colors.black54,
                 ]
+                // colors: [
+                //   cnBackgroundImage.colorFirstChild?? Colors.black54,
+                //   cnBackgroundImage.colorSecondChild?? Colors.black38,
+                // ]
             )
         ),
       ),
@@ -180,8 +198,9 @@ class CnBackgroundImage extends ChangeNotifier {
   bool firstChild = true;
   String currentImageUri = "";
 
-  setColor(Color? c){
+  setColor(Color? c, Color? c2){
     colorFirstChild = c;
+    colorSecondChild = c2;
     refresh();
   }
 

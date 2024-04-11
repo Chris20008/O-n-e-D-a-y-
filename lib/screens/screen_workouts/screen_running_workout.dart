@@ -43,11 +43,21 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
     return PopScope(
       onPopInvoked: (doPop){
-        cnRunningWorkout.isVisible = false;
-        // cnHomepage.refresh(refreshSpotifyBar: true);
-        cnSpotifyBar.refresh();
-        cnWorkouts.refresh();
-        cnBottomMenu.refresh();
+        if(cnRunningWorkout.isVisible){
+          cnRunningWorkout.isVisible = false;
+          // cnHomepage.refresh(refreshSpotifyBar: true);
+          cnWorkouts.refresh();
+          cnBottomMenu.refresh();
+
+          Future.delayed(const Duration(milliseconds: 300), (){
+            cnSpotifyBar.refresh();
+            // cnWorkouts.refresh();
+            // cnBottomMenu.refresh();
+          });
+        }
+        // cnSpotifyBar.refresh();
+        // cnWorkouts.refresh();
+        // cnBottomMenu.refresh();
       },
       // onWillPop: () async{
       //   cnRunningWorkout.isVisible = false;
@@ -1218,8 +1228,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         cnWorkouts.refreshAllWorkouts();
       }
       cnRunningWorkout.clear();
-      Navigator.of(context).pop();
-      cnHomepage.refresh();
+      cnRunningWorkout.isVisible = false;
+      // cnHomepage.refresh(refreshSpotifyBar: true);
+      cnWorkouts.refresh();
+      cnBottomMenu.refresh();
+      Future.delayed(const Duration(milliseconds: 100), (){
+        Navigator.of(context).pop();
+        cnHomepage.refresh();
+        cnSpotifyBar.refresh();
+      });
     });
   }
 }
