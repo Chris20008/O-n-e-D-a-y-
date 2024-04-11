@@ -63,24 +63,25 @@ class _GeneralOverviewState extends State<GeneralOverview> {
       fontWeight: FontWeight.bold,
       fontSize: 14,
     );
-    String text = cnScreenStatistics.workoutsSorted[2024][value]["name"];
-    // switch (value.toInt()) {
-    //   case 0:
-    //     text = cnScreenStatistics.workoutsSorted[2024]['3/18/2024']["name"];
-    //     break;
-    //   case 1:
-    //     text = cnScreenStatistics.workoutsSorted[2024]['3/25/2024']["name"];
-    //     break;
-    //   case 2:
-    //     text = cnScreenStatistics.workoutsSorted[2024]['4/1/2024']["name"];
-    //     break;
-    //   case 3:
-    //     text = cnScreenStatistics.workoutsSorted[2024]['4/8/2024']["name"];
-    //     break;
-    //   default:
-    //     text = '';
-    //     break;
-    // }
+    // String text = cnScreenStatistics.workoutsSorted[2024][value]["name"];
+    String text = "";
+    switch (value.toInt()) {
+      case 0:
+        text = cnScreenStatistics.workoutsSorted[2024]['3/18/2024']["name"];
+        break;
+      case 1:
+        text = cnScreenStatistics.workoutsSorted[2024]['3/25/2024']["name"];
+        break;
+      case 2:
+        text = cnScreenStatistics.workoutsSorted[2024]['4/1/2024']["name"];
+        break;
+      case 3:
+        text = cnScreenStatistics.workoutsSorted[2024]['4/8/2024']["name"];
+        break;
+      default:
+        text = '';
+        break;
+    }
     return SideTitleWidget(
       axisSide: meta.axisSide,
       space: 4,
