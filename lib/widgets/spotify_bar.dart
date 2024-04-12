@@ -493,7 +493,8 @@ class CnSpotifyBar extends ChangeNotifier {
         accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
         isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
       }
-    }on Exception catch (_) {
+    }on Exception catch (e) {
+      print("---------- EXCEPTION --------- ${e.toString()}");
       accessToken = "";
       isTryingToConnect = false;
     }

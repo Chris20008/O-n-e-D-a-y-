@@ -47,12 +47,12 @@ class CnScreenStatistics extends ChangeNotifier {
   Map<int, dynamic> workoutsSorted = {};
   DateTime minDate = DateTime.now();
   // DateTime minDate = DateTime(2024, 4, 5);
-  // DateTime maxDate = DateTime.now();
-  DateTime maxDate = DateTime(2025, 5, 26);
+  DateTime maxDate = DateTime.now().add(const Duration(days: 32));
+  // DateTime maxDate = DateTime(2025, 5, 26);
   Map<String, Map<String, DateTime>> intervalSelectorMap = {};
   late String currentlySelectedIntervalAsText = DateFormat('MMMM y').format(DateTime.now());
   // late DateTime currentlySelectedIntervalAsDate = DateTime.now();
-  TimeInterval selectedIntervalSize = TimeInterval.quarterly;
+  TimeInterval selectedIntervalSize = TimeInterval.monthly;
 
 
   void init() async{
