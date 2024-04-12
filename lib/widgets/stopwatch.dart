@@ -275,7 +275,7 @@ class CnStopwatchWidget extends ChangeNotifier {
     isRunning = true;
     isPaused = false;
     refresh();
-    intervallRefresh();
+    intervalRefresh();
   }
 
   void pauseTimer(){
@@ -293,13 +293,13 @@ class CnStopwatchWidget extends ChangeNotifier {
     refresh();
   }
 
-  void intervallRefresh(){
+  void intervalRefresh(){
     Future.delayed(const Duration(milliseconds: 200), (){
       if(isRunning && !isPaused){
         if(isOpened){
           refresh();
         }
-        intervallRefresh();
+        intervalRefresh();
       }
     });
   }

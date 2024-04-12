@@ -54,24 +54,22 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   void didChangeMetrics() {
     super.didChangeMetrics();
     final orientation = MediaQuery.of(context).orientation;
-    print(orientation.name);
-    // cnSpotifyBar.width = MediaQuery.of(context).size.width;
-    // cnSpotifyBar.refresh();
-    if(cnSpotifyBar.width == 0){
-      widths[orientation.name] = (widths[orientation.name] == 0
-      ? MediaQuery.of(context).size.width
-      : widths[orientation.name])!;
-      cnSpotifyBar.width = widths[orientation.name]!;
-    }
-    else if (orientation != Orientation.landscape) {
-      print("ORIENTATION NOW LANDSCAPE");
+
+    // if(cnSpotifyBar.width == 0){
+    //   widths[orientation.name] = (widths[orientation.name] == 0
+    //   ? MediaQuery.of(context).size.width
+    //   : widths[orientation.name])!;
+    //   cnSpotifyBar.width = widths[orientation.name]!;
+    // }
+    if (orientation != Orientation.landscape) {
+      // print("ORIENTATION NOW LANDSCAPE");
       widths["landscape"] = (widths["landscape"] == 0
           ? MediaQuery.of(context).size.height
           : widths["landscape"])!;
       cnSpotifyBar.width = widths["landscape"]!;
     }
     else {
-      print("ORIENTATION NOW PORTRAIT");
+      // print("ORIENTATION NOW PORTRAIT");
       widths["portrait"] = (widths["portrait"] == 0
           ? MediaQuery.of(context).size.height
           : widths["portrait"])!;
@@ -84,38 +82,21 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-    // print("WIDTH NOW in Build 1: ${cnSpotifyBar.width}");
-    // final width = MediaQuery.of(context).size.width;
-    // cnSpotifyBar.width = cnSpotifyBar.width == 0? MediaQuery.of(context).size.width : cnSpotifyBar.width;
-    // print("WIDTH NOW in Build 2: ${cnSpotifyBar.width}");
+    if(widths["portrait"] == 0 && widths["landscape"] == 0){
+      final orientation = MediaQuery.of(context).orientation;
+      widths[orientation.name] = (widths[orientation.name] == 0
+          ? MediaQuery.of(context).size.width
+          : widths[orientation.name])!;
+      cnSpotifyBar.width = widths[orientation.name]!;
+    } else if(Platform.isAndroid){
+      cnSpotifyBar.width = MediaQuery.of(context).size.width;
+    }
 
 
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
           padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
-          // child: !cnSpotifyBar.isConnected?
-          // Padding(
-          //   padding: EdgeInsets.only(top: (cnSpotifyBar.height-cnSpotifyBar.heightOfButton)/2, bottom: (cnSpotifyBar.height-cnSpotifyBar.heightOfButton)/2),
-          //   child: SizedBox(
-          //     height: cnSpotifyBar.heightOfButton,
-          //     width: cnSpotifyBar.heightOfButton,
-          //     child: IconButton(
-          //         iconSize: 25,
-          //         style: ButtonStyle(
-          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          //           // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-          //         ),
-          //         onPressed: () async{
-          //           cnSpotifyBar.connectToSpotify();
-          //         },
-          //         icon: Icon(
-          //           MyIcons.spotify,
-          //           color: Colors.amber[800],
-          //         )
-          //     ),
-          //   ),
-          // ) :
           child:
           AnimatedCrossFade(
             secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
@@ -367,7 +348,7 @@ class CnSpotifyBar extends ChangeNotifier {
   String accessToken = "";
   PlayerState? data;
   bool imageGotUpdated = false;
-  late Image lastImage;
+  Image? lastImage;
   Color? mainColor;
   int waitCounter = 0;
   double height = 60;
@@ -406,11 +387,11 @@ class CnSpotifyBar extends ChangeNotifier {
             print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
             // if(cn.currentImageUri != image.raw){
-            if(cn.currentImageUri != snapshot.data!.toString()){
+            if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
               print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
-              print(lastImage.color);
+              print(lastImage!.color);
               cn.currentImageUri = snapshot.data!.toString();
-              setMainColor(lastImage.image, cn);
+              setMainColor(lastImage!.image, cn);
             }
 
             Future.delayed(const Duration(milliseconds: 50), (){
@@ -436,7 +417,7 @@ class CnSpotifyBar extends ChangeNotifier {
           return ClipRRect(
 
             borderRadius: BorderRadius.circular(7),
-            child: lastImage,
+            child: lastImage?? const SizedBox(),
           );
         }
     );

@@ -3,14 +3,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class GeneralOverview extends StatefulWidget {
-  const GeneralOverview({super.key});
+class GeneralOverviewBarChart extends StatefulWidget {
+  const GeneralOverviewBarChart({super.key});
 
   @override
-  State<GeneralOverview> createState() => _GeneralOverviewState();
+  State<GeneralOverviewBarChart> createState() => _GeneralOverviewBarChartState();
 }
 
-class _GeneralOverviewState extends State<GeneralOverview> {
+class _GeneralOverviewBarChartState extends State<GeneralOverviewBarChart> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
 
   @override
@@ -19,15 +19,23 @@ class _GeneralOverviewState extends State<GeneralOverview> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30),
       child: SafeArea(
-        child: BarChart(
-          BarChartData(
-            barTouchData: barTouchData,
-            titlesData: titlesData,
-            borderData: borderData,
-            barGroups: barGroups,
-            gridData: const FlGridData(show: false),
-            alignment: BarChartAlignment.spaceAround,
-            maxY: 20,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          height: 200,
+          decoration: BoxDecoration(
+            color: Colors.black26,
+            borderRadius: BorderRadius.circular(15)
+          ),
+          child: BarChart(
+            BarChartData(
+              barTouchData: barTouchData,
+              titlesData: titlesData,
+              borderData: borderData,
+              barGroups: barGroups,
+              gridData: const FlGridData(show: false),
+              alignment: BarChartAlignment.spaceAround,
+              maxY: 20,
+            ),
           ),
         ),
       ),
@@ -130,6 +138,8 @@ class _GeneralOverviewState extends State<GeneralOverview> {
       x: 1,
       barRods: [
         BarChartRodData(
+          borderRadius: BorderRadius.circular(4),
+          width: 15,
           toY: cnScreenStatistics.workoutsSorted[2024]['3/18/2024']['counter']*1.0,
           gradient: _barsGradient,
         )
@@ -140,6 +150,8 @@ class _GeneralOverviewState extends State<GeneralOverview> {
       x: 1,
       barRods: [
         BarChartRodData(
+          borderRadius: BorderRadius.circular(4),
+          width: 15,
           toY: cnScreenStatistics.workoutsSorted[2024]['3/25/2024']['counter']*1.0,
           gradient: _barsGradient,
         )
@@ -150,6 +162,8 @@ class _GeneralOverviewState extends State<GeneralOverview> {
       x: 2,
       barRods: [
         BarChartRodData(
+          borderRadius: BorderRadius.circular(4),
+          width: 15,
           toY: cnScreenStatistics.workoutsSorted[2024]['4/1/2024']['counter']*1.0,
           gradient: _barsGradient,
         )
@@ -160,6 +174,8 @@ class _GeneralOverviewState extends State<GeneralOverview> {
       x: 3,
       barRods: [
         BarChartRodData(
+          borderRadius: BorderRadius.circular(4),
+          width: 15,
           toY: cnScreenStatistics.workoutsSorted[2024]['4/8/2024']['counter']*1.0,
           gradient: _barsGradient,
         )
