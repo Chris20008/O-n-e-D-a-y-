@@ -48,12 +48,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           // cnHomepage.refresh(refreshSpotifyBar: true);
           cnWorkouts.refresh();
           cnBottomMenu.refresh();
+          cnWorkouts.refreshSpotifyBarDelayed();
 
-          Future.delayed(const Duration(milliseconds: 300), (){
-            cnSpotifyBar.refresh();
-            // cnWorkouts.refresh();
-            // cnBottomMenu.refresh();
-          });
+          // Future.delayed(const Duration(milliseconds: 300), (){
+          //   cnSpotifyBar.refresh();
+          //   // cnWorkouts.refresh();
+          //   // cnBottomMenu.refresh();
+          // });
         }
         // cnSpotifyBar.refresh();
         // cnWorkouts.refresh();
@@ -1264,6 +1265,11 @@ class CnRunningWorkout extends ChangeNotifier {
   /// Contains for each linked exercise the currently selected index for getting the right one
   /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
+  late CnSpotifyBar cnSpotifyBar;
+
+  CnRunningWorkout(BuildContext context){
+    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  }
 
   void openRunningWorkout(BuildContext context, Workout w){
     setLastWorkout(w);
@@ -1274,6 +1280,10 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
+    Future.delayed(const Duration(milliseconds:500), (){
+      cnSpotifyBar.seekToRelative(1);
+      // cnSpotifyBar.refresh();
+    });
   }
 
   void reopenRunningWorkout(BuildContext context){
@@ -1283,6 +1293,10 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
+    Future.delayed(const Duration(milliseconds:500), (){
+      cnSpotifyBar.seekToRelative(1);
+      // cnSpotifyBar.refresh();
+    });
   }
   
   void removeNotSelectedExercises(){

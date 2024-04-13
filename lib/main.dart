@@ -41,9 +41,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers:[
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
-        ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
-        ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
@@ -52,6 +50,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => CnScreenStatistics()),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
+        ChangeNotifierProvider(create: (context) => CnWorkouts(context)),
+        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],

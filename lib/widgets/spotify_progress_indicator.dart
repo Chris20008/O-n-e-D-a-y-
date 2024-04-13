@@ -6,8 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
-import '../main.dart';
-
 class SpotifyProgressIndicator extends StatefulWidget {
   final PlayerState? data;
   const SpotifyProgressIndicator({super.key, this.data});
@@ -41,7 +39,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   }
 
   void periodicRefresh() async{
-    Future.delayed(const Duration(milliseconds: 150), ()async{
+    Future.delayed(const Duration(milliseconds: 300), ()async{
       if(doRefresh && cnSpotifyBar.isConnected){
         final data = await SpotifySdk.getPlayerState();
         setState(() {

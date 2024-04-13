@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +50,13 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state){
+   if(state == AppLifecycleState.resumed) {
+     cnSpotifyBar.refresh();
+   }
+  }
+
+  @override
   void didChangeMetrics() {
     super.didChangeMetrics();
     final orientation = MediaQuery.of(context).orientation;
@@ -82,13 +88,10 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-    if(widths["portrait"] == 0 && widths["landscape"] == 0){
-      final orientation = MediaQuery.of(context).orientation;
-      widths[orientation.name] = (widths[orientation.name] == 0
-          ? MediaQuery.of(context).size.width
-          : widths[orientation.name])!;
-      cnSpotifyBar.width = widths[orientation.name]!;
-    } else if(Platform.isAndroid){
+    if(cnSpotifyBar.width == 0){
+      cnSpotifyBar.width = MediaQuery.of(context).size.width;
+    } else
+    if(Platform.isAndroid){
       cnSpotifyBar.width = MediaQuery.of(context).size.width;
     }
 
@@ -355,13 +358,13 @@ class CnSpotifyBar extends ChangeNotifier {
   double width = 0;
   double heightOfButton = 54;
   late CnAnimatedColumn cnAnimatedColumn;
-  late CnRunningWorkout cnRunningWorkout;
+  // late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
   bool justClosed = false;
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
-    cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+    // cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   }
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
