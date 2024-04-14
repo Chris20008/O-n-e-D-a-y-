@@ -544,9 +544,9 @@ class CnSpotifyBar extends ChangeNotifier {
 
     try {
       await SpotifySdk.skipPrevious().then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.skipPrevious();
     } on Exception catch (_) {}
@@ -560,9 +560,9 @@ class CnSpotifyBar extends ChangeNotifier {
 
     try {
       await SpotifySdk.skipNext().then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.skipNext();
     } on Exception catch (_) {}
@@ -575,9 +575,9 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
     try {
       await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.pause();
     } on Exception catch (_) {
@@ -600,9 +600,9 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
     try {
       await SpotifySdk.resume().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
+        Future.delayed(const Duration(milliseconds: 150), (){
+          refresh();
+        })
       });
       // await SpotifySdk.resume();
     } on Exception catch (_) {
