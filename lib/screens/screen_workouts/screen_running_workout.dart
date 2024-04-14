@@ -56,18 +56,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           //   // cnBottomMenu.refresh();
           // });
         }
-        // cnSpotifyBar.refresh();
-        // cnWorkouts.refresh();
-        // cnBottomMenu.refresh();
       },
-      // onWillPop: () async{
-      //   cnRunningWorkout.isVisible = false;
-      //   // cnHomepage.refresh(refreshSpotifyBar: true);
-      //   cnSpotifyBar.refresh();
-      //   cnWorkouts.refresh();
-      //   cnBottomMenu.refresh();
-      //   return true;
-      // },
       child: Scaffold(
         body: Stack(
           alignment: Alignment.center,

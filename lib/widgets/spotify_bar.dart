@@ -75,18 +75,30 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     //   : widths[orientation.name])!;
     //   cnSpotifyBar.width = widths[orientation.name]!;
     // }
-    if (orientation != Orientation.landscape) {
-      // print("ORIENTATION NOW LANDSCAPE");
-      widths["landscape"] = (widths["landscape"] == 0
-          ? MediaQuery.of(context).size.height
-          : widths["landscape"])!;
+    if(cnSpotifyBar.width == 0){
+      final orientation = MediaQuery.of(context).orientation;
+      if(orientation == Orientation.portrait){
+        widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
+        widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
+      } else{
+        widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
+        widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
+      }
+      cnSpotifyBar.width = widths[orientation.name]!;
+      print("WIDTHS INITIALIZED: $widths");
+    }
+    else if (orientation != Orientation.landscape) {
+      print("ORIENTATION NOW LANDSCAPE");
+      // widths["landscape"] = (widths["landscape"] == 0
+      //     ? MediaQuery.of(context).size.height
+      //     : widths["landscape"])!;
       cnSpotifyBar.width = widths["landscape"]!;
     }
     else {
-      // print("ORIENTATION NOW PORTRAIT");
-      widths["portrait"] = (widths["portrait"] == 0
-          ? MediaQuery.of(context).size.height
-          : widths["portrait"])!;
+      print("ORIENTATION NOW PORTRAIT");
+      // widths["portrait"] = (widths["portrait"] == 0
+      //     ? MediaQuery.of(context).size.height
+      //     : widths["portrait"])!;
       cnSpotifyBar.width = widths["portrait"]!;
     }
     print("WIDTH NOW: ${cnSpotifyBar.width}");
@@ -97,9 +109,18 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
     cnSpotifyBar.isFirstScreen = isFirstScreen;
-    if(cnSpotifyBar.width == 0){
-      cnSpotifyBar.width = MediaQuery.of(context).size.width;
-    } else
+    // if(cnSpotifyBar.width == 0){
+    //   final orientation = MediaQuery.of(context).orientation;
+    //   if(orientation == Orientation.portrait){
+    //     widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
+    //     widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
+    //   } else{
+    //     widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
+    //     widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
+    //   }
+    //   // cnSpotifyBar.width = widths[orientation.name]!;
+    //   print("WIDTHS INITIALIZED: $widths");
+    // }
     if(Platform.isAndroid){
       cnSpotifyBar.width = MediaQuery.of(context).size.width;
     }
