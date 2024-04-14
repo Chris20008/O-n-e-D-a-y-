@@ -6,6 +6,7 @@ import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'objectbox/ob_exercise.dart';
 
@@ -98,4 +99,11 @@ void loadBackup() async{
   } else {
     // User canceled the picker
   }
+}
+
+Future<bool> hasInternet()async{
+  final conRes = await Connectivity().checkConnectivity();
+  List<ConnectivityResult> options = [ConnectivityResult.mobile, ConnectivityResult.wifi, ConnectivityResult.vpn];
+  // print("CON RES RESULT: $conRes - ${[ConnectivityResult.mobile, ConnectivityResult.wifi, ConnectivityResult.vpn].contains(conRes)}");
+  return options.any((option) => conRes.contains(option));
 }

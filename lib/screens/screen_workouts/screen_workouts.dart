@@ -161,7 +161,7 @@ class CnWorkouts extends ChangeNotifier {
   }
 
   void refreshSpotifyBarDelayed(){
-    Future.delayed(const Duration(milliseconds:500), (){
+    Future.delayed(const Duration(milliseconds:1000), (){
       cnSpotifyBar.seekToRelative(1);
       // cnSpotifyBar.refresh();
     });

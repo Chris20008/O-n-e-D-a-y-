@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'dart:io' show Platform;
+import 'package:fitness_app/util/constants.dart';
 
 import '../main.dart';
 import 'animated_column.dart';
@@ -30,16 +32,22 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnSpotifyBar cnSpotifyBar;
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   // double width = 350;
   double paddingLeftRight = 5;
   Map<String, double> widths = {
     "portrait": 0,
     "landscape": 0
   };
+  late bool isFirstScreen = ModalRoute.of(context)?.settings.name == "/";
 
   @override
   void initState() {
     super.initState();
+    // Future.delayed(const Duration(milliseconds:100), (){
+    //   late bool isFirstScreen = ModalRoute.of(context)?.settings.name == "/";
+    //   cnSpotifyBar.isFirstScreen = isFirstScreen;
+    // });
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -88,6 +96,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
+    cnSpotifyBar.isFirstScreen = isFirstScreen;
     if(cnSpotifyBar.width == 0){
       cnSpotifyBar.width = MediaQuery.of(context).size.width;
     } else
@@ -119,12 +128,25 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                           return StreamBuilder<PlayerState>(
                               stream: playerStateStream.stream,
                               builder: (BuildContext context, AsyncSnapshot<PlayerState> snapshot){
-                                final data = snapshot.data;
-                                if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
-                                  cnSpotifyBar.imageGotUpdated = true;
+
+                                // bool isFirstScreen = ModalRoute.of(context)?.settings.name == "/";
+                                // bool isFirstScreen = true;
+                                if((cnSpotifyBar.isFirstScreen && !cnRunningWorkout.isVisible) || (!cnSpotifyBar.isFirstScreen && cnRunningWorkout.isVisible)){
+                                  print("IS FIRST SCREEN: ${cnSpotifyBar.isFirstScreen}");
+                                  final data = snapshot.data;
+                                  if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
+                                    cnSpotifyBar.imageGotUpdated = true;
+                                  }
+                                  cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                                  cnSpotifyBar.progressIndicatorKey = UniqueKey();
                                 }
-                                cnSpotifyBar.data = data?? cnSpotifyBar.data;
-                                cnSpotifyBar.progressIndicatorKey = UniqueKey();
+
+                                // final data = snapshot.data;
+                                // if(data != null && data.track?.imageUri.raw != cnSpotifyBar.data?.track?.imageUri.raw){
+                                //   cnSpotifyBar.imageGotUpdated = true;
+                                // }
+                                // cnSpotifyBar.data = data?? cnSpotifyBar.data;
+                                // cnSpotifyBar.progressIndicatorKey = UniqueKey();
                                 return cnSpotifyBar.data == null?
                                 GestureDetector(
                                     onTap: cnSpotifyBar.connectToSpotify,
@@ -361,6 +383,8 @@ class CnSpotifyBar extends ChangeNotifier {
   // late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
   bool justClosed = false;
+  bool isFirstScreen = true;
+  bool isHandlingControlAction = false;
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
@@ -392,14 +416,13 @@ class CnSpotifyBar extends ChangeNotifier {
             // if(cn.currentImageUri != image.raw){
             if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
               print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
-              print(lastImage!.color);
               cn.currentImageUri = snapshot.data!.toString();
               setMainColor(lastImage!.image, cn);
             }
 
-            Future.delayed(const Duration(milliseconds: 50), (){
-              cn.refresh();
-            });
+            // Future.delayed(const Duration(milliseconds: 50), (){
+            //   cn.refresh();
+            // });
             // return lastImage;
           }
           else{
@@ -430,20 +453,20 @@ class CnSpotifyBar extends ChangeNotifier {
     final PaletteGenerator paletteGenerator = await PaletteGenerator
         .fromImageProvider(imageProvider);
     // print(paletteGenerator.dominantColor?.color);
-    waitCounter += 1;
+    // waitCounter += 1;
     // print("Enter $waitCounter");
     final c = await compute(computeColor, paletteGenerator);
     print("GOT COLOR: $c");
-    Future.delayed(const Duration(milliseconds: 100), (){
-      waitCounter -= 1;
+    // Future.delayed(const Duration(milliseconds: 100), (){
+    //   waitCounter -= 1;
       // print("GOT $waitCounter");
-      if(waitCounter == 0){
-        print("--------------------- REFRESH ---------------------");
-        print("WITH COLOR: $c");
-        mainColor = c[0];
-        cn.setColor(mainColor, c[1]);
-      }
-    });
+      // if(waitCounter == 0){
+    print("--------------------- REFRESH ---------------------");
+    print("WITH COLOR: $c");
+    mainColor = c[0];
+    cn.setColor(mainColor, c[1]);
+      // }
+    // });
 
     // mainColor = paletteGenerator.lightVibrantColor?.color??
     //     paletteGenerator.lightMutedColor?.color??
@@ -515,58 +538,89 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Future<void> skipPrevious() async {
+    if(isHandlingControlAction) return;
+
+    isHandlingControlAction = true;
+
     try {
       await SpotifySdk.skipPrevious().then((value) => {
-        Future.delayed(const Duration(milliseconds: 150), (){
-          refresh();
-        })
+        // Future.delayed(const Duration(milliseconds: 150), (){
+        //   refresh();
+        // })
       });
       // await SpotifySdk.skipPrevious();
     } on Exception catch (_) {}
+    isHandlingControlAction = false;
   }
 
   Future<void> skipNext() async {
+    if(isHandlingControlAction) return;
+
+    isHandlingControlAction = true;
+
     try {
       await SpotifySdk.skipNext().then((value) => {
-        Future.delayed(const Duration(milliseconds: 150), (){
-          refresh();
-        })
+        // Future.delayed(const Duration(milliseconds: 150), (){
+        //   refresh();
+        // })
       });
       // await SpotifySdk.skipNext();
     } on Exception catch (_) {}
+    isHandlingControlAction = false;
   }
 
   Future<void> pause() async {
+    if(isHandlingControlAction) return;
+
+    isHandlingControlAction = true;
     try {
       await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        Future.delayed(const Duration(milliseconds: 150), (){
-          refresh();
-        })
+        // Future.delayed(const Duration(milliseconds: 150), (){
+        //   refresh();
+        // })
       });
       // await SpotifySdk.pause();
     } on Exception catch (_) {
-      print("PAUSING FAILED");
-      await disconnect();
+      if(await hasInternet()){
+        accessToken = "";
+        isTryingToConnect = false;
+        isConnected = false;
+        justClosed = false;
+        connectToSpotify().then((value) => pause());
+      } else{
+        await disconnect();
+      }
     }
+    isHandlingControlAction = false;
   }
 
   Future<void> resume() async {
-    print("IN RESUME");
+    if(isHandlingControlAction) return;
+
+    isHandlingControlAction = true;
     try {
       await SpotifySdk.resume().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        Future.delayed(const Duration(milliseconds: 150), (){
-          refresh();
-        })
+        // Future.delayed(const Duration(milliseconds: 150), (){
+        //   refresh();
+        // })
       });
-
-      print("RESUME DONE");
       // await SpotifySdk.resume();
     } on Exception catch (_) {
-      print("RESUMING FAILED");
-      await disconnect();
+      if(await hasInternet()){
+        await reconnectAfterConnectionLoss();
+      } else{
+        await disconnect();
+      }
     }
+    isHandlingControlAction = false;
+  }
 
-    print("RESUME DONE DONE ");
+  Future<void> reconnectAfterConnectionLoss() async {
+    accessToken = "";
+    isTryingToConnect = false;
+    isConnected = false;
+    justClosed = false;
+    await connectToSpotify();
   }
 
   Future<void> seekToRelative(int milliseconds) async {

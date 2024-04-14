@@ -21,7 +21,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   int? remainingDuration;
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  int delay = 250;
+  int delayStartPeriodicRefreshing = 250;
 
 
   @override
@@ -30,16 +30,16 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
       currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
     }
     if (cnStopwatchWidget.isOpened){
-      delay = delay + cnStopwatchWidget.animationTimeStopwatch;
+      delayStartPeriodicRefreshing = delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
     }
-    Future.delayed(Duration(milliseconds: delay), (){
+    Future.delayed(Duration(milliseconds: delayStartPeriodicRefreshing), (){
       periodicRefresh();
     });
     super.initState();
   }
 
   void periodicRefresh() async{
-    Future.delayed(const Duration(milliseconds: 300), ()async{
+    Future.delayed(const Duration(milliseconds: 500), ()async{
       if(doRefresh && cnSpotifyBar.isConnected){
         final data = await SpotifySdk.getPlayerState();
         setState(() {
