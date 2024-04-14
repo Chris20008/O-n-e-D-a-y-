@@ -67,41 +67,40 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   @override
   void didChangeMetrics() {
     super.didChangeMetrics();
-    final orientation = MediaQuery.of(context).orientation;
-
-    // if(cnSpotifyBar.width == 0){
-    //   widths[orientation.name] = (widths[orientation.name] == 0
-    //   ? MediaQuery.of(context).size.width
-    //   : widths[orientation.name])!;
-    //   cnSpotifyBar.width = widths[orientation.name]!;
-    // }
-    if(cnSpotifyBar.width == 0){
-      final orientation = MediaQuery.of(context).orientation;
-      if(orientation == Orientation.portrait){
-        widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
-        widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
-      } else{
-        widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
-        widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
+    late Orientation orientation;
+    /// Using MediaQuery directly inside didChangeMetrics return the previous frame values.
+    /// To receive the latest values after orientation change we need to use
+    /// WidgetsBindings.instance.addPostFrameCallback() inside it
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        orientation = MediaQuery.of(context).orientation;
+      });
+      if(cnSpotifyBar.width == 0){
+        initWidths();
       }
-      cnSpotifyBar.width = widths[orientation.name]!;
-      print("WIDTHS INITIALIZED: $widths");
+      else if (orientation == Orientation.landscape) {
+        print("ORIENTATION NOW LANDSCAPE");
+        cnSpotifyBar.width = widths["landscape"]!;
+      }
+      else {
+        print("ORIENTATION NOW PORTRAIT");
+        cnSpotifyBar.width = widths["portrait"]!;
+      }
+      print("WIDTH NOW: ${cnSpotifyBar.width}");
+    });
+  }
+
+  void initWidths(){
+    final orientation = MediaQuery.of(context).orientation;
+    if(orientation == Orientation.portrait){
+      widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
+      widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
+    } else{
+      widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
+      widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
     }
-    else if (orientation != Orientation.landscape) {
-      print("ORIENTATION NOW LANDSCAPE");
-      // widths["landscape"] = (widths["landscape"] == 0
-      //     ? MediaQuery.of(context).size.height
-      //     : widths["landscape"])!;
-      cnSpotifyBar.width = widths["landscape"]!;
-    }
-    else {
-      print("ORIENTATION NOW PORTRAIT");
-      // widths["portrait"] = (widths["portrait"] == 0
-      //     ? MediaQuery.of(context).size.height
-      //     : widths["portrait"])!;
-      cnSpotifyBar.width = widths["portrait"]!;
-    }
-    print("WIDTH NOW: ${cnSpotifyBar.width}");
+    cnSpotifyBar.width = widths[orientation.name]!;
+    print("WIDTHS INITIALIZED: $widths");
   }
 
   @override
@@ -109,18 +108,9 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
     cnSpotifyBar.isFirstScreen = isFirstScreen;
-    // if(cnSpotifyBar.width == 0){
-    //   final orientation = MediaQuery.of(context).orientation;
-    //   if(orientation == Orientation.portrait){
-    //     widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
-    //     widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
-    //   } else{
-    //     widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
-    //     widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
-    //   }
-    //   // cnSpotifyBar.width = widths[orientation.name]!;
-    //   print("WIDTHS INITIALIZED: $widths");
-    // }
+    if(cnSpotifyBar.width == 0){
+      initWidths();
+    }
     if(Platform.isAndroid){
       cnSpotifyBar.width = MediaQuery.of(context).size.width;
     }
