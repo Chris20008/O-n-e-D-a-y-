@@ -44,10 +44,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // Future.delayed(const Duration(milliseconds:100), (){
-    //   late bool isFirstScreen = ModalRoute.of(context)?.settings.name == "/";
-    //   cnSpotifyBar.isFirstScreen = isFirstScreen;
-    // });
     WidgetsBinding.instance.addObserver(this);
   }
 
