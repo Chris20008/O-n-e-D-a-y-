@@ -111,10 +111,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     if(cnSpotifyBar.width == 0){
       initWidths();
     }
-    if(Platform.isAndroid){
-      cnSpotifyBar.width = MediaQuery.of(context).size.width;
-    }
-
 
     return Align(
       alignment: Alignment.bottomRight,
