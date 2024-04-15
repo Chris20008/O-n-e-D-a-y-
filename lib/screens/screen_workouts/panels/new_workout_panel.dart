@@ -561,7 +561,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onPanelSlide(value){
-    cnBottomMenu.heightOfBottomMenu = cnBottomMenu.maxHeightBottomMenu * value;
+    cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
     // if(value >= 0.99 || value <= 0.01){
     //
     //   cnNewWorkout.refresh();

@@ -90,10 +90,10 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     final orientation = MediaQuery.of(context).orientation;
     if(orientation == Orientation.portrait){
       widths[Orientation.portrait.name] = MediaQuery.of(context).size.width;
-      widths[Orientation.landscape.name] = MediaQuery.of(context).size.height;
+      widths[Orientation.landscape.name] = MediaQuery.of(context).size.height - MediaQuery.of(context).padding.bottom - MediaQuery.of(context).padding.top;
     } else{
       widths[Orientation.portrait.name] = MediaQuery.of(context).size.height;
-      widths[Orientation.landscape.name] = MediaQuery.of(context).size.width;
+      widths[Orientation.landscape.name] = MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;
     }
     cnSpotifyBar.width = widths[orientation.name]!;
     print("WIDTHS INITIALIZED: $widths");

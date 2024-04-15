@@ -158,7 +158,7 @@ class _MyHomePageState extends State<MyHomePage> {
               if(cnBottomMenu.index != 2)
                 AnimatedContainer(
                     duration: const Duration(milliseconds: 300), // Animationsdauer
-                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
                     curve: Curves.easeInOut,
                     // child: const SpotifyBar()
                     child: const SafeArea(

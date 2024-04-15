@@ -30,8 +30,11 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       height: size.height,
       child: Stack(
         children: [
-          ListView.builder(
-              padding: EdgeInsets.zero,
+          ListView.separated(
+              padding: const EdgeInsets.only(top: 70, left: 20, right: 20, bottom: 0),
+              separatorBuilder: (BuildContext context, int index) {
+                return const SizedBox(height: 10);
+              },
               addAutomaticKeepAlives: true,
               physics: const BouncingScrollPhysics(),
               key: cnWorkoutHistory.key,
@@ -39,15 +42,16 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
               itemCount: cnWorkoutHistory.workouts.length+1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == cnWorkoutHistory.workouts.length){
-                  return const SizedBox(height: 100);
+                  return const SizedBox(height: 150);
                 }
                 return WorkoutExpansionTile(
                     workout: cnWorkoutHistory.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
+                    // padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
+                    padding: EdgeInsets.zero,
                     onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
                     initiallyExpanded: cnWorkoutHistory.opened[index]
                 );
-              }
+              },
           ),
         ],
       ),

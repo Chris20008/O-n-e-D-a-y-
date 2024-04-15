@@ -58,7 +58,11 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 );
               }
           ),
-          BannerRunningWorkout(),
+          Hero(
+              transitionOnUserGestures: true,
+              tag: "Banner",
+              child: BannerRunningWorkout()
+          ),
           Container(
             height: double.maxFinite,
             width: double.maxFinite,

@@ -26,12 +26,15 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
 
   @override
   void initState() {
-    if(widget.data != null){
-      currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
+    try{
+      if(widget.data != null){
+        currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
+      }
+      if (cnStopwatchWidget.isOpened){
+        delayStartPeriodicRefreshing = delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
+      }
     }
-    if (cnStopwatchWidget.isOpened){
-      delayStartPeriodicRefreshing = delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
-    }
+    on Exception catch (_) {}
     Future.delayed(Duration(milliseconds: delayStartPeriodicRefreshing), (){
       periodicRefresh();
     });
@@ -41,13 +44,17 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   void periodicRefresh() async{
     Future.delayed(const Duration(milliseconds: 500), ()async{
       if(doRefresh && cnSpotifyBar.isConnected){
-        final data = await SpotifySdk.getPlayerState();
-        setState(() {
-          if (data != null && !data.isPaused){
-            currentWidthPercent = data.playbackPosition / data.track!.duration;
-            periodicRefresh();
-          }
-        });
+        try{
+          final data = await SpotifySdk.getPlayerState();
+          setState(() {
+            if (data != null && !data.isPaused){
+              currentWidthPercent = data.playbackPosition / data.track!.duration;
+              periodicRefresh();
+            }
+          });
+        } on Exception catch (_) {
+          periodicRefresh();
+        }
       }
     });
   }
@@ -179,7 +186,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
 //                 height: 1.5,
 //                 width: constraints.maxWidth * currentWidthPercent!,
 //                 duration: Duration(milliseconds: remainingDuration!), // Animationsdauer
-//                 // transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
+//                 // transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
 //                 curve: Curves.linear,
 //                 color: Colors.amber[800],
 //                 // child: Container(

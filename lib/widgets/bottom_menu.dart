@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,8 +26,19 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnBottomMenu cnBottomMenu;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
+
+    if(cnBottomMenu.height <= 0){
+      final double t = MediaQuery.of(context).padding.bottom;
+      cnBottomMenu.height = t + 60;
+      print("BOTTOM PADDING: $t");
+    }
 
     if(!cnBottomMenu.isVisible){
       return const SizedBox();
@@ -43,9 +53,9 @@ class _BottomMenuState extends State<BottomMenu> {
         ),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 0), // Animationsdauer
-          transform: Matrix4.translationValues(0, cnBottomMenu.heightOfBottomMenu, 0),
+          transform: Matrix4.translationValues(0, cnBottomMenu.positionYAxis, 0),
           curve: Curves.easeInOut,
-          height: cnBottomMenu.maxHeightBottomMenu,
+          height: cnBottomMenu.height,
           decoration: BoxDecoration(
               color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
               gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
@@ -80,7 +90,7 @@ class _BottomMenuState extends State<BottomMenu> {
                     ),
                     BottomNavigationBarItem(
                       icon: Icon(Icons.sports_martial_arts),
-                      label: 'Workouts',
+                      label: 'Templates',
                     ),
                     BottomNavigationBarItem(
                       icon: Icon(Icons.scatter_plot),
@@ -113,11 +123,12 @@ class _BottomMenuState extends State<BottomMenu> {
 }
 
 class CnBottomMenu extends ChangeNotifier {
-  int _selectedIndex = 0;
+  int _selectedIndex = 1;
   bool isVisible = true;
-  double heightOfBottomMenu = 0;
-  final double maxHeightBottomMenu = 92;
-  // Color backgroundColor = Colors.transparent;
+  double positionYAxis = 0;
+  // final double height = Platform.isAndroid? 60 : 92;
+  double height = 0;
+  // final t =
 
   void _changeIndex(int index) {
     _selectedIndex = index;
