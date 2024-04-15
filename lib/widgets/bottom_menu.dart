@@ -36,8 +36,8 @@ class _BottomMenuState extends State<BottomMenu> {
 
     if(cnBottomMenu.height <= 0){
       final double t = MediaQuery.of(context).padding.bottom;
-      cnBottomMenu.height = t + 60;
-      print("BOTTOM PADDING: $t");
+      cnBottomMenu.height = t + 50;
+      print("Bottom padding: $t");
     }
 
     if(!cnBottomMenu.isVisible){

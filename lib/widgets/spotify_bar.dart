@@ -29,6 +29,7 @@ class SpotifyBar extends StatefulWidget {
 }
 
 class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
+// class _SpotifyBarState extends State<SpotifyBar>{
   late CnSpotifyBar cnSpotifyBar;
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
@@ -103,6 +104,11 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
+
+    if(!cnSpotifyBar.isVisible){
+      return const SizedBox();
+    }
+
     cnSpotifyBar.isFirstScreen = isFirstScreen;
     if(cnSpotifyBar.width == 0){
       initWidths();
@@ -388,10 +394,16 @@ class CnSpotifyBar extends ChangeNotifier {
   bool justClosed = false;
   bool isFirstScreen = true;
   bool isHandlingControlAction = false;
+  bool isVisible = true;
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
     // cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  }
+
+  void setVisibility(bool isVisible){
+    this.isVisible = isVisible;
+    refresh();
   }
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
@@ -492,15 +504,6 @@ class CnSpotifyBar extends ChangeNotifier {
 
     return [color, color2];
   }
-
-  // void delayedReconnect() async{
-  //   if(!isTryingReconnect){
-  //     isTryingReconnect = true;
-  //     Future.delayed(const Duration(milliseconds: 50), (){
-  //       connectToSpotify().then((value) => isTryingReconnect = false);
-  //     });
-  //   }
-  // }
 
   Future connectToSpotify()async{
     if(justClosed){

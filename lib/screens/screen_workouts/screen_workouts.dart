@@ -165,9 +165,14 @@ class CnWorkouts extends ChangeNotifier {
   }
 
   void refreshSpotifyBarDelayed(){
-    Future.delayed(const Duration(milliseconds:1000), (){
-      cnSpotifyBar.seekToRelative(1);
-      // cnSpotifyBar.refresh();
+    Future.delayed(const Duration(milliseconds:500), (){
+      if(!cnSpotifyBar.isVisible){
+        cnSpotifyBar.setVisibility(true);
+      }
+      Future.delayed(const Duration(milliseconds:500), (){
+        cnSpotifyBar.seekToRelative(1);
+        // cnSpotifyBar.refresh();
+      });
     });
   }
 

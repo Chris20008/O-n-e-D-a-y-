@@ -14,6 +14,7 @@ import '../../../objects/workout.dart';
 import '../../../widgets/bottom_menu.dart';
 
 import '../../../widgets/exercise_row.dart';
+import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../screen_workout_history/screen_workout_history.dart';
 import '../screen_running_workout.dart';
@@ -34,6 +35,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   final deleteWorkoutKey = GlobalKey();
   final addLinkKey = GlobalKey();
 
@@ -562,20 +564,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   void onPanelSlide(value){
     cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
-    // if(value >= 0.99 || value <= 0.01){
+    if(value >= 0.8){
+      if(cnSpotifyBar.isVisible){
+        cnSpotifyBar.setVisibility(false);
+      }
+    }
+    if(value <= 0.2){
+      if(!cnSpotifyBar.isVisible){
+        cnSpotifyBar.setVisibility(true);
+      }
+    }
+    // if(value < 0.05 && !cnBottomMenu.isVisible){
+    //   SystemChrome.setPreferredOrientations([]);
     //
-    //   cnNewWorkout.refresh();
     // }
-    // if(value == 0.0){
-    //   cnNewWorkout.refresh();
+    // else if(value > 0.05 && cnBottomMenu.isVisible){
     // }
-    if(value < 0.05 && !cnBottomMenu.isVisible){
-      SystemChrome.setPreferredOrientations([]);
-      // cnBottomMenu.setVisibility(true);
-    }
-    else if(value > 0.05 && cnBottomMenu.isVisible){
-      // cnBottomMenu.setVisibility(false);
-    }
     if(value == 0 || value == 1){
       cnNewWorkout.refresh();
     }

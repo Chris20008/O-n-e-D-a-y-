@@ -37,6 +37,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
   final double _setPadding = 5;
+  double viewInsetsBottom = 0;
+  bool isAlreadyCheckingKeyboard = false;
+  bool isAlreadyCheckingKeyboardPermanent = false;
 
   @override
   void initState() {
@@ -44,9 +47,68 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     cnWorkouts.refresh();
   }
 
+  void checkIfKeyboardClosedPermanent({bool isRecursive = false}){
+    if (isAlreadyCheckingKeyboardPermanent && !isRecursive) return;
+
+    isAlreadyCheckingKeyboardPermanent = true;
+
+    Future.delayed(const Duration(milliseconds: 1000), (){
+      if(MediaQuery.of(context).viewInsets.bottom > 0){
+        checkIfKeyboardClosedPermanent(isRecursive: true);
+      }
+      else{
+        setState(() {
+          viewInsetsBottom = 0;
+          cnSpotifyBar.setVisibility(true);
+          isAlreadyCheckingKeyboardPermanent = false;
+        });
+      }
+    });
+  }
+
+  void checkIfKeyboardClosed({bool isRecursive = false}){
+    if (isAlreadyCheckingKeyboard && !isRecursive) return;
+
+    isAlreadyCheckingKeyboard = true;
+
+    Future.delayed(const Duration(milliseconds: 100), (){
+      if(MediaQuery.of(context).viewInsets.bottom > 0){
+        checkIfKeyboardClosed(isRecursive: true);
+      }
+      else{
+        setState(() {
+          viewInsetsBottom = 0;
+          cnSpotifyBar.setVisibility(true);
+          isAlreadyCheckingKeyboard = false;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+
+    // final viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    // if(viewInsetsBottom > 50){
+    //   final newInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    //   if (newInsetsBottom == 0){
+    //     viewInsetsBottom = 0;
+    //     cnSpotifyBar.setVisibility(true);
+    //   }
+    // }
+    // final newInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    // if (newInsetsBottom == 0){
+    //   viewInsetsBottom = 0;
+    //   if(!cnSpotifyBar.isVisible){
+    //     cnSpotifyBar.setVisibility(true);
+    //   }
+    // } else{
+    //   viewInsetsBottom = 51;
+    //   if(cnSpotifyBar.isVisible){
+    //     cnSpotifyBar.setVisibility(false);
+    //   }
+    // }
 
     return PopScope(
       onPopInvoked: (doPop){
@@ -56,15 +118,17 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           cnBottomMenu.refresh();
           cnWorkouts.refreshSpotifyBarDelayed();
         }
+        cnWorkouts.refreshSpotifyBarDelayed();
       },
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Stack(
           alignment: Alignment.center,
           children: [
             Scaffold(
               extendBody: true,
               // resizeToAvoidBottomInset: false,
-              bottomNavigationBar: MediaQuery.of(context).viewInsets.bottom < 50? ClipRRect(
+              bottomNavigationBar: viewInsetsBottom < 50? ClipRRect(
                 child: BackdropFilter(
                   filter: ImageFilter.blur(
                       sigmaX: 10.0,
@@ -74,7 +138,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   child: GestureDetector(
                     onTap: openPopUpFinishWorkout,
                     child: Container(
-                      height: 70,
+                      height: cnBottomMenu.height,
                       color: Colors.black.withOpacity(0.5),
                       child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaleFactor: 1.4,)),
                     ),
@@ -84,6 +148,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               body: GestureDetector(
                 onTap: (){
                   FocusScope.of(context).unfocus();
+                  checkIfKeyboardClosed();
                 },
                 child: Stack(
                   children: [
@@ -245,6 +310,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                 isDense: true,
                                                                 counterText: "",
                                                               ),
+                                                              onTap: (){
+                                                                setState(() {
+                                                                  cnSpotifyBar.setVisibility(false);
+                                                                  viewInsetsBottom = 51;
+                                                                  checkIfKeyboardClosedPermanent();
+                                                                });
+                                                              },
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
@@ -296,6 +368,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                 isDense: true,
                                                                 counterText: "",
                                                               ),
+                                                              onTap: (){
+                                                                setState(() {
+                                                                  cnSpotifyBar.setVisibility(false);
+                                                                  viewInsetsBottom = 51;
+                                                                  checkIfKeyboardClosedPermanent();
+                                                                });
+                                                              },
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
@@ -357,7 +436,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                 if (indexExercise == 0){
                                   child = Column(
                                     children: [
-                                      const SizedBox(height: 90,),
+                                      const SizedBox(height: 80,),
                                       child
                                     ],
                                   );
@@ -368,7 +447,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                   child = Column(
                                     children: [
                                       child,
-                                      const SizedBox(height: 70,)
+                                      SizedBox(
+                                        height: cnStopwatchWidget.isOpened && viewInsetsBottom < 50
+                                            ? 70 + cnStopwatchWidget.heightOfTimer
+                                            : 70
+
+                                      )
                                     ],
                                   );
                                 }
@@ -385,7 +469,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         tag: "Banner",
                         child: BannerRunningWorkout()
                     ),
-                    if(MediaQuery.of(context).viewInsets.bottom < 50)
+                    if(cnSpotifyBar.isVisible)
                       const AnimatedColumn(),
                   ],
                 ),

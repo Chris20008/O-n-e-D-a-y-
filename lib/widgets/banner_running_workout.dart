@@ -18,7 +18,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
-  final double _height = 60;
+  final double _height = 50;
 
   @override
   Widget build(BuildContext context) {
@@ -52,10 +52,12 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             bottom: false,
             child: GestureDetector(
               onTap: () {
-                cnRunningWorkout.isVisible = true;
-                cnBottomMenu.refresh();
-                setState(() {});
-                cnRunningWorkout.reopenRunningWorkout(context);
+                if(!cnRunningWorkout.isVisible){
+                  cnRunningWorkout.isVisible = true;
+                  cnBottomMenu.refresh();
+                  // setState(() {});
+                  cnRunningWorkout.reopenRunningWorkout(context);
+                }
               },
               child: Container(
                 height: _height,

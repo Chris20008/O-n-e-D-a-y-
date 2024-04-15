@@ -160,7 +160,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     duration: const Duration(milliseconds: 300), // Animationsdauer
                     transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
                     curve: Curves.easeInOut,
-                    // child: const SpotifyBar()
                     child: const SafeArea(
                       top: false,
                       child: Hero(
