@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io';
 import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,7 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
+  final double height = Platform.isAndroid? 60 : 50;
 
   @override
   void initState() {
@@ -35,9 +37,8 @@ class _BottomMenuState extends State<BottomMenu> {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     if(cnBottomMenu.height <= 0){
-      final double t = MediaQuery.of(context).padding.bottom;
-      cnBottomMenu.height = t + 50;
-      print("Bottom padding: $t");
+      final double paddingBottom = MediaQuery.of(context).padding.bottom;
+      cnBottomMenu.height = paddingBottom + height;
     }
 
     if(!cnBottomMenu.isVisible){

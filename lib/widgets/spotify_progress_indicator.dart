@@ -46,12 +46,13 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
       if(doRefresh && cnSpotifyBar.isConnected){
         try{
           final data = await SpotifySdk.getPlayerState();
-          setState(() {
-            if (data != null && !data.isPaused){
+          /// check if doRefresh is still true, cause it could have changed to false during 'await'
+          if (doRefresh && data != null && !data.isPaused){
+            setState(() {
               currentWidthPercent = data.playbackPosition / data.track!.duration;
               periodicRefresh();
-            }
-          });
+            });
+          }
         } on Exception catch (_) {
           periodicRefresh();
         }

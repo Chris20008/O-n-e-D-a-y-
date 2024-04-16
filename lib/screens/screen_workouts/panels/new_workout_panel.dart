@@ -564,16 +564,16 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   void onPanelSlide(value){
     cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
-    if(value >= 0.8){
-      if(cnSpotifyBar.isVisible){
-        cnSpotifyBar.setVisibility(false);
-      }
-    }
-    if(value <= 0.2){
-      if(!cnSpotifyBar.isVisible){
-        cnSpotifyBar.setVisibility(true);
-      }
-    }
+    // if(value >= 0.8){
+    //   if(cnSpotifyBar.isVisible){
+    //     // cnSpotifyBar.setVisibility(false);
+    //   }
+    // }
+    // if(value <= 0.2){
+    //   if(!cnSpotifyBar.isVisible){
+    //     // cnSpotifyBar.setVisibility(true);
+    //   }
+    // }
     // if(value < 0.05 && !cnBottomMenu.isVisible){
     //   SystemChrome.setPreferredOrientations([]);
     //

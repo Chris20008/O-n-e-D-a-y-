@@ -44,7 +44,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   @override
   void initState() {
     super.initState();
-    cnWorkouts.refresh();
+    Future.delayed(const Duration(milliseconds: 500), (){
+      print("-------------- REFRESH WORKOUTS --------------");
+      // cnWorkouts.refresh();
+    });
   }
 
   void checkIfKeyboardClosedPermanent({bool isRecursive = false}){
@@ -59,7 +62,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       else{
         setState(() {
           viewInsetsBottom = 0;
-          cnSpotifyBar.setVisibility(true);
+          // cnSpotifyBar.setVisibility(true);
           isAlreadyCheckingKeyboardPermanent = false;
         });
       }
@@ -78,7 +81,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       else{
         setState(() {
           viewInsetsBottom = 0;
-          cnSpotifyBar.setVisibility(true);
+          // cnSpotifyBar.setVisibility(true);
           isAlreadyCheckingKeyboard = false;
         });
       }
@@ -89,36 +92,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
 
-    // final viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
-    // if(viewInsetsBottom > 50){
-    //   final newInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
-    //   if (newInsetsBottom == 0){
-    //     viewInsetsBottom = 0;
-    //     cnSpotifyBar.setVisibility(true);
-    //   }
-    // }
-    // final newInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
-    // if (newInsetsBottom == 0){
-    //   viewInsetsBottom = 0;
-    //   if(!cnSpotifyBar.isVisible){
-    //     cnSpotifyBar.setVisibility(true);
-    //   }
-    // } else{
-    //   viewInsetsBottom = 51;
-    //   if(cnSpotifyBar.isVisible){
-    //     cnSpotifyBar.setVisibility(false);
-    //   }
-    // }
-
     return PopScope(
       onPopInvoked: (doPop){
         if(cnRunningWorkout.isVisible){
           cnRunningWorkout.isVisible = false;
           cnWorkouts.refresh();
           cnBottomMenu.refresh();
-          cnWorkouts.refreshSpotifyBarDelayed();
+          // cnWorkouts.refreshSpotifyBarDelayed();
         }
-        cnWorkouts.refreshSpotifyBarDelayed();
+        // cnWorkouts.refreshSpotifyBarDelayed();
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -312,7 +294,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                               ),
                                                               onTap: (){
                                                                 setState(() {
-                                                                  cnSpotifyBar.setVisibility(false);
+                                                                  // cnSpotifyBar.setVisibility(false);
                                                                   viewInsetsBottom = 51;
                                                                   checkIfKeyboardClosedPermanent();
                                                                 });
@@ -370,7 +352,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                               ),
                                                               onTap: (){
                                                                 setState(() {
-                                                                  cnSpotifyBar.setVisibility(false);
+                                                                  // cnSpotifyBar.setVisibility(false);
                                                                   viewInsetsBottom = 51;
                                                                   checkIfKeyboardClosedPermanent();
                                                                 });
@@ -469,7 +451,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         tag: "Banner",
                         child: BannerRunningWorkout()
                     ),
-                    if(cnSpotifyBar.isVisible)
+                    // if(cnSpotifyBar.isVisible)
                       const AnimatedColumn(),
                   ],
                 ),
@@ -591,10 +573,10 @@ class CnRunningWorkout extends ChangeNotifier {
   /// Contains for each linked exercise the currently selected index for getting the right one
   /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
-  late CnSpotifyBar cnSpotifyBar;
+  // late CnSpotifyBar cnSpotifyBar;
 
   CnRunningWorkout(BuildContext context){
-    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+    // cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   }
 
   void openRunningWorkout(BuildContext context, Workout w){
@@ -606,10 +588,10 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
-    Future.delayed(const Duration(milliseconds:500), (){
-      cnSpotifyBar.seekToRelative(1);
-      // cnSpotifyBar.refresh();
-    });
+    // Future.delayed(const Duration(milliseconds:500), (){
+    //   cnSpotifyBar.seekToRelative(1);
+    //   // cnSpotifyBar.refresh();
+    // });
   }
 
   void reopenRunningWorkout(BuildContext context){
@@ -619,10 +601,10 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
-    Future.delayed(const Duration(milliseconds:500), (){
-      cnSpotifyBar.seekToRelative(1);
-      // cnSpotifyBar.refresh();
-    });
+    // Future.delayed(const Duration(milliseconds:500), (){
+    //   cnSpotifyBar.seekToRelative(1);
+    //   // cnSpotifyBar.refresh();
+    // });
   }
   
   void removeNotSelectedExercises(){

@@ -22,6 +22,10 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
 
   @override
   Widget build(BuildContext context) {
+    print("REBUILD BANNER");
+
+    print("--- REBUILD BANNER RUNNING WORKOUTS WITH ROUTE: ${ModalRoute.of(context)?.settings.name == "/"}");
+
     if(!cnRunningWorkout.isRunning){
       return const SizedBox(width: double.maxFinite);
     }

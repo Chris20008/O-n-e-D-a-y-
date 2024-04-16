@@ -164,17 +164,17 @@ class CnWorkouts extends ChangeNotifier {
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   }
 
-  void refreshSpotifyBarDelayed(){
-    Future.delayed(const Duration(milliseconds:500), (){
-      if(!cnSpotifyBar.isVisible){
-        cnSpotifyBar.setVisibility(true);
-      }
-      Future.delayed(const Duration(milliseconds:500), (){
-        cnSpotifyBar.seekToRelative(1);
-        // cnSpotifyBar.refresh();
-      });
-    });
-  }
+  // void refreshSpotifyBarDelayed(){
+  //   Future.delayed(const Duration(milliseconds:500), (){
+  //     // if(!cnSpotifyBar.isVisible){
+  //     //   // cnSpotifyBar.setVisibility(true);
+  //     // }
+  //     Future.delayed(const Duration(milliseconds:500), (){
+  //       cnSpotifyBar.seekToRelative(1);
+  //       // cnSpotifyBar.refresh();
+  //     });
+  //   });
+  // }
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();
