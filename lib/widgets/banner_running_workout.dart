@@ -32,25 +32,14 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
     return ClipRRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(
-            // sigmaX: cnRunningWorkout.isVisible? 0 : 10.0,
-            // sigmaY: cnRunningWorkout.isVisible? 0 : 10.0,
             sigmaX: 10.0,
             sigmaY: 10.0,
             tileMode: TileMode.mirror
         ),
         child: Container(
           width: double.maxFinite,
-          // height: Platform.isAndroid? 20 : 110,
           decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.5),
-              // gradient: cnRunningWorkout.isVisible? const LinearGradient(
-              //     begin: Alignment.centerRight,
-              //     end: Alignment.centerLeft,
-              //     colors: [
-              //       Color(0xff160d05),
-              //       Color(0xff0a0604),
-              //     ]
-              // ) : null
           ),
           child: SafeArea(
             bottom: false,
@@ -58,7 +47,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
               onTap: () {
                 if(!cnRunningWorkout.isVisible){
                   cnRunningWorkout.isVisible = true;
-                  cnBottomMenu.refresh();
+                  // cnBottomMenu.refresh();
                   // setState(() {});
                   cnRunningWorkout.reopenRunningWorkout(context);
                 }

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
+import 'package:spotify_sdk/models/connection_status.dart';
 import 'package:spotify_sdk/models/image_uri.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
@@ -371,6 +372,7 @@ class CnSpotifyBar extends ChangeNotifier {
   // bool isVisible = true;
 
   late StreamSubscription<PlayerState> _subscription;
+  late StreamSubscription<ConnectionStatus> _subscriptionConnectionStatus;
   PlayerState? data;
   // late PlayerState _currentPlayerState;
 
@@ -381,8 +383,19 @@ class CnSpotifyBar extends ChangeNotifier {
   void _subscribeToPlayerState() {
     _subscription = SpotifySdk.subscribePlayerState().listen((playerState) {
       data = playerState;
+      if (playerState.track == null){
+        print("TRACK IS NULL");
+      } else{
+        print("TRACK IS NOT NULL ${playerState.track?.name}");
+      }
       progressIndicatorKey = UniqueKey();
       notifyListeners();
+    });
+    _subscriptionConnectionStatus = SpotifySdk.subscribeConnectionStatus().listen((connectionStatus){
+      if(!connectionStatus.connected){
+        print("IS NOT CONNECTED");
+        disconnect();
+      }
     });
   }
 
@@ -396,6 +409,7 @@ class CnSpotifyBar extends ChangeNotifier {
   @override
   void dispose() {
     _subscription.cancel();
+    _subscriptionConnectionStatus.cancel();
     super.dispose();
   }
 
@@ -421,9 +435,19 @@ class CnSpotifyBar extends ChangeNotifier {
 
             print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
+            // final trackName = data?.track?.name;
+            // if(trackName != null && !cn.songColors.containsKey(trackName)){
+            //   setMainColor(lastImage!.image, cn, trackName);
+            // }
+            // else if(trackName != null && cn.currentTrackName != trackName){
+            //   cn.setOnlyTrackName(trackName);
+            // }
+
             if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
+            // if(cn.currentImageUri != data?.track?.name && lastImage != null){
               print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
               cn.currentImageUri = snapshot.data!.toString();
+              // cn.currentTrackName != data?.track?.name?? "";
               setMainColor(lastImage!.image, cn);
             }
           }
@@ -453,7 +477,7 @@ class CnSpotifyBar extends ChangeNotifier {
     final PaletteGenerator paletteGenerator = await PaletteGenerator
         .fromImageProvider(imageProvider);
     currentColorPair = await compute(computeColor, paletteGenerator);
-    cn.setColor(currentColorPair[0], currentColorPair[1]);
+    cn.setColor(currentColorPair[0]?? Colors.white, currentColorPair[1]?? Colors.black);
   }
 
   static Future<List<Color>> computeColor(PaletteGenerator paletteGenerator)async{
@@ -471,6 +495,8 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Future connectToSpotify()async{
+    if(isTryingToConnect || !(await hasInternet())) return;
+
     if(justClosed){
       isConnected = true;
       justClosed = false;
@@ -480,7 +506,6 @@ class CnSpotifyBar extends ChangeNotifier {
       });
       return;
     }
-    // if(!isTryingToConnect){
     isTryingToConnect = true;
     try{
       if(Platform.isAndroid){
@@ -490,17 +515,16 @@ class CnSpotifyBar extends ChangeNotifier {
         accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
         isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
       }
-      _subscribeToPlayerState();
+      if(isConnected){
+        _subscribeToPlayerState();
+      }
     }on Exception catch (e) {
       print("---------- EXCEPTION --------- ${e.toString()}");
       accessToken = "";
       isTryingToConnect = false;
     }
-
-
-    //isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback");
     print("CONNECTED SPOTIFY: $isConnected");
-    refresh();
+    // refresh();
     isTryingToConnect = false;
     Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
       cnAnimatedColumn.refresh();
@@ -572,9 +596,9 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
     try {
       await SpotifySdk.resume().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        Future.delayed(const Duration(milliseconds: 150), (){
-          refresh();
-        })
+        // Future.delayed(const Duration(milliseconds: 150), (){
+        //   refresh();
+        // })
       });
       // await SpotifySdk.resume();
     } on Exception catch (_) {
@@ -629,18 +653,22 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Future<void> disconnect() async {
-    print("IN DISCONNECT");
     try {
       isConnected = false;
       justClosed = false;
       accessToken = "";
       refresh();
       Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), ()async{
-        await SpotifySdk.disconnect();
+        await SpotifySdk.disconnect().timeout(const Duration(seconds: 1), onTimeout: () => throw TimeoutException("Timeout while disconnecting"));
         cnAnimatedColumn.refresh();
         _subscription.cancel();
+        _subscriptionConnectionStatus.cancel();
       });
-    } on Exception catch (_) {}
+    } on Exception catch (_) {
+      cnAnimatedColumn.refresh();
+      _subscription.cancel();
+      _subscriptionConnectionStatus.cancel();
+    }
   }
 
   void refresh()async{

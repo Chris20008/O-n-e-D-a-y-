@@ -39,6 +39,8 @@ class _BackgroundImageState extends State<BackgroundImage> {
               //   Colors.black38,
               // ]
               colors: [
+                // (cnBackgroundImage.songColors[cnBackgroundImage.currentTrackName]?? cnBackgroundImage.defaultColors)[1],
+                // (cnBackgroundImage.songColors[cnBackgroundImage.currentTrackName]?? cnBackgroundImage.defaultColors)[0],
                 cnBackgroundImage.colorSecondChild?? Colors.black38,
                 cnBackgroundImage.colorFirstChild?? Colors.black54,
               ]
@@ -198,12 +200,21 @@ class CnBackgroundImage extends ChangeNotifier {
   bool firstChild = true;
   String currentImageUri = "";
   String currentTrackName = "";
+  Map<String, List<Color>> songColors = {};
+  List<Color> defaultColors = [Colors.black, Colors.white];
 
-  setColor(Color? c, Color? c2){
+  setColor(Color c, Color c2){
+    // this.currentTrackName = currentTrackName;
+    // songColors[currentTrackName] = [c, c2];
     colorFirstChild = c;
     colorSecondChild = c2;
     refresh();
   }
+
+  // setOnlyTrackName(String currentTrackName){
+  //   this.currentTrackName = currentTrackName;
+  //   refresh();
+  // }
 
   // setColor(Color? c){
   //   if(c != colorFirstChild && c!= colorSecondChild && !isRefreshing){

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/screen_workouts/screen_running_workout.dart';
 import 'animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
@@ -16,6 +17,7 @@ class StopwatchWidget extends StatefulWidget {
 
 class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget;
 
   double paddingLeftRight = 5;
@@ -165,8 +167,9 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                             backgroundColor: MaterialStateProperty.all(Colors.transparent),
                             // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                           ),
-                          onPressed: () async{
+                          onPressed: () {
                             cnStopwatchWidget.close();
+                            cnRunningWorkout.refresh();
                           },
                           icon: Icon(
                             Icons.keyboard_arrow_down,
@@ -186,8 +189,9 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   ),
-                  onPressed: () async{
+                  onPressed: () {
                     cnStopwatchWidget.open();
+                    cnRunningWorkout.refresh();
                   },
                   icon: Icon(
                     Icons.timer,

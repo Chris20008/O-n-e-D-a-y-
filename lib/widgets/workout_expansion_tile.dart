@@ -90,7 +90,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           IconButton(
                               onPressed: () {
                                 cnRunningWorkout.isVisible = true;
-                                cnBottomMenu.refresh();
+                                // cnBottomMenu.refresh();
                                 if(cnRunningWorkout.isRunning){
                                   cnWorkouts.refresh();
                                 }else{
