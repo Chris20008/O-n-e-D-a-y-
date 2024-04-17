@@ -366,9 +366,11 @@ class CnSpotifyBar extends ChangeNotifier {
   late CnAnimatedColumn cnAnimatedColumn;
   // late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
+  Key futureKey = UniqueKey();
   bool justClosed = false;
   // bool isFirstScreen = true;
   bool isHandlingControlAction = false;
+  String currentTrackName = "";
   // bool isVisible = true;
 
   late StreamSubscription<PlayerState> _subscription;
@@ -414,16 +416,30 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
+
+    print("_______________________ TRACK NAME: ${data?.track?.name}");
+
+    if(data?.track?.name == currentTrackName){
+      return ClipRRect(
+
+        borderRadius: BorderRadius.circular(7),
+        child: lastImage?? const SizedBox(),
+      );
+    }
+
     ImageUri image = data?.track?.imageUri?? ImageUri("None");
+    futureKey = UniqueKey();
     return FutureBuilder(
+        key: futureKey,
         future: SpotifySdk.getImage(
           imageUri: image,
           dimension: ImageDimension.xSmall,
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
-          print("GET IMAGE");
+          // print("GET IMAGE");
           if (snapshot.hasData) {
-
+            currentTrackName = data?.track?.name?? "";
+            print("NEW TRACK NAME: $currentTrackName");
             lastImage = Image.memory(
               snapshot.data!,
               // height: 1000,
@@ -432,38 +448,18 @@ class CnSpotifyBar extends ChangeNotifier {
               gaplessPlayback: true,
               fit: BoxFit.fitHeight,
             );
+            setMainColor(lastImage!.image, cn);
 
-            print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
+            // print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
 
-            // final trackName = data?.track?.name;
-            // if(trackName != null && !cn.songColors.containsKey(trackName)){
-            //   setMainColor(lastImage!.image, cn, trackName);
+            // if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
+            // // if(cn.currentImageUri != data?.track?.name && lastImage != null){
+            //   print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
+            //   cn.currentImageUri = snapshot.data!.toString();
+            //   // cn.currentTrackName != data?.track?.name?? "";
+            //   setMainColor(lastImage!.image, cn);
             // }
-            // else if(trackName != null && cn.currentTrackName != trackName){
-            //   cn.setOnlyTrackName(trackName);
-            // }
-
-            if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
-            // if(cn.currentImageUri != data?.track?.name && lastImage != null){
-              print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
-              cn.currentImageUri = snapshot.data!.toString();
-              // cn.currentTrackName != data?.track?.name?? "";
-              setMainColor(lastImage!.image, cn);
-            }
           }
-          // else{
-          //   if(imageGotUpdated){
-          //     imageGotUpdated = false;
-          //     return ClipRRect(
-          //       borderRadius: BorderRadius.circular(7),
-          //       child: Container(
-          //           height: 300,
-          //           width: 300,
-          //           color: (Colors.grey[850]?? Colors.black).withOpacity(0.2)
-          //       ),
-          //     );
-          //   }
-          // }
           return ClipRRect(
 
             borderRadius: BorderRadius.circular(7),
@@ -472,6 +468,53 @@ class CnSpotifyBar extends ChangeNotifier {
         }
     );
   }
+
+  // Widget spotifyImageWidget(CnBackgroundImage cn) {
+  //   ImageUri image = data?.track?.imageUri?? ImageUri("None");
+  //   return FutureBuilder(
+  //       future: SpotifySdk.getImage(
+  //         imageUri: image,
+  //         dimension: ImageDimension.xSmall,
+  //       ),
+  //       builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
+  //         print("GET IMAGE");
+  //         if (snapshot.hasData) {
+  //
+  //           lastImage = Image.memory(
+  //             snapshot.data!,
+  //             // height: 1000,
+  //             height: height-10,
+  //             width: height-10,
+  //             gaplessPlayback: true,
+  //             fit: BoxFit.fitHeight,
+  //           );
+  //
+  //           print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
+  //
+  //           // final trackName = data?.track?.name;
+  //           // if(trackName != null && !cn.songColors.containsKey(trackName)){
+  //           //   setMainColor(lastImage!.image, cn, trackName);
+  //           // }
+  //           // else if(trackName != null && cn.currentTrackName != trackName){
+  //           //   cn.setOnlyTrackName(trackName);
+  //           // }
+  //
+  //           if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
+  //           // if(cn.currentImageUri != data?.track?.name && lastImage != null){
+  //             print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
+  //             cn.currentImageUri = snapshot.data!.toString();
+  //             // cn.currentTrackName != data?.track?.name?? "";
+  //             setMainColor(lastImage!.image, cn);
+  //           }
+  //         }
+  //         return ClipRRect(
+  //
+  //           borderRadius: BorderRadius.circular(7),
+  //           child: lastImage?? const SizedBox(),
+  //         );
+  //       }
+  //   );
+  // }
 
   Future setMainColor (ImageProvider imageProvider, CnBackgroundImage cn) async {
     final PaletteGenerator paletteGenerator = await PaletteGenerator
@@ -494,7 +537,7 @@ class CnSpotifyBar extends ChangeNotifier {
     return [color, color2];
   }
 
-  Future connectToSpotify()async{
+  Future connectToSpotify() async{
     if(isTryingToConnect || !(await hasInternet())) return;
 
     if(justClosed){
