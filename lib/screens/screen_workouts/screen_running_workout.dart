@@ -422,7 +422,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         crossFadeState: viewInsetsBottom < 50
                           ? CrossFadeState.showFirst
                           : CrossFadeState.showSecond,
-                        duration: Duration(milliseconds: cnSpotifyBar.animationTimeSpotifyBar~/2)
+                        duration: Duration(milliseconds: viewInsetsBottom < 50? cnSpotifyBar.animationTimeSpotifyBar~/2 : 0)
                     )
                     // if(viewInsetsBottom < 50)
                     //   const AnimatedColumn(),
