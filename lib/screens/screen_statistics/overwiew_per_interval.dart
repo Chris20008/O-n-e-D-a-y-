@@ -15,37 +15,57 @@ class _OverviewPerIntervalState extends State<OverviewPerInterval> {
   @override
   Widget build(BuildContext context) {
     cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
-    print("REBUILD OVERVIEW");
-
-    // final workouts = cnScreenStatistics.getWorkoutsInInterval();
 
     return FutureBuilder(
         future: cnScreenStatistics.getWorkoutsInIntervalSummarized(),
         builder: (context, AsyncSnapshot<Map<String, Map>> workouts){
           if(workouts.hasData){
-            print("SNAPSHOT HAS DATA: ${workouts.data}");
             List<Widget> children = [];
             for(MapEntry<String, Map> entry in workouts.data!.entries){
               children.add(
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                    decoration: BoxDecoration(
-                      color: Colors.black26,
-                      borderRadius: BorderRadius.circular(15)
-                    ),
-                    child: Row(
-                      children: [
-                        Text(entry.key, style: Theme.of(context).textTheme.titleLarge),
-                        const Spacer(),
-                        Text(entry.value["counter"].toString())
-                      ],
+                  child: GestureDetector(
+                    onTap: ()async{
+
+                      await cnScreenStatistics.setSelectedWorkout(entry.key);
+                      cnScreenStatistics.refresh();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      decoration: BoxDecoration(
+                        color: Colors.black26,
+                        borderRadius: BorderRadius.circular(15)
+                      ),
+                      child: Row(
+                        children: [
+                          Text(entry.key, style: Theme.of(context).textTheme.titleLarge),
+                          const Spacer(),
+                          Text(entry.value["counter"].toString())
+                        ],
+                      ),
                     ),
                   ),
                 )
               );
             }
+
+            // cnScreenStatistics.selectedWorkout ??= workouts.data!.keys.first;
+            //
+            // children.add(
+            //     DropdownMenu<String>(
+            //       initialSelection: cnScreenStatistics.selectedWorkout,
+            //       onSelected: (String? value) {
+            //         setState(() {
+            //           cnScreenStatistics.selectedWorkout = value;
+            //         });
+            //       },
+            //       dropdownMenuEntries: workouts.data!.keys.map<DropdownMenuEntry<String>>((String value) {
+            //         return DropdownMenuEntry<String>(value: value, label: value);
+            //       }).toList(),
+            //     )
+            // );
+
             return Column(
               children: children,
             );
@@ -57,12 +77,5 @@ class _OverviewPerIntervalState extends State<OverviewPerInterval> {
           );
         }
     );
-
-    // return Column(
-    //   mainAxisSize: MainAxisSize.min,
-    //   children: [
-    //     for(Workout w in workouts)
-    //   ],
-    // );
   }
 }

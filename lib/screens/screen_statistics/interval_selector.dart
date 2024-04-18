@@ -10,25 +10,13 @@ class IntervalSelector extends StatefulWidget {
 }
 
 class _IntervalSelectorState extends State<IntervalSelector> {
-  late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
 
-  // final PageController _controller = PageController(viewportFraction: 0.33);
   late final ScrollController _scrollController;
   final double buttonWidth = 180;
   late final width = MediaQuery.of(context).size.width;
   late final leftRightBoxesWidth = (width-buttonWidth)/2;
   bool scrollControllerIsInitialized = false;
-
-  // @override
-  // void initState() {
-  //   // Future.delayed(const Duration(milliseconds: 0), (){
-  //   //   late final newPos = buttonWidth * List.from(cnScreenStatistics.intervalSelectorMap.keys).indexOf(cnScreenStatistics.currentlySelectedIntervalAsText) - width/2 + buttonWidth/2 +leftRightBoxesWidth;
-  //   //   // _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 50), curve: Curves.easeInOut);
-  //   //   _scrollController.jumpTo(newPos);
-  //   //   _scrollController = ScrollController(initialScrollOffset: newPos);
-  //   // });
-  //   super.initState();
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -63,12 +51,16 @@ class _IntervalSelectorState extends State<IntervalSelector> {
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                   ),
                   onPressed: (){
-                    setState(() {
-                      cnScreenStatistics.currentlySelectedIntervalAsText = text;
-                      double newPos = buttonWidth * index - width/2 + buttonWidth/2 +leftRightBoxesWidth;
-                      _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
-                    });
-                    cnScreenStatistics.refresh();
+                    // setState(() {
+                    double newPos = buttonWidth * index - width/2 + buttonWidth/2 +leftRightBoxesWidth;
+                    _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+                      if(cnScreenStatistics.currentlySelectedIntervalAsText != text){
+                        cnScreenStatistics.currentlySelectedIntervalAsText = text;
+                        cnScreenStatistics.selectedWorkout = null;
+                        cnScreenStatistics.selectedExercise = null;
+                        cnScreenStatistics.refresh();
+                      }
+                    // });
                   },
                   child: Text(text)
               ),

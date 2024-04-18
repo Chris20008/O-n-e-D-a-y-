@@ -1,15 +1,18 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/screen_statistics/overwiew_per_interval.dart';
+import 'package:fitness_app/screens/screen_statistics/workout_history_in_interval.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 
+import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
 import 'interval_selector.dart';
+import 'interval_size_selector.dart';
 
 class ScreenStatistics extends StatefulWidget {
   const ScreenStatistics({super.key});
@@ -19,24 +22,29 @@ class ScreenStatistics extends StatefulWidget {
 }
 
 class _ScreenStatisticsState extends State<ScreenStatistics> {
-  late CnScreenStatistics cnScreenStatistics;
+  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
   @override
   Widget build(BuildContext context) {
-    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
-    return ListView(
-
-      children: const [
-        SizedBox(height: 20),
-        IntervalSelector(),
-        SizedBox(height: 20),
-        OverviewPerInterval()
-        // SizedBox(height: 20,),
-        // Averages(),
-        // SizedBox(height: 20,),
-        // GeneralOverviewBarChart()
-      ],
+    return const SafeArea(
+      child: Column(
+      
+        children: [
+          SizedBox(height: 10),
+          IntervalSizeSelector(),
+          SizedBox(height: 20),
+          IntervalSelector(),
+          SizedBox(height: 20),
+          OverviewPerInterval(),
+          SizedBox(height: 20),
+          Expanded(child: WorkoutHistoryInInterval()),
+          // SizedBox(height: 20,),
+          // Averages(),
+          // SizedBox(height: 20,),
+          // GeneralOverviewBarChart()
+        ],
+      ),
     );
   }
 }
@@ -53,6 +61,8 @@ class CnScreenStatistics extends ChangeNotifier {
   late String currentlySelectedIntervalAsText = DateFormat('MMMM y').format(DateTime.now());
   // late DateTime currentlySelectedIntervalAsDate = DateTime.now();
   TimeInterval selectedIntervalSize = TimeInterval.monthly;
+  Workout? selectedWorkout;
+  Exercise? selectedExercise;
 
 
   void init() async{
@@ -184,8 +194,35 @@ class CnScreenStatistics extends ChangeNotifier {
     final sortedSummarized = Map.fromEntries(
         summarized.entries.toList()..sort((e1, e2) => e2.value["counter"].compareTo(e1.value["counter"]))
     );
+    if(sortedSummarized.keys.isNotEmpty && selectedWorkout == null){
+      print("SET SELECTED WORKOUT to ${sortedSummarized.keys.first}");
+      print("SELECTED WORKOUT IS: ${selectedWorkout}");
+      await setSelectedWorkout(sortedSummarized.keys.first).then((value) => refresh());
+      // selectedWorkout = await getWorkoutFromName(sortedSummarized.keys.first);
+    }
+    // selectedWorkout ??= sortedSummarized.keys.first;
     return sortedSummarized;
   }
+
+  Future setSelectedWorkout(String workoutName) async{
+    final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
+    if(w != null) {
+      print("SELECTED WORKOUT IS NOT NULL");
+      selectedWorkout = Workout.fromObWorkout(w);
+      selectedExercise = selectedWorkout?.exercises.first;
+      print("SELECTED WORKOUT IS: ${selectedWorkout!.name}");
+      print("SELECTED EXERCISE ${selectedExercise!.name}");
+    } else{
+      print("SELECTED WORKOUT IS NULL");
+      selectedWorkout = null;
+    }
+  }
+
+  // Future<Workout?> getWorkoutFromName(String workoutName) async{
+  //   final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
+  //   if(w == null) return null;
+  //   return Workout.fromObWorkout(w);
+  // }
 
   // void getWeeksFromMonth(int year, int month) async{
   //   final firstDayOfMonth = DateTime(year=year, month, 1);

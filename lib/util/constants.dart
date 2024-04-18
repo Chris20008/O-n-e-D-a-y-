@@ -19,9 +19,12 @@ final testdata = {
 };
 
 enum TimeInterval {
-  monthly,
-  quarterly,
-  yearly
+  monthly ("Monthly"),
+  quarterly ("Quarterly"),
+  yearly ("Yearly");
+
+  const TimeInterval(this.value);
+  final String value;
 }
 
 Widget ExerciseNameText(

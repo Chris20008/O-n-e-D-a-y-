@@ -421,7 +421,6 @@ class CnSpotifyBar extends ChangeNotifier {
 
     if(data?.track?.name == currentTrackName){
       return ClipRRect(
-
         borderRadius: BorderRadius.circular(7),
         child: lastImage?? const SizedBox(),
       );
@@ -449,16 +448,6 @@ class CnSpotifyBar extends ChangeNotifier {
               fit: BoxFit.fitHeight,
             );
             setMainColor(lastImage!.image, cn);
-
-            // print("SNAPSHOT HAS DATA IMAGE ${image.raw}");
-
-            // if(cn.currentImageUri != snapshot.data!.toString() && lastImage != null){
-            // // if(cn.currentImageUri != data?.track?.name && lastImage != null){
-            //   print("NEW IMAGE WITH TITLE: ${data?.track?.name}");
-            //   cn.currentImageUri = snapshot.data!.toString();
-            //   // cn.currentTrackName != data?.track?.name?? "";
-            //   setMainColor(lastImage!.image, cn);
-            // }
           }
           return ClipRRect(
 
