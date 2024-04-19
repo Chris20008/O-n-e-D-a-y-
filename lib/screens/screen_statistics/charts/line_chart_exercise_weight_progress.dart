@@ -46,8 +46,15 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       }
     }
 
-    minWeight = minMaxWeights[0]!;
-    maxWeight = minMaxWeights[1]!;
+    minWeight = 10000;
+    maxWeight = 0;
+    maxWeights.forEach((key, value) {
+      minWeight = minWeight < value? minWeight : value;
+      maxWeight = maxWeight < value? value : maxWeight;
+    });
+
+    // minWeight = minMaxWeights[0]!;
+    // maxWeight = minMaxWeights[1]!;
     minDate = cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]!["minDate"]!;
     
     if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
@@ -75,6 +82,10 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+1))
           + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+2));
     }
+
+    if(spots.isEmpty){
+      return const SizedBox();
+    }
     
 
     print("MIN WEIGHT: $minWeight");
@@ -83,41 +94,48 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     print("MAX X: $maxX");
     print(cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]);
 
-    return Stack(
-      children: <Widget>[
-        AspectRatio(
-          aspectRatio: 1.70,
-          child: Padding(
-            padding: const EdgeInsets.only(
-              right: 18,
-              left: 12,
-              top: 24,
-              bottom: 12,
+    return Column(
+      children: [
+        const Text("Max Weight", textScaler: TextScaler.linear(1.5),),
+        const SizedBox(height: 10,),
+        Stack(
+          children: <Widget>[
+            AspectRatio(
+              aspectRatio: 1.2,
+              child: Padding(
+                padding: EdgeInsets.zero,
+                // padding: const EdgeInsets.only(
+                //   right: 18,
+                //   left: 12,
+                //   top: 24,
+                //   bottom: 12,
+                // ),
+                child: LineChart(
+                    mainData()
+                  // showAvg ? avgData() : mainData(),
+                ),
+              ),
             ),
-            child: LineChart(
-                mainData()
-              // showAvg ? avgData() : mainData(),
-            ),
-          ),
+            // SizedBox(
+            //   width: 60,
+            //   height: 34,
+            //   child: TextButton(
+            //     onPressed: () {
+            //       setState(() {
+            //         showAvg = !showAvg;
+            //       });
+            //     },
+            //     child: Text(
+            //       'avg',
+            //       style: TextStyle(
+            //         fontSize: 12,
+            //         color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+          ],
         ),
-        // SizedBox(
-        //   width: 60,
-        //   height: 34,
-        //   child: TextButton(
-        //     onPressed: () {
-        //       setState(() {
-        //         showAvg = !showAvg;
-        //       });
-        //     },
-        //     child: Text(
-        //       'avg',
-        //       style: TextStyle(
-        //         fontSize: 12,
-        //         color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
-        //       ),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
@@ -185,37 +203,42 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 15,
+      fontSize: 12,
     );
     String text;
-    switch (value.toInt()) {
-      case 10:
-        text = '10 KG';
-        break;
-      case 30:
-        text = '30 kg';
-        break;
-      case 50:
-        text = '50 kg';
-        break;
-      case 70:
-        text = '70 kg';
-        break;
-      case 90:
-        text = '90 kg';
-        break;
-      case 110:
-        text = '110 kg';
-        break;
-      case 130:
-        text = '130 kg';
-        break;
-      case 150:
-        text = '150 kg';
-        break;
-      default:
-        return Container();
+    if(value.toInt() % 10 == 0 && value.toInt() != 0){
+      text = '${value.toInt()} KG';
+    } else{
+      return Container();
     }
+    // switch (value.toInt()) {
+    //   case 10:
+    //     text = '10 KG';
+    //     break;
+    //   case 30:
+    //     text = '30 kg';
+    //     break;
+    //   case 50:
+    //     text = '50 kg';
+    //     break;
+    //   case 70:
+    //     text = '70 kg';
+    //     break;
+    //   case 90:
+    //     text = '90 kg';
+    //     break;
+    //   case 110:
+    //     text = '110 kg';
+    //     break;
+    //   case 130:
+    //     text = '130 kg';
+    //     break;
+    //   case 150:
+    //     text = '150 kg';
+    //     break;
+    //   default:
+    //     return Container();
+    // }
 
     return Text(text, style: style, textAlign: TextAlign.left);
   }
@@ -286,7 +309,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           barWidth: 5,
           isStrokeCapRound: true,
           dotData: const FlDotData(
-            show: false,
+            show: true,
           ),
           belowBarData: BarAreaData(
             show: true,

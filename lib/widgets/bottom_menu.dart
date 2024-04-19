@@ -117,7 +117,8 @@ class _BottomMenuState extends State<BottomMenu> {
       cnWorkouts.refreshAllWorkouts();
     }
     else if(index == 2) {
-      cnScreenStatistics.refresh();
+      cnScreenStatistics.calculateCurrentData();
+      // cnScreenStatistics.refresh();
     }
     cnHomepage.refresh();
   }

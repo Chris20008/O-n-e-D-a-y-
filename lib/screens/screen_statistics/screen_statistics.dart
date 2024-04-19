@@ -221,6 +221,7 @@ class CnScreenStatistics extends ChangeNotifier {
     isCalculatingData = true;
     Map<String, int> summarized = {};
     final workouts = await getWorkoutsInInterval();
+    exercisesPerWorkout.clear();
 
     for(Workout w in workouts){
       List<StatisticExercise> exercises = exercisesPerWorkout[w.name]?? [];
@@ -302,8 +303,8 @@ class CnScreenStatistics extends ChangeNotifier {
     int minWeight = 1000000;
     int maxWeight = 0;
     for(StatisticExercise ex in exercises){
-      minWeight = minWeight < ex.weight? minWeight : ex.weight;
       maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
+      minWeight = minWeight < maxWeight? minWeight : maxWeight;
     }
     if(minWeight == 1000000) minWeight = 0;
     return [minWeight, maxWeight];
@@ -432,7 +433,7 @@ class CnScreenStatistics extends ChangeNotifier {
   void reset(){
     selectedWorkout = null;
     selectedExercise = null;
-    // sortedSummarized = null;
+    exercisesPerWorkout.clear();
   }
 
   void refresh(){
