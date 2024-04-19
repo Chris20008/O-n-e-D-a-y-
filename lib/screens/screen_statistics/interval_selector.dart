@@ -56,8 +56,9 @@ class _IntervalSelectorState extends State<IntervalSelector> {
                     _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
                       if(cnScreenStatistics.currentlySelectedIntervalAsText != text){
                         cnScreenStatistics.currentlySelectedIntervalAsText = text;
-                        cnScreenStatistics.selectedWorkout = null;
-                        cnScreenStatistics.selectedExercise = null;
+                        cnScreenStatistics.reset();
+                        cnScreenStatistics.refresh();
+                        cnScreenStatistics.calculateCurrentData();
                         cnScreenStatistics.refresh();
                       }
                     // });

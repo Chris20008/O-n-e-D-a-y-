@@ -10,19 +10,17 @@ class OverviewPerInterval extends StatefulWidget {
 }
 
 class _OverviewPerIntervalState extends State<OverviewPerInterval> {
-  late CnScreenStatistics cnScreenStatistics;
+  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   final double _wrapSpacing = 5;
 
   @override
   Widget build(BuildContext context) {
-    cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return FutureBuilder(
             future: cnScreenStatistics.getWorkoutsInIntervalSummarized(),
             builder: (context, AsyncSnapshot<Map<String, Map>> workouts){
-
               if(workouts.hasData){
                 List<Widget> children = [];
                 final keys = workouts.data!.keys.toList();
@@ -62,6 +60,19 @@ class _OverviewPerIntervalState extends State<OverviewPerInterval> {
                       ),
                     )
                   );
+                }
+
+                if(workouts.data!.isNotEmpty){
+                  children.addAll([
+                    SizedBox(height: 15, width: constraints.maxWidth),
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 5),
+                      height: 1,
+                      width: double.maxFinite,
+                      color: Colors.amber[800]!.withOpacity(0.6),
+                    ),
+                    SizedBox(height: 15, width: constraints.maxWidth),
+                  ]);
                 }
 
                 return Wrap(

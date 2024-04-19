@@ -38,18 +38,10 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 25),
-              children: [
-                const SizedBox(height: 20),
-                const OverviewPerInterval(),
-                const SizedBox(height: 15),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  height: 1,
-                  width: double.maxFinite,
-                  color: Colors.amber[800]!.withOpacity(0.6),
-                ),
-                const SizedBox(height: 15),
-                const WorkoutHistoryInInterval(),
+              children: const [
+                SizedBox(height: 20),
+                OverviewPerInterval(),
+                WorkoutHistoryInInterval(),
               ],
             ),
           )
@@ -74,26 +66,25 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 
 class CnScreenStatistics extends ChangeNotifier {
   bool isInitialized = false;
-  // late List<Workout> allWorkouts;
   Map<int, dynamic> workoutsSorted = {};
   DateTime minDate = DateTime.now();
   // DateTime minDate = DateTime(2024, 4, 5);
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   // DateTime maxDate = DateTime(2025, 5, 26);
   Map<String, Map<String, DateTime>> intervalSelectorMap = {};
+  Map<String, List<StatisticExercise>> minMaxPerExPerWorkout = {};
   late String currentlySelectedIntervalAsText = DateFormat('MMMM y').format(DateTime.now());
-  // late DateTime currentlySelectedIntervalAsDate = DateTime.now();
   TimeInterval selectedIntervalSize = TimeInterval.monthly;
   Workout? selectedWorkout;
   Exercise? selectedExercise;
+  Map<String, Map<dynamic, dynamic>>? sortedSummarized;
 
 
   void init() async{
-    // final tempObWorkouts = await objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date).build().findAsync();// .getAllAsync();
-    // allWorkouts = List.from(tempObWorkouts.map((w) => Workout.fromObWorkout(w)));
     isInitialized = true;
     setMinDate();
     refreshIntervalSelectorMap();
+    calculateCurrentData();
     print("INTERVALL SELECTOR MAP:");
     for(final i in intervalSelectorMap.entries){
       print(i);
@@ -201,42 +192,57 @@ class CnScreenStatistics extends ChangeNotifier {
     return List.from(tempObWorkouts.map((w) => Workout.fromObWorkout(w)));
   }
 
-  Future<Map<String, Map>> getWorkoutsInIntervalSummarized() async{
-    print("IN FUNCTION: getWorkoutsInIntervalSummarized");
+  Future<void> calculateCurrentData()async{
+    // await Future.delayed(const Duration(milliseconds: 200), (){});
     Map<String, Map> summarized = {};
     final workouts = await getWorkoutsInInterval();
-    print("RECEIVED WORKOUTS. $workouts");
     for(Workout w in workouts){
       print(w.name);
+      List<StatisticExercise> exercises = [];
+      for(Exercise ex in w.exercises){
+        exercises.addAll(ex.sets.map((set) =>
+            StatisticExercise(
+                name: ex.name,
+                weight: set.weight?? 0,
+                amount: set.amount?? 0,
+                date: w.date!
+            )
+        ));
+      }
+      minMaxPerExPerWorkout[w.name] = exercises;
       if(summarized.containsKey(w.name)){
         summarized[w.name]!["counter"] = summarized[w.name]!["counter"] + 1;
       } else{
         summarized[w.name] = {"counter": 1};
       }
     }
-    final sortedSummarized = Map.fromEntries(
+    print("FILL SORTED SUMMARIZED");
+    sortedSummarized = Map.fromEntries(
         summarized.entries.toList()..sort((e1, e2) => e2.value["counter"].compareTo(e1.value["counter"]))
     );
-    if(sortedSummarized.keys.isNotEmpty && selectedWorkout == null){
-      print("SET SELECTED WORKOUT to ${sortedSummarized.keys.first}");
-      print("SELECTED WORKOUT IS: ${selectedWorkout}");
-      await setSelectedWorkout(sortedSummarized.keys.first).then((value) => refresh());
-      // selectedWorkout = await getWorkoutFromName(sortedSummarized.keys.first);
+    print("SORTED SUMMARIZED= $sortedSummarized");
+    print("FILLED SORTED SUMMARIZED");
+    if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty && selectedWorkout == null){
+      await setSelectedWorkout(sortedSummarized!.keys.first);
     }
-    // selectedWorkout ??= sortedSummarized.keys.first;
-    return sortedSummarized;
+    refresh();
+  }
+
+  Future<Map<String, Map>>? getWorkoutsInIntervalSummarized() async{
+    return sortedSummarized!;
+    // while(sortedSummarized == null){
+    //   print("--------------------------- IS NULL--------------------------------- iS NuLl ______________");
+    //   await Future.delayed(const Duration(milliseconds: 2000), (){});
+    // }
+    // return sortedSummarized!;
   }
 
   Future setSelectedWorkout(String workoutName) async{
     final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
     if(w != null) {
-      print("SELECTED WORKOUT IS NOT NULL");
       selectedWorkout = Workout.fromObWorkout(w);
       selectedExercise = selectedWorkout?.exercises.first;
-      print("SELECTED WORKOUT IS: ${selectedWorkout!.name}");
-      print("SELECTED EXERCISE ${selectedExercise!.name}");
     } else{
-      print("SELECTED WORKOUT IS NULL");
       selectedWorkout = null;
     }
   }
@@ -331,6 +337,12 @@ class CnScreenStatistics extends ChangeNotifier {
 
   bool isLeapYear(int year){
     return (year%4==0 && (year%100!=0 || year%400==0));
+  }
+
+  void reset(){
+    selectedWorkout = null;
+    selectedExercise = null;
+    // sortedSummarized = null;
   }
 
   void refresh(){

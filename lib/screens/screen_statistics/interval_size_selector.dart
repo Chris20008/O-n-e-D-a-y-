@@ -39,10 +39,11 @@ class _IntervalSizeSelectorState extends State<IntervalSizeSelector> {
               ),
               onPressed: (){
                 if(cnScreenStatistics.selectedIntervalSize != ti){
-                  cnScreenStatistics.selectedWorkout = null;
-                  cnScreenStatistics.selectedExercise = null;
+                  cnScreenStatistics.reset();
+                  cnScreenStatistics.refresh();
                   cnScreenStatistics.selectedIntervalSize = ti;
                   cnScreenStatistics.refreshIntervalSelectorMap();
+                  cnScreenStatistics.calculateCurrentData();
                   cnScreenStatistics.refresh();
                 }
               },
@@ -51,32 +52,4 @@ class _IntervalSizeSelectorState extends State<IntervalSizeSelector> {
         ),
       ),
   ];
-
-  // List<Widget> getIntervalButtons(){
-  //   List<Widget> buttons = [];
-  //   for(TimeInterval ti in TimeInterval.values){
-  //     buttons.add(
-  //       ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             foregroundColor: Colors.white,
-  //             // shadowColor: Colors.transparent,
-  //             backgroundColor: cnScreenStatistics.selectedIntervalSize == ti? Colors.amber[800] : Colors.transparent,
-  //             // fixedSize: size,
-  //             padding: const EdgeInsets.all(0),
-  //             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  //           ),
-  //           onPressed: (){
-  //             // setState(() {
-  //             //   cnScreenStatistics.currentlySelectedIntervalAsText = text;
-  //             //   double newPos = buttonWidth * index - width/2 + buttonWidth/2 +leftRightBoxesWidth;
-  //             //   _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
-  //             // });
-  //             cnScreenStatistics.refresh();
-  //           },
-  //           child: Text(ti.name)
-  //       ),
-  //     );
-  //   }
-  //   return buttons;
-  // }
 }
