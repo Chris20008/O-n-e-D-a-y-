@@ -27,18 +27,41 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   @override
   Widget build(BuildContext context) {
 
-    return const SafeArea(
+    return SafeArea(
       child: Column(
       
         children: [
-          SizedBox(height: 10),
-          IntervalSizeSelector(),
-          SizedBox(height: 20),
-          IntervalSelector(),
-          SizedBox(height: 20),
-          OverviewPerInterval(),
-          SizedBox(height: 20),
-          Expanded(child: WorkoutHistoryInInterval()),
+          const SizedBox(height: 10),
+          const IntervalSizeSelector(),
+          const SizedBox(height: 20),
+          const IntervalSelector(),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              children: [
+                const SizedBox(height: 20),
+                const OverviewPerInterval(),
+                const SizedBox(height: 15),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5),
+                  height: 1,
+                  width: double.maxFinite,
+                  color: Colors.amber[800]!.withOpacity(0.6),
+                ),
+                const SizedBox(height: 15),
+                const WorkoutHistoryInInterval(),
+              ],
+            ),
+          )
+          // const OverviewPerInterval(),
+          // const SizedBox(height: 15),
+          // Container(
+          //   height: 1,
+          //   width: double.maxFinite - 50,
+          //   color: Colors.amber[900]!.withOpacity(0.6),
+          // ),
+          // const SizedBox(height: 15),
+          // const Expanded(child: WorkoutHistoryInInterval()),
           // SizedBox(height: 20,),
           // Averages(),
           // SizedBox(height: 20,),

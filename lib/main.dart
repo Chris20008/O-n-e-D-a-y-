@@ -12,6 +12,7 @@ import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -61,7 +62,10 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             useMaterial3: true,
-            splashFactory: InkSparkle.splashFactory
+            splashFactory: InkSparkle.splashFactory,
+            cupertinoOverrideTheme: const CupertinoThemeData(
+              brightness: Brightness.dark
+            )
         ),
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
