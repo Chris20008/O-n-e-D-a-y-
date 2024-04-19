@@ -527,8 +527,6 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Future connectToSpotify() async{
-    if(isTryingToConnect || !(await hasInternet())) return;
-
     if(justClosed){
       isConnected = true;
       justClosed = false;
@@ -538,6 +536,11 @@ class CnSpotifyBar extends ChangeNotifier {
       });
       return;
     }
+
+    if(isTryingToConnect || !(await hasInternet())) {
+      return;
+    }
+
     isTryingToConnect = true;
     try{
       if(Platform.isAndroid){

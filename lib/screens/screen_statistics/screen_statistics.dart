@@ -92,6 +92,8 @@ class CnScreenStatistics extends ChangeNotifier {
   TimeInterval selectedIntervalSize = TimeInterval.monthly;
   Workout? selectedWorkout;
   Exercise? selectedExercise;
+  Workout? previousSelectedWorkout;
+  Exercise? previousSelectedExercise;
 
 
   ///
@@ -255,8 +257,14 @@ class CnScreenStatistics extends ChangeNotifier {
     sortedSummarized = Map.fromEntries(
         summarized.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value))
     );
+
+    /// Set selectedWorkout and selectedExercise
     if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty && selectedWorkout == null){
-      await setSelectedWorkout(sortedSummarized!.keys.first);
+      if(sortedSummarized!.keys.contains(previousSelectedWorkout?.name)){
+        await setSelectedWorkout(previousSelectedWorkout!.name);
+      } else{
+        await setSelectedWorkout(sortedSummarized!.keys.first);
+      }
     }
 
     currentMinDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!;
@@ -275,7 +283,19 @@ class CnScreenStatistics extends ChangeNotifier {
     final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
     if(w != null) {
       selectedWorkout = Workout.fromObWorkout(w);
-      selectedExercise = selectedWorkout?.exercises.first;
+      final exerciseNames = selectedWorkout?.exercises.map((e) => e.name);
+
+      if(exerciseNames == null || exerciseNames.isEmpty){
+        return;
+      }
+
+      if(selectedExercise == null && exerciseNames.contains(previousSelectedExercise?.name)){
+        selectedExercise = previousSelectedExercise;
+      }
+      else{
+        selectedExercise = selectedWorkout?.exercises.first;
+      }
+
     } else{
       selectedWorkout = null;
     }
@@ -431,6 +451,8 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void reset(){
+    previousSelectedWorkout = selectedWorkout;
+    previousSelectedExercise = selectedExercise;
     selectedWorkout = null;
     selectedExercise = null;
     exercisesPerWorkout.clear();
