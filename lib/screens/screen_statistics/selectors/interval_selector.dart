@@ -56,6 +56,7 @@ class _IntervalSelectorState extends State<IntervalSelector> {
                     _scrollController.animateTo(newPos, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
                       if(cnScreenStatistics.currentlySelectedIntervalAsText != text){
                         cnScreenStatistics.currentlySelectedIntervalAsText = text;
+                        // cnScreenStatistics.setCurrentInterval(text);
                         cnScreenStatistics.reset();
                         cnScreenStatistics.refresh();
                         cnScreenStatistics.calculateCurrentData();

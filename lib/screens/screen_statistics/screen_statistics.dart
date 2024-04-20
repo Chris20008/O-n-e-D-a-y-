@@ -1,7 +1,9 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
-import 'package:fitness_app/screens/screen_statistics/overwiew_per_interval.dart';
-import 'package:fitness_app/screens/screen_statistics/workout_history_in_interval.dart';
+import 'package:fitness_app/screens/screen_statistics/charts/line_chart_exercise_weight_progress.dart';
+import 'package:fitness_app/screens/screen_statistics/exercise_summary_per_interval.dart';
+import 'package:fitness_app/screens/screen_statistics/selectors/exercise_selector.dart';
+import 'package:fitness_app/screens/screen_statistics/selectors/interval_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -11,8 +13,7 @@ import 'package:quiver/iterables.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
 import '../../util/objectbox/ob_workout.dart';
-import 'interval_selector.dart';
-import 'interval_size_selector.dart';
+import 'selectors/interval_size_selector.dart';
 
 class ScreenStatistics extends StatefulWidget {
   const ScreenStatistics({super.key});
@@ -40,24 +41,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               padding: const EdgeInsets.symmetric(horizontal: 25),
               children: const [
                 SizedBox(height: 20),
-                OverviewPerInterval(),
-                WorkoutHistoryInInterval(),
+                ExerciseSummaryPerInterval(),
+                ExerciseSelector(),
+                SizedBox(height: 20,),
+                LineChartExerciseWeightProgress()
               ],
             ),
           )
-          // const OverviewPerInterval(),
-          // const SizedBox(height: 15),
-          // Container(
-          //   height: 1,
-          //   width: double.maxFinite - 50,
-          //   color: Colors.amber[900]!.withOpacity(0.6),
-          // ),
-          // const SizedBox(height: 15),
-          // const Expanded(child: WorkoutHistoryInInterval()),
-          // SizedBox(height: 20,),
-          // Averages(),
-          // SizedBox(height: 20,),
-          // GeneralOverviewBarChart()
         ],
       ),
     );
@@ -66,18 +56,46 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 
 class CnScreenStatistics extends ChangeNotifier {
   bool isInitialized = false;
+  bool isCalculatingData = false;
   Map<int, dynamic> workoutsSorted = {};
   DateTime minDate = DateTime.now();
   // DateTime minDate = DateTime(2024, 4, 5);
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   // DateTime maxDate = DateTime(2025, 5, 26);
+  DateTime currentMinDate = DateTime.now();
+  DateTime currentMaxDate = DateTime.now();
+
+  /// Holds the PlainText as Key f.e. 'March 2024', 'April 2024'
+  /// And for each Key the min and max dates
+  /// Example:
+  ///       {
+  ///         'March 2024': {
+  ///                         'minDate': '2024.03.01 00:00:00.0000',
+  ///                         'maxDate': '2024.04.01 00:00:00.0000'
+  ///                       },
+  ///         'April 2024': {
+  ///                         'minDate': '2024.04.01 00:00:00.0000',
+  ///                         'maxDate': '2024.05.01 00:00:00.0000'
+  ///                       }
+  ///       }
   Map<String, Map<String, DateTime>> intervalSelectorMap = {};
-  Map<String, List<StatisticExercise>> minMaxPerExPerWorkout = {};
+
+  /// Contains as Key all Exercises name of the currently selected Workout f.e. 'Dips', 'Benchpress'.
+  /// The Entities are Object of Type StatisticExercise where one entities
+  /// contains one single set of one Exercise.
+  /// So One Exercise with 3 Sets is split into three single entities
+  Map<String, List<StatisticExercise>> exercisesPerWorkout = {};
+
+  /// Hold the currently selected Interval as plain Text which can be used
+  /// as a key to enter 'intervalSelectorMap'
   late String currentlySelectedIntervalAsText = DateFormat('MMMM y').format(DateTime.now());
   TimeInterval selectedIntervalSize = TimeInterval.monthly;
   Workout? selectedWorkout;
   Exercise? selectedExercise;
-  Map<String, Map<dynamic, dynamic>>? sortedSummarized;
+
+
+  ///
+  Map<String, int>? sortedSummarized;
 
 
   void init() async{
@@ -85,10 +103,6 @@ class CnScreenStatistics extends ChangeNotifier {
     setMinDate();
     refreshIntervalSelectorMap();
     calculateCurrentData();
-    print("INTERVALL SELECTOR MAP:");
-    for(final i in intervalSelectorMap.entries){
-      print(i);
-    }
   }
 
   void refreshIntervalSelectorMap(){
@@ -97,14 +111,14 @@ class CnScreenStatistics extends ChangeNotifier {
     late DateTime tempMinDate;
     switch (selectedIntervalSize){
       case TimeInterval.yearly:
-        tempMinDate = DateTime(minDate.year, 1, 1, 0, 0, 0);
+        tempMinDate = DateTime(minDate.year, 1, 1, 0, 0, 0, 0, 0);
         break;
       case TimeInterval.quarterly:
         final subtractionFromMonth = (minDate.month-1)%3;
-        tempMinDate = DateTime(minDate.year, minDate.month - subtractionFromMonth, 1, 0, 0, 0);
+        tempMinDate = DateTime(minDate.year, minDate.month - subtractionFromMonth, 1, 0, 0, 0, 0, 0);
         break;
       default:
-        tempMinDate = minDate.copyWith(day: 1, hour: 0, minute: 0, second: 0);
+        tempMinDate = minDate.copyWith(day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
     }
     while (isSmaller){
 
@@ -131,17 +145,19 @@ class CnScreenStatistics extends ChangeNotifier {
           ).copyWith(
               hour: 0,
               minute: 0,
-              second: 0
+              second: 0,
+              millisecond: 0,
+              microsecond: 0
           );
           break;
 
         /// quarterly new temp max date
         case TimeInterval.quarterly:
           tempMaxDate = tempMinDate.add(
-              Duration(days: getMaxDaysOfMonth(tempMinDate))
+              Duration(days: getMaxDaysOfMonths(tempMinDate))
           );
           for (num _ in range(1, 3)){
-            tempMaxDate = tempMaxDate.add(Duration(days: getMaxDaysOfMonth(tempMaxDate)));
+            tempMaxDate = tempMaxDate.add(Duration(days: getMaxDaysOfMonths(tempMaxDate)));
           }
           tempMaxDate = tempMaxDate.copyWith(hour: 0, minute: 0, second: 0);
           intervalKey = DateFormat('QQQ y').format(tempMinDate);
@@ -150,16 +166,24 @@ class CnScreenStatistics extends ChangeNotifier {
         /// monthly new temp max date
         default:
           tempMaxDate = tempMinDate.add(
-              Duration(days: getMaxDaysOfMonth(tempMinDate))
+              Duration(days: getMaxDaysOfMonths(tempMinDate))
           ).copyWith(
               hour: 0,
               minute: 0,
-              second: 0
+              second: 0,
+              millisecond: 0,
+              microsecond: 0
           );
           /// Due to German TimeCorrection in March and October it can happen, that the month is still
           /// the same, due to adding one day always adds 24 hours beeing to less in october where one day is 25 hours long
           if(tempMaxDate.month == tempMinDate.month){
-            tempMaxDate = tempMaxDate.add(const Duration(days: 1));
+            tempMaxDate = tempMaxDate.add(const Duration(days: 1)).copyWith(
+                hour: 0,
+                minute: 0,
+                second: 0,
+                millisecond: 0,
+                microsecond: 0
+            );
           }
       }
       intervalSelectorMap[intervalKey] = {
@@ -194,11 +218,12 @@ class CnScreenStatistics extends ChangeNotifier {
 
   Future<void> calculateCurrentData()async{
     // await Future.delayed(const Duration(milliseconds: 200), (){});
-    Map<String, Map> summarized = {};
+    isCalculatingData = true;
+    Map<String, int> summarized = {};
     final workouts = await getWorkoutsInInterval();
+
     for(Workout w in workouts){
-      print(w.name);
-      List<StatisticExercise> exercises = [];
+      List<StatisticExercise> exercises = exercisesPerWorkout[w.name]?? [];
       for(Exercise ex in w.exercises){
         exercises.addAll(ex.sets.map((set) =>
             StatisticExercise(
@@ -209,32 +234,40 @@ class CnScreenStatistics extends ChangeNotifier {
             )
         ));
       }
-      minMaxPerExPerWorkout[w.name] = exercises;
+      // print("ALL EXERCISES");
+      // for(final e in exercises){
+      //   print(e.name);
+      //   print(e.date);
+      //   print(e.weight);
+      //   print(e.amount);
+      //   print("");
+      // }
+      exercisesPerWorkout[w.name] = exercises;
+
       if(summarized.containsKey(w.name)){
-        summarized[w.name]!["counter"] = summarized[w.name]!["counter"] + 1;
+        summarized[w.name] = summarized[w.name]! + 1;
       } else{
-        summarized[w.name] = {"counter": 1};
+        summarized[w.name] = 1;
       }
     }
-    print("FILL SORTED SUMMARIZED");
+
     sortedSummarized = Map.fromEntries(
-        summarized.entries.toList()..sort((e1, e2) => e2.value["counter"].compareTo(e1.value["counter"]))
+        summarized.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value))
     );
-    print("SORTED SUMMARIZED= $sortedSummarized");
-    print("FILLED SORTED SUMMARIZED");
     if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty && selectedWorkout == null){
       await setSelectedWorkout(sortedSummarized!.keys.first);
     }
+
+    currentMinDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!;
+    currentMaxDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["maxDate"]!;
+
+    isCalculatingData = false;
     refresh();
+    // getSelectedExerciseHistory();
   }
 
-  Future<Map<String, Map>>? getWorkoutsInIntervalSummarized() async{
-    return sortedSummarized!;
-    // while(sortedSummarized == null){
-    //   print("--------------------------- IS NULL--------------------------------- iS NuLl ______________");
-    //   await Future.delayed(const Duration(milliseconds: 2000), (){});
-    // }
-    // return sortedSummarized!;
+  Map<String, int>? getWorkoutsInIntervalSummarized(){
+    return sortedSummarized;
   }
 
   Future setSelectedWorkout(String workoutName) async{
@@ -247,6 +280,63 @@ class CnScreenStatistics extends ChangeNotifier {
     }
   }
 
+  List<StatisticExercise>? getSelectedExerciseHistory(){
+    try{
+      final exercises = exercisesPerWorkout[selectedWorkout!.name]!
+          .where((element) => element.name == selectedExercise!.name)
+          .toList()
+          .where((element) => element.date.isAfter(currentMinDate) && element.date.isBefore(currentMaxDate))
+          .toList();
+      return exercises;
+    } on TypeError catch (_){
+      return null;
+    }
+
+  }
+
+   List<int?>? getMinMaxWeights(){
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    int minWeight = 1000000;
+    int maxWeight = 0;
+    for(StatisticExercise ex in exercises){
+      minWeight = minWeight < ex.weight? minWeight : ex.weight;
+      maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
+    }
+    if(minWeight == 1000000) minWeight = 0;
+    return [minWeight, maxWeight];
+  }
+
+  Map<DateTime, int>? getMaxWeightsPerDate(){
+    print("CURRENT MIN DATE $currentMinDate");
+    print("CURRENT MAX DATE $currentMaxDate");
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    Map<DateTime, int> maxWeights = {};
+    for(StatisticExercise ex in exercises){
+      // print("DATE: ${ex.date}");
+      final int? currentWeight = maxWeights[ex.date];
+      if(currentWeight != null){
+        maxWeights[ex.date] = currentWeight < ex.weight? ex.weight : currentWeight;
+      } else{
+        maxWeights[ex.date] = ex.weight;
+      }
+    }
+    return maxWeights;
+  }
+
+  // void setCurrentInterval(String interval){
+  //   currentlySelectedIntervalAsText = interval;
+  //   currentMinDate = intervalSelectorMap[interval]!["minDate"]!;
+  //   currentMinDate = intervalSelectorMap[interval]!["maxDate"]!;
+  // }
+
+
+
   // Future<Workout?> getWorkoutFromName(String workoutName) async{
   //   final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
   //   if(w == null) return null;
@@ -255,7 +345,7 @@ class CnScreenStatistics extends ChangeNotifier {
 
   // void getWeeksFromMonth(int year, int month) async{
   //   final firstDayOfMonth = DateTime(year=year, month, 1);
-  //   final lastDayOfMonth = DateTime(year=year, month, getMaxDaysOfMonth(firstDayOfMonth));
+  //   final lastDayOfMonth = DateTime(year=year, month, getMaxDaysOfMonths(firstDayOfMonth));
   //
   //   final DateTime firstMonday = getMondayOfWeekFromDay(firstDayOfMonth);
   //   final DateTime lastSunday = getSundayOfWeekFromDay(lastDayOfMonth);
@@ -324,7 +414,7 @@ class CnScreenStatistics extends ChangeNotifier {
     "Sun": 7,
   };
 
-  int getMaxDaysOfMonth(DateTime date){
+  int getMaxDaysOfMonths(DateTime date){
     switch (date.month){
       case 4 || 6 || 9 || 11:
         return 30;
