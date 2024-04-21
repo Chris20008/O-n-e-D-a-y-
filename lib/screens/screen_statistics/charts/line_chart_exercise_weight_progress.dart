@@ -22,8 +22,8 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   ];
 
   List<Color> gradientColors2 = [
-    Color(0xffb3b3b3),
-    Color(0xff3e3e3e),
+    const Color(0xffb3b3b3),
+    const Color(0xff3e3e3e),
   ];
 
   bool showAvg = false;
@@ -168,13 +168,13 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     // spotsTotalMovedWeight = spotsMaxWeight.map((e) => FlSpot(e.x, e.y+10)).toList();
     
 
-    print("MIN WEIGHT: $minWeight");
-    print("MAX WEIGHT: $maxWeight");
-    print("SPOTS: $spotsMaxWeight");
-    print("SPOTS: $spotsTotalMovedWeight");
-    print("MAX X: $maxX");
-    print("MAX PERCENT: $maxPercent");
-    print(cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]);
+    // print("MIN WEIGHT: $minWeight");
+    // print("MAX WEIGHT: $maxWeight");
+    // print("SPOTS: $spotsMaxWeight");
+    // print("SPOTS: $spotsTotalMovedWeight");
+    // print("MAX X: $maxX");
+    // print("MAX PERCENT: $maxPercent");
+    // print(cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]);
 
     return Column(
       children: [
