@@ -62,7 +62,9 @@ class CnScreenStatistics extends ChangeNotifier {
   // DateTime minDate = DateTime(2024, 4, 5);
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   // DateTime maxDate = DateTime(2025, 5, 26);
+  /// minDate of the currenzly selected Interval
   DateTime currentMinDate = DateTime.now();
+  /// maxDate of the currently selected Interval
   DateTime currentMaxDate = DateTime.now();
 
   /// Holds the PlainText as Key f.e. 'March 2024', 'April 2024'
@@ -80,10 +82,12 @@ class CnScreenStatistics extends ChangeNotifier {
   ///       }
   Map<String, Map<String, DateTime>> intervalSelectorMap = {};
 
-  /// Contains as Key all Exercises name of the currently selected Workout f.e. 'Dips', 'Benchpress'.
-  /// The Entities are Object of Type StatisticExercise where one entities
+  /// Contains as Key all Workout name of the currently selected Intervall f.e. 'Push', 'Pull'.
+  /// The Entities are Object of Type StatisticExercise where one entitie
   /// contains one single set of one Exercise.
   /// So One Exercise with 3 Sets is split into three single entities
+  /// Summarized we can say, that this Map holds all Sets named with the corresponding
+  /// Exercise name of all Workouts done in a selected Interval
   Map<String, List<StatisticExercise>> exercisesPerWorkout = {};
 
   /// Hold the currently selected Interval as plain Text which can be used
@@ -451,8 +455,10 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void reset(){
-    previousSelectedWorkout = selectedWorkout;
-    previousSelectedExercise = selectedExercise;
+		if(selectedWorkout != null && selectedExercise != null){
+	    previousSelectedWorkout = selectedWorkout;
+	    previousSelectedExercise = selectedExercise;
+		}
     selectedWorkout = null;
     selectedExercise = null;
     exercisesPerWorkout.clear();
