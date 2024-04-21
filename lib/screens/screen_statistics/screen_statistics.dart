@@ -29,8 +29,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
   Widget build(BuildContext context) {
 
     return SafeArea(
+      bottom: false,
       child: Column(
-      
+
         children: [
           const SizedBox(height: 10),
           const IntervalSizeSelector(),
@@ -38,16 +39,17 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           const IntervalSelector(),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               children: const [
                 SizedBox(height: 20),
                 ExerciseSummaryPerInterval(),
                 ExerciseSelector(),
                 SizedBox(height: 20,),
-                LineChartExerciseWeightProgress()
+                LineChartExerciseWeightProgress(),
+                SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -335,8 +337,6 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   Map<DateTime, int>? getMaxWeightsPerDate(){
-    print("CURRENT MIN DATE $currentMinDate");
-    print("CURRENT MAX DATE $currentMaxDate");
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
@@ -352,6 +352,22 @@ class CnScreenStatistics extends ChangeNotifier {
       }
     }
     return maxWeights;
+  }
+
+  Map<DateTime, int>? getTotalMovedWeight(){
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    Map<DateTime, int> summedWeights = {};
+    for(StatisticExercise ex in exercises){
+      summedWeights[ex.date] = (summedWeights[ex.date]?? 0) + (ex.weight*ex.amount);
+    }
+    print("TOTAL MOVED WEIGHTS");
+    for(MapEntry e in summedWeights.entries){
+      print("DATE ${e.key} WEIGHT: ${e.value}");
+    }
+    return summedWeights;
   }
 
   // void setCurrentInterval(String interval){

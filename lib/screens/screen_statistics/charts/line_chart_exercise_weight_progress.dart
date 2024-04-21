@@ -21,20 +21,36 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     Colors.amber[800]!,
   ];
 
+  List<Color> gradientColors2 = [
+    Color(0xffb3b3b3),
+    Color(0xff3e3e3e),
+  ];
+
   bool showAvg = false;
   int minWeight = 0;
   int maxWeight = 0;
+  int minTotalWeight = 0;
+  int maxTotalWeight = 0;
   int maxX = 0;
+  double minY = 0;
+  double maxY = 0;
+  double minPercent = 1;
+  double maxPercent = 1;
+  int verticalStepSize = 0;
   late DateTime minDate;
-  List<FlSpot> spots = [];
+  List<FlSpot> spotsMaxWeight = [];
+  List<FlSpot> spotsTotalMovedWeight = [];
+  Map<DateTime, int>? maxWeights;
+  Map<DateTime, int>? totalWeights;
 
   @override
   Widget build(BuildContext context) {
 
-    final minMaxWeights = cnScreenStatistics.getMinMaxWeights();
-    final Map<DateTime, int>? maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
+    // final minMaxWeights = cnScreenStatistics.getMinMaxWeights();
+    maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
+    totalWeights = cnScreenStatistics.getTotalMovedWeight();
 
-    if(minMaxWeights == null || maxWeights == null){
+    if(/*minMaxWeights == null ||*/ maxWeights == null || totalWeights == null){
       if(cnScreenStatistics.isCalculatingData){
         return const SizedBox(
             height: 100,
@@ -48,55 +64,127 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
     minWeight = 10000;
     maxWeight = 0;
-    maxWeights.forEach((key, value) {
+    maxWeights?.forEach((key, value) {
       minWeight = minWeight < value? minWeight : value;
       maxWeight = maxWeight < value? value : maxWeight;
     });
+    minPercent = minWeight / maxWeight;
+    maxPercent = 1;
 
-    // minWeight = minMaxWeights[0]!;
-    // maxWeight = minMaxWeights[1]!;
+    minTotalWeight = 10000;
+    maxTotalWeight = 0;
+    totalWeights?.forEach((key, value) {
+      minTotalWeight = minTotalWeight < value? minTotalWeight : value;
+      maxTotalWeight = maxTotalWeight < value? value : maxTotalWeight;
+    });
+
     minDate = cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]!["minDate"]!;
     
-    if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
-      spots.clear();
-      maxWeights.forEach((date, weight) {
-        spots.add(FlSpot(date.day.toDouble(), weight.toDouble()));
+    // if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
+    /// Set Spots Max Weight
+      spotsMaxWeight.clear();
+      maxWeights?.forEach((date, weight) {
+        spotsMaxWeight.add(FlSpot(date.day.toDouble(), weight.toDouble()));
       });
       maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate);
-    }
-    else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
-      spots.clear();
-      maxWeights.forEach((date, weight) {
+
+    /// Set Spots Total Moved Weight
+      spotsTotalMovedWeight.clear();
+      totalWeights?.forEach((date, totalWeight) {
+        double percent = (totalWeight*1.1) / maxTotalWeight;
+        if(percent.isNaN){
+          percent = totalWeight / maxTotalWeight;
+          if(percent.isNaN){
+            spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), 0));
+            return;
+          }
+        }
+        if(percent < minPercent){
+          minPercent = percent;
+        }
+        if(percent > maxPercent){
+          maxPercent = percent;
+        }
+        spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), maxWeight * percent));
+      });
+    // }
+    // else
+    if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
+      final List<int> daysToAddList = [];
+      maxWeights?.forEach((date, weight) {
         final distanceToFirstMonthOfQuarter = (date.month-1)%3;
-        print("DAYS TO ADD: $distanceToFirstMonthOfQuarter");
         int daysToAdd = 0;
         DateTime tempDate = date.copyWith();
-        for(final i in range(0, distanceToFirstMonthOfQuarter)){
+        for(final _ in range(0, distanceToFirstMonthOfQuarter)){
           tempDate = tempDate.copyWith(month: tempDate.month - 1);
           daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
         }
-        print("DAYS TO ADD: $daysToAdd");
-        spots.add(FlSpot((date.day + daysToAdd).toDouble(), weight.toDouble()));
+        daysToAddList.add(daysToAdd);
       });
+
+      spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
+      spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
+
       maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate)
           + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+1))
           + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+2));
     }
+    else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly){
+      final List<int> daysToAddList = [];
+      maxWeights?.forEach((date, weight) {
+        final distanceToFirstMonth = date.month-1;
+        int daysToAdd = 0;
+        DateTime tempDate = date.copyWith();
+        for(final _ in range(0, distanceToFirstMonth)){
+          tempDate = tempDate.copyWith(month: tempDate.month - 1);
+          daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
+        }
+        daysToAddList.add(daysToAdd);
+      });
+      spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
+      spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
+      maxX = 365;
+    }
 
-    if(spots.isEmpty){
+    if(spotsMaxWeight.isEmpty){
       return const SizedBox();
     }
+
+    minY = maxWeight * minPercent - 10 < 0? 0 : maxWeight * minPercent - 5;
+    maxY = maxWeight*maxPercent + 5;
+    final weightRange = maxY - minY;
+    if(weightRange < 25){
+      verticalStepSize = 2;
+    } else if (weightRange < 60){
+      verticalStepSize = 5;
+    } else if(weightRange < 100){
+      verticalStepSize = 10;
+    } else {
+      verticalStepSize = 20;
+    }
+
+
+
+    // spotsTotalMovedWeight = spotsMaxWeight.map((e) => FlSpot(e.x, e.y+10)).toList();
     
 
     print("MIN WEIGHT: $minWeight");
     print("MAX WEIGHT: $maxWeight");
-    print("SPOTS: $spots");
+    print("SPOTS: $spotsMaxWeight");
+    print("SPOTS: $spotsTotalMovedWeight");
     print("MAX X: $maxX");
+    print("MAX PERCENT: $maxPercent");
     print(cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]);
 
     return Column(
       children: [
-        const Text("Max Weight", textScaler: TextScaler.linear(1.5),),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text("Max Weight", textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
+            Text("Total Moved Weight", textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors2[0]),),
+          ],
+        ),
         const SizedBox(height: 10,),
         Stack(
           children: <Widget>[
@@ -141,39 +229,22 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
+    final style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: 16,
+      fontSize: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 10 : 16,
     );
     Widget text;
+
+    /// Monthly
     if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
-      switch (value.toInt()) {
-        case 1:
-          text = const Text('1', style: style);
-          break;
-        case 5:
-          text = const Text('5', style: style);
-          break;
-        case 10:
-          text = const Text('10', style: style);
-          break;
-        case 15:
-          text = const Text('15', style: style);
-          break;
-        case 20:
-          text = const Text('20', style: style);
-          break;
-        case 25:
-          text = const Text('25', style: style);
-          break;
-        case 30:
-          text = const Text('30', style: style);
-          break;
-        default:
-          text = const Text('', style: style);
-          break;
+      if(value.toInt() % 5 == 0){
+        text = Text(value.toInt().toString(), style: style);
+      }
+      else{
+        text = Text('', style: style);
       }
     }
+    /// Quarterly
     else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
       switch (value.toInt()) {
         case 15:
@@ -186,12 +257,18 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+2)), style: style);
           break;
         default:
-          text = const Text('', style: style);
+          text = Text('', style: style);
           break;
       }
     }
+    /// Yearly
     else{
-      text = const Text('', style: style);
+      if((value.toInt()-15) % 30 == 0){
+        text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+(value.toInt() ~/ 30))), style: style);
+      }
+      else{
+        text = Text('', style: style);
+      }
     }
 
     return SideTitleWidget(
@@ -201,76 +278,77 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
-    const style = TextStyle(
+    final style = TextStyle(
       fontWeight: FontWeight.bold,
       fontSize: 12,
+      color: gradientColors[0]
     );
     String text;
-    if(value.toInt() % 10 == 0 && value.toInt() != 0){
+    if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
       text = '${value.toInt()} KG';
     } else{
       return Container();
     }
-    // switch (value.toInt()) {
-    //   case 10:
-    //     text = '10 KG';
-    //     break;
-    //   case 30:
-    //     text = '30 kg';
-    //     break;
-    //   case 50:
-    //     text = '50 kg';
-    //     break;
-    //   case 70:
-    //     text = '70 kg';
-    //     break;
-    //   case 90:
-    //     text = '90 kg';
-    //     break;
-    //   case 110:
-    //     text = '110 kg';
-    //     break;
-    //   case 130:
-    //     text = '130 kg';
-    //     break;
-    //   case 150:
-    //     text = '150 kg';
-    //     break;
-    //   default:
-    //     return Container();
-    // }
+    return Text(text, style: style, textAlign: TextAlign.left);
+  }
 
+  Widget rightTitleWidgets(double value, TitleMeta meta) {
+    final style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 12,
+        color: gradientColors2[0]
+    );
+    String text;
+    if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
+      text = '${(((value.toInt() / ((maxWeight*maxPercent))) * (maxTotalWeight) + 5) / 1000).toStringAsFixed(2)} t';
+      // text = '${(((value.toInt() / ((maxWeight*(maxPercent/1.1))+5)) * (maxTotalWeight)) / 1000).toStringAsFixed(2)} t';
+    } else{
+      return Container();
+    }
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
   LineChartData mainData() {
     return LineChartData(
-      // lineTouchData: LineTouchData(
-      //   enabled: false
-      // ),
+      lineTouchData: LineTouchData(
+        enabled: true,
+        touchTooltipData: LineTouchTooltipData(
+          getTooltipItems: (List<LineBarSpot> spots){
+            final List<LineTooltipItem> result = spots.map((spot) => LineTooltipItem(
+                textAlign: TextAlign.left,
+                "${getSpotData(spot)} kg",
+                TextStyle(
+                  fontSize: 16,
+                  color: spot.barIndex == 0? gradientColors[0] : gradientColors2[0]
+                ))
+            ).toList();
+            return result;
+          }
+        )
+      ),
       gridData: FlGridData(
         show: true,
         drawVerticalLine: true,
-        horizontalInterval: 5,
-        verticalInterval: 5,
+        horizontalInterval: verticalStepSize.toDouble(),
+        verticalInterval: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 30 : 5,
         getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Colors.grey,
+          return FlLine(
+            color: Colors.grey[700]!.withOpacity(0.7),
             strokeWidth: 1,
           );
         },
         getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Colors.grey,
+          return FlLine(
+            color: Colors.grey[700]!.withOpacity(0.7),
             strokeWidth: 1,
           );
         },
       ),
       titlesData: FlTitlesData(
         show: true,
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
+        // rightTitles: const AxisTitles(
+        //   sideTitles: SideTitles(showTitles: false),
+        // ),
         topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
@@ -285,8 +363,17 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
+            interval: verticalStepSize.toDouble(),
             getTitlesWidget: leftTitleWidgets,
+            reservedSize: 42,
+          ),
+        ),
+        rightTitles: AxisTitles(
+          // axisNameWidget: RotatedBox(quarterTurns:1, child: Text("Test")),
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: verticalStepSize.toDouble(),
+            getTitlesWidget: rightTitleWidgets,
             reservedSize: 42,
           ),
         ),
@@ -297,16 +384,19 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       ),
       minX: 0,
       maxX: maxX.toDouble(),
-      minY: minWeight-10 < 0? 0 : minWeight-10,
-      maxY: maxWeight+10,
+      // minY: minWeight-10 < 0? 0 : minWeight-10,
+      minY: minY,
+      // maxY: maxWeight*maxPercent +10,
+      maxY: maxY,
       lineBarsData: [
         LineChartBarData(
-          spots: spots,
+          curveSmoothness: 0.1,
+          spots: spotsMaxWeight,
           isCurved: true,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
-          barWidth: 5,
+          barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
           isStrokeCapRound: true,
           dotData: const FlDotData(
             show: true,
@@ -320,8 +410,39 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             ),
           ),
         ),
+        LineChartBarData(
+          curveSmoothness: 0.1,
+          spots: spotsTotalMovedWeight,
+          isCurved: true,
+          gradient: LinearGradient(
+            colors: gradientColors2,
+          ),
+          barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
+          isStrokeCapRound: true,
+          dotData: const FlDotData(
+            show: true,
+          ),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: LinearGradient(
+              colors: gradientColors2
+                  .map((color) => color.withOpacity(0.3))
+                  .toList(),
+            ),
+          ),
+        ),
       ],
     );
+  }
+
+  String getSpotData(LineBarSpot spot){
+    Map<DateTime, int> data;
+    if(spot.barIndex == 0){
+      data = maxWeights!;
+    } else{
+      data = totalWeights!;
+    }
+    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex]}";
   }
 
   // LineChartData avgData() {
