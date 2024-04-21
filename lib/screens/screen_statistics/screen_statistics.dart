@@ -40,13 +40,14 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              children: const [
-                SizedBox(height: 20),
-                ExerciseSummaryPerInterval(),
-                ExerciseSelector(),
-                SizedBox(height: 20,),
-                LineChartExerciseWeightProgress(),
-                SafeArea(top:false, child: SizedBox(height: 30,)),
+              children: [
+                const SizedBox(height: 20),
+                const ExerciseSummaryPerInterval(),
+                const ExerciseSelector(),
+                const SizedBox(height: 20,),
+                LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
+                // LineChartExerciseWeightProgress(),
+                const SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
           ),
@@ -60,6 +61,7 @@ class CnScreenStatistics extends ChangeNotifier {
   bool isInitialized = false;
   bool isCalculatingData = false;
   Map<int, dynamic> workoutsSorted = {};
+  Key lineChartKey = UniqueKey();
   DateTime minDate = DateTime.now();
   // DateTime minDate = DateTime(2024, 4, 5);
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
@@ -265,7 +267,7 @@ class CnScreenStatistics extends ChangeNotifier {
     );
 
     /// Set selectedWorkout and selectedExercise
-    if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty && selectedWorkout == null){
+    if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty /*&& selectedWorkout == null*/){
       if(sortedSummarized!.keys.contains(previousSelectedWorkout?.name)){
         await setSelectedWorkout(previousSelectedWorkout!.name);
       } else{
@@ -288,20 +290,24 @@ class CnScreenStatistics extends ChangeNotifier {
   Future setSelectedWorkout(String workoutName) async{
     final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
     if(w != null) {
-      selectedWorkout = Workout.fromObWorkout(w);
+      final newWorkout = Workout.fromObWorkout(w);
+      if(newWorkout.name != selectedWorkout?.name && selectedWorkout != null){
+        previousSelectedWorkout = Workout.clone(selectedWorkout!);
+        lineChartKey = UniqueKey();
+      }
+      selectedWorkout = newWorkout;
       final exerciseNames = selectedWorkout?.exercises.map((e) => e.name);
 
       if(exerciseNames == null || exerciseNames.isEmpty){
         return;
       }
 
-      if(selectedExercise == null && exerciseNames.contains(previousSelectedExercise?.name)){
+      if(/*selectedExercise == null &&*/ exerciseNames.contains(previousSelectedExercise?.name)){
         selectedExercise = previousSelectedExercise;
       }
       else{
         selectedExercise = selectedWorkout?.exercises.first;
       }
-
     } else{
       selectedWorkout = null;
     }
@@ -475,8 +481,8 @@ class CnScreenStatistics extends ChangeNotifier {
 	    previousSelectedWorkout = selectedWorkout;
 	    previousSelectedExercise = selectedExercise;
 		}
-    selectedWorkout = null;
-    selectedExercise = null;
+    // selectedWorkout = null;
+    // selectedExercise = null;
     exercisesPerWorkout.clear();
   }
 

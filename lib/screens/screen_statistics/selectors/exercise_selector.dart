@@ -35,6 +35,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       ),
     );
     // setState(() {});
+    cnScreenStatistics.lineChartKey = UniqueKey();
     cnScreenStatistics.refresh();
   }
 
