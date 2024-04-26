@@ -20,7 +20,6 @@ import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
-bool objectboxIsInitialized = false;
 
 void main() {
 
@@ -104,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initObjectBox() async{
     objectbox = await ObjectBox.create();
-    objectboxIsInitialized = true;
     print("Obejctbox Initialized");
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
@@ -115,16 +113,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
-    // cnHomepage.initSpotifyBar(cnSpotifyBar);
-    // cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
 
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //   title: Text(widget.title),
-      // ),
       body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -191,6 +183,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 )
               else
                 const ScreenStatistics(),
+              // const Align(
+              //     alignment: Alignment.bottomCenter,
+              //     child: BottomMenu()
+              // ),
               const StandardPopUp()
             ],
           ),

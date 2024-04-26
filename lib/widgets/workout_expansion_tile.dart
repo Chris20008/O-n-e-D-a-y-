@@ -179,7 +179,11 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
       animationKey: startWorkoutKey,
       confirmText: "Yes",
       cancelText: "No",
-      onConfirm: () => cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout)),
+      onConfirm: () {
+        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+        });
+      },
       padding: const EdgeInsets.only(top: 20),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5),
