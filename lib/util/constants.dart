@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,47 @@ final testdata = {
     "ChestFlys": [7, 6, 5, 4, 3, 2]
   }
 };
+
+Widget blurredIconButton({required Icon icon, Function()? onPressed, Key? key}){
+  Widget iconButton = IconButton(
+    key: key,
+    iconSize: 25,
+    onPressed: onPressed,
+    icon: icon,
+  );
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(40),
+    child: Container(
+      height: 40,
+      width: 40,
+      color: Colors.grey.withOpacity(0.3),
+      child: FutureBuilder(
+        future: test(iconButton),
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            return snapshot.data!;
+          }
+          return iconButton;
+        },
+      ),
+    ),
+  );
+}
+
+Future<Widget> computeBlurredBackground(Widget child) async{
+  return BackdropFilter(
+    filter: ImageFilter.blur(
+        sigmaX: 10.0,
+        sigmaY: 10.0,
+        tileMode: TileMode.mirror
+    ),
+    child: child
+  );
+}
+
+Future<Widget> test(Widget child) async{
+  return await computeBlurredBackground(child);
+}
 
 enum TimeInterval {
   monthly ("Monthly"),

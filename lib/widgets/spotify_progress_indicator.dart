@@ -1,6 +1,5 @@
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
@@ -9,34 +8,33 @@ import 'package:spotify_sdk/spotify_sdk.dart';
 class SpotifyProgressIndicator extends StatefulWidget {
   final PlayerState? data;
   const SpotifyProgressIndicator({super.key, this.data});
-  // const SpotifyProgressIndicator({super.key});
 
   @override
   State<SpotifyProgressIndicator> createState() => _SpotifyProgressIndicatorState();
 }
 
 class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
-  bool doRefresh = true;
-  double? currentWidthPercent;
-  int? remainingDuration;
+  bool _doRefresh = true;
+  double? _currentWidthPercent;
+  int _delayStartPeriodicRefreshing = 250;
+  final double _height = 2;
+
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  int delayStartPeriodicRefreshing = 250;
-  final double height = 2;
 
 
   @override
   void initState() {
     try{
       if(widget.data != null){
-        currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
+        _currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
       }
       if (cnStopwatchWidget.isOpened){
-        delayStartPeriodicRefreshing = delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
+        _delayStartPeriodicRefreshing = _delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
       }
     }
     on Exception catch (_) {}
-    Future.delayed(Duration(milliseconds: delayStartPeriodicRefreshing), (){
+    Future.delayed(Duration(milliseconds: _delayStartPeriodicRefreshing), (){
       periodicRefresh();
     });
     super.initState();
@@ -44,13 +42,13 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
 
   void periodicRefresh() async{
     Future.delayed(const Duration(milliseconds: 500), ()async{
-      if(doRefresh && cnSpotifyBar.isConnected){
+      if(_doRefresh && cnSpotifyBar.isConnected){
         try{
           final data = await SpotifySdk.getPlayerState();
           /// check if doRefresh is still true, cause it could have changed to false during 'await'
-          if (doRefresh && data != null && !data.isPaused){
+          if (_doRefresh && data != null && !data.isPaused){
             setState(() {
-              currentWidthPercent = data.playbackPosition / data.track!.duration;
+              _currentWidthPercent = data.playbackPosition / data.track!.duration;
               periodicRefresh();
             });
           }
@@ -63,7 +61,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
 
   @override
   void dispose() {
-    doRefresh = false;
+    _doRefresh = false;
     super.dispose();
   }
 
@@ -74,15 +72,15 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
         builder: (context, constraints){
 
           return Container(
-            height: height,
+            height: _height,
             width: constraints.maxWidth,
             color: Colors.grey[350],
             child: Align(
               alignment: Alignment.centerLeft,
-              child: currentWidthPercent != null
+              child: _currentWidthPercent != null
                 ?Container(
-                  height: 1.5,
-                  width: constraints.maxWidth * currentWidthPercent!,
+                  height: _height,
+                  width: constraints.maxWidth * _currentWidthPercent!,
                   color: Colors.amber[800])
                 :const SizedBox(),
             ),

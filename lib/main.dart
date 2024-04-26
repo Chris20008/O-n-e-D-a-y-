@@ -147,35 +147,50 @@ class _MyHomePageState extends State<MyHomePage> {
               //     child: cnSpotifyBar.lastImage
               // ),
               // const BackgroundImage(),
+              // if(cnBottomMenu.index != 2)
+              //   AnimatedCrossFade(
+              //       firstChild: const ScreenWorkoutHistory(),
+              //       secondChild: const ScreenWorkout(),
+              //       crossFadeState: cnBottomMenu.index == 0?
+              //       CrossFadeState.showFirst:
+              //       CrossFadeState.showSecond,
+              //       duration: const Duration(milliseconds: 200)
+              //   )
+              // else
+              //   const ScreenStatistics(),
+              //
+              // if(cnBottomMenu.index != 2)
+
               if(cnBottomMenu.index != 2)
-                AnimatedCrossFade(
-                    firstChild: const ScreenWorkoutHistory(),
-                    secondChild: const ScreenWorkout(),
-                    crossFadeState: cnBottomMenu.index == 0?
-                    CrossFadeState.showFirst:
-                    CrossFadeState.showSecond,
-                    duration: const Duration(milliseconds: 200)
+                Stack(
+                  children: [
+                    AnimatedCrossFade(
+                        firstChild: const ScreenWorkoutHistory(),
+                        secondChild: const ScreenWorkout(),
+                        crossFadeState: cnBottomMenu.index == 0?
+                        CrossFadeState.showFirst:
+                        CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 200)
+                    ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300), // Animationsdauer
+                      transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                      curve: Curves.easeInOut,
+                      child: const SafeArea(
+                        top: false,
+                        child: Hero(
+                            transitionOnUserGestures: true,
+                            tag: "SpotifyBar",
+                            child: SpotifyBar()
+                        ),
+                      ),
+                    ),
+                    const NewWorkOutPanel(),
+                    const NewExercisePanel(),
+                  ],
                 )
               else
                 const ScreenStatistics(),
-
-              if(cnBottomMenu.index != 2)
-                AnimatedContainer(
-                    duration: const Duration(milliseconds: 300), // Animationsdauer
-                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                    curve: Curves.easeInOut,
-                    child: const SafeArea(
-                      top: false,
-                      child: Hero(
-                          transitionOnUserGestures: true,
-                          tag: "SpotifyBar",
-                          child: SpotifyBar()
-                      ),
-                    ),
-                ),
-              // cnSpotifyBar.bar,
-              const NewWorkOutPanel(),
-              const NewExercisePanel(),
               const StandardPopUp()
             ],
           ),

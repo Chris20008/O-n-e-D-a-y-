@@ -15,7 +15,7 @@ class StandardPopUp extends StatefulWidget {
 
 class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 200),
+    duration: Duration(milliseconds: cnStandardPopUp.animationTime),
     vsync: this,
   );
   late final Animation<double> _animation = CurvedAnimation(
@@ -73,11 +73,11 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
             crossFadeState: !cnStandardPopUp.isVisible?
               CrossFadeState.showFirst:
               CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 200),
+            duration: Duration(milliseconds: cnStandardPopUp.animationTime),
         ),
         AnimatedContainer(
           alignment: Alignment.center,
-          duration: Duration(milliseconds: cnStandardPopUp.jump? 0 : 200), // Animationsdauer
+          duration: Duration(milliseconds: cnStandardPopUp.jump? 0 : cnStandardPopUp.animationTime), // Animationsdauer
           transform: Matrix4.translationValues(!cnStandardPopUp.isVisible && cnStandardPopUp.pos != null? cnStandardPopUp.pos!.dx - size.width/2 : 0, !cnStandardPopUp.isVisible? (cnStandardPopUp.pos?.dy?? size.height) - size.height/2 : 0, cnStandardPopUp.isVisible? 100 : 0),
           // curve: cnStandardPopUp.isVisible? Curves.decelerate: Curves.easeInBack,
           child: ScaleTransition(
@@ -180,6 +180,7 @@ class CnStandardPopUp extends ChangeNotifier {
   Offset? pos;
   bool jump = true;
   Color color = Colors.black;
+  int animationTime = 200;
 
   void open({
     required Widget child,

@@ -45,28 +45,28 @@ class _BottomMenuState extends State<BottomMenu> {
       return const SizedBox();
     }
 
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-            sigmaX: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
-            sigmaY: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
-            tileMode: TileMode.mirror
-        ),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 0), // Animationsdauer
-          transform: Matrix4.translationValues(0, cnBottomMenu.positionYAxis, 0),
-          curve: Curves.easeInOut,
-          height: cnBottomMenu.height,
-          decoration: BoxDecoration(
-              color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
-              gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
-                  colors: [
-                    Color(0xff160d05),
-                    Color(0xff0a0604),
-                  ]
-              ) : null
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 0),
+      transform: Matrix4.translationValues(0, cnBottomMenu.positionYAxis, 0),
+      curve: Curves.easeInOut,
+      height: cnBottomMenu.height,
+      decoration: BoxDecoration(
+          color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
+          gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
+              begin: Alignment.centerRight,
+              end: Alignment.centerLeft,
+              colors: [
+                Color(0xff160d05),
+                Color(0xff0a0604),
+              ]
+          ) : null
+      ),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+              sigmaX: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
+              sigmaY: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
+              tileMode: TileMode.mirror
           ),
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -77,30 +77,26 @@ class _BottomMenuState extends State<BottomMenu> {
             ),
             child: BottomNavigationBar(
               backgroundColor: Colors.transparent,
-                  // backgroundColor: Color(0xFF150E0A),
-              // backgroundColor: Color(0xFF0D0805),
-              // backgroundColor: Color(0xFF110E0C),
-              // backgroundColor: cnNewWorkout.minPanelHeight == 0 && cnNewWorkout.panelController.isPanelClosed ? Color(0xffffff) : Color(0xFF151515),
-                  elevation: 0,
-                  showSelectedLabels: true,
-                  showUnselectedLabels: false,
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.history),
-                      label: 'History',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.sports_martial_arts),
-                      label: 'Templates',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.scatter_plot),
-                      label: 'Statistics',
-                    ),
-                  ],
-                  currentIndex: cnBottomMenu._selectedIndex,
-                  selectedItemColor: Colors.amber[800],
-                  onTap: changeIndex,
+              elevation: 0,
+              showSelectedLabels: true,
+              showUnselectedLabels: false,
+              items: const <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.history),
+                  label: 'History',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.sports_martial_arts),
+                  label: 'Templates',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.scatter_plot),
+                  label: 'Statistics',
+                ),
+              ],
+              currentIndex: cnBottomMenu._selectedIndex,
+              selectedItemColor: Colors.amber[800],
+              onTap: changeIndex,
             ),
           ),
         ),
