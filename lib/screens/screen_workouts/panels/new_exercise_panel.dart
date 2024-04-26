@@ -355,20 +355,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   ),
                   /// bottom row with icons
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10, left: 30, right: 30),
+                    padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
                     child: Align(
                       alignment: Alignment.bottomCenter,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          blurredIconButton(
+                          myIconButton(
                               icon: const Icon(Icons.close),
                               onPressed: () {
                                 cnNewExercise.closePanel(doClear: true);
                                 cnNewExercise._formKey.currentState?.reset();
                               },
                           ),
-                          blurredIconButton(
+                          myIconButton(
                               icon: const Icon(Icons.check),
                               onPressed: closePanelAndSaveExercise
                           )

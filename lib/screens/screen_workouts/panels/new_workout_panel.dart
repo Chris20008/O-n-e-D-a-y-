@@ -135,64 +135,118 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         ),
                       ),
 
-                      // /// faded box bottom screen
-                      // Align(
-                      //   alignment: Alignment.bottomCenter,
-                      //   child: Container(
-                      //     height: 60,
-                      //     decoration: const BoxDecoration(
-                      //         gradient:  LinearGradient(
-                      //             begin: Alignment.topCenter,
-                      //             end: Alignment.bottomCenter,
-                      //             colors: [
-                      //               Colors.transparent,
-                      //               Colors.black,
-                      //             ]
-                      //         )
-                      //     ),
-                      //   ),
-                      // ),
-                      //
-                      // /// bottom row with icons
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 10, left: 30, right: 30),
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      /// faded box bottom screen
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          height: 70,
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
                             children: [
-                              blurredIconButton(
-                                  icon: const Icon(Icons.close),
-                                  onPressed: onCancel
-                              ),
-                              if(cnNewWorkout.isUpdating)
-                                blurredIconButton(
-                                  key: deleteWorkoutKey,
-                                  icon:const Icon(Icons.delete_forever),
-                                  onPressed: (){
-                                    cnStandardPopUp.open(
-                                        child: const Text(
-                                          "Do you really want to Delete this workout?",
-                                          textAlign: TextAlign.center,
-                                          textScaleFactor: 1.2,
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                        onConfirm: onDelete,
-                                        onCancel: (){},
-                                        animationKey: deleteWorkoutKey,
-                                        color: Color(0xff2d2d2d)
-                                      // pos: Offset(position.dx + width/2, position.dy + height/2)
-                                    );
-                                  },
+                              Positioned(
+                                bottom: 14.8,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 55,
+                                  decoration: const BoxDecoration(
+                                      gradient:  LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black,
+                                          ]
+                                      )
+                                  ),
                                 ),
-                              blurredIconButton(
-                                  icon: const Icon(Icons.check),
-                                  onPressed: onConfirm
+                              ),
+                              Container(
+                                height: 15,
+                                color: Colors.black,
+                              ),
+                              /// bottom row with icons
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    myIconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: onCancel
+                                    ),
+                                    if(cnNewWorkout.isUpdating)
+                                      myIconButton(
+                                        key: deleteWorkoutKey,
+                                        icon:const Icon(Icons.delete_forever),
+                                        onPressed: (){
+                                          cnStandardPopUp.open(
+                                              child: const Text(
+                                                "Do you really want to Delete this workout?",
+                                                textAlign: TextAlign.center,
+                                                textScaleFactor: 1.2,
+                                                style: TextStyle(color: Colors.white),
+                                              ),
+                                              onConfirm: onDelete,
+                                              onCancel: (){},
+                                              animationKey: deleteWorkoutKey,
+                                              color: Color(0xff2d2d2d)
+                                            // pos: Offset(position.dx + width/2, position.dy + height/2)
+                                          );
+                                        },
+                                      ),
+                                    myIconButton(
+                                        icon: const Icon(Icons.check),
+                                        onPressed: onConfirm
+                                    )
+                                  ],
+                                ),
                               )
                             ],
                           ),
                         ),
-                      )
+                      ),
+
+                      // /// bottom row with icons
+                      // Padding(
+                      //   padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
+                      //   child: Align(
+                      //     alignment: Alignment.bottomCenter,
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //       children: [
+                      //         myIconButton(
+                      //             icon: const Icon(Icons.close),
+                      //             onPressed: onCancel
+                      //         ),
+                      //         if(cnNewWorkout.isUpdating)
+                      //           myIconButton(
+                      //             key: deleteWorkoutKey,
+                      //             icon:const Icon(Icons.delete_forever),
+                      //             onPressed: (){
+                      //               cnStandardPopUp.open(
+                      //                   child: const Text(
+                      //                     "Do you really want to Delete this workout?",
+                      //                     textAlign: TextAlign.center,
+                      //                     textScaleFactor: 1.2,
+                      //                     style: TextStyle(color: Colors.white),
+                      //                   ),
+                      //                   onConfirm: onDelete,
+                      //                   onCancel: (){},
+                      //                   animationKey: deleteWorkoutKey,
+                      //                   color: Color(0xff2d2d2d)
+                      //                 // pos: Offset(position.dx + width/2, position.dy + height/2)
+                      //               );
+                      //             },
+                      //           ),
+                      //         myIconButton(
+                      //             icon: const Icon(Icons.check),
+                      //             onPressed: onConfirm
+                      //         )
+                      //       ],
+                      //     ),
+                      //   ),
+                      // )
                     ],
                   ),
                 ),
@@ -235,139 +289,141 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   Widget getHeader(){
     return ClipRRect(
-      child: Container(
-        // height: 250,
-        // width: double.maxFinite,
-        color: Colors.black26,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              alignment: Alignment.topCenter,
+      child: Column(
+        children: [
+          Container(
+            color: const Color(0xff0a0604),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Column(
+                Stack(
+                  alignment: Alignment.topCenter,
                   children: [
-                    Container(
-                      height: 2,
-                      width: 40,
-                      decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(2)
-                      ),
+                    Column(
+                      children: [
+                        Container(
+                          height: 2,
+                          width: 40,
+                          decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(2)
+                          ),
+                        ),
+                        const SizedBox(height: 15,),
+                        const Text("Workout", textScaleFactor: 1.5),
+                        const SizedBox(height: 10,),
+                      ],
                     ),
-                    const SizedBox(height: 15,),
-                    const Text("Workout", textScaleFactor: 1.5),
-                    const SizedBox(height: 10,),
+                    /// Button to completely close workout when it is minimized
+                    /// currently not working in first build, because panelController is then not attached
+                    // if (cnNewWorkout.panelController.isPanelClosed)
+                    //   Align(
+                    //     alignment: Alignment.centerRight,
+                    //     child: IconButton(
+                    //         onPressed: onCancel,
+                    //         icon: const Icon(Icons.close)
+                    //     ),
+                    //   )
                   ],
                 ),
-                /// Button to completely close workout when it is minimized
-                /// currently not working in first build, because panelController is then not attached
-                // if (cnNewWorkout.panelController.isPanelClosed)
-                //   Align(
-                //     alignment: Alignment.centerRight,
-                //     child: IconButton(
-                //         onPressed: onCancel,
-                //         icon: const Icon(Icons.close)
-                //     ),
-                //   )
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: SizedBox(
-                    height: 50,
-                    child: TextField(
-                      onTap: ()async{
-                        if(cnNewWorkout.panelController.isPanelClosed){
-                          Future.delayed(const Duration(milliseconds: 300), (){
-                            cnNewWorkout.panelController.open();
-                          });
-                        }
-                      },
-                      controller: cnNewWorkout.workoutNameController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        labelText: 'Name',
-                      ),
-                      onChanged: (value){
-                        cnNewWorkout.workout.name = value;
-                      },
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 5,),
-                if(cnNewWorkout.workout.isTemplate)
-                  SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: IconButton(
-                      key: addLinkKey,
-                      onPressed: ()async{
-                        if(cnNewWorkout.panelController.isPanelClosed){
-                          await cnNewWorkout.panelController.open();
-                        }
-                        cnStandardPopUp.open(
-                            child: TextField(
-                              maxLength: 15,
-                              textAlignVertical: TextAlignVertical.center,
-                              keyboardType: TextInputType.text,
-                              controller: cnNewWorkout.linkNameController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                isDense: true,
-                                labelText: 'Group Name',
-                                counterText: "",
-                              ),
-                              onChanged: (value){},
-                            ),
-                            onConfirm: (){
-                              final linkName = cnNewWorkout.linkNameController.text;
-                              if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
-                                cnNewWorkout.workout.linkedExercises.add(linkName);
-                                cnNewWorkout.updateExercisesAndLinksList();
-                                cnNewWorkout.updateExercisesLinks();
-                                cnNewWorkout.refresh();
-                              }
-                              cnNewWorkout.linkNameController.clear();
-                              Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                FocusScope.of(context).unfocus();
+                Row(
+                  children: [
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: TextField(
+                          onTap: ()async{
+                            if(cnNewWorkout.panelController.isPanelClosed){
+                              Future.delayed(const Duration(milliseconds: 300), (){
+                                cnNewWorkout.panelController.open();
                               });
-                            },
-                            onCancel: cnNewWorkout.linkNameController.clear,
-                            animationKey: addLinkKey,
-                            color: Color(0xff2d2d2d)
-                        );
-                      },
-                      icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
+                            }
+                          },
+                          controller: cnNewWorkout.workoutNameController,
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            labelText: 'Name',
+                          ),
+                          onChanged: (value){
+                            cnNewWorkout.workout.name = value;
+                          },
+                        ),
                       ),
                     ),
-                  )
+                    const SizedBox(width: 5,),
+                    if(cnNewWorkout.workout.isTemplate)
+                      SizedBox(
+                        width: 50,
+                        height: 50,
+                        child: IconButton(
+                          key: addLinkKey,
+                          onPressed: ()async{
+                            if(cnNewWorkout.panelController.isPanelClosed){
+                              await cnNewWorkout.panelController.open();
+                            }
+                            cnStandardPopUp.open(
+                                child: TextField(
+                                  maxLength: 15,
+                                  textAlignVertical: TextAlignVertical.center,
+                                  keyboardType: TextInputType.text,
+                                  controller: cnNewWorkout.linkNameController,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    isDense: true,
+                                    labelText: 'Group Name',
+                                    counterText: "",
+                                  ),
+                                  onChanged: (value){},
+                                ),
+                                onConfirm: (){
+                                  final linkName = cnNewWorkout.linkNameController.text;
+                                  if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
+                                    cnNewWorkout.workout.linkedExercises.add(linkName);
+                                    cnNewWorkout.updateExercisesAndLinksList();
+                                    cnNewWorkout.updateExercisesLinks();
+                                    cnNewWorkout.refresh();
+                                  }
+                                  cnNewWorkout.linkNameController.clear();
+                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                    FocusScope.of(context).unfocus();
+                                  });
+                                },
+                                onCancel: cnNewWorkout.linkNameController.clear,
+                                animationKey: addLinkKey,
+                                color: Color(0xff2d2d2d)
+                            );
+                          },
+                          icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                            shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
+                          ),
+                        ),
+                      )
+                  ],
+                ),
+                const SizedBox(height: 25,),
+                Container(width: double.maxFinite, height: 1, color: Colors.grey[400],),
+                const SizedBox(height: 15,),
+                const Text("Exercises", textScaleFactor: 1.2),
+                // const SizedBox(height: 15,),
               ],
             ),
-            const SizedBox(height: 25,),
-            Container(width: double.maxFinite, height: 1, color: Colors.grey[400],),
-            const SizedBox(height: 15,),
-            const Text("Exercises", textScaleFactor: 1.2),
-            const SizedBox(height: 15,),
-            // Container(
-            //   height: 20,
-            //   decoration: const BoxDecoration(
-            //       gradient:  LinearGradient(
-            //           begin: Alignment.bottomCenter,
-            //           end: Alignment.topCenter,
-            //           colors: [
-            //             Colors.transparent,
-            //             Colors.black,
-            //           ]
-            //       )
-            //   ),
-            // ),
-          ],
-        ),
+          ),
+          Container(
+            height: 25,
+            decoration: const BoxDecoration(
+                gradient:  LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.transparent,
+                      Color(0xff0a0604),
+                    ]
+                )
+            ),
+          ),
+        ],
       ),
     );
   }

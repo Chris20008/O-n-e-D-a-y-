@@ -20,7 +20,7 @@ final testdata = {
   }
 };
 
-Widget blurredIconButton({required Icon icon, Function()? onPressed, Key? key}){
+Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   Widget iconButton = IconButton(
     key: key,
     iconSize: 25,
@@ -32,34 +32,52 @@ Widget blurredIconButton({required Icon icon, Function()? onPressed, Key? key}){
     child: Container(
       height: 40,
       width: 40,
-      color: Colors.grey.withOpacity(0.3),
-      child: FutureBuilder(
-        future: test(iconButton),
-        builder: (context, snapshot) {
-          if(snapshot.hasData){
-            return snapshot.data!;
-          }
-          return iconButton;
-        },
-      ),
+      // color: Colors.grey.withOpacity(0.3),
+      child: iconButton
     ),
   );
 }
 
-Future<Widget> computeBlurredBackground(Widget child) async{
-  return BackdropFilter(
-    filter: ImageFilter.blur(
-        sigmaX: 10.0,
-        sigmaY: 10.0,
-        tileMode: TileMode.mirror
-    ),
-    child: child
-  );
-}
+// Widget blurredIconButton({required Icon icon, Function()? onPressed, Key? key}){
+//   Widget iconButton = IconButton(
+//     key: key,
+//     iconSize: 25,
+//     onPressed: onPressed,
+//     icon: icon,
+//   );
+//   return ClipRRect(
+//     borderRadius: BorderRadius.circular(40),
+//     child: Container(
+//       height: 40,
+//       width: 40,
+//       color: Colors.grey.withOpacity(0.3),
+//       child: FutureBuilder(
+//         future: test(iconButton),
+//         builder: (context, snapshot) {
+//           if(snapshot.hasData){
+//             return snapshot.data!;
+//           }
+//           return iconButton;
+//         },
+//       ),
+//     ),
+//   );
+// }
 
-Future<Widget> test(Widget child) async{
-  return await computeBlurredBackground(child);
-}
+// Future<Widget> computeBlurredBackground(Widget child) async{
+//   return BackdropFilter(
+//     filter: ImageFilter.blur(
+//         sigmaX: 10.0,
+//         sigmaY: 10.0,
+//         tileMode: TileMode.mirror
+//     ),
+//     child: child
+//   );
+// }
+
+// Future<Widget> test(Widget child) async{
+//   return await computeBlurredBackground(child);
+// }
 
 enum TimeInterval {
   monthly ("Monthly"),
