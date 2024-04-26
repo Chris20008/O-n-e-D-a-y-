@@ -46,7 +46,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             child: GestureDetector(
               onTap: () {
                 if(!cnRunningWorkout.isVisible){
-                  cnRunningWorkout.isVisible = true;
+                  // cnRunningWorkout.isVisible = true;
                   // cnBottomMenu.refresh();
                   // setState(() {});
                   cnRunningWorkout.reopenRunningWorkout(context);

@@ -57,17 +57,22 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
             );
           },
             firstChild: const SizedBox(),
-            secondChild: BackdropFilter(
-              filter: ImageFilter.blur(
-                sigmaX: 5.0,
-                sigmaY: 5.0,
-              ),
-              // blendMode: BlendMode.,
-              child: Container(
-                height: size.height,
-                width: size.width,
-                // color: Colors.black.withOpacity(0.4),
-                color: Colors.transparent,
+            secondChild: GestureDetector(
+              onTap: (){
+                cnStandardPopUp.cancel();
+              },
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: 5.0,
+                  sigmaY: 5.0,
+                ),
+                // blendMode: BlendMode.,
+                child: Container(
+                  height: size.height,
+                  width: size.width,
+                  // color: Colors.black.withOpacity(0.4),
+                  color: Colors.transparent,
+                ),
               ),
             ),
             crossFadeState: !cnStandardPopUp.isVisible?
@@ -133,24 +138,26 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                             child: Text(cnStandardPopUp.confirmText)
                                         )
                                     ),
-                                    Container(
-                                      height: double.maxFinite,
-                                      width: 0.5,
-                                      color: Colors.grey[700]!.withOpacity(0.5),
-                                    ),
-                                    Expanded(
-                                        child: ElevatedButton(
-                                            onPressed: cnStandardPopUp.cancel,
-                                            style: ButtonStyle(
-                                                shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                                surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                                shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                            ),
-                                            child: const Text("Cancel")
-                                        )
-                                    ),
+                                    if(cnStandardPopUp.showCancel)
+                                      Container(
+                                        height: double.maxFinite,
+                                        width: 0.5,
+                                        color: Colors.grey[700]!.withOpacity(0.5),
+                                      ),
+                                    if(cnStandardPopUp.showCancel)
+                                      Expanded(
+                                          child: ElevatedButton(
+                                              onPressed: cnStandardPopUp.cancel,
+                                              style: ButtonStyle(
+                                                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                  // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                              ),
+                                              child: Text(cnStandardPopUp.cancelText)
+                                          )
+                                      ),
                                   ],
                                 ),
                               ),
@@ -179,6 +186,7 @@ class CnStandardPopUp extends ChangeNotifier {
   String cancelText = "Cancel";
   Offset? pos;
   bool jump = true;
+  bool showCancel = true;
   Color color = Colors.black;
   int animationTime = 200;
 
@@ -190,7 +198,8 @@ class CnStandardPopUp extends ChangeNotifier {
     String confirmText = "Ok",
     String cancelText = "Cancel",
     GlobalKey? animationKey,
-    Color? color
+    Color? color,
+    bool showCancel = true
   }){
     jump = true;
     this.onConfirm = onConfirm;
@@ -200,6 +209,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.confirmText = confirmText;
     this.cancelText = cancelText;
     this.color = color?? Colors.black;
+    this.showCancel = showCancel;
 
     if(animationKey != null){
       RenderBox? box = animationKey.currentContext?.findRenderObject() as RenderBox;

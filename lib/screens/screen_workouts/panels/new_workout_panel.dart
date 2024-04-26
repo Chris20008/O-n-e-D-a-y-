@@ -190,7 +190,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                               onConfirm: onDelete,
                                               onCancel: (){},
                                               animationKey: deleteWorkoutKey,
-                                              color: Color(0xff2d2d2d)
+                                              color: const Color(0xff2d2d2d)
                                             // pos: Offset(position.dx + width/2, position.dy + height/2)
                                           );
                                         },

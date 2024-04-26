@@ -458,46 +458,82 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   void openPopUpFinishWorkout(){
     cnStandardPopUp.open(
-        child: Column(
-          children: [
-            const Text(
-                "Finish Workout?",
-              textAlign: TextAlign.center,
-              textScaleFactor: 1.2,
-              style: TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 20,),
-            Container(
-              height: 0.5,
-              width: double.maxFinite,
-              color: Colors.grey[700]!.withOpacity(0.5),
-            ),
-            SizedBox(
-              height: 40,
-              width: double.maxFinite,
-              child: ElevatedButton(
-                  onPressed: () => finishWorkout(doUpdate: true),
-                  style: ButtonStyle(
-                      shadowColor: MaterialStateProperty.all(Colors.transparent),
-                      surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                  ),
-                  child: const Text(
-                    "Finish And Update Template"
-                  ),
-              ),
-            ),
-          ],
-      ),
+      showCancel: false,
       confirmText: "Finish",
       onConfirm: finishWorkout,
-      padding: const EdgeInsets.only(top: 20)
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        children: [
+          const Text(
+              "Finish Workout?",
+            textAlign: TextAlign.center,
+            textScaleFactor: 1.2,
+            style: TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 20,),
+          Container(
+            height: 0.5,
+            width: double.maxFinite,
+            color: Colors.grey[700]!.withOpacity(0.5),
+          ),
+          SizedBox(
+            height: 40,
+            width: double.maxFinite,
+            child: ElevatedButton(
+              onPressed: () => stopWorkout(),
+              style: ButtonStyle(
+                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+              ),
+              child: const Text(
+                  "STOP Workout"
+              ),
+            ),
+          ),
+          Container(
+            height: 0.5,
+            width: double.maxFinite,
+            color: Colors.grey[700]!.withOpacity(0.5),
+          ),
+          SizedBox(
+            height: 40,
+            width: double.maxFinite,
+            child: ElevatedButton(
+                onPressed: () => finishWorkout(doUpdate: true),
+                style: ButtonStyle(
+                    shadowColor: MaterialStateProperty.all(Colors.transparent),
+                    surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                ),
+                child: const Text(
+                  "Finish And Update Template"
+                ),
+            ),
+          ),
+        ],
+    ),
     );
+  }
+
+  void stopWorkout(){
+    cnStandardPopUp.clear();
+    Future.delayed(const Duration(milliseconds: 500), (){
+      cnRunningWorkout.isVisible = false;
+      cnRunningWorkout.clear();
+      cnHomepage.refresh();
+      cnWorkouts.refresh();
+      Future.delayed(const Duration(milliseconds: 100), (){
+        Navigator.of(context).pop();
+      });
+    });
   }
 
   void finishWorkout({bool doUpdate = false}){
     cnStandardPopUp.clear();
+    /// delay that the popup is closed
     Future.delayed(const Duration(milliseconds: 500), (){
       cnRunningWorkout.workout.refreshDate();
       cnRunningWorkout.removeNotSelectedExercises();
@@ -509,15 +545,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         }
         cnWorkouts.refreshAllWorkouts();
       }
-      cnRunningWorkout.clear();
       cnRunningWorkout.isVisible = false;
-      // cnHomepage.refresh(refreshSpotifyBar: true);
+      cnRunningWorkout.clear();
+      cnHomepage.refresh();
       cnWorkouts.refresh();
-      cnBottomMenu.refresh();
       Future.delayed(const Duration(milliseconds: 100), (){
         Navigator.of(context).pop();
-        cnHomepage.refresh();
-        cnSpotifyBar.refresh();
       });
     });
   }
