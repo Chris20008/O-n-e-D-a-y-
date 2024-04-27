@@ -168,7 +168,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                             // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                           ),
                           onPressed: () {
-                            cnStopwatchWidget.close();
+                            cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
                             cnRunningWorkout.refresh();
                           },
                           icon: Icon(
@@ -190,7 +190,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
-                    cnStopwatchWidget.open();
+                    cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
                     cnRunningWorkout.refresh();
                   },
                   icon: Icon(
@@ -258,17 +258,33 @@ class CnStopwatchWidget extends ChangeNotifier {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 
-  void open(){
+  void open({ScrollController? scrollController}){
     isOpened = true;
     refresh();
+    if(scrollController != null){
+      final currPos = scrollController.position.pixels;
+      scrollController.animateTo(
+          currPos + heightOfTimer,
+          duration: Duration(milliseconds: animationTimeStopwatch),
+          curve: Curves.easeInOut
+      );
+    }
     Future.delayed(Duration(milliseconds: animationTimeStopwatch), (){
       cnAnimatedColumn.refresh();
     });
   }
 
-  void close(){
+  void close({ScrollController? scrollController}){
     isOpened = false;
     refresh();
+    if(scrollController != null){
+      final currPos = scrollController.position.pixels;
+      scrollController.animateTo(
+          currPos - heightOfTimer,
+          duration: Duration(milliseconds: animationTimeStopwatch),
+          curve: Curves.easeInOut
+      );
+    }
     Future.delayed(Duration(milliseconds: animationTimeStopwatch), (){
       cnAnimatedColumn.refresh();
     });

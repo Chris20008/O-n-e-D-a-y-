@@ -138,7 +138,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                           initialSelection: newEx.name,
                                           onSelected: (String? value) {
                                             setState(() {
-                                              final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>); ///.whereType<List>();
+                                              final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
                                               final t = lists.map((element) => element.value.indexWhere((ex) {
                                                 return ex.name == value;
                                               })).toList().firstWhere((element) => element >=0);
@@ -374,11 +374,20 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                   child = Column(
                                     children: [
                                       child,
-                                      SizedBox(
-                                        height: cnStopwatchWidget.isOpened && viewInsetsBottom < 50
-                                            ? 70 + cnStopwatchWidget.heightOfTimer
-                                            : 70
-                                      )
+                                      AnimatedContainer(
+                                          duration: const Duration(milliseconds: 250),
+                                          height: cnStopwatchWidget.isOpened
+                                              ? 70 + cnStopwatchWidget.heightOfTimer
+                                              : 70
+                                      ),
+                                      // SizedBox(
+                                      //     height: cnStopwatchWidget.isOpened
+                                      //         ? 70 + cnStopwatchWidget.heightOfTimer
+                                      //         : 70
+                                      //   // height: cnStopwatchWidget.isOpened && viewInsetsBottom < 50
+                                      //   //     ? 70 + cnStopwatchWidget.heightOfTimer
+                                      //   //     : 70
+                                      // )
                                     ],
                                   );
                                 }

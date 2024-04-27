@@ -60,6 +60,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
             secondChild: GestureDetector(
               onTap: (){
                 cnStandardPopUp.cancel();
+                Focus.of(context).unfocus();
               },
               child: BackdropFilter(
                 filter: ImageFilter.blur(

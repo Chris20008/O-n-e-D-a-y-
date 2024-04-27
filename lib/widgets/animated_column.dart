@@ -89,7 +89,7 @@ class CnAnimatedColumn extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = false;
   int animationTimeStopwatch = 300;
-  double heightOfTimer = 250;
+  // double heightOfTimer = 250;
 
   void refresh()async{
     notifyListeners();

@@ -31,7 +31,7 @@ class SpotifyBar extends StatefulWidget {
 
 class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
 // class _SpotifyBarState extends State<SpotifyBar>{
-  late CnSpotifyBar cnSpotifyBar;
+  late CnSpotifyBar cnSpotifyBar = cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
@@ -104,20 +104,9 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     print("---------------------- Rebuild SPOTIFY BAR ----------------------");
-    cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
-
-    // if(!cnSpotifyBar.isVisible){
-    //   return const SizedBox();
-    // }
-
-    // cnSpotifyBar.isFirstScreen = isFirstScreen;
     if(cnSpotifyBar.width == 0){
       initWidths();
     }
-
-    // if(cnSpotifyBar.data != null && !cnSpotifyBar.data!.isPaused){
-    //   cnSpotifyBar.progressIndicatorKey = UniqueKey();
-    // }
 
     return Align(
       alignment: Alignment.bottomRight,
