@@ -33,7 +33,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
-  late CnRunningWorkout cnRunningWorkout;
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
   final double _setPadding = 5;
@@ -52,8 +52,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
-
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     return PopScope(

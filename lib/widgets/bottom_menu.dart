@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:io';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
   final double height = Platform.isAndroid? 60 : 50;
 
@@ -106,6 +108,9 @@ class _BottomMenuState extends State<BottomMenu> {
 
   void changeIndex(int index){
     cnBottomMenu._changeIndex(index);
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.cancel();
+    }
     if(index == 0) {
       cnWorkoutHistory.refreshAllWorkouts();
     }
