@@ -58,7 +58,11 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 );
               }
           ),
-          BannerRunningWorkout(),
+          Hero(
+              transitionOnUserGestures: true,
+              tag: "Banner",
+              child: BannerRunningWorkout()
+          ),
           Container(
             height: double.maxFinite,
             width: double.maxFinite,
@@ -154,6 +158,23 @@ class CnWorkouts extends ChangeNotifier {
   Key key = UniqueKey();
   List<bool> opened = [];
   ScrollController scrollController = ScrollController();
+  late CnSpotifyBar cnSpotifyBar;
+
+  CnWorkouts(BuildContext context){
+    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  }
+
+  // void refreshSpotifyBarDelayed(){
+  //   Future.delayed(const Duration(milliseconds:500), (){
+  //     // if(!cnSpotifyBar.isVisible){
+  //     //   // cnSpotifyBar.setVisibility(true);
+  //     // }
+  //     Future.delayed(const Duration(milliseconds:500), (){
+  //       cnSpotifyBar.seekToRelative(1);
+  //       // cnSpotifyBar.refresh();
+  //     });
+  //   });
+  // }
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();

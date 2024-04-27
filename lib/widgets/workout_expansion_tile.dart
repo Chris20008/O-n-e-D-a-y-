@@ -1,4 +1,5 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -36,7 +37,9 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
+  final startWorkoutKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +72,10 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                     if(!widget.workout.isTemplate)
                       Text(
                         DateFormat('E. d. MMMM').format(widget.workout.date!),
-                        textScaleFactor: 0.8,
+                        textScaler: const TextScaler.linear(0.8),
                         style: const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.w100
+                            fontWeight: FontWeight.w200
                         ),
                       ),
                     Row(
@@ -82,26 +85,32 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                             child: ExerciseNameText(
                                 widget.workout.name,
                                 maxLines: 1,
-                                fontsize: 26,
+                                fontSize: 26,
                                 minFontSize: 20
                             )
                         ),
                         if(widget.workout.isTemplate)
                           IconButton(
+                              key: startWorkoutKey,
                               onPressed: () {
-                                cnRunningWorkout.isVisible = true;
-                                cnBottomMenu.refresh();
-                                if(cnRunningWorkout.isRunning){
-                                  cnWorkouts.refresh();
-                                }else{
-                                  Future.delayed(const Duration(milliseconds: 1000), (){
-                                    cnWorkouts.refresh();
-                                  });
+                                if(!cnRunningWorkout.isRunning){
+                                  cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                                 }
-                                cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+                                else{
+                                  if(cnRunningWorkout.workout.name == widget.workout.name){
+                                    cnRunningWorkout.reopenRunningWorkout(context);
+                                  }
+                                  else{
+                                    openPopUp(widget.workout.name);
+                                  }
+                                }
                               },
                               icon: Icon(Icons.play_arrow,
-                                color: Colors.grey.withOpacity(0.4),
+                                color: !cnRunningWorkout.isRunning
+                                    ? Colors.grey.withOpacity(0.4)
+                                    : cnRunningWorkout.workout.name == widget.workout.name
+                                      ? (Colors.amber[800]?? Colors.orange).withOpacity(0.8)
+                                      : Colors.grey.withOpacity(0.2)
                               )
                           ),
                         IconButton(
@@ -119,16 +128,30 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           children: [
                             const Spacer(flex: 1,),
                             Expanded(
-                              flex: 3,
+                              flex: 5,
                               child: Wrap(
                                 alignment: WrapAlignment.end,
                                 runAlignment: WrapAlignment.end,
                                 children: [
                                   for (Exercise ex in widget.workout.exercises)
                                     if(ex == widget.workout.exercises.last)
-                                      Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                      ExerciseNameText(
+                                          ex.name,
+                                          maxLines: 1,
+                                          fontSize: 15,
+                                          minFontSize: 15,
+                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                      )
+                                      // Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                     else
-                                      Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                      ExerciseNameText(
+                                          "${ex.name}, ",
+                                          maxLines: 1,
+                                          fontSize: 15,
+                                          minFontSize: 15,
+                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                      )
+                                      // Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                 ],
                               ),
                             ),
@@ -159,6 +182,44 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                 ]
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void openPopUp(String nameNewWorkout){
+    cnStandardPopUp.open(
+      color: const Color(0xff2d2d2d),
+      animationKey: startWorkoutKey,
+      confirmText: "Yes",
+      cancelText: "No",
+      onConfirm: () {
+        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+        });
+      },
+      padding: const EdgeInsets.only(top: 20),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5),
+        child: Column(
+          children: [
+            Text(
+              "Workout ${cnRunningWorkout.workout.name} is already Running",
+              textAlign: TextAlign.center,
+              textScaleFactor: 1.2,
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 10,),
+            Text(
+              "Do you want to stop the current workout and start workout $nameNewWorkout?",
+              textAlign: TextAlign.center,
+              textScaleFactor: 1.0,
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(
+              height: 20,
+            )
+          ],
         ),
       ),
     );

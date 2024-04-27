@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:fitness_app/screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
@@ -11,6 +12,7 @@ import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -18,7 +20,6 @@ import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
-bool objectboxIsInitialized = false;
 
 void main() {
 
@@ -40,16 +41,17 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers:[
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
-        ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
-        ChangeNotifierProvider(create: (context) => CnRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
+        ChangeNotifierProvider(create: (context) => CnScreenStatistics()),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
+        ChangeNotifierProvider(create: (context) => CnWorkouts(context)),
+        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
@@ -59,7 +61,10 @@ class MyApp extends StatelessWidget {
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             useMaterial3: true,
-            splashFactory: InkSparkle.splashFactory
+            splashFactory: InkSparkle.splashFactory,
+            cupertinoOverrideTheme: const CupertinoThemeData(
+              brightness: Brightness.dark
+            )
         ),
         home: const MyHomePage(title: 'Flutter Demo Home Page'),
       ),
@@ -85,6 +90,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
   // late CnBackgroundImage cnBackgroundImage;
   late CnHomepage cnHomepage;
 
@@ -97,26 +103,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initObjectBox() async{
     objectbox = await ObjectBox.create();
-    objectboxIsInitialized = true;
     print("Obejctbox Initialized");
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
+    cnScreenStatistics.init();
     print("Refreshed All Workouts");
   }
 
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
-    // cnHomepage.initSpotifyBar(cnSpotifyBar);
-    // cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
 
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      // appBar: AppBar(
-      //   backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      //   title: Text(widget.title),
-      // ),
       body: Container(
           decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -139,31 +139,54 @@ class _MyHomePageState extends State<MyHomePage> {
               //     child: cnSpotifyBar.lastImage
               // ),
               // const BackgroundImage(),
-              AnimatedCrossFade(
-                  firstChild: const ScreenWorkoutHistory(),
-                  secondChild: const ScreenWorkout(),
-                  crossFadeState: cnBottomMenu.index == 0?
-                  CrossFadeState.showFirst:
-                  CrossFadeState.showSecond,
-                  duration: const Duration(milliseconds: 200)
-              ),
-              AnimatedContainer(
-                  duration: const Duration(milliseconds: 300), // Animationsdauer
-                  transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.maxHeightBottomMenu) : 0, 0),
-                  curve: Curves.easeInOut,
-                  // child: const SpotifyBar()
-                  child: const SafeArea(
-                    top: false,
-                    child: Hero(
-                        transitionOnUserGestures: true,
-                        tag: "SpotifyBar",
-                        child: SpotifyBar()
+              // if(cnBottomMenu.index != 2)
+              //   AnimatedCrossFade(
+              //       firstChild: const ScreenWorkoutHistory(),
+              //       secondChild: const ScreenWorkout(),
+              //       crossFadeState: cnBottomMenu.index == 0?
+              //       CrossFadeState.showFirst:
+              //       CrossFadeState.showSecond,
+              //       duration: const Duration(milliseconds: 200)
+              //   )
+              // else
+              //   const ScreenStatistics(),
+              //
+              // if(cnBottomMenu.index != 2)
+
+              if(cnBottomMenu.index != 2)
+                Stack(
+                  children: [
+                    AnimatedCrossFade(
+                        firstChild: const ScreenWorkoutHistory(),
+                        secondChild: const ScreenWorkout(),
+                        crossFadeState: cnBottomMenu.index == 0?
+                        CrossFadeState.showFirst:
+                        CrossFadeState.showSecond,
+                        duration: const Duration(milliseconds: 200)
                     ),
-                  ),
-              ),
-              // cnSpotifyBar.bar,
-              const NewWorkOutPanel(),
-              const NewExercisePanel(),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300), // Animationsdauer
+                      transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                      curve: Curves.easeInOut,
+                      child: const SafeArea(
+                        top: false,
+                        child: Hero(
+                            transitionOnUserGestures: true,
+                            tag: "SpotifyBar",
+                            child: SpotifyBar()
+                        ),
+                      ),
+                    ),
+                    const NewWorkOutPanel(),
+                    const NewExercisePanel(),
+                  ],
+                )
+              else
+                const ScreenStatistics(),
+              // const Align(
+              //     alignment: Alignment.bottomCenter,
+              //     child: BottomMenu()
+              // ),
               const StandardPopUp()
             ],
           ),

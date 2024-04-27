@@ -81,3 +81,16 @@ class SingleSet{
     this.amount
   });
 }
+
+class StatisticExercise{
+  String name;
+  int weight;
+  int amount;
+  DateTime date;
+  StatisticExercise({
+    required this.name,
+    required this.weight,
+    required this.amount,
+    required this.date
+  });
+}

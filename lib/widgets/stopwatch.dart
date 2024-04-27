@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import '../screens/screen_workouts/screen_running_workout.dart';
 import 'animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
@@ -16,6 +17,7 @@ class StopwatchWidget extends StatefulWidget {
 
 class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget;
 
   double paddingLeftRight = 5;
@@ -165,8 +167,9 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                             backgroundColor: MaterialStateProperty.all(Colors.transparent),
                             // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                           ),
-                          onPressed: () async{
-                            cnStopwatchWidget.close();
+                          onPressed: () {
+                            cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
+                            cnRunningWorkout.refresh();
                           },
                           icon: Icon(
                             Icons.keyboard_arrow_down,
@@ -186,8 +189,9 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   ),
-                  onPressed: () async{
-                    cnStopwatchWidget.open();
+                  onPressed: () {
+                    cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
+                    cnRunningWorkout.refresh();
                   },
                   icon: Icon(
                     Icons.timer,
@@ -254,17 +258,34 @@ class CnStopwatchWidget extends ChangeNotifier {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 
-  void open(){
+  void open({ScrollController? scrollController}){
     isOpened = true;
     refresh();
+    if(scrollController != null){
+      final currPos = scrollController.position.pixels;
+      scrollController.animateTo(
+          currPos + heightOfTimer,
+          duration: Duration(milliseconds: animationTimeStopwatch),
+          curve: Curves.easeInOut
+      );
+    }
     Future.delayed(Duration(milliseconds: animationTimeStopwatch), (){
       cnAnimatedColumn.refresh();
     });
   }
 
-  void close(){
+  void close({ScrollController? scrollController}){
     isOpened = false;
     refresh();
+    if(scrollController != null){
+      final currPos = scrollController.position.pixels;
+      final double newPos = currPos >= heightOfTimer? currPos - heightOfTimer : 0;
+      scrollController.animateTo(
+          newPos,
+          duration: Duration(milliseconds: animationTimeStopwatch),
+          curve: Curves.easeInOut
+      );
+    }
     Future.delayed(Duration(milliseconds: animationTimeStopwatch), (){
       cnAnimatedColumn.refresh();
     });
@@ -275,7 +296,7 @@ class CnStopwatchWidget extends ChangeNotifier {
     isRunning = true;
     isPaused = false;
     refresh();
-    intervallRefresh();
+    intervalRefresh();
   }
 
   void pauseTimer(){
@@ -293,13 +314,13 @@ class CnStopwatchWidget extends ChangeNotifier {
     refresh();
   }
 
-  void intervallRefresh(){
+  void intervalRefresh(){
     Future.delayed(const Duration(milliseconds: 200), (){
       if(isRunning && !isPaused){
         if(isOpened){
           refresh();
         }
-        intervallRefresh();
+        intervalRefresh();
       }
     });
   }
