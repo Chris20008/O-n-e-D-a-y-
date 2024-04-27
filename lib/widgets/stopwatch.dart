@@ -190,8 +190,12 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
-                    cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
-                    cnRunningWorkout.refresh();
+                    final res = cnRunningWorkout.getTextControllerValues();
+                    print("TEXT CONTROLLER VALUES");
+                    print("TYPE ${res.runtimeType}");
+                    print(res);
+                    // cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
+                    // cnRunningWorkout.refresh();
                   },
                   icon: Icon(
                     Icons.timer,
@@ -255,6 +259,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   final Stopwatch stopwatch = Stopwatch();
 
   CnStopwatchWidget(BuildContext context){
+    print("NINT STOPWATCH CN");
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 

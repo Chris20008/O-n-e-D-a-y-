@@ -44,9 +44,6 @@ class ObWorkout{
 
   void addExercises(List<ObExercise> newExercises){
     exercises.addAll(newExercises);
-    // exercises.forEach((element) {
-    //   print(element.id);
-    // });
   }
 
   void save(){
@@ -58,7 +55,7 @@ class ObWorkout{
     print("Exercises length ${exercises.length}");
   }
 
-  Map asJson(){
+  Map asMap(){
     final exs = List<Map>.from(exercises.map((ex) => {
       "id": ex.id,
       "name": ex.name,

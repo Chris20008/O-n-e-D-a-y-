@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:ui';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -108,25 +106,15 @@ Widget ExerciseNameText(
 
 Future<bool> saveBackup() async{
   Directory? appDocDir = await getDirectory();
-  // if(Platform.isAndroid){
-  //   appDocDir = await getExternalStorageDirectory();
-  // }
-  // else{
-  //   appDocDir = await getApplicationDocumentsDirectory();
-  // }
   final path = appDocDir?.path;
   final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
-  // final file = File('$path/Test_Backup.txt');
-  print("FILE PATH: ${file.path}");
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
-  // print("Länge nach Split ${resultString.split(";").length}");
-  print("FINISHED WRITING FILE");
   return true;
 }
 
 List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
-  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asJson())));
+  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
   return allWorkouts;
 }
 

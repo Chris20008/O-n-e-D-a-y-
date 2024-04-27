@@ -5,6 +5,7 @@ import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.da
 import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/animated_column.dart';
 import 'package:fitness_app/widgets/background_image.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers:[
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
+        ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
@@ -91,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: true);
   // late CnBackgroundImage cnBackgroundImage;
   late CnHomepage cnHomepage;
 
@@ -103,6 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void initObjectBox() async{
     objectbox = await ObjectBox.create();
+    await cnConfig.initData();
+    cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout, context);
     print("Obejctbox Initialized");
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
@@ -113,6 +118,10 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
+    if(cnConfig.isInitialized){
+      print("show Intor");
+      print(cnConfig.config.showIntro);
+    }
 
     return Scaffold(
       extendBody: true,

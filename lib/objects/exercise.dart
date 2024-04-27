@@ -69,6 +69,37 @@ class Exercise{
   void removeEmptySets(){
     sets = sets.where((e) => e.weight != null && e.amount != null && e.weight! >= 0 && e.amount! > 0).toList();
   }
+  
+  Map asMap(){
+    return {
+    "name": name,
+    "sets": sets.map((e) => [e.weight, e.amount]).toList(),
+    "restInSeconds": restInSeconds,
+    "seatLevel": seatLevel,
+    "originalName": originalName, 
+    "linkName": linkName
+    };
+  }
+
+  Exercise? fromMap(Map data){
+    if(
+      !data.containsKey("name") ||
+        !data.containsKey("sets")||
+        !data.containsKey("restInSeconds")||
+        !data.containsKey("seatLevel")||
+        !data.containsKey("originalName")||
+        !data.containsKey("linkName")){
+      return null;
+    }
+    return Exercise(
+      name: data["name"],
+      sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1]))),
+      restInSeconds: data["restInSeconds"],
+      seatLevel: data["seatLevel"],
+      originalName: data["originalName"],
+      linkName: data["linkName"],
+    );
+  }
 
 }
 

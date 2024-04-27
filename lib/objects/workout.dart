@@ -128,13 +128,6 @@ class Workout{
 
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       exercises[existingExercises.indexOf(exercise.originalName!)] = exercise;
-      // Exercise currentExercise = exercises[existingExercises.indexOf(exercise.originalName!)];
-      // currentExercise.name = (exercise.name).toString();
-      // currentExercise.sets = List.from(exercise.sets);
-      // currentExercise.restInSeconds = exercise.restInSeconds;
-      // currentExercise.seatLevel = exercise.seatLevel;
-      // currentExercise.originalName = exercise.originalName;
-      // currentExercise.linkName = exercise.linkName;
     }
     else{
       exercises.add(
@@ -171,5 +164,36 @@ class Workout{
       objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
       objectbox.workoutBox.remove(w.id);
     }
+  }
+  
+  Map asMap(){
+    return {
+      "id": id,
+      "name": name,
+      "date": date.toString(),
+      "isTemplate": isTemplate,
+      "linkedExercises": List.from(linkedExercises),
+      "exercises": exercises.map((e) => e.asMap()).toList()
+    };
+  }
+
+  Workout? fromMap(Map data){
+    if(
+      !data.containsKey("id") ||
+      !data.containsKey("name")||
+      !data.containsKey("date")||
+      !data.containsKey("isTemplate")||
+      !data.containsKey("linkedExercises")||
+      !data.containsKey("exercises")){
+      return null;
+    }
+    return Workout(
+      id: data["id"],
+      name: data["name"],
+      date: DateTime.parse(data["date"]),
+      isTemplate: data["isTemplate"],
+      linkedExercises: List<String>.from(data["linkedExercises"]),
+      exercises: List<Exercise>.from(data["exercises"].map((e) => Exercise().fromMap(e)))
+    );
   }
 }
