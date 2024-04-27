@@ -72,10 +72,10 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                     if(!widget.workout.isTemplate)
                       Text(
                         DateFormat('E. d. MMMM').format(widget.workout.date!),
-                        textScaleFactor: 0.8,
+                        textScaler: const TextScaler.linear(0.8),
                         style: const TextStyle(
                             color: Colors.white,
-                            fontWeight: FontWeight.w100
+                            fontWeight: FontWeight.w200
                         ),
                       ),
                     Row(
@@ -85,7 +85,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                             child: ExerciseNameText(
                                 widget.workout.name,
                                 maxLines: 1,
-                                fontsize: 26,
+                                fontSize: 26,
                                 minFontSize: 20
                             )
                         ),
@@ -128,16 +128,30 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           children: [
                             const Spacer(flex: 1,),
                             Expanded(
-                              flex: 3,
+                              flex: 5,
                               child: Wrap(
                                 alignment: WrapAlignment.end,
                                 runAlignment: WrapAlignment.end,
                                 children: [
                                   for (Exercise ex in widget.workout.exercises)
                                     if(ex == widget.workout.exercises.last)
-                                      Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                      ExerciseNameText(
+                                          ex.name,
+                                          maxLines: 1,
+                                          fontSize: 15,
+                                          minFontSize: 15,
+                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                      )
+                                      // Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                     else
-                                      Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
+                                      ExerciseNameText(
+                                          "${ex.name}, ",
+                                          maxLines: 1,
+                                          fontSize: 15,
+                                          minFontSize: 15,
+                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                      )
+                                      // Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                 ],
                               ),
                             ),

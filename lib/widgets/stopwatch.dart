@@ -279,8 +279,9 @@ class CnStopwatchWidget extends ChangeNotifier {
     refresh();
     if(scrollController != null){
       final currPos = scrollController.position.pixels;
+      final double newPos = currPos >= heightOfTimer? currPos - heightOfTimer : 0;
       scrollController.animateTo(
-          currPos - heightOfTimer,
+          newPos,
           duration: Duration(milliseconds: animationTimeStopwatch),
           curve: Curves.easeInOut
       );
