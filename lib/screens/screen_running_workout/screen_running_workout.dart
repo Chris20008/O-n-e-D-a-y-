@@ -29,7 +29,7 @@ class ScreenRunningWorkout extends StatefulWidget {
 
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with TickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 200),
     vsync: this,
   );
   late final Animation<double> _animation = CurvedAnimation(
@@ -95,6 +95,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   ),
                   child: GestureDetector(
                     onTap: openPopUpFinishWorkout,
+                    // onTap: (){
+                    //   setState(() {
+                    //     showSelectorExerciseToUpdate = true;
+                    //     selectorExerciseToUpdateKey = UniqueKey();
+                    //   });
+                    // },
                     child: Container(
                       height: cnBottomMenu.height,
                       color: Colors.black.withOpacity(0.5),
@@ -456,32 +462,32 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               ),
             ),
             const StandardPopUp(),
-            // AnimatedCrossFade(
-            //   firstChild: Container(
-            //     color: Colors.black45,
-            //   ),
-            //   secondChild: const SizedBox(),
-            //   crossFadeState: showSelectorExerciseToUpdate
-            //       ? CrossFadeState.showFirst
-            //       : CrossFadeState.showSecond,
-            //   duration: const Duration(milliseconds: 200),
-            //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-            //     return Stack(
-            //       clipBehavior: Clip.none,
-            //       alignment: Alignment.center,
-            //       children: <Widget>[
-            //         Positioned(
-            //           key: bottomChildKey,
-            //           child: bottomChild,
-            //         ),
-            //         Positioned(
-            //           key: topChildKey,
-            //           child: topChild,
-            //         ),
-            //       ],
-            //     );
-            //   },
-            // ),
+            AnimatedCrossFade(
+              firstChild: Container(
+                color: Colors.black54,
+              ),
+              secondChild: const SizedBox(),
+              crossFadeState: showSelectorExerciseToUpdate
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 200),
+              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      key: bottomChildKey,
+                      child: bottomChild,
+                    ),
+                    Positioned(
+                      key: topChildKey,
+                      child: topChild,
+                    ),
+                  ],
+                );
+              },
+            ),
             ScaleTransition(
               scale: _animation,
               child: SelectorExercisesToUpdate(
@@ -601,9 +607,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             width: double.maxFinite,
             child: ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    showSelectorExerciseToUpdate = true;
-                    selectorExerciseToUpdateKey = UniqueKey();
+                  cnStandardPopUp.clear();
+                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                    setState(() {
+                      showSelectorExerciseToUpdate = true;
+                      selectorExerciseToUpdateKey = UniqueKey();
+                    });
                   });
                 },
                 style: ButtonStyle(
@@ -622,41 +631,16 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     );
   }
 
-  void stopWorkout(){
-    cnStandardPopUp.clear();
-    Future.delayed(const Duration(milliseconds: 500), (){
-      cnRunningWorkout.isVisible = false;
-      cnRunningWorkout.clear();
-      cnHomepage.refresh();
-      cnWorkouts.refresh();
-      Future.delayed(const Duration(milliseconds: 100), (){
-        Navigator.of(context).pop();
-      });
-    });
-  }
-  
-  void openSelectorExercisesToUpdate(){
-    
-  }
-
-  void finishWorkout(){
-    cnStandardPopUp.clear();
-    /// delay that the popup is closed
-    Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-      cnRunningWorkout.workout.refreshDate();
-      cnRunningWorkout.removeNotSelectedExercises();
-      cnRunningWorkout.workout.removeEmptyExercises();
-      if(cnRunningWorkout.workout.exercises.isNotEmpty){
-        cnRunningWorkout.workout.saveToDatabase();
-        cnWorkouts.refreshAllWorkouts();
-      }
+  void stopWorkout({int? time}){
+    time = time?? cnStandardPopUp.animationTime;
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.clear();
+    }
+    Future.delayed(Duration(milliseconds: time), (){
       cnRunningWorkout.isVisible = false;
       cnRunningWorkout.isRunning = false;
-      // cnRunningWorkout.clear();
       cnHomepage.refresh();
       cnWorkouts.refresh();
-      // Navigator.of(context).pop();
-      /// delayed that the rebuild of cnHomepage and cnWorkouts is finished
       Future.delayed(const Duration(milliseconds: 50), (){
         Navigator.of(context).pop();
         /// delayed that the pop context is finished, if to short, the user
@@ -665,6 +649,44 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
           cnRunningWorkout.clear();
         });
       });
+    });
+  }
+  
+  // void openSelectorExercisesToUpdate(){
+  //
+  // }
+
+  void finishWorkout(){
+    int time;
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.clear();
+      time = cnStandardPopUp.animationTime;
+    } else {
+      time = 0;
+    }
+    /// delay that the popup is closed
+    Future.delayed(Duration(milliseconds: time), (){
+      cnRunningWorkout.workout.refreshDate();
+      cnRunningWorkout.removeNotSelectedExercises();
+      cnRunningWorkout.workout.removeEmptyExercises();
+      if(cnRunningWorkout.workout.exercises.isNotEmpty){
+        cnRunningWorkout.workout.saveToDatabase();
+        cnWorkouts.refreshAllWorkouts();
+      }
+      stopWorkout(time: 0);
+      // cnRunningWorkout.isVisible = false;
+      // cnRunningWorkout.isRunning = false;
+      // cnHomepage.refresh();
+      // cnWorkouts.refresh();
+      // /// delayed that the rebuild of cnHomepage and cnWorkouts is finished
+      // Future.delayed(const Duration(milliseconds: 50), (){
+      //   Navigator.of(context).pop();
+      //   /// delayed that the pop context is finished, if to short, the user
+      //   /// will se a blank page which is not wanted
+      //   Future.delayed(const Duration(milliseconds: 500), (){
+      //     cnRunningWorkout.clear();
+      //   });
+      // });
     });
   }
 }
@@ -815,7 +837,7 @@ class CnRunningWorkout extends ChangeNotifier {
       "selectedIndexes": selectedIndexes,
     };
     cnConfig.config.cnRunningWorkout = data;
-    final res = await cnConfig.config.save();
+    await cnConfig.config.save();
   }
 
   // Map<String, List<List<dynamic>>> getTextControllerValues(){

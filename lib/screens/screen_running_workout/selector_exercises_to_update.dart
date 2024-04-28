@@ -220,8 +220,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                           workout.exercises.removeAt(index);
                                         }
                                       }
+                                      /// cancel just closes the widget
                                       widget.onCancel();
-                                      Future.delayed(const Duration(milliseconds: 400), (){
+                                      Future.delayed(const Duration(milliseconds: 200), (){
                                         widget.onConfirm();
                                         if(doUpdate){
                                           workout.updateTemplate();

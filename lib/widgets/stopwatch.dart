@@ -187,12 +187,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
-                    final res = cnRunningWorkout.getTextControllerValues();
-                    print("TEXT CONTROLLER VALUES");
-                    print("TYPE ${res.runtimeType}");
-                    print(res);
-                    // cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
-                    // cnRunningWorkout.refresh();
+                    cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
+                    cnRunningWorkout.refresh();
                   },
                   icon: Icon(
                     Icons.timer,
