@@ -38,16 +38,17 @@ class Workout{
     name: w.name,
     exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
     date: w.date,
+    linkedExercises: List.from(w.linkedExercises),
+
     id: w.id,
-    isTemplate: w.isTemplate,
-    linkedExercises: List.from(w.linkedExercises)
+    isTemplate: w.isTemplate
   );
 
   Workout.copy(Workout w): this(
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
-      linkedExercises: List.from(w.linkedExercises),
-      date: w.date
+      date: w.date,
+      linkedExercises: List.from(w.linkedExercises)
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
@@ -64,23 +65,35 @@ class Workout{
       isTemplate: w.isTemplate,
       linkedExercises: List.from(w.linkedExercises)
   );
-  
+
+  /// Updates the template workout with same name as THIS workout with THIS workouts exercises
   void updateTemplate(){
+    /// Query the database to find the template workout with the given name
     ObWorkout? template = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true).and(ObWorkout_.name.equals(name))).build().findUnique();
     if(template != null){
+      /// Find new exercises that are not already included in the template
       List<Exercise> newExercises = exercises.where((ex) => !template.exercises.map((element) => element.name).contains(ex.name)).toList();
 
+      /// Update existing exercises in the template
       for (ObExercise ex in template.exercises){
+        /// Check if the current exercise exists in the new exercises list
         if(exercises.map((e) => e.name).toList().contains(ex.name)) {
+          /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
+          /// Update amounts and weights of the existing exercise in the template
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
+          /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
       }
+      /// Add new exercises to the template
       for (Exercise ex in newExercises){
+        /// Convert Exercise to ObExercise
         ObExercise obExercise = ex.toObExercise();
+        /// Add the new exercise to the template
         template.exercises.add(obExercise);
+        /// Put the new exercise in the database
         objectbox.exerciseBox.put(obExercise);
       }
 

@@ -49,10 +49,6 @@ class ObWorkout{
   void save(){
     objectbox.workoutBox.put(this);
     objectbox.exerciseBox.putMany(exercises);
-    for(ObExercise e in exercises){
-      print(e.name);
-    }
-    print("Exercises length ${exercises.length}");
   }
 
   Map asMap(){

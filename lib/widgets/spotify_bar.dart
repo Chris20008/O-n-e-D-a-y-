@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,8 +13,8 @@ import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
-
 import '../main.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
 import 'animated_column.dart';
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';

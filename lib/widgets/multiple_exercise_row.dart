@@ -1,16 +1,19 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
 class MultipleExerciseRow extends StatelessWidget {
   final List<Exercise> exercises;
-  final double textScaleFactor;
   final EdgeInsetsGeometry? padding;
+  final double? fontSize;
+  final double? minFontSize;
 
   const MultipleExerciseRow({
     super.key,
     required this.exercises,
-    this.textScaleFactor = 1,
-    this.padding
+    this.padding,
+    this.fontSize,
+    this.minFontSize
   });
 
   final double _height = 60;
@@ -83,17 +86,21 @@ class MultipleExerciseRow extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              SizedBox(height: 5,),
+                              const SizedBox(height: 5,),
                               Align(
                                   alignment: Alignment.centerLeft,
-                                  child: Text(
+                                  child: ExerciseNameText(
                                       ex.name,
-                                      textScaleFactor: ex.name.length > 20 ? 0.8
-                                          : ex.name.length > 14 ? 1.1
-                                          : ex.name.length > 9 ? 1.3
-                                          : ex.name.length > 5 ? 1.4
-                                          : 1.5
+                                      fontSize: fontSize
                                   )
+                                  // child: Text(
+                                  //     ex.name,
+                                  //     textScaleFactor: ex.name.length > 20 ? 0.8
+                                  //         : ex.name.length > 14 ? 1.1
+                                  //         : ex.name.length > 9 ? 1.3
+                                  //         : ex.name.length > 5 ? 1.4
+                                  //         : 1.5
+                                  // )
                               ),
                             ],
                           ),

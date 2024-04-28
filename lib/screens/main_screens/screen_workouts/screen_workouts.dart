@@ -1,16 +1,16 @@
 import 'package:fitness_app/main.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../objectbox.g.dart';
-import '../../objects/workout.dart';
-import '../../util/objectbox/ob_workout.dart';
-import '../../widgets/spotify_bar.dart';
-import '../../widgets/workout_expansion_tile.dart';
+import '../../../objectbox.g.dart';
+import '../../../objects/workout.dart';
+import '../../../util/objectbox/ob_workout.dart';
+import '../../../widgets/spotify_bar.dart';
+import '../../../widgets/workout_expansion_tile.dart';
+import '../../screen_running_workout/screen_running_workout.dart';
 
 class ScreenWorkout extends StatefulWidget {
   const ScreenWorkout({super.key});
@@ -163,18 +163,6 @@ class CnWorkouts extends ChangeNotifier {
   CnWorkouts(BuildContext context){
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   }
-
-  // void refreshSpotifyBarDelayed(){
-  //   Future.delayed(const Duration(milliseconds:500), (){
-  //     // if(!cnSpotifyBar.isVisible){
-  //     //   // cnSpotifyBar.setVisibility(true);
-  //     // }
-  //     Future.delayed(const Duration(milliseconds:500), (){
-  //       cnSpotifyBar.seekToRelative(1);
-  //       // cnSpotifyBar.refresh();
-  //     });
-  //   });
-  // }
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();

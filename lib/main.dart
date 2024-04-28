@@ -1,10 +1,10 @@
 import 'dart:async';
-import 'package:fitness_app/screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/screens/screen_workout_history/screen_workout_history.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
+import 'package:fitness_app/screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/animated_column.dart';

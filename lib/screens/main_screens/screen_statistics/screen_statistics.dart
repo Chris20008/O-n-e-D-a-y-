@@ -1,18 +1,17 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
-import 'package:fitness_app/screens/screen_statistics/charts/line_chart_exercise_weight_progress.dart';
-import 'package:fitness_app/screens/screen_statistics/exercise_summary_per_interval.dart';
-import 'package:fitness_app/screens/screen_statistics/selectors/exercise_selector.dart';
-import 'package:fitness_app/screens/screen_statistics/selectors/interval_selector.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/interval_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
-
-import '../../objects/exercise.dart';
-import '../../objects/workout.dart';
-import '../../util/objectbox/ob_workout.dart';
+import '../../../objects/exercise.dart';
+import '../../../objects/workout.dart';
+import '../../../util/objectbox/ob_workout.dart';
+import 'charts/line_chart_exercise_weight_progress.dart';
+import 'exercise_summary_per_interval.dart';
 import 'selectors/interval_size_selector.dart';
 
 class ScreenStatistics extends StatefulWidget {

@@ -1,6 +1,5 @@
 import 'dart:ui';
-
-import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/animated_column.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
@@ -9,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+
 import '../../main.dart';
 import '../../objects/exercise.dart';
 import '../../objects/workout.dart';
@@ -16,6 +16,7 @@ import '../../util/constants.dart';
 import '../../widgets/bottom_menu.dart';
 import '../../widgets/spotify_bar.dart';
 import '../../widgets/standard_popup.dart';
+import '../main_screens/screen_workouts/screen_workouts.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -26,7 +27,16 @@ class ScreenRunningWorkout extends StatefulWidget {
   State<ScreenRunningWorkout> createState() => _ScreenRunningWorkoutState();
 }
 
-class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
+class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with TickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    duration: const Duration(milliseconds: 300),
+    vsync: this,
+  );
+  late final Animation<double> _animation = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.decelerate,
+  );
+
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
@@ -37,22 +47,26 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   final double _iconSize = 13;
   final double _heightOfSetRow = 50;
   final double _setPadding = 5;
+  Key selectorExerciseToUpdateKey = UniqueKey();
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
+  bool showSelectorExerciseToUpdate = false;
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), (){
-      print("-------------- REFRESH WORKOUTS --------------");
-      // cnWorkouts.refresh();
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+
+    if(showSelectorExerciseToUpdate){
+      _controller.forward();
+    } else{
+      _controller.reverse();
+    }
 
     return PopScope(
       onPopInvoked: (doPop){
@@ -60,6 +74,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           cnRunningWorkout.isVisible = false;
           cnWorkouts.refresh();
           cnRunningWorkout.cache();
+        }
+        if(cnStandardPopUp.isVisible){
+          cnStandardPopUp.clear();
         }
       },
       child: Scaffold(
@@ -125,7 +142,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                 if(newEx is! Exercise){
                                   newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                                 }
-                                Exercise lastEx = cnRunningWorkout.lastWorkout.exercises.where((element) => element.name == newEx.name).first;
+                                Exercise lastEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
                                 child = Column(
                                   children: [
                                     Align(
@@ -439,6 +456,80 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               ),
             ),
             const StandardPopUp(),
+            AnimatedCrossFade(
+              firstChild: Container(
+                color: Colors.black45,
+              ),
+              secondChild: const SizedBox(),
+              crossFadeState: showSelectorExerciseToUpdate
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 200),
+              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      key: bottomChildKey,
+                      child: bottomChild,
+                    ),
+                    Positioned(
+                      key: topChildKey,
+                      child: topChild,
+                    ),
+                  ],
+                );
+              },
+            ),
+            ScaleTransition(
+              scale: _animation,
+              child: SelectorExercisesToUpdate(
+                key: selectorExerciseToUpdateKey,
+                workout: Workout.clone(cnRunningWorkout.workout),
+                workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplate),
+                onConfirm: finishWorkout,
+                onCancel: (){
+                  setState(() {
+                    showSelectorExerciseToUpdate = false;
+                  });
+                },
+              ),
+            )
+            // AnimatedCrossFade(
+            //   firstChild: SelectorExercisesToUpdate(
+            //     key: selectorExerciseToUpdateKey,
+            //     workout: Workout.clone(cnRunningWorkout.workout),
+            //     workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplate),
+            //     onConfirm: finishWorkout,
+            //     onCancel: (){
+            //       setState(() {
+            //         showSelectorExerciseToUpdate = false;
+            //       });
+            //     },
+            //   ),
+            //   secondChild: const SizedBox(),
+            //   crossFadeState: showSelectorExerciseToUpdate
+            //     ? CrossFadeState.showFirst
+            //     : CrossFadeState.showSecond,
+            //   duration: const Duration(milliseconds: 200),
+            //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+            //     return Stack(
+            //       clipBehavior: Clip.none,
+            //       alignment: Alignment.center,
+            //       children: <Widget>[
+            //         Positioned(
+            //           key: bottomChildKey,
+            //           child: bottomChild,
+            //         ),
+            //         Positioned(
+            //           key: topChildKey,
+            //           child: topChild,
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // )
           ],
         ),
       ),
@@ -509,7 +600,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
             height: 40,
             width: double.maxFinite,
             child: ElevatedButton(
-                onPressed: () => finishWorkout(doUpdate: true),
+                onPressed: () {
+                  setState(() {
+                    showSelectorExerciseToUpdate = true;
+                    selectorExerciseToUpdateKey = UniqueKey();
+                  });
+                },
                 style: ButtonStyle(
                     shadowColor: MaterialStateProperty.all(Colors.transparent),
                     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
@@ -538,27 +634,36 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       });
     });
   }
+  
+  void openSelectorExercisesToUpdate(){
+    
+  }
 
-  void finishWorkout({bool doUpdate = false}){
+  void finishWorkout(){
     cnStandardPopUp.clear();
     /// delay that the popup is closed
-    Future.delayed(const Duration(milliseconds: 500), (){
+    Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
       cnRunningWorkout.workout.refreshDate();
       cnRunningWorkout.removeNotSelectedExercises();
       cnRunningWorkout.workout.removeEmptyExercises();
       if(cnRunningWorkout.workout.exercises.isNotEmpty){
         cnRunningWorkout.workout.saveToDatabase();
-        if(doUpdate){
-          cnRunningWorkout.workout.updateTemplate();
-        }
         cnWorkouts.refreshAllWorkouts();
       }
       cnRunningWorkout.isVisible = false;
-      cnRunningWorkout.clear();
+      cnRunningWorkout.isRunning = false;
+      // cnRunningWorkout.clear();
       cnHomepage.refresh();
       cnWorkouts.refresh();
-      Future.delayed(const Duration(milliseconds: 100), (){
+      // Navigator.of(context).pop();
+      /// delayed that the rebuild of cnHomepage and cnWorkouts is finished
+      Future.delayed(const Duration(milliseconds: 50), (){
         Navigator.of(context).pop();
+        /// delayed that the pop context is finished, if to short, the user
+        /// will se a blank page which is not wanted
+        Future.delayed(const Duration(milliseconds: 500), (){
+          cnRunningWorkout.clear();
+        });
       });
     });
   }
@@ -566,7 +671,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
 class CnRunningWorkout extends ChangeNotifier {
   Workout workout = Workout();
-  Workout lastWorkout = Workout();
+  Workout workoutTemplate = Workout();
   bool isRunning = false;
   bool isVisible = false;
   ScrollController scrollController = ScrollController();
@@ -596,7 +701,7 @@ class CnRunningWorkout extends ChangeNotifier {
   void initCachedData(Map data, BuildContext context){
     if(
       data.containsKey("workout") &&
-      data.containsKey("lastWorkout") &&
+      data.containsKey("workoutTemplate") &&
       data.containsKey("isRunning") &&
       data.containsKey("isVisible") &&
       data.containsKey("testControllerValues") &&
@@ -608,7 +713,7 @@ class CnRunningWorkout extends ChangeNotifier {
         selectedIndexes[entry.key] = entry.value;
       }
       workout = Workout().fromMap(data["workout"]) ?? Workout();
-      lastWorkout = Workout().fromMap(data["lastWorkout"]) ?? Workout();
+      workoutTemplate = Workout().fromMap(data["workoutTemplate"]) ?? Workout();
       initSlideableKeys();
       initGroupedExercises();
       initTextControllers();
@@ -624,7 +729,7 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void openRunningWorkout(BuildContext context, Workout w){
-    setLastWorkout(w);
+    setWorkoutTemplate(w);
     isRunning = true;
     Navigator.push(
         context,
@@ -651,9 +756,9 @@ class CnRunningWorkout extends ChangeNotifier {
     workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
   }
 
-  void setLastWorkout(Workout w){
-    lastWorkout = w;
-    workout = Workout.copy(lastWorkout);
+  void setWorkoutTemplate(Workout w){
+    workoutTemplate = w;
+    workout = Workout.copy(workoutTemplate);
     workout.resetAllExercisesSets();
     initSlideableKeys();
     initSelectedIndexes();
@@ -703,7 +808,7 @@ class CnRunningWorkout extends ChangeNotifier {
   Future<void> cache()async{
     Map data = {
       "workout": workout.asMap(),
-      "lastWorkout": lastWorkout.asMap(),
+      "workoutTemplate": workoutTemplate.asMap(),
       "isRunning": isRunning,
       "isVisible": isVisible,
       "testControllerValues": getTextControllerValues(),

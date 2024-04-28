@@ -1,12 +1,12 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../objects/workout.dart';
-import '../../util/objectbox/ob_workout.dart';
-import '../../widgets/workout_expansion_tile.dart';
-import '../screen_workouts/screen_running_workout.dart';
+import '../../../objects/workout.dart';
+import '../../../util/objectbox/ob_workout.dart';
+import '../../../widgets/workout_expansion_tile.dart';
+import '../screen_workouts/panels/new_workout_panel.dart';
+import '../../screen_running_workout/screen_running_workout.dart';
 
 class ScreenWorkoutHistory extends StatefulWidget {
   const ScreenWorkoutHistory({super.key});

@@ -1,14 +1,11 @@
-import 'dart:ui';
-
-import 'package:fitness_app/screens/screen_workouts/screen_workouts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
-import '../../../objects/exercise.dart';
-import '../../../util/constants.dart';
-import '../screen_running_workout.dart';
+import '../../../../objects/exercise.dart';
+import '../../../../util/constants.dart';
+import '../../../screen_running_workout/screen_running_workout.dart';
+import '../screen_workouts.dart';
 import 'new_workout_panel.dart';
 
 class NewExercisePanel extends StatefulWidget {
@@ -79,6 +76,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 borderRadius: BorderRadius.circular(2)
                             ),
                           ),
+                          const SizedBox(height: 15,),
                           const Text("Exercise", textScaleFactor: 1.5),
                           const SizedBox(height: 10,),
 

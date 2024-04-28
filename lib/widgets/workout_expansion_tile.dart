@@ -3,13 +3,12 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
 import '../main.dart';
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
-import '../screens/screen_workouts/panels/new_workout_panel.dart';
-import '../screens/screen_workouts/screen_running_workout.dart';
-import '../screens/screen_workouts/screen_workouts.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
 
@@ -173,7 +172,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           maxHeight: 1000,
                           child: MultipleExerciseRow(
                             exercises: widget.workout.exercises,
-                            textScaleFactor: 1.3,
+                            // textScaleFactor: 1.3,
                             padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                           )
                       )

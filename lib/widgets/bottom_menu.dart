@@ -5,11 +5,11 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/screen_statistics/screen_statistics.dart';
-import '../screens/screen_workout_history/screen_workout_history.dart';
-import '../screens/screen_workouts/panels/new_workout_panel.dart';
-import '../screens/screen_workouts/screen_running_workout.dart';
-import '../screens/screen_workouts/screen_workouts.dart';
+import '../screens/main_screens/screen_statistics/screen_statistics.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/main_screens/screen_workout_history/screen_workout_history.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 
 class BottomMenu extends StatefulWidget {
   const BottomMenu({super.key});

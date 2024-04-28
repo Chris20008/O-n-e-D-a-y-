@@ -1,25 +1,21 @@
-import 'dart:ui';
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fitness_app/screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
-import '../../../main.dart';
-import '../../../objects/exercise.dart';
-import '../../../objects/workout.dart';
-import '../../../util/constants.dart';
-import '../../../widgets/bottom_menu.dart';
-
-import '../../../widgets/exercise_row.dart';
-import '../../../widgets/spotify_bar.dart';
-import '../../../widgets/standard_popup.dart';
+import '../../../../main.dart';
+import '../../../../objects/exercise.dart';
+import '../../../../objects/workout.dart';
+import '../../../../util/constants.dart';
+import '../../../../widgets/bottom_menu.dart';
+import '../../../../widgets/exercise_row.dart';
+import '../../../../widgets/spotify_bar.dart';
+import '../../../../widgets/standard_popup.dart';
 import '../../screen_workout_history/screen_workout_history.dart';
-import '../screen_running_workout.dart';
+import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
+import 'new_exercise_panel.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
   const NewWorkOutPanel({super.key});
@@ -102,7 +98,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                               padding: const EdgeInsets.all(0),
                               shrinkWrap: true,
                               children: [
-                                SizedBox(height: 200,),
+                                const SizedBox(height: 200,),
                                 /// Exercises and Links
                                 ReorderableListView(
                                     scrollController: ScrollController(),
@@ -292,6 +288,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       child: Column(
         children: [
           Container(
+            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
             color: const Color(0xff0a0604),
             child: Column(
               mainAxisSize: MainAxisSize.min,

@@ -90,11 +90,13 @@ Widget ExerciseNameText(
     String name,
     {
       int maxLines = 2,
-      double fontSize = 17,
-      double minFontSize = 10,
+      double? fontSize = 17,
+      double? minFontSize = 10,
       TextStyle? style
     })
 {
+  fontSize = fontSize?? 17;
+  minFontSize = minFontSize?? 10;
   return AutoSizeText(
     name,
     maxLines: maxLines,

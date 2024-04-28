@@ -6,12 +6,18 @@ class ExerciseRow extends StatelessWidget {
   final Exercise exercise;
   final double textScaleFactor;
   final EdgeInsetsGeometry? padding;
+  final Widget? child;
+  final int flexLeft;
+  final int flexRight;
 
   const ExerciseRow({
     super.key,
     required this.exercise,
     this.textScaleFactor = 1.5,
-    this.padding
+    this.padding,
+    this.child,
+    this.flexLeft = 3,
+    this.flexRight = 7
   });
 
   @override
@@ -21,11 +27,11 @@ class ExerciseRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-              flex:3,
-              child: ExerciseNameText(exercise.name)
+              flex:flexLeft,
+              child: child?? ExerciseNameText(exercise.name)
           ),
           Expanded(
-            flex: 7,
+            flex: flexRight,
             child: SizedBox(
               height: 60,
               child: ListView(
