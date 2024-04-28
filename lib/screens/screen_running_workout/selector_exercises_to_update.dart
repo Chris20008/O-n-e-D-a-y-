@@ -25,7 +25,7 @@ class SelectorExercisesToUpdate extends StatefulWidget {
 
 class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
-  late List<bool> isCheckedList = List<bool>.generate(widget.workout.exercises.length, (index) => false);
+  late List<bool> isCheckedList;
   late Workout workout;
 
   @override
@@ -208,7 +208,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                             Expanded(
                                 child: ElevatedButton(
                                     onPressed: () {
-                                      if(isCheckedList.any((state) => state)){
+                                      bool doUpdate = isCheckedList.any((state) => state);
+                                      if(doUpdate){
                                         List<int> indexesToRemove = [];
                                         for (num index in range(isCheckedList.length)){
                                           if(isCheckedList[index.toInt()] == false){
@@ -222,7 +223,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       widget.onCancel();
                                       Future.delayed(const Duration(milliseconds: 400), (){
                                         widget.onConfirm();
-                                        workout.updateTemplate();
+                                        if(doUpdate){
+                                          workout.updateTemplate();
+                                        }
                                       });
                                     },
                                     style: ButtonStyle(

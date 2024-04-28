@@ -456,32 +456,32 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               ),
             ),
             const StandardPopUp(),
-            AnimatedCrossFade(
-              firstChild: Container(
-                color: Colors.black45,
-              ),
-              secondChild: const SizedBox(),
-              crossFadeState: showSelectorExerciseToUpdate
-                  ? CrossFadeState.showFirst
-                  : CrossFadeState.showSecond,
-              duration: const Duration(milliseconds: 200),
-              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-                return Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    Positioned(
-                      key: bottomChildKey,
-                      child: bottomChild,
-                    ),
-                    Positioned(
-                      key: topChildKey,
-                      child: topChild,
-                    ),
-                  ],
-                );
-              },
-            ),
+            // AnimatedCrossFade(
+            //   firstChild: Container(
+            //     color: Colors.black45,
+            //   ),
+            //   secondChild: const SizedBox(),
+            //   crossFadeState: showSelectorExerciseToUpdate
+            //       ? CrossFadeState.showFirst
+            //       : CrossFadeState.showSecond,
+            //   duration: const Duration(milliseconds: 200),
+            //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+            //     return Stack(
+            //       clipBehavior: Clip.none,
+            //       alignment: Alignment.center,
+            //       children: <Widget>[
+            //         Positioned(
+            //           key: bottomChildKey,
+            //           child: bottomChild,
+            //         ),
+            //         Positioned(
+            //           key: topChildKey,
+            //           child: topChild,
+            //         ),
+            //       ],
+            //     );
+            //   },
+            // ),
             ScaleTransition(
               scale: _animation,
               child: SelectorExercisesToUpdate(
