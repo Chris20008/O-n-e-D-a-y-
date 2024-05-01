@@ -1,3 +1,4 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
@@ -38,12 +39,6 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    // workout = Workout.clone(widget.workout);
-    // workout.removeEmptyExercises();
-
-    // if(workout.exercises.isEmpty){
-    //   return const SizedBox();
-    // }
 
     return Stack(
       children: [
@@ -52,9 +47,6 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
             widget.onCancel();
             isCheckedList = List<bool>.generate(widget.workout.exercises.length, (index) => false);
           },
-          // child: Container(
-          //   color: Colors.black45,
-          // ),
         ),
         Center(
           child: Padding(
@@ -92,7 +84,11 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                 children: [
                                   Row(
                                     children: [
-                                      Text(workout.exercises[index].name, textScaler: const TextScaler.linear(1.35),),
+                                      OverflowSafeText(
+                                          workout.exercises[index].name,
+                                          minFontSize: 20
+                                      ),
+                                      // Text(workout.exercises[index].name, textScaler: const TextScaler.linear(1.35),),
                                       Expanded(child: Container(color: Colors.transparent ,height: 50,),),
                                       Transform.scale(
                                         scale: 1.4,
@@ -112,27 +108,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                   Stack(
                                     children: [
                                       MultipleExerciseRow(
-                                          exercises: getExercises(index),
+                                        exercises: getExercises(index),
                                         fontSize: 15,
-                                      ),
-                                      Positioned(
-                                        right: 0,
-                                        top:0,
-                                        bottom: 0,
-                                        child: Container(
-                                          width: 40,
-                                          decoration: BoxDecoration(
-                                            gradient:  LinearGradient(
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight,
-                                                colors: [
-                                                  Theme.of(context).primaryColor.withOpacity(0.0),
-                                                  Theme.of(context).primaryColor,
-                                                ]
-                                            ),
-                                          ),
-                                          // height: 40,
-                                        ),
+                                        colorFade: Theme.of(context).primaryColor,
                                       ),
                                     ],
                                   )

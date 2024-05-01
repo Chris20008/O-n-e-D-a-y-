@@ -58,8 +58,9 @@ class _BottomMenuState extends State<BottomMenu> {
               begin: Alignment.centerRight,
               end: Alignment.centerLeft,
               colors: [
-                Color(0xff160d05),
+                // Color(0xff160d05),
                 Color(0xff0a0604),
+                Color(0xff0a0604)
               ]
           ) : null
       ),

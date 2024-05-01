@@ -86,13 +86,14 @@ enum TimeInterval {
   final String value;
 }
 
-Widget ExerciseNameText(
+Widget OverflowSafeText(
     String name,
     {
       int maxLines = 2,
       double? fontSize = 17,
       double? minFontSize = 10,
-      TextStyle? style
+      TextStyle? style,
+      TextAlign? textAlign
     })
 {
   fontSize = fontSize?? 17;
@@ -103,6 +104,7 @@ Widget ExerciseNameText(
     style: style?? TextStyle(fontSize: fontSize, color: Colors.white),
     minFontSize: minFontSize,
     overflow: TextOverflow.ellipsis,
+    textAlign: textAlign,
   );
 }
 

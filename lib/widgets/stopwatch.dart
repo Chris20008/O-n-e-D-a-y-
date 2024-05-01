@@ -87,7 +87,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                                 width: 70,
                                                 child: Center(
                                                   child: Text(
-                                                    "Löschen",
+                                                    "Delete",
                                                     style: TextStyle(color: Color(
                                                         0xfffdfdfd)),
                                                   ),
@@ -119,7 +119,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                         onTap: cnStopwatchWidget.isPaused? cnStopwatchWidget.startTimer : cnStopwatchWidget.pauseTimer,
                                         child: Center(
                                           child: Text(
-                                            cnStopwatchWidget.isPaused? "Start" : "Stopp",
+                                            cnStopwatchWidget.isPaused? "Start" : "Stop",
                                             style: TextStyle(
                                               color: cnStopwatchWidget.isPaused? const Color(0x9627eb15) : const Color(
                                                   0xfffd443a)

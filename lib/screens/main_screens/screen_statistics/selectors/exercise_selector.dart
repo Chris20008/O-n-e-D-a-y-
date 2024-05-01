@@ -1,3 +1,4 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +74,8 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                   // });
                 },
                 children: cnScreenStatistics.selectedWorkout!.exercises.map((Exercise ex) {
-                  return Center(child: Text(ex.name));
+                  return Center(child: OverflowSafeText(ex.name, maxLines: 1, minFontSize: 12));
+                  // return Center(child: Text(ex.name));
                 }).toList()
             ),
           ),
@@ -81,12 +83,18 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                cnScreenStatistics.selectedExercise!.name,
-                style: const TextStyle(
-                  fontSize: 22.0,
-                ),
+              OverflowSafeText(
+                  cnScreenStatistics.selectedExercise!.name,
+                  style: const TextStyle(
+                    fontSize: 22.0,
+                  ),
               ),
+              // Text(
+              //   cnScreenStatistics.selectedExercise!.name,
+              //   style: const TextStyle(
+              //     fontSize: 22.0,
+              //   ),
+              // ),
               const SizedBox(width: 10,),
               const Icon(Icons.arrow_forward_ios, size: 15,)
             ],

@@ -28,7 +28,7 @@ class ExerciseRow extends StatelessWidget {
         children: [
           Expanded(
               flex:flexLeft,
-              child: child?? ExerciseNameText(exercise.name)
+              child: child?? OverflowSafeText(exercise.name)
           ),
           Expanded(
             flex: flexRight,

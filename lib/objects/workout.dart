@@ -159,6 +159,9 @@ class Workout{
       List<ObExercise> oldObExercises = existingObWorkout.exercises;
       objectbox.exerciseBox.removeMany(oldObExercises.map((e) => e.id).toList());
       existingObWorkout.name = name;
+      if(date != null){
+        existingObWorkout.date = date!;
+      }
       existingObWorkout.linkedExercises = List.from(linkedExercises);
     }
 

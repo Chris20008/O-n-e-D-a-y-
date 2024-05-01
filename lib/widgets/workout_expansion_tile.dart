@@ -81,7 +81,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                            child: ExerciseNameText(
+                            child: OverflowSafeText(
                                 widget.workout.name,
                                 maxLines: 1,
                                 fontSize: 26,
@@ -134,7 +134,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                 children: [
                                   for (Exercise ex in widget.workout.exercises)
                                     if(ex == widget.workout.exercises.last)
-                                      ExerciseNameText(
+                                      OverflowSafeText(
                                           ex.name,
                                           maxLines: 1,
                                           fontSize: 15,
@@ -143,7 +143,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                       )
                                       // Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                     else
-                                      ExerciseNameText(
+                                      OverflowSafeText(
                                           "${ex.name}, ",
                                           maxLines: 1,
                                           fontSize: 15,
@@ -188,6 +188,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
 
   void openPopUp(String nameNewWorkout){
     cnStandardPopUp.open(
+      context: context,
       color: const Color(0xff2d2d2d),
       animationKey: startWorkoutKey,
       confirmText: "Yes",
@@ -202,18 +203,17 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: Column(
           children: [
-            Text(
+            OverflowSafeText(
               "Workout ${cnRunningWorkout.workout.name} is already Running",
-              textAlign: TextAlign.center,
-              textScaleFactor: 1.2,
-              style: const TextStyle(color: Colors.white),
+              textAlign: TextAlign.center
             ),
             const SizedBox(height: 10,),
-            Text(
+            OverflowSafeText(
               "Do you want to stop the current workout and start workout $nameNewWorkout?",
+              maxLines: 6,
               textAlign: TextAlign.center,
-              textScaleFactor: 1.0,
-              style: const TextStyle(color: Colors.white),
+              fontSize: 14
+              // fontSize:
             ),
             const SizedBox(
               height: 20,

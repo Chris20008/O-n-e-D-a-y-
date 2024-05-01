@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../main.dart';
@@ -35,6 +39,30 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   final deleteWorkoutKey = GlobalKey();
   final addLinkKey = GlobalKey();
+
+  // This function displays a CupertinoModalPopup with a reasonable fixed height
+  // which hosts CupertinoDatePicker.
+  void _showDialog(Widget child) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => Container(
+        height: 216,
+        padding: const EdgeInsets.only(top: 6.0),
+        // The Bottom margin is provided to align the popup above the system
+        // navigation bar.
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        // Provide a background color for the popup.
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        // Use a SafeArea widget to avoid system overlaps.
+        child: SafeArea(
+          top: false,
+          child: child,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,10 +123,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             ListView(
                               controller: ScrollController(),
                               physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.all(0),
+                              padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
                               shrinkWrap: true,
                               children: [
-                                const SizedBox(height: 200,),
+                                SizedBox(height: cnNewWorkout.workout.isTemplate? 210 : 240,),
                                 /// Exercises and Links
                                 ReorderableListView(
                                     scrollController: ScrollController(),
@@ -177,6 +205,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                         icon:const Icon(Icons.delete_forever),
                                         onPressed: (){
                                           cnStandardPopUp.open(
+                                              context: context,
                                               child: const Text(
                                                 "Do you really want to Delete this workout?",
                                                 textAlign: TextAlign.center,
@@ -202,47 +231,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           ),
                         ),
                       ),
-
-                      // /// bottom row with icons
-                      // Padding(
-                      //   padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
-                      //   child: Align(
-                      //     alignment: Alignment.bottomCenter,
-                      //     child: Row(
-                      //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //       children: [
-                      //         myIconButton(
-                      //             icon: const Icon(Icons.close),
-                      //             onPressed: onCancel
-                      //         ),
-                      //         if(cnNewWorkout.isUpdating)
-                      //           myIconButton(
-                      //             key: deleteWorkoutKey,
-                      //             icon:const Icon(Icons.delete_forever),
-                      //             onPressed: (){
-                      //               cnStandardPopUp.open(
-                      //                   child: const Text(
-                      //                     "Do you really want to Delete this workout?",
-                      //                     textAlign: TextAlign.center,
-                      //                     textScaleFactor: 1.2,
-                      //                     style: TextStyle(color: Colors.white),
-                      //                   ),
-                      //                   onConfirm: onDelete,
-                      //                   onCancel: (){},
-                      //                   animationKey: deleteWorkoutKey,
-                      //                   color: Color(0xff2d2d2d)
-                      //                 // pos: Offset(position.dx + width/2, position.dy + height/2)
-                      //               );
-                      //             },
-                      //           ),
-                      //         myIconButton(
-                      //             icon: const Icon(Icons.check),
-                      //             onPressed: onConfirm
-                      //         )
-                      //       ],
-                      //     ),
-                      //   ),
-                      // )
                     ],
                   ),
                 ),
@@ -326,25 +314,26 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 Row(
                   children: [
                     Expanded(
-                      child: SizedBox(
-                        height: 50,
-                        child: TextField(
-                          onTap: ()async{
-                            if(cnNewWorkout.panelController.isPanelClosed){
-                              Future.delayed(const Duration(milliseconds: 300), (){
-                                cnNewWorkout.panelController.open();
-                              });
-                            }
-                          },
-                          controller: cnNewWorkout.workoutNameController,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            labelText: 'Name',
-                          ),
-                          onChanged: (value){
-                            cnNewWorkout.workout.name = value;
-                          },
+                      child: TextField(
+                        onTap: ()async{
+                          if(cnNewWorkout.panelController.isPanelClosed){
+                            Future.delayed(const Duration(milliseconds: 300), (){
+                              cnNewWorkout.panelController.open();
+                            });
+                          }
+                        },
+                        style: const TextStyle(
+                          fontSize: 20
                         ),
+                        controller: cnNewWorkout.workoutNameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          labelText: 'Name',
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                        ),
+                        onChanged: (value){
+                          cnNewWorkout.workout.name = value;
+                        },
                       ),
                     ),
                     const SizedBox(width: 5,),
@@ -353,22 +342,29 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         width: 50,
                         height: 50,
                         child: IconButton(
+                          icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
                           key: addLinkKey,
                           onPressed: ()async{
                             if(cnNewWorkout.panelController.isPanelClosed){
                               await cnNewWorkout.panelController.open();
                             }
                             cnStandardPopUp.open(
+                                context: context,
                                 child: TextField(
                                   maxLength: 15,
-                                  textAlignVertical: TextAlignVertical.center,
+                                  // textAlignVertical: TextAlignVertical.center,
                                   keyboardType: TextInputType.text,
+                                  keyboardAppearance: Brightness.dark,
                                   controller: cnNewWorkout.linkNameController,
+                                  style: const TextStyle(
+                                      fontSize: 20
+                                  ),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                     isDense: true,
                                     labelText: 'Group Name',
                                     counterText: "",
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
                                   ),
                                   onChanged: (value){},
                                 ),
@@ -385,12 +381,14 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     FocusScope.of(context).unfocus();
                                   });
                                 },
-                                onCancel: cnNewWorkout.linkNameController.clear,
+                                onCancel: (){
+                                  cnNewWorkout.linkNameController.clear();
+                                  FocusScope.of(context).unfocus();
+                                },
                                 animationKey: addLinkKey,
-                                color: Color(0xff2d2d2d)
+                                color: const Color(0xff2d2d2d)
                             );
                           },
-                          icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
                             shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
@@ -399,11 +397,51 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       )
                   ],
                 ),
-                const SizedBox(height: 25,),
-                Container(width: double.maxFinite, height: 1, color: Colors.grey[400],),
-                const SizedBox(height: 15,),
+                if(!cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.date != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Date', textScaler: TextScaler.linear(1.5),),
+                        CupertinoButton(
+                          onPressed: () => _showDialog(
+                            CupertinoDatePicker(
+                              initialDateTime: cnNewWorkout.workout.date,
+                              mode: CupertinoDatePickerMode.dateAndTime,
+                              use24hFormat: true,
+                              showDayOfWeek: true,
+                              onDateTimeChanged: (DateTime newDate) {
+                                // cnNewWorkout.workout.date = newDate;
+                                setState(() => cnNewWorkout.workout.date = newDate);
+                              },
+                            ),
+                          ),
+                          child: Text(
+                            DateFormat('E. d. MMMM').format(cnNewWorkout.workout.date!),
+                            // '${cnNewWorkout.workout.date!.month}-${cnNewWorkout.workout.date!.day}-${cnNewWorkout.workout.date!.year}',
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  const SizedBox(height: 25,),
+                Container(
+                  height: 1,
+                  decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(2)
+                  ),
+                ),
+                Container(height: 15,),
                 const Text("Exercises", textScaleFactor: 1.2),
-                // const SizedBox(height: 15,),
+                Container(height: 16,),
+                // const Text("", textScaleFactor: 0.5)
+                // Container(height: 0, color: Color(0xff0a0604),),
               ],
             ),
           ),
@@ -711,11 +749,14 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     const Color(0xFF5F9561),
     const Color(0xFFFFEA30),
     const Color(0xFF558FDF),
-    const Color(0xFFF48E40)
+    const Color(0xFFF48E40),
+    const Color(0xFFA349D1),
+    const Color(0xFF8AEAC3),
+    const Color(0xFF4F8447),
   ];
   double minPanelHeight = 0;
   bool isCurrentlyRebuilding = false;
-  double keepShowingPanelHeight = 212;
+  double keepShowingPanelHeight = Platform.isAndroid? 180 : 212; //212;
   late CnHomepage cnHomepage;
 
   CnNewWorkOutPanel(BuildContext context){

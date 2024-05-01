@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
@@ -21,10 +22,6 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    print("REBUILD BANNER");
-
-    print("--- REBUILD BANNER RUNNING WORKOUTS WITH ROUTE: ${ModalRoute.of(context)?.settings.name == "/"}");
-
     if(!cnRunningWorkout.isRunning){
       return const SizedBox(width: double.maxFinite);
     }
@@ -58,11 +55,19 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      cnRunningWorkout.workout.name,
-                      textScaler: const TextScaler.linear(1.6),
-                      style: Theme.of(context).textTheme.titleMedium,
+                    Spacer(),
+                    Expanded(
+                      flex: 4,
+                      child: Center(
+                        child: OverflowSafeText(
+                          cnRunningWorkout.workout.name,
+                          style: Theme.of(context).textTheme.titleMedium,
+                          maxLines: 1,
+                          minFontSize: 27
+                        ),
+                      ),
                     ),
+                    const Spacer(),
                   ],
                 ),
               ),

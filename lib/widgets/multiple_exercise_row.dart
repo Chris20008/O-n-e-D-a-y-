@@ -7,13 +7,15 @@ class MultipleExerciseRow extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double? fontSize;
   final double? minFontSize;
+  final Color? colorFade;
 
   const MultipleExerciseRow({
     super.key,
     required this.exercises,
     this.padding,
     this.fontSize,
-    this.minFontSize
+    this.minFontSize,
+    this.colorFade,
   });
 
   final double _height = 60;
@@ -62,7 +64,13 @@ class MultipleExerciseRow extends StatelessWidget {
                                         else if (ex.restInSeconds < 60)
                                           Text("${ex.restInSeconds}s", textScaleFactor: 0.9,)
                                         else if (ex.restInSeconds % 60 != 0)
-                                          Text("${(ex.restInSeconds/60).floor()}:${ex.restInSeconds%60}m", textScaleFactor: 0.9,)
+                                          Expanded(
+                                              child: OverflowSafeText(
+                                                "${(ex.restInSeconds/60).floor()}:${ex.restInSeconds%60}m",
+                                                maxLines: 1,
+                                                fontSize: 12
+                                              ),
+                                          )
                                         else
                                           Text("${(ex.restInSeconds/60).round()}m", textScaleFactor: 0.9,),
                                         SizedBox(width: 10,)
@@ -89,18 +97,10 @@ class MultipleExerciseRow extends StatelessWidget {
                               const SizedBox(height: 5,),
                               Align(
                                   alignment: Alignment.centerLeft,
-                                  child: ExerciseNameText(
+                                  child: OverflowSafeText(
                                       ex.name,
                                       fontSize: fontSize
                                   )
-                                  // child: Text(
-                                  //     ex.name,
-                                  //     textScaleFactor: ex.name.length > 20 ? 0.8
-                                  //         : ex.name.length > 14 ? 1.1
-                                  //         : ex.name.length > 9 ? 1.3
-                                  //         : ex.name.length > 5 ? 1.4
-                                  //         : 1.5
-                                  // )
                               ),
                             ],
                           ),
@@ -113,15 +113,15 @@ class MultipleExerciseRow extends StatelessWidget {
 
             Expanded(
               flex: 7,
-              child: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  SingleChildScrollView(
 
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
 
-                /// Column for all Exercises
-                child: Row(
-                  children: [
-                    Column(
+                    /// Column for all Exercises
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -131,30 +131,32 @@ class MultipleExerciseRow extends StatelessWidget {
                           Row(
                             children: [
                             for (var set in ex.sets)
+                              set.weight == null || set.amount == null? SizedBox() :
+                              /// Each Set
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(5),
                                 child: Padding(
-                                  padding: EdgeInsets.only(left: 3, right: 3, top: _topBottomPadding, bottom: _topBottomPadding),
-                                  child: Container(
+                                  padding: EdgeInsets.only(
+                                      left: set == ex.sets.first && colorFade != null? 15 : 3,
+                                      right: set == ex.sets.last && colorFade != null? 30 : 3,
+                                      top: _topBottomPadding,
+                                      bottom: _topBottomPadding),
+                                  child: SizedBox(
                                     height: _height,
                                     width: _width,
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
 
-                                        /// Backgroud of single set
+                                        /// Background of single set
                                         Container(
-                                          // height: height,
-                                          // width: width,
                                           decoration: BoxDecoration(
                                             color: Colors.grey[500]!.withOpacity(0.2),
                                             borderRadius: BorderRadius.circular(5),
-                                            // border: Border.all(color: Colors.black, width: 1)
-                                            // border: BoxBorder
                                           ),
                                         ),
 
-                                        /// One Column for each set
+                                        /// One Column for each set (weight / amount)
                                         Column(
                                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                           children: [
@@ -176,8 +178,50 @@ class MultipleExerciseRow extends StatelessWidget {
                           )
                       ],
                     ),
-                  ],
-                ),
+                  ),
+                  if(colorFade != null)
+                    Positioned(
+                      right: 0,
+                      top:0,
+                      bottom: 0,
+                      child: Container(
+                        width: 20,
+                          // color:Colors.red
+                        decoration: BoxDecoration(
+                          gradient:  LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [
+                                colorFade!.withOpacity(0.0),
+                                colorFade!,
+                              ]
+                          ),
+                        ),
+                        // height: 40,
+                      ),
+                    ),
+                  if(colorFade != null)
+                    Positioned(
+                      left: 0,
+                      top:0,
+                      bottom: 0,
+                      child: Container(
+                        width: 20,
+                        // color:Colors.red
+                        decoration: BoxDecoration(
+                          gradient:  LinearGradient(
+                              end: Alignment.centerLeft,
+                              begin: Alignment.centerRight,
+                              colors: [
+                                colorFade!.withOpacity(0.0),
+                                colorFade!,
+                              ]
+                          ),
+                        ),
+                        // height: 40,
+                      ),
+                    ),
+                ],
               ),
             )
           ],
