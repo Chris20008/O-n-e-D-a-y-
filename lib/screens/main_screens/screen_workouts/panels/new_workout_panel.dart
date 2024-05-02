@@ -42,9 +42,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   // This function displays a CupertinoModalPopup with a reasonable fixed height
   // which hosts CupertinoDatePicker.
-  void _showDialog(Widget child) {
-    HapticFeedback.vibrate();
-    showCupertinoModalPopup<void>(
+  void _showDialog(Widget child) async {
+    HapticFeedback.selectionClick();
+    await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
         height: 216,
@@ -63,6 +63,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         ),
       ),
     );
+    setState(() {});
   }
 
   @override
@@ -416,9 +417,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                               showDayOfWeek: true,
                               onDateTimeChanged: (DateTime newDate) {
                                 // cnNewWorkout.workout.date = newDate;
-                                setState(() => cnNewWorkout.workout.date = newDate);
+                                cnNewWorkout.workout.date = newDate;
                                 if(Platform.isAndroid){
-                                  HapticFeedback.heavyImpact();
+                                  HapticFeedback.selectionClick();
                                 }
                               },
                             ),
@@ -692,7 +693,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onCancel(){
-    vibrateHeavyToLight();
+    vibrateCancel();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
   }
@@ -706,7 +707,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onConfirm(){
-    vibrateLightToHeavy();
+    vibrateConfirm();
     cnNewWorkout.updateExercisesOrderInWorkoutObject();
     if(!cnNewWorkout.isUpdating){
       cnNewWorkout.workout.isTemplate = true;
@@ -788,7 +789,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void openPanel(){
-    HapticFeedback.vibrate();
+    HapticFeedback.selectionClick();
     minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(

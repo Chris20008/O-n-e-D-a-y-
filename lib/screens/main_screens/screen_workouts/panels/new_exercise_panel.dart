@@ -509,7 +509,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void openPanel(){
-    HapticFeedback.vibrate();
+    HapticFeedback.selectionClick();
     panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 300),

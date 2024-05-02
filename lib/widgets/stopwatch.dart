@@ -260,7 +260,6 @@ class CnStopwatchWidget extends ChangeNotifier {
 
   void open({ScrollController? scrollController}){
     isOpened = true;
-    vibrateLightToHeavy();
     refresh();
     if(scrollController != null){
       final currPos = scrollController.position.pixels;
@@ -277,7 +276,6 @@ class CnStopwatchWidget extends ChangeNotifier {
 
   void close({ScrollController? scrollController}){
     isOpened = false;
-    vibrateHeavyToLight();
     refresh();
     if(scrollController != null){
       final currPos = scrollController.position.pixels;

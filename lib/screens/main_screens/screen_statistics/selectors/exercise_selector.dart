@@ -19,7 +19,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
 
   Future _showDialog(Widget child) async{
-    HapticFeedback.vibrate();
+    HapticFeedback.selectionClick();
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -76,7 +76,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                   // setState(() {
                   cnScreenStatistics.selectedExercise = cnScreenStatistics.selectedWorkout!.exercises[index];
                   if(Platform.isAndroid){
-                    HapticFeedback.heavyImpact();
+                    HapticFeedback.selectionClick();
                   }
                   // });
                 },

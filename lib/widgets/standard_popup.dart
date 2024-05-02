@@ -185,7 +185,7 @@ class CnStandardPopUp extends ChangeNotifier {
     Color? color,
     bool showCancel = true
   }){
-    HapticFeedback.vibrate();
+    HapticFeedback.selectionClick();
     jump = true;
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;

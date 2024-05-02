@@ -79,9 +79,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                 setState(() {
                                   isCheckedList[index] = !isCheckedList[index];
                                   if(isCheckedList[index]){
-                                    vibrateLightToHeavy();
+                                    vibrateConfirm();
                                   } else{
-                                    vibrateHeavyToLight();
+                                    vibrateCancel();
                                   }
                                 });
                               },

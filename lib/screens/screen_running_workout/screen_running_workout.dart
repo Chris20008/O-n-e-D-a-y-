@@ -177,7 +177,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                           onConfirm: (){
                                             if(cnRunningWorkout.controllerSeatLevel.text.isNotEmpty){
                                               newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
-                                              vibrateLightToHeavy();
+                                              vibrateCancel();
                                             }
                                             cnRunningWorkout.controllerSeatLevel.clear();
                                             cnRunningWorkout.refresh();
@@ -363,7 +363,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                    cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
                                                                    cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
                                                                 ){
-                                                                  vibrateLightToHeavy();
+                                                                  vibrateConfirm();
                                                                   cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = set.weight!.toString();
                                                                   newEx.sets[indexSet].weight = set.weight;
                                                                   cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();

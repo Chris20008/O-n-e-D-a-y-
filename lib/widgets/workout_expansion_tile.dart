@@ -97,7 +97,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   cnRunningWorkout.isRunning = true;
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
                                   cnWorkouts.refresh();
-                                  HapticFeedback.vibrate();
+                                  HapticFeedback.selectionClick();
                                   Future.delayed(const Duration(milliseconds: 200), (){
                                     cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                                   });

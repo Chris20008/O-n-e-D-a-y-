@@ -166,26 +166,26 @@ Future<bool> hasInternet()async{
   return options.any((option) => conRes.contains(option));
 }
 
-void vibrateLightToHeavy(){
-  HapticFeedback.lightImpact();
-  Future.delayed(const Duration(milliseconds: 100), (){
-    HapticFeedback.vibrate();
+void vibrateCancel(){
+  HapticFeedback.selectionClick();
+  Future.delayed(const Duration(milliseconds: 180), (){
+    HapticFeedback.heavyImpact();
   });
 }
 
-void vibrateHeavyToLight(){
-  HapticFeedback.vibrate();
-  Future.delayed(const Duration(milliseconds: 100), (){
-    HapticFeedback.lightImpact();
+void vibrateConfirm(){
+  HapticFeedback.mediumImpact();
+  Future.delayed(const Duration(milliseconds: 180), (){
+    HapticFeedback.selectionClick();
   });
 }
 
 void vibrateSuccess(){
-  HapticFeedback.vibrate();
+  HapticFeedback.heavyImpact();
   Future.delayed(const Duration(milliseconds: 100), (){
     HapticFeedback.lightImpact();
     Future.delayed(const Duration(milliseconds: 100), (){
-      HapticFeedback.vibrate();
+      HapticFeedback.heavyImpact();
     });
   });
 }
