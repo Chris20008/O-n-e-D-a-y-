@@ -98,7 +98,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
                                   cnWorkouts.refresh();
                                   HapticFeedback.selectionClick();
-                                  Future.delayed(const Duration(milliseconds: 200), (){
+                                  Future.delayed(const Duration(milliseconds: 300), (){
                                     cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                                   });
                                 }

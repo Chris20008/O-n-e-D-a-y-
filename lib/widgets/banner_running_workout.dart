@@ -78,7 +78,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
           ?CrossFadeState.showFirst
           :CrossFadeState.showSecond,
         duration: const Duration(
-          milliseconds: 200
+          milliseconds: 250
         )
     );
 
