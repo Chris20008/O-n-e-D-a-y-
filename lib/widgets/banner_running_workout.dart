@@ -22,59 +22,117 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    if(!cnRunningWorkout.isRunning){
-      return const SizedBox(width: double.maxFinite);
-    }
-    return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-            sigmaX: 10.0,
-            sigmaY: 10.0,
-            tileMode: TileMode.mirror
-        ),
-        child: Container(
-          width: double.maxFinite,
-          decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.5),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: GestureDetector(
-              onTap: () {
-                if(!cnRunningWorkout.isVisible){
-                  // cnRunningWorkout.isVisible = true;
-                  // cnBottomMenu.refresh();
-                  // setState(() {});
-                  cnRunningWorkout.reopenRunningWorkout(context);
-                }
-              },
-              child: Container(
-                height: _height,
-                width: double.maxFinite,
-                color: Colors.black.withOpacity(0.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Spacer(),
-                    Expanded(
-                      flex: 4,
-                      child: Center(
-                        child: OverflowSafeText(
-                          cnRunningWorkout.workout.name,
-                          style: Theme.of(context).textTheme.titleMedium,
-                          maxLines: 1,
-                          minFontSize: 27
+    print("REBUILD BANNER RUNNING WORKOUT");
+
+    return AnimatedCrossFade(
+        firstChild: const SizedBox(width: double.maxFinite),
+        secondChild: ClipRRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+                sigmaX: 10.0,
+                sigmaY: 10.0,
+                tileMode: TileMode.mirror
+            ),
+            child: Container(
+              width: double.maxFinite,
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: GestureDetector(
+                  onTap: () {
+                    if(!cnRunningWorkout.isVisible){
+                      cnRunningWorkout.reopenRunningWorkout(context);
+                    }
+                  },
+                  child: Container(
+                    height: _height,
+                    width: double.maxFinite,
+                    color: Colors.black.withOpacity(0.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Spacer(),
+                        Expanded(
+                          flex: 4,
+                          child: Center(
+                            child: OverflowSafeText(
+                                cnRunningWorkout.workout.name,
+                                style: Theme.of(context).textTheme.titleMedium,
+                                maxLines: 1,
+                                minFontSize: 27
+                            ),
+                          ),
                         ),
-                      ),
+                        const Spacer(),
+                      ],
                     ),
-                    const Spacer(),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
+        crossFadeState: !cnRunningWorkout.isRunning
+          ?CrossFadeState.showFirst
+          :CrossFadeState.showSecond,
+        duration: const Duration(
+          milliseconds: 200
+        )
     );
+
+    // if(!cnRunningWorkout.isRunning){
+    //   return const SizedBox(width: double.maxFinite);
+    // }
+    // print("IS RUNNING");
+    // return ClipRRect(
+    //   child: BackdropFilter(
+    //     filter: ImageFilter.blur(
+    //         sigmaX: 10.0,
+    //         sigmaY: 10.0,
+    //         tileMode: TileMode.mirror
+    //     ),
+    //     child: Container(
+    //       width: double.maxFinite,
+    //       decoration: BoxDecoration(
+    //           color: Colors.black.withOpacity(0.5),
+    //       ),
+    //       child: SafeArea(
+    //         bottom: false,
+    //         child: GestureDetector(
+    //           onTap: () {
+    //             if(!cnRunningWorkout.isVisible){
+    //               cnRunningWorkout.reopenRunningWorkout(context);
+    //             }
+    //           },
+    //           child: Container(
+    //             height: _height,
+    //             width: double.maxFinite,
+    //             color: Colors.black.withOpacity(0.0),
+    //             child: Row(
+    //               mainAxisAlignment: MainAxisAlignment.center,
+    //               children: [
+    //                 Spacer(),
+    //                 Expanded(
+    //                   flex: 4,
+    //                   child: Center(
+    //                     child: OverflowSafeText(
+    //                       cnRunningWorkout.workout.name,
+    //                       style: Theme.of(context).textTheme.titleMedium,
+    //                       maxLines: 1,
+    //                       minFontSize: 27
+    //                     ),
+    //                   ),
+    //                 ),
+    //                 const Spacer(),
+    //               ],
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }

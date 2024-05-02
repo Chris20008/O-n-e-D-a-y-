@@ -1,8 +1,10 @@
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../util/constants.dart';
 import 'animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
@@ -258,6 +260,7 @@ class CnStopwatchWidget extends ChangeNotifier {
 
   void open({ScrollController? scrollController}){
     isOpened = true;
+    vibrateLightToHeavy();
     refresh();
     if(scrollController != null){
       final currPos = scrollController.position.pixels;
@@ -274,6 +277,7 @@ class CnStopwatchWidget extends ChangeNotifier {
 
   void close({ScrollController? scrollController}){
     isOpened = false;
+    vibrateHeavyToLight();
     refresh();
     if(scrollController != null){
       final currPos = scrollController.position.pixels;

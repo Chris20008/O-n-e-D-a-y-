@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -142,7 +143,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                       onChanged: (value){
                                         value = value.trim();
                                         if (value.isNotEmpty){
-                                          cnNewExercise.exercise.restInSeconds = int.parse(value);
+                                          cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
                                         }
                                         else{
                                           cnNewExercise.exercise.restInSeconds = 0;
@@ -181,7 +182,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                       onChanged: (value){
                                         value = value.trim();
                                         if (value.isNotEmpty){
-                                          cnNewExercise.exercise.seatLevel = int.parse(value);
+                                          cnNewExercise.exercise.seatLevel = int.tryParse(value);
                                         }
                                         else{
                                           cnNewExercise.exercise.seatLevel = null;
@@ -298,7 +299,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               onChanged: (value) {
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
-                                                  cnNewExercise.exercise.sets[index].weight = int.parse(value);
+                                                  cnNewExercise.exercise.sets[index].weight = int.tryParse(value);
                                                 }
                                                 else{
                                                   cnNewExercise.exercise.sets[index].weight = null;
@@ -344,7 +345,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               onChanged: (value){
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
-                                                  cnNewExercise.exercise.sets[index].amount = int.parse(value);
+                                                  cnNewExercise.exercise.sets[index].amount = int.tryParse(value);
                                                 }
                                                 else{
                                                   cnNewExercise.exercise.sets[index].amount = null;
@@ -508,6 +509,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void openPanel(){
+    HapticFeedback.vibrate();
     panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 300),

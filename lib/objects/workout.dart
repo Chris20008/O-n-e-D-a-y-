@@ -83,6 +83,8 @@ class Workout{
           /// Update amounts and weights of the existing exercise in the template
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
+          ex.restInSeconds = newExercise.restInSeconds;
+          ex.seatLevel = newExercise.seatLevel;
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }

@@ -1,6 +1,7 @@
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../main.dart';
@@ -93,7 +94,13 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                               key: startWorkoutKey,
                               onPressed: () {
                                 if(!cnRunningWorkout.isRunning){
-                                  cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+                                  cnRunningWorkout.isRunning = true;
+                                  cnRunningWorkout.workout = Workout.copy(widget.workout);
+                                  cnWorkouts.refresh();
+                                  HapticFeedback.vibrate();
+                                  Future.delayed(const Duration(milliseconds: 200), (){
+                                    cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+                                  });
                                 }
                                 else{
                                   if(cnRunningWorkout.workout.name == widget.workout.name){

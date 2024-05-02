@@ -131,7 +131,7 @@
 //                                   onChanged: (value){
 //                                     value = value.trim();
 //                                     if (value.isNotEmpty){
-//                                       cnNewExercise.exercise.restInSeconds = int.parse(value);
+//                                       cnNewExercise.exercise.restInSeconds = int.tryParse(value);
 //                                     }
 //                                     else{
 //                                       cnNewExercise.exercise.restInSeconds = 0;
@@ -159,7 +159,7 @@
 //                                   onChanged: (value){
 //                                     value = value.trim();
 //                                     if (value.isNotEmpty){
-//                                       cnNewExercise.exercise.seatLevel = int.parse(value);
+//                                       cnNewExercise.exercise.seatLevel = int.tryParse(value);
 //                                     }
 //                                     else{
 //                                       cnNewExercise.exercise.seatLevel = null;
@@ -263,7 +263,7 @@
 //                                             onChanged: (value) {
 //                                               value = value.trim();
 //                                               if(value.isNotEmpty){
-//                                                 cnNewExercise.exercise.sets[index].weight = int.parse(value);
+//                                                 cnNewExercise.exercise.sets[index].weight = int.tryParse(value);
 //                                               }
 //                                               else{
 //                                                 cnNewExercise.exercise.sets[index].weight = null;
@@ -304,7 +304,7 @@
 //                                             onChanged: (value){
 //                                               value = value.trim();
 //                                               if(value.isNotEmpty){
-//                                                 cnNewExercise.exercise.sets[index].amount = int.parse(value);
+//                                                 cnNewExercise.exercise.sets[index].amount = int.tryParse(value);
 //                                               }
 //                                               else{
 //                                                 cnNewExercise.exercise.sets[index].amount = null;

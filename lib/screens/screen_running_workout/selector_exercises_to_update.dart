@@ -78,6 +78,11 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                               onTap: (){
                                 setState(() {
                                   isCheckedList[index] = !isCheckedList[index];
+                                  if(isCheckedList[index]){
+                                    vibrateLightToHeavy();
+                                  } else{
+                                    vibrateHeavyToLight();
+                                  }
                                 });
                               },
                               child: Column(
@@ -202,6 +207,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       widget.onCancel();
                                       Future.delayed(const Duration(milliseconds: 200), (){
                                         widget.onConfirm();
+                                        vibrateSuccess();
                                         if(doUpdate){
                                           workout.updateTemplate();
                                         }

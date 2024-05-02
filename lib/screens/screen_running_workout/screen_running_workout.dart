@@ -6,6 +6,7 @@ import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
@@ -76,6 +77,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         }
         if(cnStandardPopUp.isVisible){
           cnStandardPopUp.clear();
+        }
+        if(MediaQuery.of(context).viewInsets.bottom > 0){
+          FocusScope.of(context).unfocus();
         }
       },
       child: Scaffold(
@@ -168,7 +172,42 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                     const SizedBox(height: 5),
                                     GestureDetector(
                                       onTap: (){
-
+                                        cnStandardPopUp.open(
+                                          context: context,
+                                          onConfirm: (){
+                                            if(cnRunningWorkout.controllerSeatLevel.text.isNotEmpty){
+                                              newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
+                                              vibrateLightToHeavy();
+                                            }
+                                            cnRunningWorkout.controllerSeatLevel.clear();
+                                            cnRunningWorkout.refresh();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          onCancel: (){
+                                            cnRunningWorkout.controllerSeatLevel.clear();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          child: TextField(
+                                            controller: cnRunningWorkout.controllerSeatLevel,
+                                            keyboardType: TextInputType.number,
+                                            maxLength: 3,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              labelText: "Seat Level",
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            style: const TextStyle(
+                                                fontSize: 18
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            onChanged: (value){},
+                                          ),
+                                        );
                                       },
                                       child: Align(
                                         alignment: Alignment.centerLeft,
@@ -196,7 +235,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                           context: context,
                                           onConfirm: (){
                                             if(cnRunningWorkout.controllerRestInSeconds.text.isNotEmpty){
-                                              newEx.restInSeconds = int.parse(cnRunningWorkout.controllerRestInSeconds.text);
+                                              newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
                                             }
                                             cnRunningWorkout.controllerRestInSeconds.clear();
                                             cnRunningWorkout.refresh();
@@ -324,6 +363,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                    cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
                                                                    cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
                                                                 ){
+                                                                  vibrateLightToHeavy();
                                                                   cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = set.weight!.toString();
                                                                   newEx.sets[indexSet].weight = set.weight;
                                                                   cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
@@ -332,7 +372,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                   cnRunningWorkout.cache();
                                                                 } else{
                                                                   setState(() {
-                                                                    Focus.of(context).unfocus();
+                                                                    FocusScope.of(context).unfocus();
                                                                   });
                                                                 }
                                                               },
@@ -393,7 +433,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
-                                                                  newEx.sets[indexSet].weight = int.parse(value);
+                                                                  newEx.sets[indexSet].weight = int.tryParse(value);
                                                                 }
                                                                 else{
                                                                   newEx.sets[indexSet].weight = null;
@@ -432,7 +472,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
-                                                                  newEx.sets[indexSet].amount = int.parse(value);
+                                                                  newEx.sets[indexSet].amount = int.tryParse(value);
                                                                 }
                                                                 else{
                                                                   newEx.sets[indexSet].amount = null;
@@ -445,121 +485,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                       ],
                                                     ),
                                                   ),
-                                                  // Spacer()
-
-                                                  // Row(
-                                                  //   mainAxisAlignment: MainAxisAlignment.end,
-                                                  //   children: [
-                                                  //     // Expanded(
-                                                  //     //   child: GestureDetector(
-                                                  //     //     onTap: (){
-                                                  //     //       if(set.weight?.toString() != null){
-                                                  //     //         cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = set.weight!.toString();
-                                                  //     //         newEx.sets[indexSet].weight = set.weight;
-                                                  //     //         cnRunningWorkout.refresh();
-                                                  //     //         cnRunningWorkout.cache();
-                                                  //     //       }
-                                                  //     //     },
-                                                  //     //     child: Container(
-                                                  //     //       height: _heightOfSetRow,
-                                                  //     //       color: Colors.transparent,
-                                                  //     //       child: Center(child: Text("${set.weight?? ""}", textScaleFactor: 1.2,)),
-                                                  //     //     ),
-                                                  //     //   ),
-                                                  //     // ),
-                                                  //     // SizedBox(
-                                                  //     //   width: 50,
-                                                  //     //   height: _heightOfSetRow,
-                                                  //     //   /// Input weight
-                                                  //     //   child: Center(
-                                                  //     //     child: TextField(
-                                                  //     //       maxLength: 3,
-                                                  //     //       textAlign: TextAlign.center,
-                                                  //     //       keyboardType: TextInputType.number,
-                                                  //     //       keyboardAppearance: Brightness.dark,
-                                                  //     //       controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
-                                                  //     //       decoration: InputDecoration(
-                                                  //     //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                  //     //         // isDense: true,
-                                                  //     //         counterText: "",
-                                                  //     //         contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                  //     //       ),
-                                                  //     //       style: const TextStyle(
-                                                  //     //         fontSize: 18,
-                                                  //     //       ),
-                                                  //     //       onChanged: (value){
-                                                  //     //         value = value.trim();
-                                                  //     //         if(value.isNotEmpty){
-                                                  //     //           newEx.sets[indexSet].weight = int.parse(value);
-                                                  //     //         }
-                                                  //     //         else{
-                                                  //     //           newEx.sets[indexSet].weight = null;
-                                                  //     //         }
-                                                  //     //         cnRunningWorkout.cache();
-                                                  //     //       },
-                                                  //     //     ),
-                                                  //     //   ),
-                                                  //     // ),
-                                                  //   ],
-                                                  // ),
-                                                  // // const Spacer(flex: 1),
-                                                  // Row(
-                                                  //   mainAxisAlignment: MainAxisAlignment.end,
-                                                  //   children: [
-                                                  //     // Expanded(
-                                                  //     //   child: GestureDetector(
-                                                  //     //     onTap: (){
-                                                  //     //       if(set.amount?.toString() != null){
-                                                  //     //         cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
-                                                  //     //         newEx.sets[indexSet].amount = set.amount;
-                                                  //     //         cnRunningWorkout.refresh();
-                                                  //     //         cnRunningWorkout.cache();
-                                                  //     //       }
-                                                  //     //     },
-                                                  //     //     child: Container(
-                                                  //     //       height: _heightOfSetRow,
-                                                  //     //       color: Colors.transparent,
-                                                  //     //       child: Center(child: Text("${set.amount?? ""}", textScaleFactor: 1.2,)),
-                                                  //     //     ),
-                                                  //     //   ),
-                                                  //     // ),
-                                                  //     // SizedBox(
-                                                  //     //   width: 50,
-                                                  //     //   height: _heightOfSetRow,
-                                                  //     //
-                                                  //     //   /// Input amount
-                                                  //     //   child: Center(
-                                                  //     //     child: TextField(
-                                                  //     //       maxLength: 3,
-                                                  //     //       textAlign: TextAlign.center,
-                                                  //     //       keyboardType: TextInputType.number,
-                                                  //     //       keyboardAppearance: Brightness.dark,
-                                                  //     //       controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
-                                                  //     //       decoration: InputDecoration(
-                                                  //     //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                  //     //         // isDense: true,
-                                                  //     //         counterText: "",
-                                                  //     //         contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                  //     //       ),
-                                                  //     //       style: const TextStyle(
-                                                  //     //         fontSize: 18,
-                                                  //     //       ),
-                                                  //     //       onChanged: (value){
-                                                  //     //         value = value.trim();
-                                                  //     //         if(value.isNotEmpty){
-                                                  //     //           newEx.sets[indexSet].amount = int.parse(value);
-                                                  //     //         }
-                                                  //     //         else{
-                                                  //     //           newEx.sets[indexSet].amount = null;
-                                                  //     //         }
-                                                  //     //         cnRunningWorkout.cache();
-                                                  //     //       },
-                                                  //     //     ),
-                                                  //     //   ),
-                                                  //     // ),
-                                                  //   ],
-                                                  // ),
-                                                  // const SizedBox(width: 25,)
                                                 ],
                                               ),
                                             ),
@@ -633,7 +558,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                         ],
                       ),
                     ),
-                    const Hero(
+                    /// do not make const, should be updated by rebuild
+                    Hero(
                         transitionOnUserGestures: true,
                         tag: "Banner",
                         child: BannerRunningWorkout()

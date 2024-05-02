@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class StandardPopUp extends StatefulWidget {
@@ -184,6 +185,7 @@ class CnStandardPopUp extends ChangeNotifier {
     Color? color,
     bool showCancel = true
   }){
+    HapticFeedback.vibrate();
     jump = true;
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;

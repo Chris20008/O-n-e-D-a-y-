@@ -43,6 +43,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   // This function displays a CupertinoModalPopup with a reasonable fixed height
   // which hosts CupertinoDatePicker.
   void _showDialog(Widget child) {
+    HapticFeedback.vibrate();
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -377,13 +378,15 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     cnNewWorkout.refresh();
                                   }
                                   cnNewWorkout.linkNameController.clear();
-                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
                                     FocusScope.of(context).unfocus();
                                   });
                                 },
                                 onCancel: (){
                                   cnNewWorkout.linkNameController.clear();
-                                  FocusScope.of(context).unfocus();
+                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
+                                    FocusScope.of(context).unfocus();
+                                  });
                                 },
                                 animationKey: addLinkKey,
                                 color: const Color(0xff2d2d2d)
@@ -414,6 +417,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                               onDateTimeChanged: (DateTime newDate) {
                                 // cnNewWorkout.workout.date = newDate;
                                 setState(() => cnNewWorkout.workout.date = newDate);
+                                if(Platform.isAndroid){
+                                  HapticFeedback.heavyImpact();
+                                }
                               },
                             ),
                           ),
@@ -686,6 +692,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onCancel(){
+    vibrateHeavyToLight();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
   }
@@ -699,6 +706,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onConfirm(){
+    vibrateLightToHeavy();
     cnNewWorkout.updateExercisesOrderInWorkoutObject();
     if(!cnNewWorkout.isUpdating){
       cnNewWorkout.workout.isTemplate = true;
@@ -780,6 +788,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void openPanel(){
+    HapticFeedback.vibrate();
     minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     panelController.animatePanelToPosition(

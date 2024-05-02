@@ -418,11 +418,11 @@ class CnScreenStatistics extends ChangeNotifier {
   //   }
   //   DateTime currentMonday = getMondayOfWeekFromDay(minDate);
   //   while (addNewWeek){
-  //     final int dayOfMonthMonday = int.parse(DateFormat('d').format(currentMonday));
-  //     final int monthMonday = int.parse(DateFormat('M').format(currentMonday));
+  //     final int dayOfMonthMonday = int.tryParse(DateFormat('d').format(currentMonday));
+  //     final int monthMonday = int.tryParse(DateFormat('M').format(currentMonday));
   //     final sunday = currentMonday.add(const Duration(days: 6));
-  //     final int dayOfMonthSunday = int.parse(DateFormat('d').format(sunday));
-  //     final int monthSunday = int.parse(DateFormat('M').format(sunday));
+  //     final int dayOfMonthSunday = int.tryParse(DateFormat('d').format(sunday));
+  //     final int monthSunday = int.tryParse(DateFormat('M').format(sunday));
   //     workoutsSorted[currentMonday.year][DateFormat('yMd').format(currentMonday)] = {
   //       "name": "$dayOfMonthMonday.$monthMonday - $dayOfMonthSunday.$monthSunday",
   //       "counter": 0

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -163,4 +164,28 @@ Future<bool> hasInternet()async{
   List<ConnectivityResult> options = [ConnectivityResult.mobile, ConnectivityResult.wifi, ConnectivityResult.vpn];
   // print("CON RES RESULT: $conRes - ${[ConnectivityResult.mobile, ConnectivityResult.wifi, ConnectivityResult.vpn].contains(conRes)}");
   return options.any((option) => conRes.contains(option));
+}
+
+void vibrateLightToHeavy(){
+  HapticFeedback.lightImpact();
+  Future.delayed(const Duration(milliseconds: 100), (){
+    HapticFeedback.vibrate();
+  });
+}
+
+void vibrateHeavyToLight(){
+  HapticFeedback.vibrate();
+  Future.delayed(const Duration(milliseconds: 100), (){
+    HapticFeedback.lightImpact();
+  });
+}
+
+void vibrateSuccess(){
+  HapticFeedback.vibrate();
+  Future.delayed(const Duration(milliseconds: 100), (){
+    HapticFeedback.lightImpact();
+    Future.delayed(const Duration(milliseconds: 100), (){
+      HapticFeedback.vibrate();
+    });
+  });
 }

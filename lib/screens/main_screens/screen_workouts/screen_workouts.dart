@@ -50,14 +50,32 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 if (index == cnWorkouts.workouts.length){
                   return const SizedBox(height: 100);
                 }
+                if(index == 0){
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AnimatedContainer(
+                        duration: Duration(milliseconds: cnRunningWorkout.isRunning? 250 : 0),
+                        height: cnRunningWorkout.isRunning? 110 : 60,
+                      ),
+                      WorkoutExpansionTile(
+                        workout: cnWorkouts.workouts[index],
+                        padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
+                        onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
+                        initiallyExpanded: cnWorkouts.opened[index],
+                      )
+                    ],
+                  );
+                }
                 return WorkoutExpansionTile(
                     workout: cnWorkouts.workouts[index],
-                    padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20+110:70 : 10, left: 20, right: 20, bottom: 0),
+                    padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
                     onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                     initiallyExpanded: cnWorkouts.opened[index],
                 );
               }
           ),
+          /// do not make const, should be updated by rebuild
           Hero(
               transitionOnUserGestures: true,
               tag: "Banner",

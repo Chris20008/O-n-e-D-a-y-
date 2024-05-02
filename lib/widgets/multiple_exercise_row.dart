@@ -94,14 +94,18 @@ class MultipleExerciseRow extends StatelessWidget {
                                   )
                                 ],
                               ),
-                              const SizedBox(height: 5,),
-                              Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: OverflowSafeText(
-                                      ex.name,
-                                      fontSize: fontSize
-                                  )
+                              Expanded(
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: OverflowSafeText(
+                                        ex.name,
+                                        fontSize: fontSize,
+                                        minFontSize: 14,
+                                        maxLines: 1
+                                    )
+                                ),
                               ),
+                              const SizedBox(height: 5,),
                             ],
                           ),
                         )

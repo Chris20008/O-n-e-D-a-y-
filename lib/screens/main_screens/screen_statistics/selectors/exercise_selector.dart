@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../objects/exercise.dart';
 import '../screen_statistics.dart';
@@ -16,6 +19,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
 
   Future _showDialog(Widget child) async{
+    HapticFeedback.vibrate();
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -71,6 +75,9 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                 onSelectedItemChanged: (int index) {
                   // setState(() {
                   cnScreenStatistics.selectedExercise = cnScreenStatistics.selectedWorkout!.exercises[index];
+                  if(Platform.isAndroid){
+                    HapticFeedback.heavyImpact();
+                  }
                   // });
                 },
                 children: cnScreenStatistics.selectedWorkout!.exercises.map((Exercise ex) {
