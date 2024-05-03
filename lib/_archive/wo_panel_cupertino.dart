@@ -180,7 +180,7 @@
 //                                           cnStandardPopUp.open(
 //                                               context: context,
 //                                               child: const Text(
-//                                                 "Do you really want to Delete this workout?",
+//                                                 "Do you really want to delete this workout?",
 //                                                 textAlign: TextAlign.center,
 //                                                 textScaleFactor: 1.2,
 //                                                 style: TextStyle(color: Colors.white),

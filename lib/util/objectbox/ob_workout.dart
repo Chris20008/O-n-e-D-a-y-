@@ -38,8 +38,6 @@ class ObWorkout{
   void deleteAllExercises(){
     List<int> obExercises = exercises.map((ex) => ex.id).toList();
     objectbox.exerciseBox.removeMany(obExercises);
-    // exercises.clear();
-    print("Exercises length ${exercises.length}");
   }
 
   void addExercises(List<ObExercise> newExercises){

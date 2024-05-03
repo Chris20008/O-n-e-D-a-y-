@@ -135,7 +135,11 @@ class MultipleExerciseRow extends StatelessWidget {
                           Row(
                             children: [
                             for (var set in ex.sets)
-                              set.weight == null || set.amount == null? SizedBox() :
+                              set.weight == null || set.amount == null?
+                              SizedBox(
+                                height: _height+_topBottomPadding+_topBottomPadding,
+                                width: _width
+                              ) :
                               /// Each Set
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(5),

@@ -1,10 +1,8 @@
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
-import '../util/constants.dart';
 import 'animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
@@ -160,20 +158,23 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     ),
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton(
-                          iconSize: 25,
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                          ),
-                          onPressed: () {
-                            cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
-                            cnRunningWorkout.refresh();
-                          },
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.amber[800],
-                          )
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 2.5),
+                        child: IconButton(
+                            iconSize: 30,
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                            ),
+                            onPressed: () {
+                              cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
+                              cnRunningWorkout.refresh();
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.amber[800],
+                            )
+                        ),
                       ),
                     )
                   ],

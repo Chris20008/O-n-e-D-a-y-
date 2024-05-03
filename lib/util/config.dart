@@ -57,8 +57,8 @@ class CnConfig extends ChangeNotifier {
 
     final Map<String, dynamic>? tempConfigData = await cache.readData(fileName: "config");
 
-    print("Received Temp Config Data");
-    print(tempConfigData);
+    // print("Received Temp Config Data");
+    // print(tempConfigData);
 
     try{
       if(tempConfigData != null){

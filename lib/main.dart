@@ -14,6 +14,7 @@ import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -119,8 +120,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     cnHomepage = Provider.of<CnHomepage>(context);
     if(cnConfig.isInitialized){
-      print("show Intor");
-      print(cnConfig.config.showIntro);
     }
 
     return Scaffold(

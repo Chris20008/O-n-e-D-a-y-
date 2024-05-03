@@ -1,14 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
+import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
 import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
-import 'new_workout_panel.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -19,11 +18,12 @@ class NewExercisePanel extends StatefulWidget {
 
 class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
-  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  // late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   final double _iconSize = 25;
   final double _widthSetWeightAmount = 50;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +89,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
                             /// Exercise name
                             Form(
-                              key: cnNewExercise._formKey,
+                              key: _formKey,
                               child: TextFormField(
                                 maxLength: 40,
                                 validator: (value) {
@@ -423,7 +423,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 icon: const Icon(Icons.close),
                                 onPressed: () {
                                   cnNewExercise.closePanel(doClear: true);
-                                  cnNewExercise._formKey.currentState?.reset();
+                                  _formKey.currentState?.reset();
                                 },
                             ),
                             myIconButton(
@@ -467,18 +467,23 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   }
 
   void closePanelAndSaveExercise(){
-    if (cnNewExercise._formKey.currentState!.validate()
+    if (_formKey.currentState!.validate()
         && cnNewExercise.exercise.name.isNotEmpty
         // && cnNewExercise.exercise.sets.first.amount != null
         // && cnNewExercise.exercise.sets.first.weight != null
     ) {
       cnNewExercise.exercise.removeEmptySets();
-      cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
+
+      if(cnNewExercise.onConfirm != null){
+        cnNewExercise.onConfirm!(cnNewExercise.exercise);
+      }
+      // cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
+      // cnNewWorkout.refreshExercise(cnNewExercise.exercise);
+      // cnNewWorkout.updateExercisesAndLinksList();
+      // cnNewWorkout.updateExercisesLinks();
+      // cnNewWorkout.refresh();
+
       cnNewExercise.closePanel(doClear: true);
-      cnNewWorkout.refreshExercise(cnNewExercise.exercise);
-      cnNewWorkout.updateExercisesAndLinksList();
-      cnNewWorkout.updateExercisesLinks();
-      cnNewWorkout.refresh();
       // }
     }
   }
@@ -486,18 +491,23 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
-  final _formKey = GlobalKey<FormState>();
   final PanelController panelController = PanelController();
 
   Key key = UniqueKey();
   Exercise exercise = Exercise();
+  Workout workout = Workout();
   TextEditingController exerciseNameController = TextEditingController();
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
   ScrollController scrollControllerSets = ScrollController();
+  Function? onConfirm;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+
+  CnNewExercisePanel(){
+    clear();
+  }
 
   void setExercise(Exercise ex){
     exercise = ex;
@@ -508,7 +518,12 @@ class CnNewExercisePanel extends ChangeNotifier {
     seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
   }
 
-  void openPanel(){
+  void openPanel({required Workout workout, Exercise? exercise, Function? onConfirm}){
+    if(exercise != null){
+      setExercise(exercise);
+    }
+    this.workout = workout;
+    this.onConfirm = onConfirm;
     HapticFeedback.selectionClick();
     panelController.animatePanelToPosition(
         1,

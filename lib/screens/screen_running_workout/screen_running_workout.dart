@@ -6,7 +6,6 @@ import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
@@ -121,7 +120,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
                             /// Each EXERCISE
                             child: ListView.separated(
-                              // key: listViewKey,
                               controller: cnRunningWorkout.scrollController,
                               physics: const BouncingScrollPhysics(),
                               shrinkWrap: true,
@@ -148,10 +146,16 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 Exercise lastEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
                                 child = Column(
                                   children: [
-                                    Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
-                                        OverflowSafeText(newEx.name):
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
+                                        Expanded(
+                                            child: OverflowSafeText(
+                                                newEx.name,
+                                                maxLines: 1
+                                            ),
+                                        ):
                                         DropdownMenu<String>(
                                           initialSelection: newEx.name,
                                           onSelected: (String? value) {
@@ -167,7 +171,28 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                           dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
                                             return DropdownMenuEntry<String>(value: value.name, label: value.name);
                                           }).toList(),
-                                        )
+                                        ),
+                                        if(cnRunningWorkout.newExNames.contains(newEx.name))
+                                          myIconButton(
+                                            icon:const Icon(Icons.delete_forever),
+                                            onPressed: (){
+                                              cnStandardPopUp.open(
+                                                  context: context,
+                                                  child: const Text(
+                                                    "Do you really want to delete this Exercise?",
+                                                    textAlign: TextAlign.center,
+                                                    textScaleFactor: 1.2,
+                                                    style: TextStyle(color: Colors.white),
+                                                  ),
+                                                  onConfirm: (){
+                                                    cnRunningWorkout.deleteExercise(newEx);
+                                                  },
+                                                  onCancel: (){},
+                                                  color: const Color(0xff2d2d2d)
+                                              );
+                                            },
+                                          ),
+                                      ],
                                     ),
                                     const SizedBox(height: 5),
                                     GestureDetector(
@@ -194,6 +219,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                           child: TextField(
                                             controller: cnRunningWorkout.controllerSeatLevel,
                                             keyboardType: TextInputType.number,
+                                            keyboardAppearance: Brightness.dark,
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -252,6 +278,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                           child: TextField(
                                             controller: cnRunningWorkout.controllerRestInSeconds,
                                             keyboardType: TextInputType.number,
+                                            keyboardAppearance: Brightness.dark,
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -349,7 +376,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                           const Spacer(),
                                                           IgnorePointer(
                                                             ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                        cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty),
+                                                                        cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
+                                                                        set.weight != null &&
+                                                                        set.amount != null),
                                                             child: ElevatedButton(
                                                               style: ButtonStyle(
                                                                   shadowColor: MaterialStateProperty.all(Colors.transparent),
@@ -592,9 +621,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                           ? CrossFadeState.showFirst
                           : CrossFadeState.showSecond,
                         duration: Duration(milliseconds: viewInsetsBottom < 50? cnSpotifyBar.animationTimeSpotifyBar~/2 : 0)
-                    )
-                    // if(viewInsetsBottom < 50)
-                    //   const AnimatedColumn(),
+                    ),
                   ],
                 ),
               ),
@@ -640,40 +667,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                 },
               ),
             )
-            // AnimatedCrossFade(
-            //   firstChild: SelectorExercisesToUpdate(
-            //     key: selectorExerciseToUpdateKey,
-            //     workout: Workout.clone(cnRunningWorkout.workout),
-            //     workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplate),
-            //     onConfirm: finishWorkout,
-            //     onCancel: (){
-            //       setState(() {
-            //         showSelectorExerciseToUpdate = false;
-            //       });
-            //     },
-            //   ),
-            //   secondChild: const SizedBox(),
-            //   crossFadeState: showSelectorExerciseToUpdate
-            //     ? CrossFadeState.showFirst
-            //     : CrossFadeState.showSecond,
-            //   duration: const Duration(milliseconds: 200),
-            //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-            //     return Stack(
-            //       clipBehavior: Clip.none,
-            //       alignment: Alignment.center,
-            //       children: <Widget>[
-            //         Positioned(
-            //           key: bottomChildKey,
-            //           child: bottomChild,
-            //         ),
-            //         Positioned(
-            //           key: topChildKey,
-            //           child: topChild,
-            //         ),
-            //       ],
-            //     );
-            //   },
-            // )
           ],
         ),
       ),
@@ -821,6 +814,7 @@ class CnRunningWorkout extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
   TextEditingController controllerRestInSeconds = TextEditingController();
   TextEditingController controllerSeatLevel = TextEditingController();
+  List<String> newExNames = [];
   late Map<String, List<Key>> slideableKeys = {
     for (var e in workout.exercises)
       e.name :
@@ -843,6 +837,41 @@ class CnRunningWorkout extends ChangeNotifier {
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
   }
+  
+  void addExercise(Exercise ex){
+    // print("SCROLL CONTROLLER POSITION 1");
+    // print(scrollController.position.pixels);
+    // print(scrollController.position.maxScrollExtent);
+    workoutTemplate.exercises.add(Exercise.clone(ex));
+    workout.exercises.add(ex);
+    newExNames.add(ex.name);
+    slideableKeys[ex.name] = ex.generateKeyForEachSet();
+    groupedExercises[ex.name] = ex;
+    textControllers[ex.name] = ex.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
+    refresh();
+    // print("SCROLL CONTROLLER POSITION 2");
+    // print(scrollController.position.pixels);
+    // print(scrollController.position.maxScrollExtent);
+    // Future.delayed(const Duration(milliseconds: 800), (){
+    //   print("SCROLL CONTROLLER POSITION 3");
+    //   print(scrollController.position.pixels);
+    //   print(scrollController.position.maxScrollExtent);
+    //   scrollController.animateTo(
+    //       scrollController.position.maxScrollExtent,
+    //       duration: const Duration(milliseconds: 1000),
+    //       curve: Curves.easeInOut
+    //   );
+    // });
+  }
+
+  void deleteExercise(Exercise ex){
+    workoutTemplate.exercises.removeWhere((e) => e.name == ex.name);
+    workout.exercises.removeWhere((e) => e.name == ex.name);
+    newExNames.removeWhere((e) => e == ex.name);
+    slideableKeys.remove(ex.name);
+    groupedExercises.remove(ex.name);
+    refresh();
+  }
 
   void initCachedData(Map data, BuildContext context){
     if(
@@ -851,10 +880,12 @@ class CnRunningWorkout extends ChangeNotifier {
       data.containsKey("isRunning") &&
       data.containsKey("isVisible") &&
       data.containsKey("testControllerValues") &&
-      data.containsKey("selectedIndexes")
+      data.containsKey("selectedIndexes") &&
+      data.containsKey("newExNames")
     ){
       isRunning = data["isRunning"];
       isVisible = data["isVisible"];
+      newExNames = List<String>.from(data["newExNames"]);
       for(MapEntry entry in data["selectedIndexes"].entries){
         selectedIndexes[entry.key] = entry.value;
       }
@@ -959,6 +990,7 @@ class CnRunningWorkout extends ChangeNotifier {
       "isVisible": isVisible,
       "testControllerValues": getTextControllerValues(),
       "selectedIndexes": selectedIndexes,
+      "newExNames": newExNames
     };
     cnConfig.config.cnRunningWorkout = data;
     await cnConfig.config.save();
@@ -986,6 +1018,7 @@ class CnRunningWorkout extends ChangeNotifier {
     slideableKeys.clear();
     selectedIndexes.clear();
     groupedExercises.clear();
+    newExNames.clear();
     scrollController = ScrollController();
     isRunning = false;
     cnConfig.setCnRunningWorkout({});

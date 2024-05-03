@@ -209,7 +209,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                           cnStandardPopUp.open(
                                               context: context,
                                               child: const Text(
-                                                "Do you really want to Delete this workout?",
+                                                "Do you really want to delete this workout?",
                                                 textAlign: TextAlign.center,
                                                 textScaleFactor: 1.2,
                                                 style: TextStyle(color: Colors.white),
@@ -652,7 +652,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   void addExercise(){
     if(cnNewWorkout.panelController.isPanelOpen){
-      cnNewExercisePanel.openPanel();
+      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: confirmAddExercise);
     }
   }
 
@@ -686,10 +686,18 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
 
     if(cnNewWorkout.panelController.isPanelOpen){
-      cnNewExercisePanel.setExercise(clonedEx);
-      cnNewExercisePanel.openPanel();
+      // cnNewExercisePanel.setExercise(clonedEx);
+      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: clonedEx, onConfirm: confirmAddExercise);
       cnNewExercisePanel.refresh();
     }
+  }
+
+  void confirmAddExercise(Exercise ex){
+    cnNewWorkout.workout.addOrUpdateExercise(ex);
+    cnNewWorkout.refreshExercise(ex);
+    cnNewWorkout.updateExercisesAndLinksList();
+    cnNewWorkout.updateExercisesLinks();
+    cnNewWorkout.refresh();
   }
 
   void onCancel(){

@@ -74,14 +74,11 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
         initWidths();
       }
       else if (orientation == Orientation.landscape) {
-        print("ORIENTATION NOW LANDSCAPE");
         cnSpotifyBar.width = widths["landscape"]!;
       }
       else {
-        print("ORIENTATION NOW PORTRAIT");
         cnSpotifyBar.width = widths["portrait"]!;
       }
-      print("WIDTH NOW: ${cnSpotifyBar.width}");
     });
   }
 
@@ -95,7 +92,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
       widths[Orientation.landscape.name] = MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;
     }
     cnSpotifyBar.width = widths[orientation.name]!;
-    print("WIDTHS INITIALIZED: $widths");
   }
 
   @override
