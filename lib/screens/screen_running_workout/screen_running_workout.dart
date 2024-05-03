@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fitness_app/screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/animated_column.dart';
@@ -27,12 +28,20 @@ class ScreenRunningWorkout extends StatefulWidget {
 }
 
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with TickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
+  late final AnimationController _controllerSelectorExUpdate = AnimationController(
     duration: const Duration(milliseconds: 200),
     vsync: this,
   );
-  late final Animation<double> _animation = CurvedAnimation(
-    parent: _controller,
+  late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
+    parent: _controllerSelectorExUpdate,
+    curve: Curves.decelerate,
+  );
+  late final AnimationController _controllerSelectorExPerLink = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  );
+  late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
+    parent: _controllerSelectorExPerLink,
     curve: Curves.decelerate,
   );
 
@@ -47,10 +56,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   final double _heightOfSetRow = 30;
   final double _setPadding = 5;
   Key selectorExerciseToUpdateKey = UniqueKey();
+  Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
   bool showSelectorExerciseToUpdate = false;
+  bool showSelectorExercisePerLink = false;
 
   @override
   void initState() {
@@ -62,9 +73,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     if(showSelectorExerciseToUpdate){
-      _controller.forward();
+      _controllerSelectorExUpdate.forward();
     } else{
-      _controller.reverse();
+      _controllerSelectorExUpdate.reverse();
+    }
+    if(showSelectorExercisePerLink){
+      _controllerSelectorExPerLink.forward();
+    } else{
+      _controllerSelectorExPerLink.reverse();
     }
 
     return PopScope(
@@ -632,7 +648,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                 color: Colors.black54,
               ),
               secondChild: const SizedBox(),
-              crossFadeState: showSelectorExerciseToUpdate
+              crossFadeState: showSelectorExerciseToUpdate || showSelectorExercisePerLink
                   ? CrossFadeState.showFirst
                   : CrossFadeState.showSecond,
               duration: const Duration(milliseconds: 200),
@@ -654,7 +670,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               },
             ),
             ScaleTransition(
-              scale: _animation,
+              scale: _animationSelectorExUpdate,
               child: SelectorExercisesToUpdate(
                 key: selectorExerciseToUpdateKey,
                 workout: Workout.clone(cnRunningWorkout.workout),
@@ -666,11 +682,44 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   });
                 },
               ),
+            ),
+            ScaleTransition(
+              scale: _animationSelectorExPerLink,
+              child: SelectorExercisesPerLink(
+                key: selectorExercisePerLinkKey,
+                groupedExercises: cnRunningWorkout.groupedExercises,
+                relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
+                onConfirm: confirmSelectorExPerLink,//finishWorkout,
+                onCancel: (){
+                  setState(() {
+                    showSelectorExercisePerLink = false;
+                  });
+                },
+              ),
             )
           ],
         ),
       ),
     );
+  }
+
+  void confirmSelectorExPerLink({List<String>? exToRemove}){
+    setState(() {
+      showSelectorExercisePerLink = false;
+      cnRunningWorkout.exercisesToRemove = exToRemove?? [];
+    });
+    if(canUpdateTemplate()){
+      cnStandardPopUp.clear();
+      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+        setState(() {
+          showSelectorExerciseToUpdate = true;
+          selectorExerciseToUpdateKey = UniqueKey();
+        });
+      });
+    }
+    else{
+      finishWorkout();
+    }
   }
 
   void addSet(Exercise ex, Exercise lastEx){
@@ -692,12 +741,97 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     });
   }
 
+  /// Find the first indication of whether or not an Exercise has changed.
+  ///
+  /// Can be through:
+  ///   - amount of sets
+  ///   - weight
+  ///   - amount
+  ///   - rest in seconds
+  ///   - seat level
+  ///   - new Exercise added
+  bool canUpdateTemplate(){
+    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+    tempWo.removeEmptyExercises();
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+    List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplate.exercises.map((e) => e.name).toList();
+    for(Exercise ex in tempWo.exercises){
+      print("NAMEEEEE");
+      print(ex.name);
+      /// Exercise name does not exist in template yet => can update Template
+      if(!templateWorkoutExerciseNames.contains(ex.name)){
+        return true;
+      }
+      Exercise tempTemplateEx = cnRunningWorkout.workoutTemplate.exercises.firstWhere((e) => e.name == ex.name);
+      if(!tempTemplateEx.equals(ex)){
+        return true;
+      }
+      // /// Not same amount of sets for Exercise => can update Template
+      // if(tempTemplateEx.sets.length != ex.sets.length){
+      //   return true;
+      // }
+      // /// Seat level or rest in seconds have changed => can update Template
+      // if(tempTemplateEx.seatLevel != ex.seatLevel || tempTemplateEx.restInSeconds != ex.restInSeconds){
+      //   return true;
+      // }
+      // /// Check for ech Set
+      // for(List<SingleSet> setPair in zip([tempTemplateEx.sets, ex.sets])){
+      //   /// when weight or amount is not the same => can update Template
+      //   if(setPair[0].amount != setPair[1].amount || setPair[0].weight != setPair[1].weight){
+      //     return true;
+      //   }
+      // }
+    }
+    return false;
+  }
+
+  bool hasStartedWorkout(){
+    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+    tempWo.removeEmptyExercises();
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+    return true;
+  }
+
   void openPopUpFinishWorkout(){
+    final bool canFinish = hasStartedWorkout();
     cnStandardPopUp.open(
       context: context,
       showCancel: false,
       confirmText: "Finish",
-      onConfirm: finishWorkout,
+      canConfirm: canFinish,
+      confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
+      // onConfirm: finishWorkout,
+      onConfirm: () {
+        cnStandardPopUp.clear();
+        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          setState(() {
+            cnRunningWorkout.checkMultipleExercisesPerLink();
+            if(cnRunningWorkout.linkWithMultipleExercisesStarted.isNotEmpty){
+              showSelectorExercisePerLink = true;
+              selectorExercisePerLinkKey = UniqueKey();
+            } else{
+              confirmSelectorExPerLink();
+            }
+
+          });
+        });
+        // if(canUpdateTemplate()){
+        //   cnStandardPopUp.clear();
+        //   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+        //     setState(() {
+        //       showSelectorExerciseToUpdate = true;
+        //       selectorExerciseToUpdateKey = UniqueKey();
+        //     });
+        //   });
+        // }
+        // else{
+        //   finishWorkout();
+        // }
+      },
       padding: const EdgeInsets.only(top: 20),
       child: Column(
         children: [
@@ -724,42 +858,43 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   backgroundColor: MaterialStateProperty.all(Colors.transparent),
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
               ),
-              child: const Text(
-                  "STOP Workout"
+              child: Text(
+                  "Stop Workout",
+                style: TextStyle(color: Colors.red.withOpacity(0.6)),
               ),
             ),
           ),
-          Container(
-            height: 0.5,
-            width: double.maxFinite,
-            color: Colors.grey[700]!.withOpacity(0.5),
-          ),
-          SizedBox(
-            height: 40,
-            width: double.maxFinite,
-            child: ElevatedButton(
-                onPressed: () {
-                  cnStandardPopUp.clear();
-                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                    setState(() {
-                      showSelectorExerciseToUpdate = true;
-                      selectorExerciseToUpdateKey = UniqueKey();
-                    });
-                  });
-                },
-                style: ButtonStyle(
-                    shadowColor: MaterialStateProperty.all(Colors.transparent),
-                    surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                ),
-                child: const Text(
-                  "Finish And Update Template"
-                ),
-            ),
-          ),
+          // Container(
+          //   height: 0.5,
+          //   width: double.maxFinite,
+          //   color: Colors.grey[700]!.withOpacity(0.5),
+          // ),
+          // SizedBox(
+          //   height: 40,
+          //   width: double.maxFinite,
+          //   child: ElevatedButton(
+          //       onPressed: () {
+          //         cnStandardPopUp.clear();
+          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          //           setState(() {
+          //             showSelectorExerciseToUpdate = true;
+          //             selectorExerciseToUpdateKey = UniqueKey();
+          //           });
+          //         });
+          //       },
+          //       style: ButtonStyle(
+          //           shadowColor: MaterialStateProperty.all(Colors.transparent),
+          //           surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          //           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+          //       ),
+          //       child: const Text(
+          //         "Finish And Update Template"
+          //       ),
+          //   ),
+          // ),
         ],
-    ),
+      ),
     );
   }
 
@@ -795,7 +930,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     /// delay that the popup is closed
     Future.delayed(Duration(milliseconds: time), (){
       cnRunningWorkout.workout.refreshDate();
-      cnRunningWorkout.removeNotSelectedExercises();
+      cnRunningWorkout.removeNotRelevantExercises();
       cnRunningWorkout.workout.removeEmptyExercises();
       if(cnRunningWorkout.workout.exercises.isNotEmpty){
         cnRunningWorkout.workout.saveToDatabase();
@@ -833,6 +968,8 @@ class CnRunningWorkout extends ChangeNotifier {
   /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
   late CnConfig cnConfig;
+  List<String> linkWithMultipleExercisesStarted = [];
+  List<String> exercisesToRemove = [];
 
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -928,12 +1065,23 @@ class CnRunningWorkout extends ChangeNotifier {
     isVisible = true;
   }
   
-  void removeNotSelectedExercises(){
-    for (MapEntry entry in List.from(groupedExercises.entries)){
-      if(entry.value is Exercise) continue;
-      groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
-    }
-    workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
+  // void removeNotSelectedExercises(){
+  //   for (MapEntry entry in List.from(groupedExercises.entries)){
+  //     if(entry.value is Exercise) continue;
+  //     groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
+  //   }
+  //   workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
+  // }
+
+  void removeNotRelevantExercises(){
+    // for (MapEntry entry in List.from(groupedExercises.entries)){
+    //   if(entry.value is Exercise) {
+    //     continue;
+    //   }
+    //   groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
+    // }
+    // workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
+    workout.exercises.removeWhere((ex) => exercisesToRemove.contains(ex.name));
   }
 
   void setWorkoutTemplate(Workout w){
@@ -1015,13 +1163,33 @@ class CnRunningWorkout extends ChangeNotifier {
     }
   }
 
+  void checkMultipleExercisesPerLink(){
+    Map<String, int> linkCounter = {};
+    Workout tempWo = Workout.clone(workout);
+    tempWo.removeEmptyExercises();
+    for(Exercise ex in tempWo.exercises){
+      if(ex.linkName == null){
+        continue;
+      }
+      if(linkCounter.containsKey(ex.linkName)){
+        linkCounter[ex.linkName!] = linkCounter[ex.linkName]! + 1;
+      } else{
+        linkCounter[ex.linkName!] = 1;
+      }
+    }
+    linkCounter.removeWhere((key, value) => value <= 1);
+    linkWithMultipleExercisesStarted = linkCounter.entries.map((e) => e.key).toList();
+  }
+
   void clear(){
     workout = Workout();
     textControllers.clear();
     slideableKeys.clear();
     selectedIndexes.clear();
     groupedExercises.clear();
+    exercisesToRemove.clear();
     newExNames.clear();
+    linkWithMultipleExercisesStarted.clear();
     scrollController = ScrollController();
     isRunning = false;
     cnConfig.setCnRunningWorkout({});

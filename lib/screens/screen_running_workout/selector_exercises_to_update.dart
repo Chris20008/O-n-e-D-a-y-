@@ -28,24 +28,52 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
   late List<bool> isCheckedList;
   late Workout workout;
+  List<Exercise> relevantExercises = [];
 
   @override
   void initState() {
     workout = Workout.clone(widget.workout);
     workout.removeEmptyExercises();
-    isCheckedList = List<bool>.generate(workout.exercises.length, (index) => false);
+    final List<String> allExNamesTemplate = widget.workoutTemplate.exercises.map((e) => e.name).toList();
+    for(Exercise ex in workout.exercises){
+      if(!allExNamesTemplate.contains(ex.name)){
+        relevantExercises.add(ex);
+        continue;
+      }
+      final tempEx = widget.workoutTemplate.exercises.firstWhere((e) => ex.name == e.name);
+      if(!ex.equals(tempEx)){
+        relevantExercises.add(ex);
+      }
+    }
+    print("RELEVANT EXERCISES");
+    for(Exercise ex in relevantExercises){
+      print(ex.name);
+    }
+    // for(List<Exercise> exs in zip([workout.exercises, widget.workoutTemplate.exercises])){
+    //
+    // }
+    // isCheckedList = List<bool>.generate(workout.exercises.length, (index) => true);
+    isCheckedList = List<bool>.generate(relevantExercises.length, (index) => true);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
 
+    // print("IS VISIBLE");
+    // print(widget.isVisible);
+    //
+    // if(workout.exercises.isEmpty && widget.isVisible){
+    //   widget.onConfirm();
+    //   return const SizedBox();
+    // }
+
     return Stack(
       children: [
         GestureDetector(
           onTap: (){
             widget.onCancel();
-            isCheckedList = List<bool>.generate(widget.workout.exercises.length, (index) => false);
+            isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
           },
         ),
         Center(
@@ -60,17 +88,17 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     color: Theme.of(context).primaryColor,
                     child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
-                        padding: workout.exercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 65),
+                        padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 65),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
                           return Container(
-                            margin: const EdgeInsets.only(top: 15, left: 15, right: 15),
+                            margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
                             height: 1,
                             width: double.maxFinite - 50,
                             color: Colors.amber[900]!.withOpacity(0.4),
                           );
                         },
-                        itemCount: workout.exercises.length,
+                        itemCount: relevantExercises.length,
                         itemBuilder: (context, index){
                           return Padding(
                             padding: const EdgeInsets.only(left: 15),
@@ -90,10 +118,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                   Row(
                                     children: [
                                       OverflowSafeText(
-                                          workout.exercises[index].name,
+                                          relevantExercises[index].name,
                                           minFontSize: 20
                                       ),
-                                      // Text(workout.exercises[index].name, textScaler: const TextScaler.linear(1.35),),
                                       Expanded(child: Container(color: Colors.transparent ,height: 50,),),
                                       Transform.scale(
                                         scale: 1.4,
@@ -110,14 +137,10 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       ),
                                     ],
                                   ),
-                                  Stack(
-                                    children: [
-                                      MultipleExerciseRow(
-                                        exercises: getExercises(index),
-                                        fontSize: 15,
-                                        colorFade: Theme.of(context).primaryColor,
-                                      ),
-                                    ],
+                                  MultipleExerciseRow(
+                                    exercises: getExercises(index),
+                                    fontSize: 15,
+                                    colorFade: Theme.of(context).primaryColor,
                                   )
                                 ],
                               ),
@@ -131,7 +154,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     color: Theme.of(context).primaryColor,
                     child: Center(
                         child: Text(
-                          workout.exercises.isEmpty? "No Exercise To Update" : "Select Exercises To Update",
+                          relevantExercises.isEmpty? "No Exercise To Update" : "Select Exercises To Update",
                           textScaler: const TextScaler.linear(1.5),
                         )
                     ),
@@ -187,7 +210,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     right: 0,
                       child: Row(
                         children: [
-                          if(workout.exercises.isNotEmpty)
+                          if(relevantExercises.isNotEmpty)
                             Expanded(
                                 child: ElevatedButton(
                                     onPressed: () {
@@ -200,7 +223,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                           }
                                         }
                                         for(int index in indexesToRemove.reversed){
-                                          workout.exercises.removeAt(index);
+                                          relevantExercises.removeAt(index);
                                         }
                                       }
                                       /// cancel just closes the widget
@@ -209,6 +232,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                         widget.onConfirm();
                                         vibrateSuccess();
                                         if(doUpdate){
+                                          workout.exercises = relevantExercises;
                                           workout.updateTemplate();
                                         }
                                       });
@@ -235,7 +259,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: Text(workout.exercises.isNotEmpty? "Cancel" : "Ok")
+                                  child: Text(relevantExercises.isNotEmpty? "Cancel" : "Ok")
                               )
                           ),
                         ],
@@ -251,7 +275,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   }
 
   List<Exercise> getExercises(int index){
-    Exercise tempNew = Exercise.clone(workout.exercises[index]);
+    Exercise tempNew = Exercise.clone(relevantExercises[index]);
     Exercise tempTemplate = Exercise.clone(widget.workoutTemplate.exercises.firstWhere((ex) => ex.name == tempNew.name));
 
     tempNew.name = "New";

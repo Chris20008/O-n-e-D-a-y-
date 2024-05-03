@@ -120,7 +120,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                             // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                             shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                         ),
-                                        child: Text(cnStandardPopUp.confirmText)
+                                        child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
                                     )
                                 ),
                                 if(cnStandardPopUp.showCancel)
@@ -167,9 +167,11 @@ class CnStandardPopUp extends ChangeNotifier {
   EdgeInsets padding = const EdgeInsets.all(20);
   String confirmText = "Ok";
   String cancelText = "Cancel";
+  TextStyle? confirmTextStyle;
   Offset? pos;
   bool jump = true;
   bool showCancel = true;
+  bool canConfirm = true;
   Color color = Colors.black;
   int animationTime = 200;
 
@@ -183,7 +185,9 @@ class CnStandardPopUp extends ChangeNotifier {
     String cancelText = "Cancel",
     GlobalKey? animationKey,
     Color? color,
-    bool showCancel = true
+    bool showCancel = true,
+    bool canConfirm = true,
+    TextStyle? confirmTextStyle
   }){
     HapticFeedback.selectionClick();
     jump = true;
@@ -195,6 +199,8 @@ class CnStandardPopUp extends ChangeNotifier {
     this.cancelText = cancelText;
     this.color = color?? Theme.of(context).primaryColor;
     this.showCancel = showCancel;
+    this.canConfirm = canConfirm;
+    this.confirmTextStyle = confirmTextStyle;
 
     if(animationKey != null){
       RenderBox? box = animationKey.currentContext?.findRenderObject() as RenderBox;
@@ -215,6 +221,9 @@ class CnStandardPopUp extends ChangeNotifier {
   }
 
   void confirm(){
+    if(!canConfirm){
+      return;
+    }
     if(onConfirm != null){
       onConfirm!();
     }

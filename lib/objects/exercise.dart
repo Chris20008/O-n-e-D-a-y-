@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:quiver/iterables.dart';
 
 import '../util/objectbox/ob_exercise.dart';
 
@@ -101,6 +102,18 @@ class Exercise{
     );
   }
 
+  bool equals(Exercise ex){
+    if(ex.sets.length != sets.length){
+      return false;
+    }
+    for(List<SingleSet> s in zip([ex.sets, sets])){
+      if(!s[0].equals(s[1])){
+        return false;
+      }
+    }
+    return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
+  }
+
 }
 
 class SingleSet{
@@ -111,6 +124,10 @@ class SingleSet{
     this.weight,
     this.amount
   });
+
+  bool equals(SingleSet s){
+    return weight == s.weight && amount == s.amount;
+  }
 }
 
 class StatisticExercise{
