@@ -108,12 +108,19 @@ class _MyHomePageState extends State<MyHomePage> {
   void initObjectBox() async{
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
-    cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout, context);
-    print("Obejctbox Initialized");
+    cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnScreenStatistics.init();
-    print("Refreshed All Workouts");
+    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible){
+      Future.delayed(const Duration(milliseconds: 300), (){
+        Navigator.push(
+            context,
+            CupertinoPageRoute(
+                builder: (context) => const ScreenRunningWorkout()
+            ));
+        });
+    }
   }
 
   @override

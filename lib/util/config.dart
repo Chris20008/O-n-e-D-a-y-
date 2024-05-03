@@ -48,17 +48,17 @@ class CnConfig extends ChangeNotifier {
   late Config config;
   bool isInitialized = false;
 
-  CnConfig() {
-    initData();
-  }
+  // CnConfig() {
+  //   initData();
+  // }
 
   Future initData() async{
     cache = CustomCacheManager();
 
     final Map<String, dynamic>? tempConfigData = await cache.readData(fileName: "config");
 
-    // print("Received Temp Config Data");
-    // print(tempConfigData);
+    print("Received Temp Config Data");
+    print(tempConfigData);
 
     try{
       if(tempConfigData != null){

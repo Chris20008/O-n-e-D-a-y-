@@ -848,6 +848,7 @@ class CnRunningWorkout extends ChangeNotifier {
     slideableKeys[ex.name] = ex.generateKeyForEachSet();
     groupedExercises[ex.name] = ex;
     textControllers[ex.name] = ex.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
+    cache();
     refresh();
     // print("SCROLL CONTROLLER POSITION 2");
     // print(scrollController.position.pixels);
@@ -873,7 +874,9 @@ class CnRunningWorkout extends ChangeNotifier {
     refresh();
   }
 
-  void initCachedData(Map data, BuildContext context){
+  void initCachedData(Map data){
+    print("Received Cached Data");
+    print(data);
     if(
       data.containsKey("workout") &&
       data.containsKey("workoutTemplate") &&
@@ -895,13 +898,13 @@ class CnRunningWorkout extends ChangeNotifier {
       initGroupedExercises();
       initTextControllers();
       setTextControllerValues(data["testControllerValues"]);
-      if(isVisible && isRunning){
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-                builder: (context) => const ScreenRunningWorkout()
-            ));
-      }
+      // if(isVisible && isRunning){
+      //   Navigator.push(
+      //       context,
+      //       CupertinoPageRoute(
+      //           builder: (context) => const ScreenRunningWorkout()
+      //       ));
+      // }
     }
   }
 
