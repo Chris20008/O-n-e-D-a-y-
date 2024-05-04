@@ -173,10 +173,10 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                   Container(
                     height: 50,
                     color: Theme.of(context).primaryColor,
-                    child: Center(
+                    child: const Center(
                         child: Text(
-                          "Select Exercises To Track",
-                          textScaler: const TextScaler.linear(1.5),
+                          "Select Group Exercises To Track",
+                          textScaler: TextScaler.linear(1.5),
                         )
                     ),
                   ),

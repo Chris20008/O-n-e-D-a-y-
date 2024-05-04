@@ -703,14 +703,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     );
   }
 
-  void confirmSelectorExPerLink({List<String>? exToRemove}){
+  void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
     setState(() {
       showSelectorExercisePerLink = false;
       cnRunningWorkout.exercisesToRemove = exToRemove?? [];
     });
     if(canUpdateTemplate()){
       cnStandardPopUp.clear();
-      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+      Future.delayed(Duration(milliseconds: delay?? cnStandardPopUp.animationTime), (){
         setState(() {
           showSelectorExerciseToUpdate = true;
           selectorExerciseToUpdateKey = UniqueKey();
@@ -814,7 +814,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               showSelectorExercisePerLink = true;
               selectorExercisePerLinkKey = UniqueKey();
             } else{
-              confirmSelectorExPerLink();
+              confirmSelectorExPerLink(delay: 0);
             }
 
           });
