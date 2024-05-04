@@ -36,7 +36,7 @@ dependencies:
   flutter_slidable: ^3.0.1
   objectbox: ^2.3.1
   objectbox_flutter_libs:
-  intl: ^0.19.0
+  intl: ^0.18.1
   quiver: ^3.2.1
   auto_size_text: ^3.0.0
   spotify_sdk: ^2.3.1
@@ -44,15 +44,18 @@ dependencies:
   google_fonts: ^6.2.1
   permission_handler: 11.3.1
   path_provider: ^2.1.2
-  file_picker: ^8.0.0+1
+  file_picker: ^8.0.3
   fl_chart: ^0.67.0
   connectivity_plus: ^6.0.2
   flutter_keyboard_visibility: ^6.0.0
+  jiffy: ^6.2.0
 
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:

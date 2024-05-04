@@ -6,11 +6,13 @@ class Config{
 
   bool showIntro;
   Map cnRunningWorkout;
+  String? languageCode;
   late CustomCacheManager cache;
 
   Config({
     this.showIntro = true,
-    this.cnRunningWorkout = const {}
+    this.cnRunningWorkout = const {},
+    this.languageCode
   }) {
     cache = CustomCacheManager();
     save();
@@ -18,12 +20,14 @@ class Config{
 
   Map<String, dynamic> toJson() => {
     'showIntro': showIntro,
+    "languageCode": languageCode,
     'cnRunningWorkout': cnRunningWorkout
   };
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
       showIntro: json['showIntro']?? false,
+      languageCode: json['languageCode'],
       cnRunningWorkout: json['cnRunningWorkout']?? {}
     );
   }
@@ -47,10 +51,6 @@ class CnConfig extends ChangeNotifier {
   late CustomCacheManager cache;
   late Config config;
   bool isInitialized = false;
-
-  // CnConfig() {
-  //   initData();
-  // }
 
   Future initData() async{
     cache = CustomCacheManager();
@@ -82,6 +82,11 @@ class CnConfig extends ChangeNotifier {
 
   Future setShowIntro(bool state) async{
     config.showIntro = state;
+    await config.save();
+  }
+
+  Future setLanguage(String languageCode) async{
+    config.languageCode = languageCode;
     await config.save();
   }
 

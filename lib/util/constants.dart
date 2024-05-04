@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/intl_standalone.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -11,13 +13,30 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'objectbox/ob_exercise.dart';
 
-final testdata = {
-  "Name": "TESTNAME",
-  "Exercises": {
-    "Dips": [2, 3, 4, 5, 6, 7],
-    "ChestFlys": [7, 6, 5, 4, 3, 2]
-  }
+Future setIntlLanguage({String? countryCode})async{
+  final res = await findSystemLocale();
+  Intl.systemLocale = countryCode?? res;
+}
+
+class Language{
+  final String languageCode;
+  final String countryCode;
+
+  Language({required this.languageCode, required this.countryCode});
+}
+
+Map languages = {
+  "de": Language(languageCode: "de", countryCode: "de_DE"),
+  "en": Language(languageCode: "en", countryCode: "en_US")
 };
+
+enum LANGUAGES{
+  de ("de"),
+  en ("en");
+
+  const LANGUAGES(this.value);
+  final String value;
+}
 
 Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   Widget iconButton = IconButton(
@@ -36,47 +55,6 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
     ),
   );
 }
-
-// Widget blurredIconButton({required Icon icon, Function()? onPressed, Key? key}){
-//   Widget iconButton = IconButton(
-//     key: key,
-//     iconSize: 25,
-//     onPressed: onPressed,
-//     icon: icon,
-//   );
-//   return ClipRRect(
-//     borderRadius: BorderRadius.circular(40),
-//     child: Container(
-//       height: 40,
-//       width: 40,
-//       color: Colors.grey.withOpacity(0.3),
-//       child: FutureBuilder(
-//         future: test(iconButton),
-//         builder: (context, snapshot) {
-//           if(snapshot.hasData){
-//             return snapshot.data!;
-//           }
-//           return iconButton;
-//         },
-//       ),
-//     ),
-//   );
-// }
-
-// Future<Widget> computeBlurredBackground(Widget child) async{
-//   return BackdropFilter(
-//     filter: ImageFilter.blur(
-//         sigmaX: 10.0,
-//         sigmaY: 10.0,
-//         tileMode: TileMode.mirror
-//     ),
-//     child: child
-//   );
-// }
-
-// Future<Widget> test(Widget child) async{
-//   return await computeBlurredBackground(child);
-// }
 
 enum TimeInterval {
   monthly ("Monthly"),
@@ -133,7 +111,9 @@ Future<Directory?> getDirectory() async{
 }
 
 void loadBackup() async{
-  FilePickerResult? result = await FilePicker.platform.pickFiles();
+  FilePickerResult? result = await FilePicker.platform.pickFiles(
+      initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files"
+  );
 
   if (result != null) {
     print("------- GOT RESULT -------");
@@ -154,6 +134,18 @@ void loadBackup() async{
     objectbox.exerciseBox.removeAll();
     objectbox.workoutBox.putMany(allObWorkouts);
     objectbox.exerciseBox.putMany(allObExercises);
+  } else {
+    // User canceled the picker
+  }
+}
+
+void pickBackupPath() async{
+  // FilePickerResult? result = await FilePicker.platform.pickFiles();
+  String? result = await FilePicker.platform.getDirectoryPath();
+
+  if (result != null) {
+    print("------- GOT pickBackupPath RESULT -------");
+    print(result);
   } else {
     // User canceled the picker
   }

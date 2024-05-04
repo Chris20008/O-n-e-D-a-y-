@@ -425,7 +425,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             ),
                           ),
                           child: Text(
-                            DateFormat('E. d. MMMM').format(cnNewWorkout.workout.date!),
+                            DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),
                             // '${cnNewWorkout.workout.date!.month}-${cnNewWorkout.workout.date!.day}-${cnNewWorkout.workout.date!.year}',
                             style: const TextStyle(
                               fontSize: 20.0,
@@ -775,9 +775,13 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   bool isCurrentlyRebuilding = false;
   double keepShowingPanelHeight = Platform.isAndroid? 180 : 212; //212;
   late CnHomepage cnHomepage;
+  late CnWorkouts cnWorkouts;
+  late CnWorkoutHistory cnWorkoutHistory;
 
   CnNewWorkOutPanel(BuildContext context){
     cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+    cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+    cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   }
 
   void delayedRefresh() async{
@@ -808,6 +812,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     refresh();
     print("open panel ${workout.linkedExercises}");
     cnHomepage.refresh();
+    cnWorkouts.refresh();
+    cnWorkoutHistory.refresh();
   }
 
   void addToExercisesAndLinksList(dynamic item){
@@ -919,6 +925,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
       });
     });
     cnHomepage.refresh();
+    cnWorkouts.refresh();
+    cnWorkoutHistory.refresh();
   }
 
   void editWorkout(Workout workout){

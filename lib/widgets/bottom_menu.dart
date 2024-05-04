@@ -10,6 +10,7 @@ import '../screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workout_history/screen_workout_history.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
+import '../util/config.dart';
 
 class BottomMenu extends StatefulWidget {
   const BottomMenu({super.key});
@@ -26,6 +27,7 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
   final double height = Platform.isAndroid? 60 : 50;
 
@@ -117,10 +119,12 @@ class _BottomMenuState extends State<BottomMenu> {
     }
     else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();
+
+      // only for testing changing language
+      // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
       cnScreenStatistics.calculateCurrentData();
-      // cnScreenStatistics.refresh();
     }
     cnHomepage.refresh();
   }

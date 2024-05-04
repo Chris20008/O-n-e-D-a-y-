@@ -71,7 +71,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   children: [
                     if(!widget.workout.isTemplate)
                       Text(
-                        DateFormat('E. d. MMMM').format(widget.workout.date!),
+                        DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(widget.workout.date!),
                         textScaler: const TextScaler.linear(0.8),
                         style: const TextStyle(
                             color: Colors.white,

@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../objectbox.g.dart';
@@ -48,7 +49,15 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               itemCount: cnWorkouts.workouts.length+1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == cnWorkouts.workouts.length){
-                  return const SizedBox(height: 100);
+                  return SafeArea(
+                      top: false,
+                      left: false,
+                      right: false,
+                      child: AnimatedContainer(
+                        height: cnSpotifyBar.height + 20 + (cnNewWorkout.minPanelHeight > 0? cnNewWorkout.minPanelHeight-MediaQuery.paddingOf(context).bottom : 0),
+                        duration: const Duration(milliseconds: 300),
+                      )
+                  );
                 }
                 if(index == 0){
                   return Column(
@@ -128,6 +137,24 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                       )
                   ),
                 ),
+                // SizedBox(
+                //   width: 54,
+                //   height: 54,
+                //   child: IconButton(
+                //       iconSize: 25,
+                //       style: ButtonStyle(
+                //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                //       ),
+                //       onPressed: () {
+                //         // saveBackup();
+                //         pickBackupPath();
+                //       },
+                //       icon: Icon(
+                //         Icons.cloud_circle_outlined,
+                //         color: Colors.amber[800],
+                //       )
+                //   ),
+                // ),
                 Spacer(),
                 // SizedBox(
                 //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
@@ -176,11 +203,6 @@ class CnWorkouts extends ChangeNotifier {
   Key key = UniqueKey();
   List<bool> opened = [];
   ScrollController scrollController = ScrollController();
-  late CnSpotifyBar cnSpotifyBar;
-
-  CnWorkouts(BuildContext context){
-    cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  }
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();
