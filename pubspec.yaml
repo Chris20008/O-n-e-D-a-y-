@@ -49,6 +49,7 @@ dependencies:
   connectivity_plus: ^6.0.2
   flutter_keyboard_visibility: ^6.0.0
   jiffy: ^6.2.0
+  flutter_dotenv: ^5.1.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -83,6 +84,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/assets/
+    - dotenv.env
 
   fonts:
     - family: MyIcons

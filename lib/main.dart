@@ -17,6 +17,7 @@ import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
@@ -142,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void initObjectBox() async{
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
+    await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.languageCode == null){
       print("IS NULL SO SAVE");
       cnConfig.setLanguage(Localizations.localeOf(context).languageCode);

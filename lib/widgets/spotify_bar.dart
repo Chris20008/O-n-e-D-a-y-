@@ -18,6 +18,7 @@ import '../screens/screen_running_workout/screen_running_workout.dart';
 import 'animated_column.dart';
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
@@ -479,11 +480,11 @@ class CnSpotifyBar extends ChangeNotifier {
     isTryingToConnect = true;
     try{
       if(Platform.isAndroid){
-        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "fitness-app://spotify-callback");
       }
       else{
-        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
-        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
+        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
       }
       if(isConnected){
         _subscribeToPlayerState();
