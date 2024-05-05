@@ -92,13 +92,13 @@ Widget OverflowSafeText(
 Future<bool> saveBackup() async{
   Directory? appDocDir = await getDirectory();
   final path = appDocDir?.path;
+  /// Seems like having ':' in the filename leads to issues, so we replace them
   final filename = "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
-  // final filename = "Auto_Backup_TEST2.txt";
   final fullPath = '$path/$filename';
   final file = File(fullPath);
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
 
-  if(dotenv.env["ICLOUD_CONTAINER_ID"] != null){
+  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null){
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
       filePath: fullPath,
