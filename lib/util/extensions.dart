@@ -10,6 +10,11 @@ extension DateOnlyCompare on DateTime {
     return year == today.year && month == today.month && day == today.day;
   }
 
+  bool isYesterday() {
+    final today = DateTime.now().subtract(const Duration(days: 1));
+    return year == today.year && month == today.month && day == today.day;
+  }
+
   bool isInLastSevenDays(){
     final lastSevenDays = DateTime.now().subtract(const Duration(days: 7));
     return isAfter(lastSevenDays);

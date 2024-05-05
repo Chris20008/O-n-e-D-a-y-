@@ -100,6 +100,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               children: [
                 SafeArea(
                   bottom: false,
+                  // child: SizedBox()
                   child: SizedBox(
                     width: 54,
                     height: 54,
@@ -110,7 +111,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         ),
                         onPressed: () {
                           saveBackup();
-                          // loadBackup();
                         },
                         icon: Icon(
                           Icons.backup,

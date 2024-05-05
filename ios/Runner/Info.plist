@@ -43,6 +43,18 @@
 	<true/>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Access to devices storage is necessary to create a backup.</string>
+	<key>NSUbiquitousContainers</key>
+	<dict>
+		<key>iCloud.christian.range.OneDay</key>
+		<dict>
+			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
+			<true/>
+			<key>NSUbiquitousContainerName</key>
+			<string>O̶n̶e̶D̶a̶y̶</string>
+			<key>NSUbiquitousContainerSupportedFolderLevels</key>
+			<string>Any</string>
+		</dict>
+	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIFileSharingEnabled</key>

@@ -898,28 +898,28 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     );
   }
 
-  void stopWorkout({int? time}){
+  Future stopWorkout({int? time})async{
     time = time?? cnStandardPopUp.animationTime;
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
     }
-    Future.delayed(Duration(milliseconds: time), (){
+    await Future.delayed(Duration(milliseconds: time), ()async{
       cnRunningWorkout.isVisible = false;
       cnRunningWorkout.isRunning = false;
       cnHomepage.refresh();
       cnWorkouts.refresh();
-      Future.delayed(const Duration(milliseconds: 50), (){
+      await Future.delayed(const Duration(milliseconds: 50), ()async{
         Navigator.of(context).pop();
         /// delayed that the pop context is finished, if to short, the user
         /// will se a blank page which is not wanted
-        Future.delayed(const Duration(milliseconds: 500), (){
+        await Future.delayed(const Duration(milliseconds: 500), (){
           cnRunningWorkout.clear();
         });
       });
     });
   }
 
-  void finishWorkout(){
+  Future finishWorkout() async{
     int time;
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
@@ -928,7 +928,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       time = 0;
     }
     /// delay that the popup is closed
-    Future.delayed(Duration(milliseconds: time), (){
+    await Future.delayed(Duration(milliseconds: time), ()async{
       cnRunningWorkout.workout.refreshDate();
       cnRunningWorkout.removeNotRelevantExercises();
       cnRunningWorkout.workout.removeEmptyExercises();
@@ -936,7 +936,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnRunningWorkout.workout.saveToDatabase();
         cnWorkouts.refreshAllWorkouts();
       }
-      stopWorkout(time: 0);
+      await stopWorkout(time: 0);
+      saveBackup();
     });
   }
 }

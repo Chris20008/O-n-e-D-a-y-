@@ -53,7 +53,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
     //
     // }
     // isCheckedList = List<bool>.generate(workout.exercises.length, (index) => true);
-    isCheckedList = List<bool>.generate(relevantExercises.length, (index) => true);
+    isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
     super.initState();
   }
 

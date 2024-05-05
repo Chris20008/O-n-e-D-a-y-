@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:icloud_storage/icloud_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:path_provider/path_provider.dart';
@@ -90,8 +92,36 @@ Widget OverflowSafeText(
 Future<bool> saveBackup() async{
   Directory? appDocDir = await getDirectory();
   final path = appDocDir?.path;
-  final file = File('$path/Auto_Backup_${DateTime.now()}.txt');
+  final filename = "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
+  // final filename = "Auto_Backup_TEST2.txt";
+  final fullPath = '$path/$filename';
+  final file = File(fullPath);
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
+
+  if(dotenv.env["ICLOUD_CONTAINER_ID"] != null){
+    await ICloudStorage.upload(
+      containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
+      filePath: fullPath,
+      /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
+      /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
+      destinationRelativePath: 'Documents/backups/$filename',
+      onProgress: (stream) {
+        // final uploadProgressSub = stream.listen(
+        //       (progress) => print('Upload File Progress: $progress'),
+        //   onDone: () => print('Upload File Done'),
+        //   onError: (err) => print('Upload File Error: $err'),
+        //   cancelOnError: true,
+        // );
+      },
+    );
+
+    // final fileList = await ICloudStorage.gather(
+    //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
+    // );
+    // print("Files gathered");
+    // fileList.forEach((element) {print(element.relativePath);});
+  }
+
   return true;
 }
 

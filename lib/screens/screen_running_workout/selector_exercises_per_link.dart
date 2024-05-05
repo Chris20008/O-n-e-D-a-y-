@@ -30,7 +30,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
     print("RELEVANT LINKS");
     print(widget.relevantLinkNames);
     for(MapEntry e in widget.groupedExercises.entries){
-      // print("Map Entry");
       if(!widget.relevantLinkNames.contains(e.key) || e.value is Exercise){
         continue;
       }
@@ -38,6 +37,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       for(Exercise ex in groupedExercises[e.key]){
         ex.removeEmptySets();
       }
+      // groupedExercises[e.key].removeWhere((ex) => ex.sets.isEmpty);
     }
     // groupedExercises = Map.from(widget.groupedExercises);
     // groupedExercises.removeWhere((key, value) => value is Exercise);
@@ -121,48 +121,54 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                     ],
                                   ),
                                   for(Exercise ex in groupedExercises[linkNames[index]])
-                                    GestureDetector(
-                                      onTap: (){
-                                        setState(() {
-                                          final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
-                                          isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
-                                          if(!currentState){
-                                            vibrateConfirm();
-                                          } else{
-                                            vibrateCancel();
-                                          }
-                                        });
-                                      },
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: MultipleExerciseRow(
-                                              exercises: [ex],
-                                              fontSize: 15,
-                                              colorFade: Theme.of(context).primaryColor,
+                                    /// show only exercises that actually to have filled sets
+                                    /// In a Group with 3 or more Exercises it is likely to happen
+                                    /// that the user fills two exercises. However the not filled
+                                    /// exercises are still in the group. Here we filter for only those
+                                    /// that actually have filled sets
+                                    if(ex.sets.isNotEmpty)
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
+                                            isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
+                                            if(!currentState){
+                                              vibrateConfirm();
+                                            } else{
+                                              vibrateCancel();
+                                            }
+                                          });
+                                        },
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: MultipleExerciseRow(
+                                                exercises: [ex],
+                                                fontSize: 15,
+                                                colorFade: Theme.of(context).primaryColor,
+                                              ),
                                             ),
-                                          ),
-                                          Transform.scale(
-                                            scale: 1.4,
-                                            child: Checkbox(
-                                              checkColor: Colors.white,
-                                              value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
-                                              shape: const CircleBorder(),
-                                              onChanged: (bool? value) {
-                                                setState(() {
-                                                  isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value!;
-                                                  if(value){
-                                                    vibrateConfirm();
-                                                  } else{
-                                                    vibrateCancel();
-                                                  }
-                                                });
-                                              },
+                                            Transform.scale(
+                                              scale: 1.4,
+                                              child: Checkbox(
+                                                checkColor: Colors.white,
+                                                value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
+                                                shape: const CircleBorder(),
+                                                onChanged: (bool? value) {
+                                                  setState(() {
+                                                    isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value!;
+                                                    if(value){
+                                                      vibrateConfirm();
+                                                    } else{
+                                                      vibrateCancel();
+                                                    }
+                                                  });
+                                                },
+                                              ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                                          ],
+                                        ),
+                                      )
                                 ],
                               ),
                             ),

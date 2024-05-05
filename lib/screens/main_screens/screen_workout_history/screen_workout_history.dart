@@ -73,33 +73,68 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 /// check if date is not null
                 if (dateOfWorkout != null) {
 
-                  if(dateOfWorkout.isToday()){
-                    if(dateOfNewerWorkout == null){
-                      child = Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Center(
-                            child: Text(
-                              "Today",
-                              textScaler: TextScaler.linear(1.8),
-                            ),
+                  if(dateOfWorkout.isToday() &&
+                      (dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday())
+                  ){
+                    child = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Center(
+                          child: Text(
+                            "Today",
+                            textScaler: TextScaler.linear(1.8),
                           ),
-                          const SizedBox(height: 5),
-                          child
-                        ],
-                      );
-                    }
-                    return child;
+                        ),
+                        const SizedBox(height: 5),
+                        child
+                      ],
+                    );
+                    // if(dateOfNewerWorkout == null){
+                    //   child = Column(
+                    //     crossAxisAlignment: CrossAxisAlignment.start,
+                    //     children: [
+                    //       const Center(
+                    //         child: Text(
+                    //           "Today",
+                    //           textScaler: TextScaler.linear(1.8),
+                    //         ),
+                    //       ),
+                    //       const SizedBox(height: 5),
+                    //       child
+                    //     ],
+                    //   );
+                    // }
+                    // return child;
                   }
 
-                  else if(dateOfWorkout.isInLastSevenDays() &&
-                      (dateOfNewerWorkout == null || dateOfNewerWorkout.isToday())
+                  else if(dateOfWorkout.isYesterday() &&
+                      (dateOfNewerWorkout == null || !dateOfNewerWorkout.isYesterday())
                   ){
                     child = Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if(dateOfNewerWorkout != null)
-                          SizedBox(height: 40,),
+                          const SizedBox(height: 40,),
+                        const Center(
+                          child: Text(
+                            "Yesterday",
+                            textScaler: TextScaler.linear(1.7),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        child
+                      ],
+                    );
+                  }
+
+                  else if(dateOfWorkout.isInLastSevenDays() &&
+                      (dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday())
+                  ){
+                    child = Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if(dateOfNewerWorkout != null)
+                          const SizedBox(height: 40,),
                         const Center(
                           child: Text(
                             "Last 7 Days",
@@ -119,7 +154,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if(dateOfNewerWorkout != null)
-                          SizedBox(height: 40,),
+                          const SizedBox(height: 40,),
                         Center(
                           child: Text(
                             DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
