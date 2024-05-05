@@ -46,7 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  final Language _language = languages[LANGUAGES.de.value];
+  final Language _language = languages[LANGUAGES.en.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
@@ -60,6 +60,7 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    // setIntlLanguage(countryCode: _language.countryCode);
     setIntlLanguage();
   }
 
@@ -143,10 +144,10 @@ class _MyHomePageState extends State<MyHomePage> {
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     if(cnConfig.config.languageCode == null){
-      print("IS NULL SO SAVE");
-      cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
+      if(context.mounted){
+        cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
+      }
     } else{
-      print("IS NOT NULL: ${cnConfig.config.languageCode}");
       if(context.mounted){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.languageCode);
       }
