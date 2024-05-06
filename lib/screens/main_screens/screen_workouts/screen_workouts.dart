@@ -159,28 +159,29 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 // SizedBox(
                 //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
                 // ),
-                SizedBox(
-                  width: 54,
-                  height: 54,
-                  child: IconButton(
-                      iconSize: 25,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                      ),
-                      onPressed: () {
-                        if(cnNewWorkout.isUpdating){
-                          cnNewWorkout.clear();
-                        }
-                        cnNewWorkout.workout.isTemplate = true;
-                        cnNewWorkout.openPanel();
-                        cnHomepage.refresh();
-                      },
-                      icon: Icon(
-                          Icons.add,
-                        color: Colors.amber[800],
-                      )
+                if(cnNewWorkout.minPanelHeight <= 0)
+                  SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          if(cnNewWorkout.isUpdating){
+                            cnNewWorkout.clear();
+                          }
+                          cnNewWorkout.workout.isTemplate = true;
+                          cnNewWorkout.openPanel();
+                          cnHomepage.refresh();
+                        },
+                        icon: Icon(
+                            Icons.add,
+                          color: Colors.amber[800],
+                        )
+                    ),
                   ),
-                ),
 
                 /// Space to be over bottom navigation bar
                 const SafeArea(

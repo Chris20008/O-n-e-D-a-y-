@@ -8,7 +8,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
-import 'package:fitness_app/widgets/animated_column.dart';
+import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';

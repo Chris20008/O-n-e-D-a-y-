@@ -15,7 +15,7 @@ import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
 import '../main.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
-import 'animated_column.dart';
+import '../screens/screen_running_workout/animated_column.dart';
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';

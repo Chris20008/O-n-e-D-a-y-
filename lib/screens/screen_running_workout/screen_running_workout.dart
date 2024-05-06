@@ -2,7 +2,7 @@ import 'dart:ui';
 import 'package:fitness_app/screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/util/config.dart';
-import 'package:fitness_app/widgets/animated_column.dart';
+import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
@@ -742,7 +742,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       lastEx.addSet();
       cnRunningWorkout.textControllers[ex.name]?.add([TextEditingController(), TextEditingController()]);
       cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
-      cnRunningWorkout.scrollController.jumpTo(cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2);
+      final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
+      if(newControllerPos >= 0 && cnRunningWorkout.scrollController.position.maxScrollExtent >= newControllerPos){
+        cnRunningWorkout.scrollController.jumpTo(newControllerPos);
+      }
     });
   }
 

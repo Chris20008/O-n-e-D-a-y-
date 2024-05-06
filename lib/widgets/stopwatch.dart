@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
-import 'animated_column.dart';
+import '../screens/screen_running_workout/animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
   const StopwatchWidget({super.key});

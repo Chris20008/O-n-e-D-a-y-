@@ -71,6 +71,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
+    print("REBUILD WORKOUT PANEL");
+    print("REBUILD WORKOUT PANEL");
+    print("REBUILD WORKOUT PANEL");
+    print("REBUILD WORKOUT PANEL");
+
     return PopScope(
       canPop: false,
       onPopInvoked: (doPop){
@@ -338,7 +343,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                               }
                               return null;
                             },
-                            onTap: (){
+                            onTap: ()async{
                               if(cnNewWorkout.panelController.isPanelClosed){
                                 Future.delayed(const Duration(milliseconds: 300), (){
                                   HapticFeedback.selectionClick();
@@ -804,6 +809,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     // }
     if(value == 0 || value == 1){
       cnNewWorkout.refresh();
+    }
+    if(value == 0){
       FocusScope.of(context).unfocus();
     }
     cnBottomMenu.refresh();

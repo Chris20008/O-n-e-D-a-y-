@@ -5,9 +5,9 @@ import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../main.dart';
-import '../objects/exercise.dart';
-import 'bottom_menu.dart';
+import '../../main.dart';
+import '../../objects/exercise.dart';
+import '../../widgets/bottom_menu.dart';
 
 class AnimatedColumn extends StatefulWidget {
   const AnimatedColumn({super.key});
