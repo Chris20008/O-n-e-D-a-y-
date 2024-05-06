@@ -38,7 +38,7 @@ class Exercise{
   );
 
   ObExercise toObExercise(){
-    List<int> weights = [];
+    List<double> weights = [];
     List<int> amounts = [];
     sets = sets.where((set) => set.weight != null && set.amount != null).toList();
     for (SingleSet set in sets){
@@ -59,7 +59,7 @@ class Exercise{
     return sets.map((e) => UniqueKey()).toList();
   }
 
-  void addSet({int? weight, int? amount}){
+  void addSet({double? weight, int? amount}){
     sets.add(SingleSet(weight: weight, amount: amount));
   }
 
@@ -117,7 +117,7 @@ class Exercise{
 }
 
 class SingleSet{
-  int? weight;
+  double? weight;
   int? amount;
 
   SingleSet({
@@ -132,7 +132,7 @@ class SingleSet{
 
 class StatisticExercise{
   String name;
-  int weight;
+  double weight;
   int amount;
   DateTime date;
   StatisticExercise({

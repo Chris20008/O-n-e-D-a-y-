@@ -22,7 +22,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   final double _iconSize = 25;
-  final double _widthSetWeightAmount = 50;
+  final double _widthSetWeightAmount = 55;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -269,10 +269,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             color: Colors.transparent,
                                             child: TextField(
                                               key: cnNewExercise.ensureVisibleKeys[index][0],
-                                              maxLength: 3,
-                                              style: const TextStyle(
-                                                  fontSize: 18,
-                                              ),
+                                              maxLength: 6,
+                                              style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
                                               onTap: ()async{
                                                 // cnNewExercise.controllers[index][0].text = "";
                                                 // cnNewExercise.exercise.sets[index].weight = null;
@@ -289,7 +287,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               },
                                               textAlign: TextAlign.center,
                                               controller: cnNewExercise.controllers[index][0],
-                                              keyboardType: TextInputType.number,
+                                              keyboardType: const TextInputType.numberWithOptions(
+                                                  decimal: true,
+                                                  signed: false
+                                              ),
                                               keyboardAppearance: Brightness.dark,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -299,11 +300,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               onChanged: (value) {
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
-                                                  cnNewExercise.exercise.sets[index].weight = int.tryParse(value);
+                                                  value = validateDoubleTextInput(value);
+                                                  cnNewExercise.controllers[index][0].text = value;
+                                                  cnNewExercise.exercise.sets[index].weight = double.tryParse(value);
                                                 }
                                                 else{
                                                   cnNewExercise.exercise.sets[index].weight = null;
                                                 }
+                                                setState(() {
+
+                                                });
                                               },
                                             ),
                                           ),
@@ -320,8 +326,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   fontSize: 18
                                               ),
                                               onTap: ()async{
-                                                // cnNewExercise.controllers[index][1].text = "";
-                                                // cnNewExercise.exercise.sets[index].amount = null;
                                                 cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
                                                 if(insetsBottom == 0) {
                                                   await Future.delayed(const Duration(milliseconds: 300));
@@ -340,12 +344,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                 counterText: "",
-                                                contentPadding: EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                                contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                               ),
                                               onChanged: (value){
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
+                                                  final newValue = int.tryParse(value);
                                                   cnNewExercise.exercise.sets[index].amount = int.tryParse(value);
+                                                  if(newValue == null){
+                                                    cnNewExercise.controllers[index][1].clear();
+                                                  }
                                                 }
                                                 else{
                                                   cnNewExercise.exercise.sets[index].amount = null;

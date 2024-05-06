@@ -55,7 +55,7 @@ class Workout{
       name: w.name,
       exercises: List.from(w.exercises.map((e) => Exercise(
           name: e.name,
-          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0], amount: set[1]))),
+          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt()))),
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel,
           linkName: e.linkName

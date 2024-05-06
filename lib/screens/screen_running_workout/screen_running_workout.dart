@@ -54,6 +54,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
   final double _iconSize = 20;
   final double _heightOfSetRow = 30;
+  final double _widthOfTextField = 55;
   final double _setPadding = 5;
   Key selectorExerciseToUpdateKey = UniqueKey();
   Key selectorExercisePerLinkKey = UniqueKey();
@@ -70,6 +71,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   @override
   Widget build(BuildContext context) {
+
+    print("\n\nREBUILD\n\n");
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     if(showSelectorExerciseToUpdate){
@@ -378,86 +381,82 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
                                                   /// Set
                                                   SizedBox(
-                                                      width: 50,
+                                                      width: _widthOfTextField,
                                                       child: Text("${indexSet + 1}", textScaleFactor: 1.2,)
                                                   ),
 
                                                   /// Button to copy templates data
                                                   Expanded(
-                                                    flex: 3,
-                                                    child: SizedBox(
-                                                      height: _heightOfSetRow,
-                                                      child: Row(
-                                                        children: [
-                                                          const Spacer(),
-                                                          IgnorePointer(
-                                                            ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                        cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
-                                                                        set.weight != null &&
-                                                                        set.amount != null),
-                                                            child: ElevatedButton(
-                                                              style: ButtonStyle(
-                                                                  shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                                                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                                                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
-                                                              ),
-                                                              onPressed: (){
-                                                                if(set.weight?.toString() != null &&
-                                                                   set.amount?.toString() != null &&
-                                                                   cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                   cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
-                                                                ){
-                                                                  vibrateConfirm();
-                                                                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = set.weight!.toString();
-                                                                  newEx.sets[indexSet].weight = set.weight;
-                                                                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
-                                                                  newEx.sets[indexSet].amount = set.amount;
-                                                                  cnRunningWorkout.refresh();
-                                                                  cnRunningWorkout.cache();
-                                                                } else{
-                                                                  setState(() {
-                                                                    FocusScope.of(context).unfocus();
-                                                                  });
-                                                                }
-                                                              },
-                                                              child: Container(
-                                                                color: Colors.transparent,
-                                                                width: 100,
-                                                                child: Center(
-                                                                  child: OverflowSafeText(
-                                                                    maxLines: 1,
-                                                                    set.weight != null && set.amount != null? "${set.weight?? ""} kg x ${set.amount?? ""}" : "",
-                                                                    style: TextStyle(
-                                                                        color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                                cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
-                                                                          ?Colors.white
-                                                                          : Colors.white.withOpacity(0.2)
-                                                                    ),
-                                                                  ),
-                                                                ),
+                                                    flex: 2,
+                                                    child: IgnorePointer(
+                                                      ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                                  cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
+                                                                  set.weight != null &&
+                                                                  set.amount != null),
+                                                      child: SizedBox(
+                                                        height: _heightOfSetRow,
+                                                        child: ElevatedButton(
+                                                          style: ButtonStyle(
+                                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
+                                                          ),
+                                                          onPressed: (){
+                                                            if(set.weight?.toString() != null &&
+                                                               set.amount?.toString() != null &&
+                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
+                                                            ){
+                                                              vibrateConfirm();
+                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weight.toString().endsWith(".0")? set.weight?.toInt().toString() : set.weight.toString())?? "";
+                                                              newEx.sets[indexSet].weight = set.weight;
+                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                                                              newEx.sets[indexSet].amount = set.amount;
+                                                              cnRunningWorkout.refresh();
+                                                              cnRunningWorkout.cache();
+                                                            } else{
+                                                              setState(() {
+                                                                FocusScope.of(context).unfocus();
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Center(
+                                                            child: OverflowSafeText(
+                                                              maxLines: 1,
+                                                              set.weight != null && set.amount != null? "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""} kg x ${set.amount?? ""}" : "",
+                                                              style: TextStyle(
+                                                                  color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                                          cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
+                                                                    ?Colors.white
+                                                                    : Colors.white.withOpacity(0.2)
                                                               ),
                                                             ),
                                                           ),
-                                                        ],
+                                                        ),
                                                       ),
                                                     )
                                                   ),
 
+                                                  /// Weight and Amount
                                                   Expanded(
                                                     flex: 2,
                                                     child: Row(
                                                       mainAxisAlignment: MainAxisAlignment.center,
                                                       children: [
+
                                                         /// Weight
                                                         SizedBox(
-                                                          width: 50,
+                                                          width: _widthOfTextField,
                                                           height: _heightOfSetRow,
                                                           child: Center(
                                                             child: TextField(
-                                                              maxLength: 3,
+                                                              maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
                                                               textAlign: TextAlign.center,
-                                                              keyboardType: TextInputType.number,
+                                                              keyboardType: const TextInputType.numberWithOptions(
+                                                                  decimal: true,
+                                                                  signed: false
+                                                              ),
                                                               keyboardAppearance: Brightness.dark,
                                                               controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
                                                               onTap: (){
@@ -469,35 +468,41 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                   counterText: "",
                                                                   contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
                                                                   hintFadeDuration: const Duration(milliseconds: 200),
-                                                                  hintText: "${set.weight?? ""}",
-                                                                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
+                                                                  hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
+                                                                  hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15))
                                                               ),
-                                                              style: const TextStyle(
-                                                                fontSize: 18,
-                                                              ),
+                                                              style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text),
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
-                                                                  newEx.sets[indexSet].weight = int.tryParse(value);
+                                                                  value = validateDoubleTextInput(value);
+                                                                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
+                                                                  newEx.sets[indexSet].weight = double.tryParse(value);
                                                                 }
                                                                 else{
                                                                   newEx.sets[indexSet].weight = null;
                                                                 }
                                                                 cnRunningWorkout.cache();
+                                                                setState(() => {});
                                                               },
                                                             ),
                                                           ),
                                                         ),
+
                                                         const SizedBox(width: 10,),
+
                                                         /// Amount
                                                         SizedBox(
-                                                          width: 50,
+                                                          width: _widthOfTextField,
                                                           height: _heightOfSetRow,
                                                           child: Center(
                                                             child: TextField(
                                                               maxLength: 3,
                                                               textAlign: TextAlign.center,
-                                                              keyboardType: TextInputType.number,
+                                                              keyboardType: const TextInputType.numberWithOptions(
+                                                                  decimal: false,
+                                                                  signed: false
+                                                              ),
                                                               keyboardAppearance: Brightness.dark,
                                                               controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
                                                               onTap: (){
@@ -517,10 +522,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               onChanged: (value){
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
-                                                                  newEx.sets[indexSet].amount = int.tryParse(value);
+                                                                  final newValue = int.tryParse(value);
+                                                                  newEx.sets[indexSet].amount = newValue;
+                                                                  if(newValue == null){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1];
+                                                                  }
+                                                                  if(value.length == 1){
+                                                                    setState(() => {});
+                                                                  }
                                                                 }
                                                                 else{
                                                                   newEx.sets[indexSet].amount = null;
+                                                                  setState(() => {});
                                                                 }
                                                                 cnRunningWorkout.cache();
                                                               },

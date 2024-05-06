@@ -15,6 +15,41 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import 'objectbox/ob_exercise.dart';
 
+TextStyle getTextStyleForTextField(String text, {Color? color}){
+  return TextStyle(
+    fontSize: text.length < 4
+    ?18
+    : text.length < 5
+    ? 16
+    : text.length < 6
+    ? 13 : 10,
+    color: color,
+  );
+}
+
+String validateDoubleTextInput(String text){
+  if(text.characters.last == "."){
+    final count = ".".allMatches(text).length;
+    if(count > 1){
+      text = text.substring(0, text.length-1);
+    }
+  }
+  if(text.characters.first == "."){
+    text = "0$text";
+  }
+  return text;
+}
+
+String checkOnlyOneDecimalPoint(String text){
+  if(text.characters.last == "."){
+    final count = ".".allMatches(text).length;
+    if(count > 1){
+      text = text.substring(0, text.length-1);
+    }
+  }
+  return text;
+}
+
 Future setIntlLanguage({String? countryCode})async{
   final res = await findSystemLocale();
   Intl.systemLocale = countryCode?? res;
@@ -98,10 +133,25 @@ Future<bool> saveBackup() async{
   final file = File(fullPath);
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
 
-  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null){
+  if(Platform.isIOS){
+    await saveBackupIOS(fullPath, filename);
+
+    // final fileList = await ICloudStorage.gather(
+    //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
+    // );
+    // print("Files gathered");
+    // fileList.forEach((element) {print(element.relativePath);});
+  }
+
+  return true;
+}
+
+Future saveBackupIOS(String sourceFilePath, String filename)async{
+  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
-      filePath: fullPath,
+      filePath: sourceFilePath,
+
       /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
       /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
       destinationRelativePath: 'Documents/backups/$filename',
@@ -114,15 +164,7 @@ Future<bool> saveBackup() async{
         // );
       },
     );
-
-    // final fileList = await ICloudStorage.gather(
-    //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
-    // );
-    // print("Files gathered");
-    // fileList.forEach((element) {print(element.relativePath);});
   }
-
-  return true;
 }
 
 List getWorkoutsAsStringList(){

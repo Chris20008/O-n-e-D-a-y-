@@ -19,7 +19,7 @@ class MultipleExerciseRow extends StatelessWidget {
   });
 
   final double _height = 60;
-  final double _width = 30;
+  final double _width = 36;
   final double _topBottomPadding = 5;
   final double _iconSize = 13;
 
@@ -165,17 +165,25 @@ class MultipleExerciseRow extends StatelessWidget {
                                         ),
 
                                         /// One Column for each set (weight / amount)
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Text("${set.weight}"),
-                                            Container(
-                                              color: Colors.grey[900],
-                                              height: 1,
-                                              width: _width/2,
-                                            ),
-                                            Text("${set.amount}")
-                                          ],
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                                          child: Column(
+                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              OverflowSafeText(
+                                                "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight}",
+                                                maxLines: 1,
+                                                fontSize: 14,
+                                                minFontSize: 9
+                                              ),
+                                              Container(
+                                                color: Colors.grey[900],
+                                                height: 1,
+                                                width: _width/2,
+                                              ),
+                                              Text("${set.amount}")
+                                            ],
+                                          ),
                                         )
                                       ],
                                     ),

@@ -27,10 +27,10 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   ];
 
   bool showAvg = false;
-  int minWeight = 0;
-  int maxWeight = 0;
-  int minTotalWeight = 0;
-  int maxTotalWeight = 0;
+  double minWeight = 0;
+  double maxWeight = 0;
+  double minTotalWeight = 0;
+  double maxTotalWeight = 0;
   int maxX = 0;
   double minY = 0;
   double maxY = 0;
@@ -40,8 +40,8 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   late DateTime minDate;
   List<FlSpot> spotsMaxWeight = [];
   List<FlSpot> spotsTotalMovedWeight = [];
-  Map<DateTime, int>? maxWeights;
-  Map<DateTime, int>? totalWeights;
+  Map<DateTime, double>? maxWeights;
+  Map<DateTime, double>? totalWeights;
 
   @override
   Widget build(BuildContext context) {
@@ -436,7 +436,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   }
 
   String getSpotData(LineBarSpot spot){
-    Map<DateTime, int> data;
+    Map<DateTime, double> data;
     if(spot.barIndex == 0){
       data = maxWeights!;
     } else{

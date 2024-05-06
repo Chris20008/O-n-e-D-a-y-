@@ -6,7 +6,7 @@ class ObExercise{
   int id;
 
   String name;
-  List<int> weights;
+  List<double> weights;
   List<int> amounts;
   int restInSeconds;
   int? seatLevel;
@@ -25,8 +25,9 @@ class ObExercise{
   ObExercise.fromMap(Map w): this(
       // id: w["id"],
       name: w["name"],
-      weights: List.from(w["weights"]?? [0]),
-      amounts: List.from(w["amounts"]?? [0]),
+      weights: List<double>.from(List.from(w["weights"]?? [0.0]).map((w) => double.parse(w.toString()))),
+      amounts: List<int>.from(List.from(w["amounts"]?? [0.0]).map((a) => int.parse(a.toString()))),
+      // amounts: List.from(w["amounts"]?? [0]),
       restInSeconds: w["restInSeconds"]?? 0,
       seatLevel: w["seatLevel"],
       linkName: w["linkName"]

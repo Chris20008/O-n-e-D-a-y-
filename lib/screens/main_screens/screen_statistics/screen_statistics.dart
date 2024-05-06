@@ -326,13 +326,13 @@ class CnScreenStatistics extends ChangeNotifier {
 
   }
 
-   List<int?>? getMinMaxWeights(){
+   List<double?>? getMinMaxWeights(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    int minWeight = 1000000;
-    int maxWeight = 0;
+    double minWeight = 1000000;
+    double maxWeight = 0;
     for(StatisticExercise ex in exercises){
       maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
       minWeight = minWeight < maxWeight? minWeight : maxWeight;
@@ -341,15 +341,15 @@ class CnScreenStatistics extends ChangeNotifier {
     return [minWeight, maxWeight];
   }
 
-  Map<DateTime, int>? getMaxWeightsPerDate(){
+  Map<DateTime, double>? getMaxWeightsPerDate(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    Map<DateTime, int> maxWeights = {};
+    Map<DateTime, double> maxWeights = {};
     for(StatisticExercise ex in exercises){
       // print("DATE: ${ex.date}");
-      final int? currentWeight = maxWeights[ex.date];
+      final double? currentWeight = maxWeights[ex.date];
       if(currentWeight != null){
         maxWeights[ex.date] = currentWeight < ex.weight? ex.weight : currentWeight;
       } else{
@@ -359,12 +359,12 @@ class CnScreenStatistics extends ChangeNotifier {
     return maxWeights;
   }
 
-  Map<DateTime, int>? getTotalMovedWeight(){
+  Map<DateTime, double>? getTotalMovedWeight(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    Map<DateTime, int> summedWeights = {};
+    Map<DateTime, double> summedWeights = {};
     for(StatisticExercise ex in exercises){
       summedWeights[ex.date] = (summedWeights[ex.date]?? 0) + (ex.weight*ex.amount);
     }

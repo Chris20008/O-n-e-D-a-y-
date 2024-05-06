@@ -45,7 +45,7 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(5, 5749807508740524100),
             name: 'weights',
-            type: 27,
+            type: 29,
             flags: 0),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(6, 2424955615328354415),
@@ -171,7 +171,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectToFB: (ObExercise object, fb.Builder fbb) {
           final nameOffset = fbb.writeString(object.name);
           final amountsOffset = fbb.writeListInt64(object.amounts);
-          final weightsOffset = fbb.writeListInt64(object.weights);
+          final weightsOffset = fbb.writeListFloat64(object.weights);
           final linkNameOffset = object.linkName == null
               ? null
               : fbb.writeString(object.linkName!);
@@ -194,7 +194,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final nameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 6, '');
           final weightsParam =
-              const fb.ListReader<int>(fb.Int64Reader(), lazy: false)
+              const fb.ListReader<double>(fb.Float64Reader(), lazy: false)
                   .vTableGet(buffer, rootOffset, 12, []);
           final amountsParam =
               const fb.ListReader<int>(fb.Int64Reader(), lazy: false)
@@ -285,7 +285,7 @@ class ObExercise_ {
 
   /// see [ObExercise.weights]
   static final weights =
-      obx.QueryIntegerVectorProperty<ObExercise>(_entities[0].properties[3]);
+      obx.QueryDoubleVectorProperty<ObExercise>(_entities[0].properties[3]);
 
   /// see [ObExercise.restInSeconds]
   static final restInSeconds =
