@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import '../screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'bottom_menu.dart';
@@ -18,10 +19,12 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnWorkouts cnWorkouts;
   final double _height = 50;
 
   @override
   Widget build(BuildContext context) {
+    cnWorkouts = Provider.of<CnWorkouts>(context);
     // print("REBUILD BANNER RUNNING WORKOUT");
 
     return AnimatedCrossFade(
@@ -36,7 +39,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             child: Container(
               width: double.maxFinite,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.45),
               ),
               child: SafeArea(
                 bottom: false,

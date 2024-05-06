@@ -1,8 +1,26 @@
 import 'package:jiffy/jiffy.dart';
 
 extension DateOnlyCompare on DateTime {
-  bool isSameDate(DateTime other) {
+
+  bool isSameDate(DateTime? other) {
+    if(other  == null){
+      return false;
+    }
     return year == other.year && month == other.month && day == other.day;
+  }
+
+  bool isSameWeek(DateTime? other){
+    if(other  == null){
+      return false;
+    }
+    return Jiffy.parseFromDateTime(other).weekOfYear == Jiffy.parseFromDateTime(this).weekOfYear;
+  }
+
+  bool isSameMonth(DateTime? other){
+    if(other  == null){
+      return false;
+    }
+    return year == other.year && month == other.month;
   }
 
   bool isToday() {
@@ -16,15 +34,13 @@ extension DateOnlyCompare on DateTime {
   }
 
   bool isInLastSevenDays(){
+    final endOfToday = DateTime.now().copyWith(hour: 23, minute: 59, second: 59);
     final lastSevenDays = DateTime.now().subtract(const Duration(days: 7));
-    return isAfter(lastSevenDays);
+    return isAfter(lastSevenDays) && isBefore(endOfToday);
   }
 
-  bool isSameMonth(DateTime other){
-    return year == other.year && month == other.month;
-  }
-
-  bool isSameWeek(DateTime other){
-    return Jiffy.parseFromDateTime(other).weekOfYear == Jiffy.parseFromDateTime(this).weekOfYear;
+  bool isInFuture(){
+    final endOfToday = DateTime.now().copyWith(hour: 23, minute: 59, second: 59);
+    return isAfter(endOfToday);
   }
 }

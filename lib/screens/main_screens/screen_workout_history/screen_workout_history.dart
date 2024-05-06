@@ -73,105 +73,70 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 /// check if date is not null
                 if (dateOfWorkout != null) {
 
-                  if(dateOfWorkout.isToday() &&
-                      (dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday())
-                  ){
-                    child = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Center(
-                          child: Text(
-                            "Today",
-                            textScaler: TextScaler.linear(1.8),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        child
-                      ],
-                    );
-                    // if(dateOfNewerWorkout == null){
-                    //   child = Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       const Center(
-                    //         child: Text(
-                    //           "Today",
-                    //           textScaler: TextScaler.linear(1.8),
-                    //         ),
-                    //       ),
-                    //       const SizedBox(height: 5),
-                    //       child
-                    //     ],
-                    //   );
-                    // }
-                    // return child;
+                  /// Future
+                  if(dateOfWorkout.isInFuture()){
+                    if(dateOfNewerWorkout == null){
+                      return getChildWithTimeHeader(
+                          child: child,
+                          headerText: "Future",
+                          heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                          textScaler: 1.8
+                      );
+                    }
                   }
 
-                  else if(dateOfWorkout.isYesterday() &&
-                      (dateOfNewerWorkout == null || !dateOfNewerWorkout.isYesterday())
-                  ){
-                    child = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if(dateOfNewerWorkout != null)
-                          const SizedBox(height: 40,),
-                        const Center(
-                          child: Text(
-                            "Yesterday",
-                            textScaler: TextScaler.linear(1.7),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        child
-                      ],
-                    );
+                  /// Today
+                  if(dateOfWorkout.isToday()){
+                    if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday()){
+                      return getChildWithTimeHeader(
+                        child: child,
+                        headerText: "Today",
+                        heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                        textScaler: 1.8
+                      );
+                    }
                   }
 
-                  else if(dateOfWorkout.isInLastSevenDays() &&
-                      (dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday())
-                  ){
-                    child = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if(dateOfNewerWorkout != null)
-                          const SizedBox(height: 40,),
-                        const Center(
-                          child: Text(
-                            "Last 7 Days",
-                            textScaler: TextScaler.linear(1.7),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        child
-                      ],
-                    );
+                  /// Yesterday
+                  else if(dateOfWorkout.isYesterday()){
+                    if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isYesterday()){
+                      return getChildWithTimeHeader(
+                          child: child,
+                          headerText: "Yesterday",
+                          heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                          textScaler: 1.7
+                      );
+                    }
                   }
 
-                  else if(!dateOfWorkout.isInLastSevenDays() &&
-                      (dateOfNewerWorkout == null || dateOfNewerWorkout.isInLastSevenDays() || !dateOfWorkout.isSameMonth(dateOfNewerWorkout))
-                  ){
-                    child = Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if(dateOfNewerWorkout != null)
-                          const SizedBox(height: 40,),
-                        Center(
-                          child: Text(
-                            DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
-                            textScaler: const TextScaler.linear(1.7),
-                          ),
-                        ),
-                        if(dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout))
-                          getWeekDecoration(Jiffy.parseFromDateTime(dateOfWorkout).weekOfYear.toString()),
-                        const SizedBox(height: 5),
-                        child
-                      ],
+                  /// Last 7 days
+                  else if(dateOfWorkout.isInLastSevenDays()){
+                    if(dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday()){
+                      return getChildWithTimeHeader(
+                          child: child,
+                          headerText: "Last 7 Days",
+                          heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                          textScaler: 1.7
+                      );
+                    }
+                  }
+
+                  /// Month Header
+                  else if(dateOfNewerWorkout == null || dateOfNewerWorkout.isInLastSevenDays() || !dateOfWorkout.isSameMonth(dateOfNewerWorkout)){
+                    return getChildWithTimeHeader(
+                        child: child,
+                        headerText: DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
+                        heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                        textScaler: 1.7,
+                        /// with week header
+                        dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
                     );
                   }
-                  else if(dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)){
-                    child = Column(
+                  /// Week Header
+                  else if(!dateOfWorkout.isSameWeek(dateOfNewerWorkout)){
+                    return Column(
                       children: [
-                        SizedBox(height: 15,),
+                        const SizedBox(height: 15,),
                         getWeekDecoration(Jiffy.parseFromDateTime(dateOfWorkout).weekOfYear.toString()),
                         const SizedBox(height: 5),
                         child
@@ -181,7 +146,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 }
 
                 return child;
-                // return children[index];
               },
           ),
         ],
@@ -203,6 +167,30 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
           textScaler: const TextScaler.linear(1),
         ),
       ),
+    );
+  }
+
+  Widget getChildWithTimeHeader({
+    required Widget child,
+    required String headerText,
+    double heightSpacer = 40,
+    double textScaler = 1.7,
+    DateTime? dateForWeekDecoration}){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: heightSpacer),
+        Center(
+          child: Text(
+            headerText,
+            textScaler: TextScaler.linear(textScaler),
+          ),
+        ),
+        if(dateForWeekDecoration != null)
+          getWeekDecoration(Jiffy.parseFromDateTime(dateForWeekDecoration).weekOfYear.toString()),
+        const SizedBox(height: 5),
+        child
+      ],
     );
   }
 }

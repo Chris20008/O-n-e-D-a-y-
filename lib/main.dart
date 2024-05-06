@@ -187,8 +187,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    const Color(0xff84490b),
-                    Colors.black.withOpacity(0.9),
+                    const Color(0xffc26a0e),
+                    const Color(0xbb110a02)
+
+                    // const Color(0xffb2620e)
+                    // const Color(0xbb1c1003),
+
+                    // const Color(0xff84490b),
+                    // Colors.black.withOpacity(0.9),
                   ]
               )
           ),

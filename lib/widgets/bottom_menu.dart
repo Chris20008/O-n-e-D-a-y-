@@ -55,22 +55,23 @@ class _BottomMenuState extends State<BottomMenu> {
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
-          color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
-          gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-              colors: [
-                // Color(0xff160d05),
-                Color(0xff0a0604),
-                Color(0xff0a0604)
-              ]
-          ) : null
+        color: cnNewWorkout.minPanelHeight > 0? const Color(0xff0a0604): Colors.black.withOpacity(0.4),
+          // color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
+          // gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
+          //     begin: Alignment.centerRight,
+          //     end: Alignment.centerLeft,
+          //     colors: [
+          //       // Color(0xff160d05),
+          //       Color(0xff0a0604),
+          //       Color(0xff0a0604)
+          //     ]
+          // ) : null
       ),
       child: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
-              sigmaX: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
-              sigmaY: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
+              sigmaX: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
+              sigmaY: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
               tileMode: TileMode.mirror
           ),
           child: Theme(

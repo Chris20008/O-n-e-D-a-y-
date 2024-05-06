@@ -123,7 +123,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         child: Stack(
                           children: [
                             ListView(
-                              controller: ScrollController(),
+                              controller: cnNewWorkout.scrollController,
                               physics: const BouncingScrollPhysics(),
                               padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
                               shrinkWrap: true,
@@ -371,8 +371,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   onChanged: (value){},
                                 ),
                                 onConfirm: (){
+                                  bool added = false;
                                   final linkName = cnNewWorkout.linkNameController.text;
                                   if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
+                                    added = true;
                                     cnNewWorkout.workout.linkedExercises.add(linkName);
                                     cnNewWorkout.updateExercisesAndLinksList();
                                     cnNewWorkout.updateExercisesLinks();
@@ -381,6 +383,15 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   cnNewWorkout.linkNameController.clear();
                                   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
                                     FocusScope.of(context).unfocus();
+                                    /// Scrolling to maxScrollExtend not working properly, overshoots
+                                    // if(added){
+                                    //   print("POSITION SCROLL CONTROLLER");
+                                    //   print(cnNewWorkout.scrollController.position.pixels);
+                                    //   cnNewWorkout.scrollController.animateTo(
+                                    //       cnNewWorkout.scrollController.position.maxScrollExtent,
+                                    //       duration: const Duration(milliseconds: 500),
+                                    //       curve: Curves.easeInOut);
+                                    // }
                                   });
                                 },
                                 onCancel: (){
@@ -761,6 +772,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   TextEditingController workoutNameController = TextEditingController();
   TextEditingController linkNameController = TextEditingController();
   bool isUpdating = false;
+  ScrollController scrollController = ScrollController();
   List<dynamic> exercisesAndLinks = [];
   List<Color> linkColors = [
     const Color(0xFF5F9561),

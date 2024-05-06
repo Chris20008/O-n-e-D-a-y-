@@ -49,6 +49,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
         borderRadius: BorderRadius.circular(15),
         child: Container(
           color: Colors.black.withOpacity(0.5),
+          // color: const Color(0x33939393),
           child: Theme(
             data: Theme.of(context).copyWith(
               splashColor: Colors.transparent,
