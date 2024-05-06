@@ -705,7 +705,7 @@
 //   ];
 //   double minPanelHeight = 0;
 //   bool isCurrentlyRebuilding = false;
-//   double keepShowingPanelHeight = 212;
+//   double keepShowingPanelHeightTemplate = 212;
 //   late CnHomepage cnHomepage;
 //
 //   CnNewWorkOutPanel(BuildContext context){
@@ -729,7 +729,7 @@
 //   }
 //
 //   void openPanel(){
-//     minPanelHeight = keepShowingPanelHeight;
+//     minPanelHeight = keepShowingPanelHeightTemplate;
 //     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 //     panelController.animatePanelToPosition(
 //         1,

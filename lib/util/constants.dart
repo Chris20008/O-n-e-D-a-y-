@@ -13,6 +13,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
+import '../objectbox.g.dart';
+import '../objects/workout.dart';
 import 'objectbox/ob_exercise.dart';
 
 TextStyle getTextStyleForTextField(String text, {Color? color}){
@@ -253,3 +255,32 @@ void vibrateSuccess(){
     });
   });
 }
+
+bool workoutNameExistsInTemplates({required String workoutName}){
+  final result = objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName, caseSensitive: false).and(ObWorkout_.isTemplate.equals(true))).build().findFirst();
+  if(result == null){
+    return false;
+  }
+  return true;
+}
+
+bool exerciseNameExistsInWorkout({required Workout workout, required String exerciseName}){
+  final List<String> exNames = workout.exercises.map((e) => e.name.toLowerCase()).toList();
+  if(exNames.contains(exerciseName.toLowerCase())){
+    return true;
+  }
+  return false;
+}
+
+// bool exerciseNameExistsInWorkout({required String workoutName, required String exerciseName}){
+//   /// create builder
+//   final builder = objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName, caseSensitive: false).and(ObWorkout_.isTemplate.equals(true)));
+//   /// link builder with exercises
+//   builder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(exerciseName, caseSensitive: false));
+//   /// find first workout
+//   final result = builder.build().findFirst();
+//   if(result == null){
+//     return false;
+//   }
+//   return true;
+// }

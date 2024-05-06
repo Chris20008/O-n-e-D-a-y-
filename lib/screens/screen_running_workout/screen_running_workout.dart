@@ -474,8 +474,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                 value = value.trim();
                                                                 if(value.isNotEmpty){
                                                                   value = validateDoubleTextInput(value);
-                                                                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
-                                                                  newEx.sets[indexSet].weight = double.tryParse(value);
+                                                                  final newValue = double.tryParse(value);
+                                                                  newEx.sets[indexSet].weight = newValue;
+                                                                  if(newValue == null){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
+                                                                  }
                                                                 }
                                                                 else{
                                                                   newEx.sets[indexSet].weight = null;
@@ -523,7 +526,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                   final newValue = int.tryParse(value);
                                                                   newEx.sets[indexSet].amount = newValue;
                                                                   if(newValue == null){
-                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1];
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
                                                                   }
                                                                   if(value.length == 1){
                                                                     setState(() => {});

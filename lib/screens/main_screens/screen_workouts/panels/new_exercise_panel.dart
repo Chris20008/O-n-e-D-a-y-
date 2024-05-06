@@ -8,6 +8,7 @@ import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
 import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
+import 'new_workout_panel.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -92,9 +93,15 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               key: _formKey,
                               child: TextFormField(
                                 maxLength: 40,
+                                autovalidateMode: AutovalidateMode.onUserInteraction,
                                 validator: (value) {
+                                  value = value?.trim();
                                   if (value == null || value.isEmpty) {
                                     return 'Enter Exercise name';
+                                  } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
+                                            cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
+                                  ){
+                                    return 'Exercise name already exists in current workout';
                                   }
                                   return null;
                                 },
@@ -301,8 +308,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
                                                   value = validateDoubleTextInput(value);
-                                                  cnNewExercise.controllers[index][0].text = value;
-                                                  cnNewExercise.exercise.sets[index].weight = double.tryParse(value);
+                                                  final newValue = double.tryParse(value);
+                                                  cnNewExercise.exercise.sets[index].weight = newValue;
+                                                  if(newValue == null){
+                                                    cnNewExercise.controllers[index][0].clear();
+                                                  }
                                                 }
                                                 else{
                                                   cnNewExercise.exercise.sets[index].weight = null;
@@ -350,7 +360,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 value = value.trim();
                                                 if(value.isNotEmpty){
                                                   final newValue = int.tryParse(value);
-                                                  cnNewExercise.exercise.sets[index].amount = int.tryParse(value);
+                                                  cnNewExercise.exercise.sets[index].amount = newValue;
                                                   if(newValue == null){
                                                     cnNewExercise.controllers[index][1].clear();
                                                   }
@@ -461,38 +471,24 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   }
 
   void addSet(){
-    // if(cnNewExercise.exercise.sets.last.amount != null &&cnNewExercise.exercise.sets.last.weight != null) {
     setState(() {
       cnNewExercise.exercise.addSet();
       cnNewExercise.controllers.add([TextEditingController(),TextEditingController()]);
       cnNewExercise.ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
       cnNewExercise.scrollControllerSets.jumpTo(cnNewExercise.scrollControllerSets.position.pixels+44);
     });
-    // }
-    // else{
-    //   print("no");
-    // }
   }
 
   void closePanelAndSaveExercise(){
-    if (_formKey.currentState!.validate()
-        && cnNewExercise.exercise.name.isNotEmpty
-        // && cnNewExercise.exercise.sets.first.amount != null
-        // && cnNewExercise.exercise.sets.first.weight != null
-    ) {
+    if (_formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
       cnNewExercise.exercise.removeEmptySets();
 
       if(cnNewExercise.onConfirm != null){
         cnNewExercise.onConfirm!(cnNewExercise.exercise);
       }
-      // cnNewWorkout.workout.addOrUpdateExercise(cnNewExercise.exercise);
-      // cnNewWorkout.refreshExercise(cnNewExercise.exercise);
-      // cnNewWorkout.updateExercisesAndLinksList();
-      // cnNewWorkout.updateExercisesLinks();
-      // cnNewWorkout.refresh();
 
       cnNewExercise.closePanel(doClear: true);
-      // }
+      _formKey.currentState?.reset();
     }
   }
 
