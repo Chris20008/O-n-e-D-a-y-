@@ -180,7 +180,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           maxHeight: 1000,
                           child: MultipleExerciseRow(
                             exercises: widget.workout.exercises,
-                            // textScaleFactor: 1.3,
+                            // textScaler: TextScaler.linear()1.3,
                             padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                           )
                       )

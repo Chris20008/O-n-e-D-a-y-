@@ -80,7 +80,7 @@
 //                             ),
 //                           ),
 //                           const SizedBox(height: 15,),
-//                           const Text("Exercise", textScaleFactor: 1.5),
+//                           const Text("Exercise", textScaler: TextScaler.linear()1.5),
 //                           const SizedBox(height: 10,),
 //
 //                           /// Exercise name
@@ -175,9 +175,9 @@
 //                           const Row(
 //                             // mainAxisAlignment: MainAxisAlignment.spaceAround,
 //                             children: [
-//                               Expanded(child: Center(child: Text("Set", textScaleFactor: 1.2))),
-//                               Expanded(child: Center(child: Text("Weight", textScaleFactor: 1.2))),
-//                               Expanded(child: Center(child: Text("Amount", textScaleFactor: 1.2))),
+//                               Expanded(child: Center(child: Text("Set", textScaler: TextScaler.linear()1.2))),
+//                               Expanded(child: Center(child: Text("Weight", textScaler: TextScaler.linear()1.2))),
+//                               Expanded(child: Center(child: Text("Amount", textScaler: TextScaler.linear()1.2))),
 //                             ],
 //                           ),
 //                           Expanded(
@@ -228,7 +228,7 @@
 //                                         SizedBox(
 //                                             width: _widthOfWeightAmountTextField,
 //                                             height: 35,
-//                                             child: Center(child: Text("${index+1}", textScaleFactor: 1.2))
+//                                             child: Center(child: Text("${index+1}", textScaler: TextScaler.linear()1.2))
 //                                         ),
 //
 //                                         /// Weight

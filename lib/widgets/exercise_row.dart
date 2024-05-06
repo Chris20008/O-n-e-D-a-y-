@@ -4,7 +4,7 @@ import '../objects/exercise.dart';
 
 class ExerciseRow extends StatelessWidget {
   final Exercise exercise;
-  final double textScaleFactor;
+  // final double textScaleFactor;
   final EdgeInsetsGeometry? padding;
   final Widget? child;
   final int flexLeft;
@@ -13,7 +13,7 @@ class ExerciseRow extends StatelessWidget {
   const ExerciseRow({
     super.key,
     required this.exercise,
-    this.textScaleFactor = 1.5,
+    // this.textScaleFactor = 1.5,
     this.padding,
     this.child,
     this.flexLeft = 3,

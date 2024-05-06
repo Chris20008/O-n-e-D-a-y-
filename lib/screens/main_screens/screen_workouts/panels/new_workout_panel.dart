@@ -69,7 +69,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   @override
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
-    print("REBUILD NEW WOKROUT PANEL");
 
     return PopScope(
       canPop: false,
@@ -211,7 +210,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                               child: const Text(
                                                 "Do you really want to delete this workout?",
                                                 textAlign: TextAlign.center,
-                                                textScaleFactor: 1.2,
+                                                textScaler: TextScaler.linear(1.2),
                                                 style: TextStyle(color: Colors.white),
                                               ),
                                               onConfirm: onDelete,
@@ -297,7 +296,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           ),
                         ),
                         const SizedBox(height: 15,),
-                        const Text("Workout", textScaleFactor: 1.5),
+                        const Text("Workout", textScaler: TextScaler.linear(1.5)),
                         const SizedBox(height: 10,),
                       ],
                     ),
@@ -456,9 +455,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   ),
                 ),
                 Container(height: 15,),
-                const Text("Exercises", textScaleFactor: 1.2),
+                const Text("Exercises", textScaler: TextScaler.linear(1.2)),
                 Container(height: 16,),
-                // const Text("", textScaleFactor: 0.5)
+                // const Text("", textScaler: TextScaler.linear()0.5)
                 // Container(height: 0, color: Color(0xff0a0604),),
               ],
             ),
@@ -496,7 +495,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 dismissLink(cnNewWorkout.exercisesAndLinks[index]);
               },
               borderRadius: BorderRadius.circular(15),
-              backgroundColor: Color(0xFFA12D2C),
+              backgroundColor: const Color(0xFFA12D2C),
               foregroundColor: Colors.white,
               icon: Icons.delete,
             ),
@@ -554,7 +553,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               dismissExercise(cnNewWorkout.exercisesAndLinks[index]);
             },
             borderRadius: BorderRadius.circular(15),
-            backgroundColor: Color(0xFFA12D2C),
+            backgroundColor: const Color(0xFFA12D2C),
             foregroundColor: Colors.white,
             icon: Icons.delete,
           ),
@@ -592,7 +591,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               openExercise(cnNewWorkout.exercisesAndLinks[index], copied: true);
             },
             borderRadius: BorderRadius.circular(15),
-            backgroundColor: Color(0xFF617EB1),
+            backgroundColor: const Color(0xFF617EB1),
             // backgroundColor: Colors.white.withOpacity(0.1),
             foregroundColor: Colors.white,
             icon: Icons.copy,
@@ -625,7 +624,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
           children: [
             ExerciseRow(
               exercise: cnNewWorkout.exercisesAndLinks[index],
-              textScaleFactor: 1.3,
               padding: const EdgeInsets.only(left: 20, right: 10, bottom: 5, top: 5),
             ),
             if ((cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName != null)
@@ -668,12 +666,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addLink(String linkName){
-    print("add link");
     if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
       linkName = "Curls";
     }
     if (cnNewWorkout.workout.linkedExercises.contains(linkName)){
-      print("Return");
       return;
     }
     cnNewWorkout.workout.linkedExercises.add(linkName);
@@ -761,7 +757,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       cnNewWorkout.refresh();
     }
     cnBottomMenu.refresh();
-    // cnNewWorkout.delayedRefresh();
   }
 
 }
@@ -822,7 +817,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         curve: Curves.easeOut
     );
     refresh();
-    print("open panel ${workout.linkedExercises}");
     cnHomepage.refresh();
     cnWorkouts.refresh();
     cnWorkoutHistory.refresh();
@@ -842,23 +836,19 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     Set itemsToAdd = {};
     for(dynamic item in exercisesAndLinks){
       if(item is Exercise && !workout.exercises.map((e) => e.name).contains(item.name)){
-        print("remove Exercise ${item.name}");
         itemsToRemove.add(item);
       }
       else if(item is String && !workout.linkedExercises.contains(item)){
-        print("remove linkname $item");
         itemsToRemove.add(item);
       }
     }
     for(Exercise ex in workout.exercises){
       if(!exercisesAndLinks.whereType<Exercise>().map((e) => e.name).contains(ex.name)){
-        print("add Exercise ${ex.name}");
         itemsToAdd.add(ex);
       }
     }
     for(final linkName in workout.linkedExercises){
       if(!exercisesAndLinks.contains(linkName)){
-        print("add linkname $linkName");
         itemsToAdd.add(linkName);
       }
     }
@@ -943,7 +933,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
 
   void editWorkout(Workout workout){
     Workout w = Workout.clone(workout);
-    print("WORKOUT ID in history: ${workout.id}");
     if(isUpdating && this.workout.id == w.id){
       openPanel();
     }

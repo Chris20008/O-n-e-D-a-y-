@@ -60,9 +60,9 @@ class MultipleExerciseRow extends StatelessWidget {
                                         Icon(Icons.timer, size: _iconSize,),
                                         const SizedBox(width: 2,),
                                         if (ex.restInSeconds == 0)
-                                          Text("-", textScaleFactor: 0.9,)
+                                          const Text("-", textScaler: TextScaler.linear(0.9),)
                                         else if (ex.restInSeconds < 60)
-                                          Text("${ex.restInSeconds}s", textScaleFactor: 0.9,)
+                                          Text("${ex.restInSeconds}s", textScaler: const TextScaler.linear(0.9),)
                                         else if (ex.restInSeconds % 60 != 0)
                                           Expanded(
                                               child: OverflowSafeText(
@@ -72,8 +72,8 @@ class MultipleExerciseRow extends StatelessWidget {
                                               ),
                                           )
                                         else
-                                          Text("${(ex.restInSeconds/60).round()}m", textScaleFactor: 0.9,),
-                                        SizedBox(width: 10,)
+                                          Text("${(ex.restInSeconds/60).round()}m", textScaler: const TextScaler.linear(0.9),),
+                                        const SizedBox(width: 10,)
                                       ],
                                     ),
                                   ),
@@ -86,9 +86,9 @@ class MultipleExerciseRow extends StatelessWidget {
                                         Icon(Icons.airline_seat_recline_normal, size: _iconSize,),
                                         const SizedBox(width: 2,),
                                         if (ex.seatLevel == null)
-                                          Text("-", textScaleFactor: 0.9,)
+                                          const Text("-", textScaler: TextScaler.linear(0.9),)
                                         else
-                                          Text(ex.seatLevel.toString(), textScaleFactor: 0.9,)
+                                          Text(ex.seatLevel.toString(), textScaler: const TextScaler.linear(0.9),)
                                       ],
                                     ),
                                   )

@@ -182,7 +182,7 @@
 //                                               child: const Text(
 //                                                 "Do you really want to delete this workout?",
 //                                                 textAlign: TextAlign.center,
-//                                                 textScaleFactor: 1.2,
+//                                                 textScaler: TextScaler.linear()1.2,
 //                                                 style: TextStyle(color: Colors.white),
 //                                               ),
 //                                               onConfirm: onDelete,
@@ -268,7 +268,7 @@
 //                           ),
 //                         ),
 //                         const SizedBox(height: 15,),
-//                         // const Text("Workout", textScaleFactor: 1.5),
+//                         // const Text("Workout", textScaler: TextScaler.linear()1.5),
 //                         // const SizedBox(height: 10,),
 //                       ],
 //                     ),
@@ -392,7 +392,7 @@
 //                 const SizedBox(height: 25,),
 //                 Container(width: double.maxFinite, height: 1, color: Colors.grey[400],),
 //                 const SizedBox(height: 15,),
-//                 const Text("Exercises", textScaleFactor: 1.2),
+//                 const Text("Exercises", textScaler: TextScaler.linear()1.2),
 //                 // const SizedBox(height: 15,),
 //               ],
 //             ),
@@ -464,7 +464,7 @@
 //                 child: SizedBox(
 //                   // padding: EdgeInsets.all(2),
 //                   height: 30,
-//                   child: AutoSizeText(cnNewWorkout.exercisesAndLinks[index], textScaleFactor: 1.7, maxLines: 1,),
+//                   child: AutoSizeText(cnNewWorkout.exercisesAndLinks[index], textScaler: TextScaler.linear()1.7, maxLines: 1,),
 //                 ),
 //               ),
 //             ],
@@ -559,7 +559,7 @@
 //           children: [
 //             ExerciseRow(
 //               exercise: cnNewWorkout.exercisesAndLinks[index],
-//               textScaleFactor: 1.3,
+//               textScaler: TextScaler.linear()1.3,
 //               padding: const EdgeInsets.only(left: 20, right: 10, bottom: 5, top: 5),
 //             ),
 //             if ((cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName != null)

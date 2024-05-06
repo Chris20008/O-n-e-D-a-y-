@@ -71,8 +71,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   @override
   Widget build(BuildContext context) {
-
-    print("\n\nREBUILD\n\n");
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     if(showSelectorExerciseToUpdate){
@@ -119,7 +117,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                     child: Container(
                       height: cnBottomMenu.height,
                       color: Colors.black.withOpacity(0.5),
-                      child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaleFactor: 1.4,)),
+                      child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaler: const TextScaler.linear(1.4),)),
                     ),
                   ),
                 ),
@@ -200,7 +198,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   child: const Text(
                                                     "Do you really want to delete this Exercise?",
                                                     textAlign: TextAlign.center,
-                                                    textScaleFactor: 1.2,
+                                                    textScaler: TextScaler.linear(1.2),
                                                     style: TextStyle(color: Colors.white),
                                                   ),
                                                   onConfirm: (){
@@ -266,9 +264,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                               const SizedBox(width: 2,),
                                               if (newEx.seatLevel == null)
-                                                const Text("-", textScaleFactor: 1,)
+                                                const Text("-", textScaler: TextScaler.linear(1),)
                                               else
-                                                Text(newEx.seatLevel.toString(), textScaleFactor: 1,)
+                                                Text(newEx.seatLevel.toString(), textScaler: const TextScaler.linear(1),)
                                             ],
                                           ),
                                         ),
@@ -324,13 +322,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                               const SizedBox(width: 2,),
                                               if (newEx.restInSeconds == 0)
-                                                const Text("-", textScaleFactor: 1,)
+                                                const Text("-", textScaler: TextScaler.linear(1),)
                                               else if (newEx.restInSeconds < 60)
-                                                Text("${newEx.restInSeconds}s", textScaleFactor: 1,)
+                                                Text("${newEx.restInSeconds}s", textScaler: const TextScaler.linear(1),)
                                               else if (newEx.restInSeconds % 60 != 0)
-                                                  Text("${(newEx.restInSeconds/60).floor()}:${newEx.restInSeconds%60}m", textScaleFactor: 1,)
+                                                  Text("${(newEx.restInSeconds/60).floor()}:${newEx.restInSeconds%60}m", textScaler: const TextScaler.linear(1),)
                                                 else
-                                                  Text("${(newEx.restInSeconds/60).round()}m", textScaleFactor: 1,),
+                                                  Text("${(newEx.restInSeconds/60).round()}m", textScaler: const TextScaler.linear(1),),
                                               const SizedBox(width: 10,)
                                             ],
                                           ),
@@ -382,7 +380,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   /// Set
                                                   SizedBox(
                                                       width: _widthOfTextField,
-                                                      child: Text("${indexSet + 1}", textScaleFactor: 1.2,)
+                                                      child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
                                                   ),
 
                                                   /// Button to copy templates data
@@ -771,8 +769,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     }
     List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplate.exercises.map((e) => e.name).toList();
     for(Exercise ex in tempWo.exercises){
-      print("NAMEEEEE");
-      print(ex.name);
       /// Exercise name does not exist in template yet => can update Template
       if(!templateWorkoutExerciseNames.contains(ex.name)){
         return true;
@@ -851,7 +847,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
           const Text(
               "Finish Workout?",
             textAlign: TextAlign.center,
-            textScaleFactor: 1.2,
+            textScaler: TextScaler.linear(1.2),
             style: TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 20,),
@@ -990,9 +986,6 @@ class CnRunningWorkout extends ChangeNotifier {
   }
   
   void addExercise(Exercise ex){
-    // print("SCROLL CONTROLLER POSITION 1");
-    // print(scrollController.position.pixels);
-    // print(scrollController.position.maxScrollExtent);
     workoutTemplate.exercises.add(Exercise.clone(ex));
     workout.exercises.add(ex);
     newExNames.add(ex.name);
@@ -1001,19 +994,6 @@ class CnRunningWorkout extends ChangeNotifier {
     textControllers[ex.name] = ex.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     cache();
     refresh();
-    // print("SCROLL CONTROLLER POSITION 2");
-    // print(scrollController.position.pixels);
-    // print(scrollController.position.maxScrollExtent);
-    // Future.delayed(const Duration(milliseconds: 800), (){
-    //   print("SCROLL CONTROLLER POSITION 3");
-    //   print(scrollController.position.pixels);
-    //   print(scrollController.position.maxScrollExtent);
-    //   scrollController.animateTo(
-    //       scrollController.position.maxScrollExtent,
-    //       duration: const Duration(milliseconds: 1000),
-    //       curve: Curves.easeInOut
-    //   );
-    // });
   }
 
   void deleteExercise(Exercise ex){

@@ -170,7 +170,7 @@ class Workout{
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
-    print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
+    // print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);
     objectbox.exerciseBox.putMany(newObExercises);
   }
