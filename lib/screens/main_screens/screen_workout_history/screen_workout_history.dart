@@ -88,13 +88,15 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   }
 
                   /// Today
-                  if(dateOfWorkout.isToday()){
+                  else if(dateOfWorkout.isToday()){
                     if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday()){
                       return getChildWithTimeHeader(
                         child: child,
                         headerText: "Today",
                         heightSpacer: dateOfNewerWorkout == null? 0 : 40,
-                        textScaler: 1.8
+                        textScaler: 1.8,
+                        /// with week header
+                        dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
                       );
                     }
                   }
@@ -106,20 +108,26 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                           child: child,
                           headerText: "Yesterday",
                           heightSpacer: dateOfNewerWorkout == null? 0 : 40,
-                          textScaler: 1.7
+                          textScaler: 1.7,
+                          /// with week header
+                          dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
                       );
                     }
                   }
 
                   /// Last 7 days
                   else if(dateOfWorkout.isInLastSevenDays()){
-                    // if(dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday()){
-                    if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isInLastSevenDays()){
+                    if(dateOfNewerWorkout == null
+                        || dateOfNewerWorkout.isToday()
+                        || dateOfNewerWorkout.isYesterday()
+                        || dateOfNewerWorkout.isInFuture() ){
                       return getChildWithTimeHeader(
                           child: child,
                           headerText: "Last 7 Days",
                           heightSpacer: dateOfNewerWorkout == null? 0 : 40,
-                          textScaler: 1.7
+                          textScaler: 1.7,
+                          /// with week header
+                          dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
                       );
                     }
                   }
