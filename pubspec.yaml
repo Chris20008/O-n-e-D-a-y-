@@ -34,7 +34,7 @@ dependencies:
   provider: ^6.1.1
   sliding_up_panel: ^2.0.0+1
   flutter_slidable: ^3.0.1
-  objectbox: ^2.3.1
+  objectbox: ^2.5.1
   objectbox_flutter_libs:
   intl: ^0.18.1
   quiver: ^3.2.1
@@ -50,6 +50,8 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   jiffy: ^6.2.0
   flutter_dotenv: ^5.1.0
+  calendar_date_picker2: ^1.0.2
+  scrollable_positioned_list: ^0.3.8
 
 
   # The following adds the Cupertino Icons font to your application.

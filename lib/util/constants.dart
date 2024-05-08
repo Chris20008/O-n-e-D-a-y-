@@ -1,8 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:icloud_storage/icloud_storage.dart';
@@ -15,6 +18,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'objectbox/ob_exercise.dart';
 
 TextStyle getTextStyleForTextField(String text, {Color? color}){
@@ -272,6 +276,161 @@ bool exerciseNameExistsInWorkout({required Workout workout, required String exer
   return false;
 }
 
+Widget buildCalendarDialogButton({
+  required BuildContext context,
+  required CnNewWorkOutPanel cnNewWorkout,
+  bool justShow = false,
+  Function? onConfirm,
+  bool buttonIsCalender = false
+}) {
+  const colorAmber = Color(0xFFC16A03);
+  const arrowSize = 15.0;
+  const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
+  final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
+  final config = CalendarDatePicker2WithActionButtonsConfig(
+    // cancelButton: justShow? Container() : null,
+    // okButton: justShow? Container() : null,
+    lastMonthIcon: const Icon(
+      Icons.arrow_back_ios,
+      size: arrowSize,
+      color: colorAmber,
+    ),
+    nextMonthIcon: const Icon(
+      Icons.arrow_forward_ios,
+      size: arrowSize,
+      color: colorAmber,
+    ),
+    disableMonthPicker: true,
+    gapBetweenCalendarAndButtons: 0,
+    daySplashColor: Colors.transparent,
+    // buttonPadding: justShow? const EdgeInsets.only(right: 100) : null,
+    dayTextStyle: dayTextStyle,
+    // closeDialogOnOkTapped: !justShow,
+    // closeDialogOnCancelTapped: !justShow,
+    calendarType: CalendarDatePicker2Type.single,
+    selectedDayHighlightColor: colorAmber,
+    // closeDialogOnCancelTapped: true,
+    firstDayOfWeek: 1,
+
+    weekdayLabelTextStyle: const TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+    ),
+    controlsTextStyle: const TextStyle(
+      color: colorAmber,
+      fontSize: 15,
+      fontWeight: FontWeight.bold,
+    ),
+    centerAlignModePicker: true,
+    customModePickerIcon: const SizedBox(),
+    selectedDayTextStyle: dayTextStyle.copyWith(color: Colors.white),
+    dayTextStylePredicate: ({required date}) {
+      TextStyle? textStyle;
+      if (date.weekday == DateTime.saturday ||
+          date.weekday == DateTime.sunday) {
+        textStyle = weekendTextStyle;
+      }
+      return textStyle;
+    },
+    monthTextStyle: const TextStyle(color: Colors.white),
+    yearTextStyle: const TextStyle(color: Colors.white),
+    dayBuilder: ({
+      required date,
+      textStyle,
+      decoration,
+      isSelected,
+      isDisabled,
+      isToday,
+    }) {
+      Widget? dayWidget;
+      bool exists = false;
+      late DateTime relevantDate;
+      for(DateTime d in cnNewWorkout.allWorkoutDates.keys){
+        if(d.isSameDate(date)){
+          exists = true;
+          relevantDate = d;
+          break;
+        }
+      }
+      if (exists) {
+        dayWidget = Container(
+          decoration: decoration,
+          child: Center(
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                Text(
+                  MaterialLocalizations.of(context).formatDecimal(date.day),
+                  style: textStyle,
+                ),
+                /// Workout Name as Label
+                Padding(
+                    padding: const EdgeInsets.only(top: 26.5, left: 2, right: 2),
+                    child: OverflowSafeText(
+                        cnNewWorkout.allWorkoutDates[relevantDate] is List? "${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts" : cnNewWorkout.allWorkoutDates[relevantDate],
+                        maxLines: 1,
+                        fontSize: 5,
+                        textAlign: TextAlign.center,
+                        // minFontSize: 4,
+                        style: TextStyle(
+                            color: (isSelected?? false)
+                                ? Colors.white
+                                : date.isSameDate(cnNewWorkout.originalWorkout.date) && !justShow
+                                ? const Color(0xFFFFD995)
+                                : colorAmber)
+                    )
+                ),
+                // only dot indicator
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 27.5),
+                //   child: Container(
+                //     height: 5,
+                //     width: 5,
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(5),
+                //       color: date.isSameDate(cnNewWorkout.originalWorkout.date)? Colors.blue : colorAmber,
+                //     ),
+                //   ),
+                // ),
+              ],
+            ),
+          ),
+        );
+      }
+      return dayWidget;
+    },
+  );
+  return CupertinoButton(
+    onPressed: () async {
+      cnNewWorkout.getAllWorkoutDays();
+      HapticFeedback.selectionClick();
+      final values = await showCalendarDatePicker2Dialog(
+        context: context,
+        config: config,
+        dialogSize: const Size(325, 400),
+        borderRadius: BorderRadius.circular(15),
+        value: [cnNewWorkout.workout.date],
+        dialogBackgroundColor: Theme.of(context).primaryColor,
+      );
+      if (values != null && onConfirm != null) {
+        onConfirm(values);
+      }
+    },
+    child: buttonIsCalender
+        ? Icon(
+          Icons.calendar_month,
+          size: 30,
+          color: Colors.amber[800],
+        )
+        : Text(
+          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),
+          // '${cnNewWorkout.workout.date!.month}-${cnNewWorkout.workout.date!.day}-${cnNewWorkout.workout.date!.year}',
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+    )
+  );
+}
 // bool exerciseNameExistsInWorkout({required String workoutName, required String exerciseName}){
 //   /// create builder
 //   final builder = objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName, caseSensitive: false).and(ObWorkout_.isTemplate.equals(true)));

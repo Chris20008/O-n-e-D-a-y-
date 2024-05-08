@@ -47,7 +47,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  final Language _language = languages[LANGUAGES.en.value];
+  final Language _language = languages[LANGUAGES.de.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
@@ -87,7 +87,8 @@ class MyAppState extends State<MyApp> {
       ],
       child: MaterialApp(
         // showPerformanceOverlay: true,
-        locale: _locale,//const Locale("de"),
+        locale: _locale,
+        // locale: const Locale("de"),
         supportedLocales: const [
           Locale('en'), /// English
           Locale('de'), /// German
@@ -145,17 +146,21 @@ class _MyHomePageState extends State<MyHomePage> {
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
+    print("LAnguage Code");
+    print(cnConfig.config.languageCode);
     if(cnConfig.config.languageCode == null){
+      print("IS NULL");
       if(context.mounted){
         cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
     } else{
+      print("IS NOT NULL");
       if(context.mounted){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.languageCode);
       }
     }
-    // setIntlLanguage(countryCode: MyApp.of(context)!._locale.countryCode);
-    // MyApp.of(context)!._language;
+    print(cnConfig.config.languageCode);
+    // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();

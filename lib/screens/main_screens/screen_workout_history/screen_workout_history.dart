@@ -1,12 +1,13 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:provider/provider.dart';
 import '../../../objects/workout.dart';
+import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
@@ -26,7 +27,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory;
-  // List<Widget> children = [];
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,8 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       height: size.height,
       child: Stack(
         children: [
-          ListView.separated(
+          ScrollablePositionedList.separated(
+              shrinkWrap: true,
               padding: const EdgeInsets.only(top: 70, left: 20, right: 20, bottom: 0),
               separatorBuilder: (BuildContext context, int index) {
                 return const SizedBox(height: 10);
@@ -46,7 +47,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
               addAutomaticKeepAlives: true,
               physics: const BouncingScrollPhysics(),
               key: cnWorkoutHistory.key,
-              controller: cnWorkoutHistory.scrollController,
+              itemScrollController: cnWorkoutHistory.scrollController,
               itemCount: cnWorkoutHistory.workouts.length+1,
               itemBuilder: (BuildContext context, int index) {
                 if (index == cnWorkoutHistory.workouts.length){
@@ -63,6 +64,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 final dateOfWorkout = cnWorkoutHistory.workouts[index].date;
                 final DateTime? dateOfNewerWorkout = index > 0 ? cnWorkoutHistory.workouts[index-1].date : null;
                 Widget child = WorkoutExpansionTile(
+                    // key: UniqueKey(),
                     workout: cnWorkoutHistory.workouts[index],
                     // padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
                     padding: EdgeInsets.zero,
@@ -148,6 +150,42 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 return child;
               },
           ),
+
+          SafeArea(
+              child: Align(
+                alignment: Alignment.topRight,
+                child: buildCalendarDialogButton(
+                    context: context,
+                    cnNewWorkout:
+                    cnNewWorkout,
+                    justShow: false,
+                    buttonIsCalender: true,
+                    onConfirm: (List<DateTime?> values){
+                      if(values.isNotEmpty){
+                        int index;
+                        String key = "${values.first?.year}${values.first?.month}${values.first?.day}";
+                        if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
+                          index = cnWorkoutHistory.indexOfWorkout.keys.toList().indexOf(key);
+                          cnWorkoutHistory.scrollController.scrollTo(
+                              index: index,
+                              duration: const Duration(seconds: 1),
+                              alignment: index == 0
+                                  ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
+                                  ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
+                                  ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
+                                  ? 0.3 :  0.1,
+                              curve: Curves.easeInOut
+                          ).then((value) {
+                            // setState(() {
+                            //   cnWorkoutHistory.opened[index] = true;
+                            // });
+                          });
+                        }
+                      }
+                    }
+                ),
+              )
+          )
         ],
       ),
     );
@@ -199,16 +237,20 @@ class CnWorkoutHistory extends ChangeNotifier {
   List<Workout> workouts = [];
   Key key = UniqueKey();
   List<bool> opened = [];
-  ScrollController scrollController = ScrollController();
+  ItemScrollController scrollController = ItemScrollController();
+  Map<String, int> indexOfWorkout = {};
 
   void refreshAllWorkouts(){
     workouts.clear();
+    indexOfWorkout.clear();
     // final builder = objectbox.workoutBox.query().order(ObWorkout_.date, flags: Order.descending).build();
     final builder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build();
     List<ObWorkout> obWorkouts = builder.find();
-
-    for (var w in obWorkouts) {
+    int index = 0;
+    for (ObWorkout w in obWorkouts) {
       workouts.add(Workout.fromObWorkout(w));
+      indexOfWorkout["${w.date.year}${w.date.month}${w.date.day}"] = index;
+      index += 1;
     }
     opened = workouts.map((e) => false).toList();
 
