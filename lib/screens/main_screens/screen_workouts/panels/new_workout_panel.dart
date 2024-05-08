@@ -263,13 +263,13 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         child: Column(
           children: [
             const Text(
-              "Workout name changed",
+              "Workout name(s) changed",
               textScaler: TextScaler.linear(1.4),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 15),
             const Text(
-              "Do you want to apply the new name to workouts created from this template inside your history as well?",
+              "Do you want to apply the new name(s) to workouts created from this template inside your history as well?",
               textScaler: TextScaler.linear(1),
               textAlign: TextAlign.center,
             ),
