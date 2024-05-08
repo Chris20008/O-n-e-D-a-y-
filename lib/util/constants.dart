@@ -188,7 +188,7 @@ Future<Directory?> getDirectory() async{
   }
 }
 
-void loadBackup() async{
+Future loadBackup() async{
   FilePickerResult? result = await FilePicker.platform.pickFiles(
       initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files"
   );

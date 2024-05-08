@@ -117,6 +117,7 @@ class _BottomMenuState extends State<BottomMenu> {
     }
     if(index == 0) {
       cnWorkoutHistory.refreshAllWorkouts();
+      cnNewWorkout.refreshAllWorkoutDays();
     }
     else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();

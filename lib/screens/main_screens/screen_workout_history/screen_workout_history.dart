@@ -113,7 +113,8 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
                   /// Last 7 days
                   else if(dateOfWorkout.isInLastSevenDays()){
-                    if(dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday()){
+                    // if(dateOfNewerWorkout == null || dateOfNewerWorkout.isToday() || dateOfNewerWorkout.isYesterday()){
+                    if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isInLastSevenDays()){
                       return getChildWithTimeHeader(
                           child: child,
                           headerText: "Last 7 Days",
@@ -124,7 +125,11 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   }
 
                   /// Month Header
-                  else if(dateOfNewerWorkout == null || dateOfNewerWorkout.isInLastSevenDays() || !dateOfWorkout.isSameMonth(dateOfNewerWorkout)){
+                  else if(dateOfNewerWorkout == null
+                      || dateOfNewerWorkout.isInLastSevenDays()
+                      || dateOfNewerWorkout.isInFuture()
+                      || !dateOfNewerWorkout.isSameMonth(dateOfWorkout)
+                  ){
                     return getChildWithTimeHeader(
                         child: child,
                         headerText: DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
@@ -162,24 +167,26 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     buttonIsCalender: true,
                     onConfirm: (List<DateTime?> values){
                       if(values.isNotEmpty){
-                        int index;
+                        int? index;
                         String key = "${values.first?.year}${values.first?.month}${values.first?.day}";
                         if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
-                          index = cnWorkoutHistory.indexOfWorkout.keys.toList().indexOf(key);
-                          cnWorkoutHistory.scrollController.scrollTo(
-                              index: index,
-                              duration: const Duration(seconds: 1),
-                              alignment: index == 0
-                                  ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
-                                  ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
-                                  ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
-                                  ? 0.3 :  0.1,
-                              curve: Curves.easeInOut
-                          ).then((value) {
-                            // setState(() {
-                            //   cnWorkoutHistory.opened[index] = true;
-                            // });
-                          });
+                          index = cnWorkoutHistory.indexOfWorkout[key];
+                          if(index != null){
+                            cnWorkoutHistory.scrollController.scrollTo(
+                                index: index,
+                                duration: const Duration(seconds: 1),
+                                alignment: index == 0
+                                    ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
+                                    ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
+                                    ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
+                                    ? 0.3 :  0.1,
+                                curve: Curves.easeInOut
+                            ).then((value) {
+                              // setState(() {
+                              //   cnWorkoutHistory.opened[index] = true;
+                              // });
+                            });
+                          }
                         }
                       }
                     }
@@ -243,13 +250,15 @@ class CnWorkoutHistory extends ChangeNotifier {
   void refreshAllWorkouts(){
     workouts.clear();
     indexOfWorkout.clear();
-    // final builder = objectbox.workoutBox.query().order(ObWorkout_.date, flags: Order.descending).build();
     final builder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build();
     List<ObWorkout> obWorkouts = builder.find();
     int index = 0;
     for (ObWorkout w in obWorkouts) {
       workouts.add(Workout.fromObWorkout(w));
-      indexOfWorkout["${w.date.year}${w.date.month}${w.date.day}"] = index;
+      final key = "${w.date.year}${w.date.month}${w.date.day}";
+      if(!indexOfWorkout.containsKey(key)){
+        indexOfWorkout[key] = index;
+      }
       index += 1;
     }
     opened = workouts.map((e) => false).toList();

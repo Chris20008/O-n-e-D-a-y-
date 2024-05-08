@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/util/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,55 +69,55 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   //   setState(() {});
   // }
 
-  void _showDialog(Widget child) async {
-    HapticFeedback.selectionClick();
-    // final dates = [DateTime.now().subtract(const Duration(days: 2)), DateTime.now().subtract(const Duration(days: 2))];
-
-    // final date = await showDatePickerDialog(
-    //   context: context,
-    //   minDate: DateTime(2020, 1, 1),
-    //   maxDate: DateTime(2999, 12, 31),
-    //   initialDate: cnNewWorkout.workout.date,
-    //   selectedDate: cnNewWorkout.workout.date,
-    //   currentDate: DateTime.now(),
-    //   // enabledCellsDecoration: BoxDecoration(
-    //   //   color: Colors.green,
-    //   //   borderRadius: BorderRadius.circular(100)
-    //   // ),
-    //   // disabledCellsDecoration: const BoxDecoration(color: Colors.green),
-    //   // currentDateDecoration: BoxDecoration(color: Colors.blue),
-    //   enabledCellsTextStyle: const TextStyle(color: Colors.white),
-    //   daysOfTheWeekTextStyle: const TextStyle(color:  Colors.white),
-    //   barrierColor: Colors.black.withOpacity(0.6)
-    // );
-    // cnNewWorkout.workout.date = date?? cnNewWorkout.workout.date;
-
-    // if(Platform.isAndroid){
-    HapticFeedback.selectionClick();
-    // }
-
-    // await showCupertinoModalPopup<void>(
-    //   context: context,
-    //   builder: (BuildContext context) => Container(
-    //     height: 216,
-    //     padding: const EdgeInsets.only(top: 6.0),
-    //     // The Bottom margin is provided to align the popup above the system
-    //     // navigation bar.
-    //     margin: EdgeInsets.only(
-    //       bottom: MediaQuery.of(context).viewInsets.bottom,
-    //     ),
-    //     // Provide a background color for the popup.
-    //     color: CupertinoColors.systemBackground.resolveFrom(context),
-    //     // Use a SafeArea widget to avoid system overlaps.
-    //     child: SafeArea(
-    //       top: false,
-    //       child: child,
-    //     ),
-    //   ),
-    // );
-
-    setState(() {});
-  }
+  // void _showDialog(Widget child) async {
+  //   HapticFeedback.selectionClick();
+  //   // final dates = [DateTime.now().subtract(const Duration(days: 2)), DateTime.now().subtract(const Duration(days: 2))];
+  //
+  //   // final date = await showDatePickerDialog(
+  //   //   context: context,
+  //   //   minDate: DateTime(2020, 1, 1),
+  //   //   maxDate: DateTime(2999, 12, 31),
+  //   //   initialDate: cnNewWorkout.workout.date,
+  //   //   selectedDate: cnNewWorkout.workout.date,
+  //   //   currentDate: DateTime.now(),
+  //   //   // enabledCellsDecoration: BoxDecoration(
+  //   //   //   color: Colors.green,
+  //   //   //   borderRadius: BorderRadius.circular(100)
+  //   //   // ),
+  //   //   // disabledCellsDecoration: const BoxDecoration(color: Colors.green),
+  //   //   // currentDateDecoration: BoxDecoration(color: Colors.blue),
+  //   //   enabledCellsTextStyle: const TextStyle(color: Colors.white),
+  //   //   daysOfTheWeekTextStyle: const TextStyle(color:  Colors.white),
+  //   //   barrierColor: Colors.black.withOpacity(0.6)
+  //   // );
+  //   // cnNewWorkout.workout.date = date?? cnNewWorkout.workout.date;
+  //
+  //   // if(Platform.isAndroid){
+  //   HapticFeedback.selectionClick();
+  //   // }
+  //
+  //   // await showCupertinoModalPopup<void>(
+  //   //   context: context,
+  //   //   builder: (BuildContext context) => Container(
+  //   //     height: 216,
+  //   //     padding: const EdgeInsets.only(top: 6.0),
+  //   //     // The Bottom margin is provided to align the popup above the system
+  //   //     // navigation bar.
+  //   //     margin: EdgeInsets.only(
+  //   //       bottom: MediaQuery.of(context).viewInsets.bottom,
+  //   //     ),
+  //   //     // Provide a background color for the popup.
+  //   //     color: CupertinoColors.systemBackground.resolveFrom(context),
+  //   //     // Use a SafeArea widget to avoid system overlaps.
+  //   //     child: SafeArea(
+  //   //       top: false,
+  //   //       child: child,
+  //   //     ),
+  //   //   ),
+  //   // );
+  //
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -444,10 +445,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   onChanged: (value){},
                                 ),
                                 onConfirm: (){
-                                  bool added = false;
+                                  // bool added = false;
                                   final linkName = cnNewWorkout.linkNameController.text;
                                   if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
-                                    added = true;
+                                    // added = true;
                                     cnNewWorkout.workout.linkedExercises.add(linkName);
                                     cnNewWorkout.updateExercisesAndLinksList();
                                     cnNewWorkout.updateExercisesLinks();
@@ -892,21 +893,42 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     Map<DateTime, dynamic> dates = {};
     final workouts  = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).build().find();
     for(ObWorkout w in workouts){
-      if(dates.keys.contains(w.date)){
-        if(dates[w.date] is List){
-          dates[w.date].add(w.name);
+      bool contains = false;
+      DateTime? keyDate;
+
+      for(final k in dates.keys){
+        if(k.isSameDate(w.date)){
+          contains = true;
+          keyDate = k;
+          break;
+        }
+      }
+
+      /// if date exists
+      if(contains && keyDate != null){
+        if(dates[keyDate] is List){
+          dates[keyDate].add(w.name);
         }
         else{
-          dates[w.date] = [dates[w.date], w.name];
+          dates[keyDate] = [dates[keyDate], w.name];
         }
-      } else{
+      }
+      else{
         dates[w.date] = w.name;
       }
+    }
+
+    for(final entry in dates.entries){
+      print(entry.key);
+      print(entry.value);
+      print("");
     }
     return dates;
   }
 
   void refreshAllWorkoutDays(){
+    print("");
+    print("REFRESH");
     allWorkoutDates = getAllWorkoutDays();
   }
 
