@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:quiver/iterables.dart';
 
 import '../util/objectbox/ob_exercise.dart';
 
@@ -37,7 +38,7 @@ class Exercise{
   );
 
   ObExercise toObExercise(){
-    List<int> weights = [];
+    List<double> weights = [];
     List<int> amounts = [];
     sets = sets.where((set) => set.weight != null && set.amount != null).toList();
     for (SingleSet set in sets){
@@ -58,7 +59,7 @@ class Exercise{
     return sets.map((e) => UniqueKey()).toList();
   }
 
-  void addSet({int? weight, int? amount}){
+  void addSet({double? weight, int? amount}){
     sets.add(SingleSet(weight: weight, amount: amount));
   }
 
@@ -69,22 +70,69 @@ class Exercise{
   void removeEmptySets(){
     sets = sets.where((e) => e.weight != null && e.amount != null && e.weight! >= 0 && e.amount! > 0).toList();
   }
+  
+  Map asMap(){
+    return {
+    "name": name,
+    "sets": sets.map((e) => [e.weight, e.amount]).toList(),
+    "restInSeconds": restInSeconds,
+    "seatLevel": seatLevel,
+    "originalName": originalName, 
+    "linkName": linkName
+    };
+  }
+
+  Exercise? fromMap(Map data){
+    if(
+      !data.containsKey("name") ||
+        !data.containsKey("sets")||
+        !data.containsKey("restInSeconds")||
+        !data.containsKey("seatLevel")||
+        !data.containsKey("originalName")||
+        !data.containsKey("linkName")){
+      return null;
+    }
+    return Exercise(
+      name: data["name"],
+      sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1]))),
+      restInSeconds: data["restInSeconds"],
+      seatLevel: data["seatLevel"],
+      originalName: data["originalName"],
+      linkName: data["linkName"],
+    );
+  }
+
+  bool equals(Exercise ex){
+    if(ex.sets.length != sets.length){
+      return false;
+    }
+    for(List<SingleSet> s in zip([ex.sets, sets])){
+      if(!s[0].equals(s[1])){
+        return false;
+      }
+    }
+    return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
+  }
 
 }
 
 class SingleSet{
-  int? weight;
+  double? weight;
   int? amount;
 
   SingleSet({
     this.weight,
     this.amount
   });
+
+  bool equals(SingleSet s){
+    return weight == s.weight && amount == s.amount;
+  }
 }
 
 class StatisticExercise{
   String name;
-  int weight;
+  double weight;
   int amount;
   DateTime date;
   StatisticExercise({

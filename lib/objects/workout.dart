@@ -38,23 +38,24 @@ class Workout{
     name: w.name,
     exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
     date: w.date,
+    linkedExercises: List.from(w.linkedExercises),
+
     id: w.id,
-    isTemplate: w.isTemplate,
-    linkedExercises: List.from(w.linkedExercises)
+    isTemplate: w.isTemplate
   );
 
   Workout.copy(Workout w): this(
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
-      linkedExercises: List.from(w.linkedExercises),
-      date: w.date
+      date: w.date,
+      linkedExercises: List.from(w.linkedExercises)
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
       name: w.name,
       exercises: List.from(w.exercises.map((e) => Exercise(
           name: e.name,
-          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0], amount: set[1]))),
+          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt()))),
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel,
           linkName: e.linkName
@@ -64,23 +65,37 @@ class Workout{
       isTemplate: w.isTemplate,
       linkedExercises: List.from(w.linkedExercises)
   );
-  
+
+  /// Updates the template workout with same name as THIS workout with THIS workouts exercises
   void updateTemplate(){
+    /// Query the database to find the template workout with the given name
     ObWorkout? template = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true).and(ObWorkout_.name.equals(name))).build().findUnique();
     if(template != null){
+      /// Find new exercises that are not already included in the template
       List<Exercise> newExercises = exercises.where((ex) => !template.exercises.map((element) => element.name).contains(ex.name)).toList();
 
+      /// Update existing exercises in the template
       for (ObExercise ex in template.exercises){
+        /// Check if the current exercise exists in the new exercises list
         if(exercises.map((e) => e.name).toList().contains(ex.name)) {
+          /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
+          /// Update amounts and weights of the existing exercise in the template
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
+          ex.restInSeconds = newExercise.restInSeconds;
+          ex.seatLevel = newExercise.seatLevel;
+          /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
       }
+      /// Add new exercises to the template
       for (Exercise ex in newExercises){
+        /// Convert Exercise to ObExercise
         ObExercise obExercise = ex.toObExercise();
+        /// Add the new exercise to the template
         template.exercises.add(obExercise);
+        /// Put the new exercise in the database
         objectbox.exerciseBox.put(obExercise);
       }
 
@@ -128,13 +143,6 @@ class Workout{
 
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       exercises[existingExercises.indexOf(exercise.originalName!)] = exercise;
-      // Exercise currentExercise = exercises[existingExercises.indexOf(exercise.originalName!)];
-      // currentExercise.name = (exercise.name).toString();
-      // currentExercise.sets = List.from(exercise.sets);
-      // currentExercise.restInSeconds = exercise.restInSeconds;
-      // currentExercise.seatLevel = exercise.seatLevel;
-      // currentExercise.originalName = exercise.originalName;
-      // currentExercise.linkName = exercise.linkName;
     }
     else{
       exercises.add(
@@ -153,13 +161,16 @@ class Workout{
       List<ObExercise> oldObExercises = existingObWorkout.exercises;
       objectbox.exerciseBox.removeMany(oldObExercises.map((e) => e.id).toList());
       existingObWorkout.name = name;
+      if(date != null){
+        existingObWorkout.date = date!;
+      }
       existingObWorkout.linkedExercises = List.from(linkedExercises);
     }
 
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
-    print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
+    // print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);
     objectbox.exerciseBox.putMany(newObExercises);
   }
@@ -171,5 +182,36 @@ class Workout{
       objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
       objectbox.workoutBox.remove(w.id);
     }
+  }
+  
+  Map asMap(){
+    return {
+      "id": id,
+      "name": name,
+      "date": date.toString(),
+      "isTemplate": isTemplate,
+      "linkedExercises": List.from(linkedExercises),
+      "exercises": exercises.map((e) => e.asMap()).toList()
+    };
+  }
+
+  Workout? fromMap(Map data){
+    if(
+      !data.containsKey("id") ||
+      !data.containsKey("name")||
+      !data.containsKey("date")||
+      !data.containsKey("isTemplate")||
+      !data.containsKey("linkedExercises")||
+      !data.containsKey("exercises")){
+      return null;
+    }
+    return Workout(
+      id: data["id"],
+      name: data["name"],
+      date: DateTime.parse(data["date"]),
+      isTemplate: data["isTemplate"],
+      linkedExercises: List<String>.from(data["linkedExercises"]),
+      exercises: List<Exercise>.from(data["exercises"].map((e) => Exercise().fromMap(e)))
+    );
   }
 }

@@ -1,4 +1,3 @@
-import 'package:objectbox/objectbox.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import '../../objectbox.g.dart';

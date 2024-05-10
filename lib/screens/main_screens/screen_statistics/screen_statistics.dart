@@ -1,18 +1,17 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
-import 'package:fitness_app/screens/screen_statistics/charts/line_chart_exercise_weight_progress.dart';
-import 'package:fitness_app/screens/screen_statistics/exercise_summary_per_interval.dart';
-import 'package:fitness_app/screens/screen_statistics/selectors/exercise_selector.dart';
-import 'package:fitness_app/screens/screen_statistics/selectors/interval_selector.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/interval_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
-
-import '../../objects/exercise.dart';
-import '../../objects/workout.dart';
-import '../../util/objectbox/ob_workout.dart';
+import '../../../objects/exercise.dart';
+import '../../../objects/workout.dart';
+import '../../../util/objectbox/ob_workout.dart';
+import 'charts/line_chart_exercise_weight_progress.dart';
+import 'exercise_summary_per_interval.dart';
 import 'selectors/interval_size_selector.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -327,13 +326,13 @@ class CnScreenStatistics extends ChangeNotifier {
 
   }
 
-   List<int?>? getMinMaxWeights(){
+   List<double?>? getMinMaxWeights(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    int minWeight = 1000000;
-    int maxWeight = 0;
+    double minWeight = 1000000;
+    double maxWeight = 0;
     for(StatisticExercise ex in exercises){
       maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
       minWeight = minWeight < maxWeight? minWeight : maxWeight;
@@ -342,15 +341,15 @@ class CnScreenStatistics extends ChangeNotifier {
     return [minWeight, maxWeight];
   }
 
-  Map<DateTime, int>? getMaxWeightsPerDate(){
+  Map<DateTime, double>? getMaxWeightsPerDate(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    Map<DateTime, int> maxWeights = {};
+    Map<DateTime, double> maxWeights = {};
     for(StatisticExercise ex in exercises){
       // print("DATE: ${ex.date}");
-      final int? currentWeight = maxWeights[ex.date];
+      final double? currentWeight = maxWeights[ex.date];
       if(currentWeight != null){
         maxWeights[ex.date] = currentWeight < ex.weight? ex.weight : currentWeight;
       } else{
@@ -360,12 +359,12 @@ class CnScreenStatistics extends ChangeNotifier {
     return maxWeights;
   }
 
-  Map<DateTime, int>? getTotalMovedWeight(){
+  Map<DateTime, double>? getTotalMovedWeight(){
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
     }
-    Map<DateTime, int> summedWeights = {};
+    Map<DateTime, double> summedWeights = {};
     for(StatisticExercise ex in exercises){
       summedWeights[ex.date] = (summedWeights[ex.date]?? 0) + (ex.weight*ex.amount);
     }
@@ -419,11 +418,11 @@ class CnScreenStatistics extends ChangeNotifier {
   //   }
   //   DateTime currentMonday = getMondayOfWeekFromDay(minDate);
   //   while (addNewWeek){
-  //     final int dayOfMonthMonday = int.parse(DateFormat('d').format(currentMonday));
-  //     final int monthMonday = int.parse(DateFormat('M').format(currentMonday));
+  //     final int dayOfMonthMonday = int.tryParse(DateFormat('d').format(currentMonday));
+  //     final int monthMonday = int.tryParse(DateFormat('M').format(currentMonday));
   //     final sunday = currentMonday.add(const Duration(days: 6));
-  //     final int dayOfMonthSunday = int.parse(DateFormat('d').format(sunday));
-  //     final int monthSunday = int.parse(DateFormat('M').format(sunday));
+  //     final int dayOfMonthSunday = int.tryParse(DateFormat('d').format(sunday));
+  //     final int monthSunday = int.tryParse(DateFormat('M').format(sunday));
   //     workoutsSorted[currentMonday.year][DateFormat('yMd').format(currentMonday)] = {
   //       "name": "$dayOfMonthMonday.$monthMonday - $dayOfMonthSunday.$monthSunday",
   //       "counter": 0

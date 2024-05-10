@@ -1,12 +1,9 @@
-import 'dart:ui';
-
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-
-import '../screens/screen_workouts/screen_running_workout.dart';
-import 'animated_column.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/screen_running_workout/animated_column.dart';
 
 class StopwatchWidget extends StatefulWidget {
   const StopwatchWidget({super.key});
@@ -90,7 +87,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                                 width: 70,
                                                 child: Center(
                                                   child: Text(
-                                                    "Löschen",
+                                                    "Delete",
                                                     style: TextStyle(color: Color(
                                                         0xfffdfdfd)),
                                                   ),
@@ -122,7 +119,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                         onTap: cnStopwatchWidget.isPaused? cnStopwatchWidget.startTimer : cnStopwatchWidget.pauseTimer,
                                         child: Center(
                                           child: Text(
-                                            cnStopwatchWidget.isPaused? "Start" : "Stopp",
+                                            cnStopwatchWidget.isPaused? "Start" : "Stop",
                                             style: TextStyle(
                                               color: cnStopwatchWidget.isPaused? const Color(0x9627eb15) : const Color(
                                                   0xfffd443a)
@@ -161,20 +158,23 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     ),
                     Align(
                       alignment: Alignment.topRight,
-                      child: IconButton(
-                          iconSize: 25,
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                          ),
-                          onPressed: () {
-                            cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
-                            cnRunningWorkout.refresh();
-                          },
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.amber[800],
-                          )
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 2.5),
+                        child: IconButton(
+                            iconSize: 30,
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                            ),
+                            onPressed: () {
+                              cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
+                              cnRunningWorkout.refresh();
+                            },
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.amber[800],
+                            )
+                        ),
                       ),
                     )
                   ],
@@ -255,6 +255,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   final Stopwatch stopwatch = Stopwatch();
 
   CnStopwatchWidget(BuildContext context){
+    print("NINT STOPWATCH CN");
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 

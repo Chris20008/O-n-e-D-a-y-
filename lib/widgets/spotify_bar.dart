@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:ui';
-
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:fitness_app/screens/screen_workouts/screen_running_workout.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,11 +13,12 @@ import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
-
 import '../main.dart';
-import 'animated_column.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/screen_running_workout/animated_column.dart';
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
@@ -77,14 +75,11 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
         initWidths();
       }
       else if (orientation == Orientation.landscape) {
-        print("ORIENTATION NOW LANDSCAPE");
         cnSpotifyBar.width = widths["landscape"]!;
       }
       else {
-        print("ORIENTATION NOW PORTRAIT");
         cnSpotifyBar.width = widths["portrait"]!;
       }
-      print("WIDTH NOW: ${cnSpotifyBar.width}");
     });
   }
 
@@ -98,7 +93,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
       widths[Orientation.landscape.name] = MediaQuery.of(context).size.width - MediaQuery.of(context).padding.left - MediaQuery.of(context).padding.right;
     }
     cnSpotifyBar.width = widths[orientation.name]!;
-    print("WIDTHS INITIALIZED: $widths");
   }
 
   @override
@@ -486,11 +480,11 @@ class CnSpotifyBar extends ChangeNotifier {
     isTryingToConnect = true;
     try{
       if(Platform.isAndroid){
-        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "fitness-app://spotify-callback");
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "fitness-app://spotify-callback");
       }
       else{
-        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
-        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: "6911043ee364484fb270f70844bdb38f", redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
+        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
       }
       if(isConnected){
         _subscribeToPlayerState();

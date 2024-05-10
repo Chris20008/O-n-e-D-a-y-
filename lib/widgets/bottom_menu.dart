@@ -5,11 +5,12 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../screens/screen_statistics/screen_statistics.dart';
-import '../screens/screen_workout_history/screen_workout_history.dart';
-import '../screens/screen_workouts/panels/new_workout_panel.dart';
-import '../screens/screen_workouts/screen_running_workout.dart';
-import '../screens/screen_workouts/screen_workouts.dart';
+import '../screens/main_screens/screen_statistics/screen_statistics.dart';
+import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/main_screens/screen_workout_history/screen_workout_history.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/screen_workouts.dart';
+import '../util/config.dart';
 
 class BottomMenu extends StatefulWidget {
   const BottomMenu({super.key});
@@ -26,6 +27,7 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
   final double height = Platform.isAndroid? 60 : 50;
 
@@ -53,21 +55,23 @@ class _BottomMenuState extends State<BottomMenu> {
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
-          color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
-          gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
-              colors: [
-                Color(0xff160d05),
-                Color(0xff0a0604),
-              ]
-          ) : null
+        color: cnNewWorkout.minPanelHeight > 0? const Color(0xff0a0604): Colors.black.withOpacity(0.4),
+          // color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
+          // gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
+          //     begin: Alignment.centerRight,
+          //     end: Alignment.centerLeft,
+          //     colors: [
+          //       // Color(0xff160d05),
+          //       Color(0xff0a0604),
+          //       Color(0xff0a0604)
+          //     ]
+          // ) : null
       ),
       child: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
-              sigmaX: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
-              sigmaY: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? 0 : 10.0,
+              sigmaX: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
+              sigmaY: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
               tileMode: TileMode.mirror
           ),
           child: Theme(
@@ -113,13 +117,16 @@ class _BottomMenuState extends State<BottomMenu> {
     }
     if(index == 0) {
       cnWorkoutHistory.refreshAllWorkouts();
+      cnNewWorkout.refreshAllWorkoutDays();
     }
     else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();
+
+      // only for testing changing language
+      // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
       cnScreenStatistics.calculateCurrentData();
-      // cnScreenStatistics.refresh();
     }
     cnHomepage.refresh();
   }

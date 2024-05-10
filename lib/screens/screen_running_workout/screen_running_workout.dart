@@ -1,0 +1,1202 @@
+import 'dart:ui';
+import 'package:fitness_app/screens/screen_running_workout/selector_exercises_per_link.dart';
+import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to_update.dart';
+import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
+import 'package:fitness_app/widgets/banner_running_workout.dart';
+import 'package:fitness_app/widgets/stopwatch.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
+import '../../main.dart';
+import '../../objects/exercise.dart';
+import '../../objects/workout.dart';
+import '../../util/constants.dart';
+import '../../widgets/bottom_menu.dart';
+import '../../widgets/spotify_bar.dart';
+import '../../widgets/standard_popup.dart';
+import '../main_screens/screen_workouts/screen_workouts.dart';
+
+class ScreenRunningWorkout extends StatefulWidget {
+  const ScreenRunningWorkout({
+    super.key,
+  });
+
+  @override
+  State<ScreenRunningWorkout> createState() => _ScreenRunningWorkoutState();
+}
+
+class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with TickerProviderStateMixin {
+  late final AnimationController _controllerSelectorExUpdate = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  );
+  late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
+    parent: _controllerSelectorExUpdate,
+    curve: Curves.decelerate,
+  );
+  late final AnimationController _controllerSelectorExPerLink = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  );
+  late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
+    parent: _controllerSelectorExPerLink,
+    curve: Curves.decelerate,
+  );
+
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+  final double _iconSize = 20;
+  final double _heightOfSetRow = 30;
+  final double _widthOfTextField = 55;
+  final double _setPadding = 5;
+  Key selectorExerciseToUpdateKey = UniqueKey();
+  Key selectorExercisePerLinkKey = UniqueKey();
+  double viewInsetsBottom = 0;
+  bool isAlreadyCheckingKeyboard = false;
+  bool isAlreadyCheckingKeyboardPermanent = false;
+  bool showSelectorExerciseToUpdate = false;
+  bool showSelectorExercisePerLink = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
+
+    if(showSelectorExerciseToUpdate){
+      _controllerSelectorExUpdate.forward();
+    } else{
+      _controllerSelectorExUpdate.reverse();
+    }
+    if(showSelectorExercisePerLink){
+      _controllerSelectorExPerLink.forward();
+    } else{
+      _controllerSelectorExPerLink.reverse();
+    }
+
+    return PopScope(
+      onPopInvoked: (doPop){
+        if(cnRunningWorkout.isVisible){
+          cnRunningWorkout.isVisible = false;
+          cnWorkouts.refresh();
+          cnRunningWorkout.cache();
+        }
+        if(cnStandardPopUp.isVisible){
+          cnStandardPopUp.clear();
+        }
+        if(MediaQuery.of(context).viewInsets.bottom > 0){
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          alignment: Alignment.center,
+          children: [
+            Scaffold(
+              extendBody: true,
+              bottomNavigationBar: viewInsetsBottom < 50? ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                      sigmaX: 10.0,
+                      sigmaY: 10.0,
+                      tileMode: TileMode.mirror
+                  ),
+                  child: GestureDetector(
+                    onTap: openPopUpFinishWorkout,
+                    child: Container(
+                      height: cnBottomMenu.height,
+                      color: Colors.black.withOpacity(0.5),
+                      child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaler: const TextScaler.linear(1.4),)),
+                    ),
+                  ),
+                ),
+              ): const SizedBox(),
+              body: GestureDetector(
+                onTap: (){
+                  FocusScope.of(context).unfocus();
+                },
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top:0,bottom: 0,left: 20, right: 20),
+                      child: Column(
+                        children: [
+
+                          Expanded(
+
+                            /// Each EXERCISE
+                            child: ListView.separated(
+                              controller: cnRunningWorkout.scrollController,
+                              physics: const BouncingScrollPhysics(),
+                              shrinkWrap: true,
+                              separatorBuilder: (BuildContext context, int index) {
+                                return Column(
+                                  children: [
+                                    const SizedBox(height: 20,),
+                                    Container(
+                                      height: 1,
+                                      width: double.maxFinite - 50,
+                                      color: Colors.amber[900]!.withOpacity(0.6),
+                                    ),
+                                    const SizedBox(height: 20,),
+                                  ],
+                                );
+                              },
+                              itemCount: cnRunningWorkout.groupedExercises.length,
+                              itemBuilder: (BuildContext context, int indexExercise) {
+                                Widget? child;
+                                dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+                                if(newEx is! Exercise){
+                                  newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
+                                }
+                                Exercise lastEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
+                                child = Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
+                                        Expanded(
+                                            child: OverflowSafeText(
+                                                newEx.name,
+                                                maxLines: 1
+                                            ),
+                                        ):
+                                        DropdownMenu<String>(
+                                          initialSelection: newEx.name,
+                                          onSelected: (String? value) {
+                                            setState(() {
+                                              final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                              final t = lists.map((element) => element.value.indexWhere((ex) {
+                                                return ex.name == value;
+                                              })).toList().firstWhere((element) => element >=0);
+                                              cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                            });
+                                            cnRunningWorkout.cache();
+                                          },
+                                          dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
+                                            return DropdownMenuEntry<String>(value: value.name, label: value.name);
+                                          }).toList(),
+                                        ),
+                                        if(cnRunningWorkout.newExNames.contains(newEx.name))
+                                          myIconButton(
+                                            icon:const Icon(Icons.delete_forever),
+                                            onPressed: (){
+                                              cnStandardPopUp.open(
+                                                  context: context,
+                                                  child: const Text(
+                                                    "Do you really want to delete this Exercise?",
+                                                    textAlign: TextAlign.center,
+                                                    textScaler: TextScaler.linear(1.2),
+                                                    style: TextStyle(color: Colors.white),
+                                                  ),
+                                                  onConfirm: (){
+                                                    cnRunningWorkout.deleteExercise(newEx);
+                                                  },
+                                                  onCancel: (){},
+                                                  color: const Color(0xff2d2d2d)
+                                              );
+                                            },
+                                          ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 5),
+                                    GestureDetector(
+                                      onTap: (){
+                                        cnStandardPopUp.open(
+                                          context: context,
+                                          onConfirm: (){
+                                            if(cnRunningWorkout.controllerSeatLevel.text.isNotEmpty){
+                                              newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
+                                              vibrateCancel();
+                                            }
+                                            cnRunningWorkout.controllerSeatLevel.clear();
+                                            cnRunningWorkout.refresh();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          onCancel: (){
+                                            cnRunningWorkout.controllerSeatLevel.clear();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          child: TextField(
+                                            controller: cnRunningWorkout.controllerSeatLevel,
+                                            keyboardType: TextInputType.number,
+                                            keyboardAppearance: Brightness.dark,
+                                            maxLength: 3,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              labelText: "Seat Level",
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            style: const TextStyle(
+                                                fontSize: 18
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            onChanged: (value){},
+                                          ),
+                                        );
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          width: 100,
+                                          height: 30,
+                                          color: Colors.transparent,
+                                          child: Row(
+                                            mainAxisAlignment: MainAxisAlignment.start,
+                                            children: [
+                                              Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                                              const SizedBox(width: 2,),
+                                              if (newEx.seatLevel == null)
+                                                const Text("-", textScaler: TextScaler.linear(1),)
+                                              else
+                                                Text(newEx.seatLevel.toString(), textScaler: const TextScaler.linear(1),)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: (){
+                                        cnStandardPopUp.open(
+                                          context: context,
+                                          onConfirm: (){
+                                            if(cnRunningWorkout.controllerRestInSeconds.text.isNotEmpty){
+                                              newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
+                                            }
+                                            cnRunningWorkout.controllerRestInSeconds.clear();
+                                            cnRunningWorkout.refresh();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          onCancel: (){
+                                            cnRunningWorkout.controllerRestInSeconds.clear();
+                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              FocusScope.of(context).unfocus();
+                                            });
+                                          },
+                                          child: TextField(
+                                            controller: cnRunningWorkout.controllerRestInSeconds,
+                                            keyboardType: TextInputType.number,
+                                            keyboardAppearance: Brightness.dark,
+                                            maxLength: 3,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              labelText: "Rest In Seconds",
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            style: const TextStyle(
+                                                fontSize: 18
+                                            ),
+                                            textAlign: TextAlign.center,
+                                            onChanged: (value){},
+                                          ),
+                                        );
+                                      },
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          width: 100,
+                                          height: 30,
+                                          color: Colors.transparent,
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                                              const SizedBox(width: 2,),
+                                              if (newEx.restInSeconds == 0)
+                                                const Text("-", textScaler: TextScaler.linear(1),)
+                                              else if (newEx.restInSeconds < 60)
+                                                Text("${newEx.restInSeconds}s", textScaler: const TextScaler.linear(1),)
+                                              else if (newEx.restInSeconds % 60 != 0)
+                                                  Text("${(newEx.restInSeconds/60).floor()}:${newEx.restInSeconds%60}m", textScaler: const TextScaler.linear(1),)
+                                                else
+                                                  Text("${(newEx.restInSeconds/60).round()}m", textScaler: const TextScaler.linear(1),),
+                                              const SizedBox(width: 10,)
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    /// Each Set
+                                    ListView.builder(
+                                        physics: const BouncingScrollPhysics(),
+                                        shrinkWrap: true,
+                                        itemCount: newEx.sets.length+1,
+                                        itemBuilder: (BuildContext context, int indexSet) {
+                                          if(indexSet == newEx.sets.length){
+                                            return Row(
+                                              children: [
+                                                Expanded(
+                                                  child: IconButton(
+                                                      alignment: Alignment.center,
+                                                      color: Colors.amber[800],
+                                                      style: ButtonStyle(
+                                                          backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                          shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                                      ),
+                                                      onPressed: () {
+                                                        addSet(newEx, lastEx);
+                                                      },
+                                                      icon: const Icon(
+                                                        Icons.add,
+                                                        size: 20,
+                                                      )
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }
+
+                                          SingleSet set = lastEx.sets[indexSet];
+                                          Widget? child;
+                                          child = Padding(
+                                            // padding: EdgeInsets.zero,
+                                            padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
+                                            child: SizedBox(
+                                              width: double.maxFinite,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+
+                                                  /// Set
+                                                  SizedBox(
+                                                      width: _widthOfTextField,
+                                                      child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
+                                                  ),
+
+                                                  /// Button to copy templates data
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: IgnorePointer(
+                                                      ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                                  cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
+                                                                  set.weight != null &&
+                                                                  set.amount != null),
+                                                      child: SizedBox(
+                                                        height: _heightOfSetRow,
+                                                        child: ElevatedButton(
+                                                          style: ButtonStyle(
+                                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
+                                                          ),
+                                                          onPressed: (){
+                                                            if(set.weight?.toString() != null &&
+                                                               set.amount?.toString() != null &&
+                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
+                                                            ){
+                                                              vibrateConfirm();
+                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weight.toString().endsWith(".0")? set.weight?.toInt().toString() : set.weight.toString())?? "";
+                                                              newEx.sets[indexSet].weight = set.weight;
+                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                                                              newEx.sets[indexSet].amount = set.amount;
+                                                              cnRunningWorkout.refresh();
+                                                              cnRunningWorkout.cache();
+                                                            } else{
+                                                              setState(() {
+                                                                FocusScope.of(context).unfocus();
+                                                              });
+                                                            }
+                                                          },
+                                                          child: Center(
+                                                            child: OverflowSafeText(
+                                                              maxLines: 1,
+                                                              set.weight != null && set.amount != null? "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""} kg x ${set.amount?? ""}" : "",
+                                                              style: TextStyle(
+                                                                  color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                                                                          cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
+                                                                    ?Colors.white
+                                                                    : Colors.white.withOpacity(0.2)
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ),
+
+                                                  /// Weight and Amount
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: Row(
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      children: [
+
+                                                        /// Weight
+                                                        SizedBox(
+                                                          width: _widthOfTextField,
+                                                          height: _heightOfSetRow,
+                                                          child: Center(
+                                                            child: TextField(
+                                                              maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
+                                                              textAlign: TextAlign.center,
+                                                              keyboardType: const TextInputType.numberWithOptions(
+                                                                  decimal: true,
+                                                                  signed: false
+                                                              ),
+                                                              keyboardAppearance: Brightness.dark,
+                                                              controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
+                                                              onTap: (){
+                                                                cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][0].value.text.length);
+                                                              },
+                                                              decoration: InputDecoration(
+                                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                                  // isDense: true,
+                                                                  counterText: "",
+                                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                                                                  hintFadeDuration: const Duration(milliseconds: 200),
+                                                                  hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
+                                                                  hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15))
+                                                              ),
+                                                              style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text),
+                                                              onChanged: (value){
+                                                                value = value.trim();
+                                                                if(value.isNotEmpty){
+                                                                  value = validateDoubleTextInput(value);
+                                                                  final newValue = double.tryParse(value);
+                                                                  newEx.sets[indexSet].weight = newValue;
+                                                                  if(newValue == null){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
+                                                                  }
+                                                                }
+                                                                else{
+                                                                  newEx.sets[indexSet].weight = null;
+                                                                }
+                                                                cnRunningWorkout.cache();
+                                                                setState(() => {});
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+
+                                                        const SizedBox(width: 10,),
+
+                                                        /// Amount
+                                                        SizedBox(
+                                                          width: _widthOfTextField,
+                                                          height: _heightOfSetRow,
+                                                          child: Center(
+                                                            child: TextField(
+                                                              maxLength: 3,
+                                                              textAlign: TextAlign.center,
+                                                              keyboardType: const TextInputType.numberWithOptions(
+                                                                  decimal: false,
+                                                                  signed: false
+                                                              ),
+                                                              keyboardAppearance: Brightness.dark,
+                                                              controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
+                                                              onTap: (){
+                                                                cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][1].value.text.length);
+                                                              },
+                                                              decoration: InputDecoration(
+                                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                                  // isDense: true,
+                                                                  counterText: "",
+                                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                                                                  hintText: "${set.amount?? ""}",
+                                                                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
+                                                              ),
+                                                              style: const TextStyle(
+                                                                fontSize: 18,
+                                                              ),
+                                                              onChanged: (value){
+                                                                value = value.trim();
+                                                                if(value.isNotEmpty){
+                                                                  final newValue = int.tryParse(value);
+                                                                  newEx.sets[indexSet].amount = newValue;
+                                                                  if(newValue == null){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
+                                                                  }
+                                                                  if(value.length == 1){
+                                                                    setState(() => {});
+                                                                  }
+                                                                }
+                                                                else{
+                                                                  newEx.sets[indexSet].amount = null;
+                                                                  setState(() => {});
+                                                                }
+                                                                cnRunningWorkout.cache();
+                                                              },
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+
+                                          return Slidable(
+                                            key: cnRunningWorkout.slideableKeys[newEx.name]![indexSet],
+                                            // key: UniqueKey(),
+                                            startActionPane: ActionPane(
+                                              motion: const ScrollMotion(),
+                                              dismissible: DismissiblePane(
+                                                  onDismissed: () {
+                                                    dismiss(newEx, lastEx, indexSet);
+                                                  }),
+                                              children: [
+                                                SlidableAction(
+                                                  flex:10,
+                                                  onPressed: (BuildContext context){
+                                                    dismiss(newEx, lastEx, indexSet);
+                                                  },
+                                                  borderRadius: BorderRadius.circular(15),
+                                                  backgroundColor: const Color(0xFFA12D2C),
+                                                  foregroundColor: Colors.white,
+                                                  icon: Icons.delete,
+                                                ),
+                                                SlidableAction(
+                                                  flex: 1,
+                                                  onPressed: (BuildContext context){},
+                                                  backgroundColor: Colors.transparent,
+                                                  foregroundColor: Colors.transparent,
+                                                  label: '',
+                                                ),
+                                              ],
+                                            ),
+                                            child: child,
+                                          );
+                                        }
+                                    ),
+                                  ],
+                                );
+
+                                /// Top Spacer
+                                if (indexExercise == 0){
+                                  child = Column(
+                                    children: [
+                                      const SizedBox(height: 80,),
+                                      child
+                                    ],
+                                  );
+                                }
+
+                                /// Bottom Spacer
+                                if (indexExercise == cnRunningWorkout.groupedExercises.length-1){
+                                  child = Column(
+                                    children: [
+                                      child,
+                                      AnimatedContainer(
+                                          duration: const Duration(milliseconds: 250),
+                                          height: cnStopwatchWidget.isOpened
+                                              ? 70 + cnStopwatchWidget.heightOfTimer
+                                              : 70
+                                      ),
+                                    ],
+                                  );
+                                }
+
+                                return child;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    /// do not make const, should be updated by rebuild
+                    Hero(
+                        transitionOnUserGestures: true,
+                        tag: "Banner",
+                        child: BannerRunningWorkout()
+                    ),
+                    AnimatedCrossFade(
+                        layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                          return Stack(
+                            clipBehavior: Clip.none,
+                            alignment: Alignment.center,
+                            children: <Widget>[
+                              Positioned(
+                                key: bottomChildKey,
+                                // bottom: 0,
+                                // left: 0,
+                                child: bottomChild,
+                              ),
+                              Positioned(
+                                key: topChildKey,
+                                child: topChild,
+                              ),
+                            ],
+                          );
+                        },
+                        firstChild: const AnimatedColumn(),
+                        secondChild: const Align(
+                          alignment: Alignment.bottomRight,
+                            child: SizedBox(width: double.maxFinite)
+                        ),
+                        crossFadeState: viewInsetsBottom < 50
+                          ? CrossFadeState.showFirst
+                          : CrossFadeState.showSecond,
+                        duration: Duration(milliseconds: viewInsetsBottom < 50? cnSpotifyBar.animationTimeSpotifyBar~/2 : 0)
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const StandardPopUp(),
+            AnimatedCrossFade(
+              firstChild: Container(
+                color: Colors.black54,
+              ),
+              secondChild: const SizedBox(),
+              crossFadeState: showSelectorExerciseToUpdate || showSelectorExercisePerLink
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: const Duration(milliseconds: 200),
+              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                return Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    Positioned(
+                      key: bottomChildKey,
+                      child: bottomChild,
+                    ),
+                    Positioned(
+                      key: topChildKey,
+                      child: topChild,
+                    ),
+                  ],
+                );
+              },
+            ),
+            ScaleTransition(
+              scale: _animationSelectorExUpdate,
+              child: SelectorExercisesToUpdate(
+                key: selectorExerciseToUpdateKey,
+                workout: Workout.clone(cnRunningWorkout.workout),
+                workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplate),
+                onConfirm: finishWorkout,
+                onCancel: (){
+                  setState(() {
+                    showSelectorExerciseToUpdate = false;
+                  });
+                },
+              ),
+            ),
+            ScaleTransition(
+              scale: _animationSelectorExPerLink,
+              child: SelectorExercisesPerLink(
+                key: selectorExercisePerLinkKey,
+                groupedExercises: cnRunningWorkout.groupedExercises,
+                relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
+                onConfirm: confirmSelectorExPerLink,//finishWorkout,
+                onCancel: (){
+                  setState(() {
+                    showSelectorExercisePerLink = false;
+                  });
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
+    setState(() {
+      showSelectorExercisePerLink = false;
+      cnRunningWorkout.exercisesToRemove = exToRemove?? [];
+    });
+    if(canUpdateTemplate()){
+      cnStandardPopUp.clear();
+      Future.delayed(Duration(milliseconds: delay?? cnStandardPopUp.animationTime), (){
+        setState(() {
+          showSelectorExerciseToUpdate = true;
+          selectorExerciseToUpdateKey = UniqueKey();
+        });
+      });
+    }
+    else{
+      finishWorkout();
+    }
+  }
+
+  void addSet(Exercise ex, Exercise lastEx){
+    setState(() {
+      ex.addSet();
+      lastEx.addSet();
+      cnRunningWorkout.textControllers[ex.name]?.add([TextEditingController(), TextEditingController()]);
+      cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
+      final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
+      if(newControllerPos >= 0 && cnRunningWorkout.scrollController.position.maxScrollExtent >= newControllerPos){
+        cnRunningWorkout.scrollController.jumpTo(newControllerPos);
+      }
+    });
+  }
+
+  void dismiss(Exercise ex, Exercise lastEx, int index){
+    setState(() {
+      ex.sets.removeAt(index);
+      lastEx.sets.removeAt(index);
+      cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
+      cnRunningWorkout.slideableKeys[ex.name]?.removeAt(index);
+    });
+  }
+
+  /// Find the first indication of whether or not an Exercise has changed.
+  ///
+  /// Can be through:
+  ///   - amount of sets
+  ///   - weight
+  ///   - amount
+  ///   - rest in seconds
+  ///   - seat level
+  ///   - new Exercise added
+  bool canUpdateTemplate(){
+    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+    tempWo.removeEmptyExercises();
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+    List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplate.exercises.map((e) => e.name).toList();
+    for(Exercise ex in tempWo.exercises){
+      /// Exercise name does not exist in template yet => can update Template
+      if(!templateWorkoutExerciseNames.contains(ex.name)){
+        return true;
+      }
+      Exercise tempTemplateEx = cnRunningWorkout.workoutTemplate.exercises.firstWhere((e) => e.name == ex.name);
+      if(!tempTemplateEx.equals(ex)){
+        return true;
+      }
+      // /// Not same amount of sets for Exercise => can update Template
+      // if(tempTemplateEx.sets.length != ex.sets.length){
+      //   return true;
+      // }
+      // /// Seat level or rest in seconds have changed => can update Template
+      // if(tempTemplateEx.seatLevel != ex.seatLevel || tempTemplateEx.restInSeconds != ex.restInSeconds){
+      //   return true;
+      // }
+      // /// Check for ech Set
+      // for(List<SingleSet> setPair in zip([tempTemplateEx.sets, ex.sets])){
+      //   /// when weight or amount is not the same => can update Template
+      //   if(setPair[0].amount != setPair[1].amount || setPair[0].weight != setPair[1].weight){
+      //     return true;
+      //   }
+      // }
+    }
+    return false;
+  }
+
+  bool hasStartedWorkout(){
+    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+    tempWo.removeEmptyExercises();
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+    return true;
+  }
+
+  void openPopUpFinishWorkout(){
+    final bool canFinish = hasStartedWorkout();
+    cnStandardPopUp.open(
+      context: context,
+      showCancel: false,
+      confirmText: "Finish",
+      canConfirm: canFinish,
+      confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
+      // onConfirm: finishWorkout,
+      onConfirm: () {
+        cnStandardPopUp.clear();
+        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          setState(() {
+            cnRunningWorkout.checkMultipleExercisesPerLink();
+            if(cnRunningWorkout.linkWithMultipleExercisesStarted.isNotEmpty){
+              showSelectorExercisePerLink = true;
+              selectorExercisePerLinkKey = UniqueKey();
+            } else{
+              confirmSelectorExPerLink(delay: 0);
+            }
+
+          });
+        });
+        // if(canUpdateTemplate()){
+        //   cnStandardPopUp.clear();
+        //   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+        //     setState(() {
+        //       showSelectorExerciseToUpdate = true;
+        //       selectorExerciseToUpdateKey = UniqueKey();
+        //     });
+        //   });
+        // }
+        // else{
+        //   finishWorkout();
+        // }
+      },
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        children: [
+          const Text(
+              "Finish Workout?",
+            textAlign: TextAlign.center,
+            textScaler: TextScaler.linear(1.2),
+            style: TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 20,),
+          Container(
+            height: 0.5,
+            width: double.maxFinite,
+            color: Colors.grey[700]!.withOpacity(0.5),
+          ),
+          SizedBox(
+            height: 40,
+            width: double.maxFinite,
+            child: ElevatedButton(
+              onPressed: () => stopWorkout(),
+              style: ButtonStyle(
+                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+              ),
+              child: Text(
+                  "Stop Workout",
+                style: TextStyle(color: Colors.red.withOpacity(0.6)),
+              ),
+            ),
+          ),
+          // Container(
+          //   height: 0.5,
+          //   width: double.maxFinite,
+          //   color: Colors.grey[700]!.withOpacity(0.5),
+          // ),
+          // SizedBox(
+          //   height: 40,
+          //   width: double.maxFinite,
+          //   child: ElevatedButton(
+          //       onPressed: () {
+          //         cnStandardPopUp.clear();
+          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          //           setState(() {
+          //             showSelectorExerciseToUpdate = true;
+          //             selectorExerciseToUpdateKey = UniqueKey();
+          //           });
+          //         });
+          //       },
+          //       style: ButtonStyle(
+          //           shadowColor: MaterialStateProperty.all(Colors.transparent),
+          //           surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          //           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+          //       ),
+          //       child: const Text(
+          //         "Finish And Update Template"
+          //       ),
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
+
+  Future stopWorkout({int? time})async{
+    time = time?? cnStandardPopUp.animationTime;
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.clear();
+    }
+    await Future.delayed(Duration(milliseconds: time), ()async{
+      cnRunningWorkout.isVisible = false;
+      cnRunningWorkout.isRunning = false;
+      cnHomepage.refresh();
+      cnWorkouts.refresh();
+      await Future.delayed(const Duration(milliseconds: 50), ()async{
+        Navigator.of(context).pop();
+        /// delayed that the pop context is finished, if to short, the user
+        /// will se a blank page which is not wanted
+        await Future.delayed(const Duration(milliseconds: 500), (){
+          cnRunningWorkout.clear();
+        });
+      });
+    });
+  }
+
+  Future finishWorkout() async{
+    int time;
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.clear();
+      time = cnStandardPopUp.animationTime;
+    } else {
+      time = 0;
+    }
+    /// delay that the popup is closed
+    await Future.delayed(Duration(milliseconds: time), ()async{
+      cnRunningWorkout.workout.refreshDate();
+      cnRunningWorkout.removeNotRelevantExercises();
+      cnRunningWorkout.workout.removeEmptyExercises();
+      if(cnRunningWorkout.workout.exercises.isNotEmpty){
+        cnRunningWorkout.workout.saveToDatabase();
+        cnWorkouts.refreshAllWorkouts();
+      }
+      await stopWorkout(time: 0);
+      saveBackup();
+    });
+  }
+}
+
+class CnRunningWorkout extends ChangeNotifier {
+  Workout workout = Workout();
+  Workout workoutTemplate = Workout();
+  bool isRunning = false;
+  bool isVisible = false;
+  ScrollController scrollController = ScrollController();
+  TextEditingController controllerRestInSeconds = TextEditingController();
+  TextEditingController controllerSeatLevel = TextEditingController();
+  List<String> newExNames = [];
+  late Map<String, List<Key>> slideableKeys = {
+    for (var e in workout.exercises)
+      e.name :
+      e.generateKeyForEachSet()
+  };
+  late Map<String, List<List<TextEditingController>>> textControllers = {
+    for (var e in workout.exercises)
+      e.name :
+      e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
+  };
+  /// Contains all Excercises - linked and non linked ones - as a Map
+  /// linked exercises are saved as another Map with key = linkName
+  /// non linked Excercises are saved as the exercise itself with the ex.name as the key
+  Map groupedExercises = {};
+  /// Contains for each linked exercise the currently selected index for getting the right one
+  /// from the groupedExercises Map
+  Map<String, int> selectedIndexes = {};
+  late CnConfig cnConfig;
+  List<String> linkWithMultipleExercisesStarted = [];
+  List<String> exercisesToRemove = [];
+
+  CnRunningWorkout(BuildContext context){
+    cnConfig = Provider.of<CnConfig>(context, listen: false);
+  }
+  
+  void addExercise(Exercise ex){
+    workoutTemplate.exercises.add(Exercise.clone(ex));
+    workout.exercises.add(ex);
+    newExNames.add(ex.name);
+    slideableKeys[ex.name] = ex.generateKeyForEachSet();
+    groupedExercises[ex.name] = ex;
+    textControllers[ex.name] = ex.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
+    cache();
+    refresh();
+  }
+
+  void deleteExercise(Exercise ex){
+    workoutTemplate.exercises.removeWhere((e) => e.name == ex.name);
+    workout.exercises.removeWhere((e) => e.name == ex.name);
+    newExNames.removeWhere((e) => e == ex.name);
+    slideableKeys.remove(ex.name);
+    groupedExercises.remove(ex.name);
+    refresh();
+  }
+
+  void initCachedData(Map data){
+    print("Received Cached Data");
+    print(data);
+    if(
+      data.containsKey("workout") &&
+      data.containsKey("workoutTemplate") &&
+      data.containsKey("isRunning") &&
+      data.containsKey("isVisible") &&
+      data.containsKey("testControllerValues") &&
+      data.containsKey("selectedIndexes") &&
+      data.containsKey("newExNames")
+    ){
+      isRunning = data["isRunning"];
+      isVisible = data["isVisible"];
+      newExNames = List<String>.from(data["newExNames"]);
+      for(MapEntry entry in data["selectedIndexes"].entries){
+        selectedIndexes[entry.key] = entry.value;
+      }
+      workout = Workout().fromMap(data["workout"]) ?? Workout();
+      workoutTemplate = Workout().fromMap(data["workoutTemplate"]) ?? Workout();
+      initSlideableKeys();
+      initGroupedExercises();
+      initTextControllers();
+      setTextControllerValues(data["testControllerValues"]);
+      // if(isVisible && isRunning){
+      //   Navigator.push(
+      //       context,
+      //       CupertinoPageRoute(
+      //           builder: (context) => const ScreenRunningWorkout()
+      //       ));
+      // }
+    }
+  }
+
+  void openRunningWorkout(BuildContext context, Workout w){
+    setWorkoutTemplate(w);
+    isRunning = true;
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => const ScreenRunningWorkout()
+        ));
+    isVisible = true;
+  }
+
+  void reopenRunningWorkout(BuildContext context){
+    Navigator.push(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => const ScreenRunningWorkout()
+        ));
+    isVisible = true;
+  }
+  
+  // void removeNotSelectedExercises(){
+  //   for (MapEntry entry in List.from(groupedExercises.entries)){
+  //     if(entry.value is Exercise) continue;
+  //     groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
+  //   }
+  //   workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
+  // }
+
+  void removeNotRelevantExercises(){
+    // for (MapEntry entry in List.from(groupedExercises.entries)){
+    //   if(entry.value is Exercise) {
+    //     continue;
+    //   }
+    //   groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
+    // }
+    // workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
+    workout.exercises.removeWhere((ex) => exercisesToRemove.contains(ex.name));
+  }
+
+  void setWorkoutTemplate(Workout w){
+    workoutTemplate = w;
+    workout = Workout.copy(workoutTemplate);
+    workout.resetAllExercisesSets();
+    initSlideableKeys();
+    initSelectedIndexes();
+    initGroupedExercises();
+    initTextControllers();
+  }
+
+  void initSlideableKeys(){
+    slideableKeys = {
+      for (var e in workout.exercises)
+        e.name :
+        e.generateKeyForEachSet()
+    };
+  }
+
+  void initSelectedIndexes(){
+    selectedIndexes = {
+      for (String link in workout.linkedExercises)
+        link:
+        0
+    };
+  }
+
+  void initGroupedExercises(){
+    groupedExercises.clear();
+    for (Exercise ex in workout.exercises){
+      if (ex.linkName == null){
+        groupedExercises[ex.name] = ex;
+      }
+      else if(!groupedExercises.containsKey(ex.linkName)){
+        groupedExercises[ex.linkName] = [ex];
+      }
+      else{
+        groupedExercises[ex.linkName] = groupedExercises[ex.linkName] + [ex];
+      }
+    }
+  }
+
+  void initTextControllers(){
+    textControllers = {
+      for (var e in workout.exercises)
+        e.name :
+        e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
+    };
+  }
+
+  Future<void> cache()async{
+    Map data = {
+      "workout": workout.asMap(),
+      "workoutTemplate": workoutTemplate.asMap(),
+      "isRunning": isRunning,
+      "isVisible": isVisible,
+      "testControllerValues": getTextControllerValues(),
+      "selectedIndexes": selectedIndexes,
+      "newExNames": newExNames
+    };
+    cnConfig.config.cnRunningWorkout = data;
+    await cnConfig.config.save();
+  }
+
+  // Map<String, List<List<dynamic>>> getTextControllerValues(){
+  Map<String, List<dynamic>> getTextControllerValues(){
+    return {
+      for (MapEntry entry in textControllers.entries)
+        entry.key :
+        entry.value.map((controllers) => [controllers[0].text, controllers[1].text]).toList()
+    };
+  }
+
+  void setTextControllerValues(Map<String, dynamic> textControllersValues){
+    for (MapEntry entry in textControllersValues.entries){
+      // textControllers[entry.key] = entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[0])]).toList();
+      textControllers[entry.key] = List<List<TextEditingController>>.from(entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[1])]));
+    }
+  }
+
+  void checkMultipleExercisesPerLink(){
+    Map<String, int> linkCounter = {};
+    Workout tempWo = Workout.clone(workout);
+    tempWo.removeEmptyExercises();
+    for(Exercise ex in tempWo.exercises){
+      if(ex.linkName == null){
+        continue;
+      }
+      if(linkCounter.containsKey(ex.linkName)){
+        linkCounter[ex.linkName!] = linkCounter[ex.linkName]! + 1;
+      } else{
+        linkCounter[ex.linkName!] = 1;
+      }
+    }
+    linkCounter.removeWhere((key, value) => value <= 1);
+    linkWithMultipleExercisesStarted = linkCounter.entries.map((e) => e.key).toList();
+  }
+
+  void clear(){
+    workout = Workout();
+    textControllers.clear();
+    slideableKeys.clear();
+    selectedIndexes.clear();
+    groupedExercises.clear();
+    exercisesToRemove.clear();
+    newExNames.clear();
+    linkWithMultipleExercisesStarted.clear();
+    scrollController = ScrollController();
+    isRunning = false;
+    cnConfig.setCnRunningWorkout({});
+    refresh();
+  }
+
+  void refresh(){
+    notifyListeners();
+  }
+}

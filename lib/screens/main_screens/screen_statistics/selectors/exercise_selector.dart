@@ -1,9 +1,12 @@
-import 'package:fitness_app/screens/screen_statistics/screen_statistics.dart';
+import 'dart:io';
+
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
-import '../../../objects/exercise.dart';
+import '../../../../objects/exercise.dart';
+import '../screen_statistics.dart';
 
 class ExerciseSelector extends StatefulWidget {
   const ExerciseSelector({super.key});
@@ -16,6 +19,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
 
   Future _showDialog(Widget child) async{
+    HapticFeedback.selectionClick();
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -71,10 +75,14 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                 onSelectedItemChanged: (int index) {
                   // setState(() {
                   cnScreenStatistics.selectedExercise = cnScreenStatistics.selectedWorkout!.exercises[index];
+                  if(Platform.isAndroid){
+                    HapticFeedback.selectionClick();
+                  }
                   // });
                 },
                 children: cnScreenStatistics.selectedWorkout!.exercises.map((Exercise ex) {
-                  return Center(child: Text(ex.name));
+                  return Center(child: OverflowSafeText(ex.name, maxLines: 1, minFontSize: 12));
+                  // return Center(child: Text(ex.name));
                 }).toList()
             ),
           ),
@@ -82,12 +90,18 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                cnScreenStatistics.selectedExercise!.name,
-                style: const TextStyle(
-                  fontSize: 22.0,
-                ),
+              OverflowSafeText(
+                  cnScreenStatistics.selectedExercise!.name,
+                  style: const TextStyle(
+                    fontSize: 22.0,
+                  ),
               ),
+              // Text(
+              //   cnScreenStatistics.selectedExercise!.name,
+              //   style: const TextStyle(
+              //     fontSize: 22.0,
+              //   ),
+              // ),
               const SizedBox(width: 10,),
               const Icon(Icons.arrow_forward_ios, size: 15,)
             ],

@@ -1,6 +1,7 @@
-import 'package:fitness_app/screens/screen_statistics/screen_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../screen_statistics.dart';
 
 class IntervalSelector extends StatefulWidget {
   const IntervalSelector({super.key});
