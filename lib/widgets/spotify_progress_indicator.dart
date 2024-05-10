@@ -1,5 +1,5 @@
 import 'package:fitness_app/widgets/spotify_bar.dart';
-import 'package:fitness_app/widgets/stopwatch.dart';
+import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';

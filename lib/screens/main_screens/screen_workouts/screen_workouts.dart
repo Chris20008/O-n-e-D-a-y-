@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../objectbox.g.dart';
+import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
@@ -214,6 +215,11 @@ class CnWorkouts extends ChangeNotifier {
     }
     opened = workouts.map((e) => false).toList();
     refresh();
+    for(Exercise ex in workouts[0].exercises){
+      print(ex.name);
+      print(ex.id);
+      print("");
+    }
   }
 
   void refresh(){

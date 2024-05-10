@@ -9,6 +9,7 @@ class Exercise{
   List<SingleSet> sets;
   int restInSeconds;
   int? seatLevel;
+  int id;
 
   String? originalName;
   String? linkName;
@@ -19,6 +20,7 @@ class Exercise{
     this.sets = const [],
     this.restInSeconds = 0,
     this.seatLevel,
+    this.id = -100,
     this.originalName,
     this.linkName
   }){
@@ -29,7 +31,16 @@ class Exercise{
   }
 
   /// Don't clone the original name
+  Exercise.copy(Exercise ex): this(
+      name: ex.name,
+      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
+      restInSeconds: ex.restInSeconds,
+      seatLevel: ex.seatLevel,
+      linkName: ex.linkName
+  );
+
   Exercise.clone(Exercise ex): this(
+      id: ex.id,
       name: ex.name,
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
       restInSeconds: ex.restInSeconds,

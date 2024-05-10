@@ -4,7 +4,7 @@ import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
-import 'package:fitness_app/widgets/stopwatch.dart';
+import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -992,7 +992,7 @@ class CnRunningWorkout extends ChangeNotifier {
   }
   
   void addExercise(Exercise ex){
-    workoutTemplate.exercises.add(Exercise.clone(ex));
+    workoutTemplate.exercises.add(Exercise.copy(ex));
     workout.exercises.add(ex);
     newExNames.add(ex.name);
     slideableKeys[ex.name] = ex.generateKeyForEachSet();

@@ -275,8 +275,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   }
 
   List<Exercise> getExercises(int index){
-    Exercise tempNew = Exercise.clone(relevantExercises[index]);
-    Exercise tempTemplate = Exercise.clone(widget.workoutTemplate.exercises.firstWhere((ex) => ex.name == tempNew.name));
+    Exercise tempNew = Exercise.copy(relevantExercises[index]);
+    Exercise tempTemplate = Exercise.copy(widget.workoutTemplate.exercises.firstWhere((ex) => ex.name == tempNew.name));
 
     tempNew.name = "New";
     tempTemplate.name = "Template";

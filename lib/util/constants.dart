@@ -21,6 +21,114 @@ import '../objects/workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'objectbox/ob_exercise.dart';
 
+List<Color> linkColors = [
+  const Color(0xFF5F9561),
+  const Color(0xFFFFEA30),
+  const Color(0xFF558FDF),
+  const Color(0xFFF48E40),
+  const Color(0xFFA349D1),
+  const Color(0xFF8AEAC3),
+  const Color(0xFF4F8447),
+];
+
+Color? getLinkColor({required String linkName, required Workout workout}){
+  int index = workout.linkedExercises.indexOf(linkName);
+  if(index >= 0){
+    return linkColors[index % linkColors.length];
+  }
+  return null;
+}
+
+// Widget standardDialog({
+//   required Widget child,
+//   EdgeInsets padding = EdgeInsets.zero,
+//   required Function onConfirm,
+//   String confirmText = "Ok",
+//   String cancelText = "Cancel",
+//   TextStyle? confirmTextStyle,
+//   bool showCancel = true,
+//   Function? onCancel,
+// }){
+//   return ClipRRect(
+//     borderRadius: BorderRadius.circular(15),
+//     child: ConstrainedBox(
+//       constraints: const BoxConstraints(
+//           maxWidth: 300.0,
+//           maxHeight: 600
+//       ),
+//       child: Container(
+//           // width: size.width*0.65,
+//           // color: color,
+//           child: SingleChildScrollView(
+//             physics: const BouncingScrollPhysics(),
+//             child: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               mainAxisAlignment: MainAxisAlignment.start,
+//               children: [
+//                 Padding(
+//                   padding: padding,
+//                   child: SingleChildScrollView(
+//                       padding: const EdgeInsets.all(0.0),
+//                       child: child
+//                   ),
+//                 ),
+//                 Container(
+//                   height: 0.5,
+//                   width: double.maxFinite,
+//                   color: Colors.grey[700]!.withOpacity(0.5),
+//                 ),
+//                 SizedBox(
+//                   height: 40,
+//                   child: Row(
+//                     children: [
+//                       Expanded(
+//                           child: ElevatedButton(
+//                               onPressed: () => onConfirm(),
+//                               style: ButtonStyle(
+//                                   shadowColor: MaterialStateProperty.all(Colors.transparent),
+//                                   surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+//                                   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+//                                   // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+//                                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+//                               ),
+//                               child: Text(confirmText, style: confirmTextStyle)
+//                           )
+//                       ),
+//                       if(showCancel)
+//                         Container(
+//                           height: double.maxFinite,
+//                           width: 0.5,
+//                           color: Colors.grey[700]!.withOpacity(0.5),
+//                         ),
+//                       if(showCancel)
+//                         Expanded(
+//                             child: ElevatedButton(
+//                                 onPressed: () {
+//                                   if(onCancel != null){
+//                                     onCancel();
+//                                   }
+//                                 },
+//                                 style: ButtonStyle(
+//                                     shadowColor: MaterialStateProperty.all(Colors.transparent),
+//                                     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+//                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+//                                     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+//                                     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+//                                 ),
+//                                 child: Text(cancelText)
+//                             )
+//                         ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           )
+//       ),
+//     ),
+//   );
+// }
+
 TextStyle getTextStyleForTextField(String text, {Color? color}){
   return TextStyle(
     fontSize: text.length < 4

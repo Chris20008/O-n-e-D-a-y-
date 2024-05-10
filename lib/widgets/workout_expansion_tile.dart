@@ -39,7 +39,6 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
-  final startWorkoutKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +91,6 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                         ),
                         if(widget.workout.isTemplate)
                           IconButton(
-                              key: startWorkoutKey,
                               onPressed: () {
                                 if(!cnRunningWorkout.isRunning){
                                   cnRunningWorkout.isRunning = true;
@@ -198,7 +196,6 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
     cnStandardPopUp.open(
       context: context,
       color: const Color(0xff2d2d2d),
-      animationKey: startWorkoutKey,
       confirmText: "Yes",
       cancelText: "No",
       onConfirm: () {

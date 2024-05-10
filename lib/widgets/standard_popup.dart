@@ -57,12 +57,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
           },
             firstChild: const SizedBox(),
             secondChild: GestureDetector(
-              onTap: (){
-                cnStandardPopUp.cancel();
-                // if(MediaQuery.of(context).viewInsets.bottom > 0){
-                //   Focus.of(context).unfocus();
-                // }
-              },
+              onTap: cnStandardPopUp.tapOutside,
               child: Container(
                 height: size.height,
                 width: size.width,
@@ -81,12 +76,12 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                    maxWidth: 300.0,
-                    maxHeight: 600
+                constraints: BoxConstraints(
+                    maxWidth: cnStandardPopUp.maxWidth,
+                    maxHeight: cnStandardPopUp.maxHeight
                 ),
                 child: Container(
-                    width: size.width*0.65,
+                    width: size.width*cnStandardPopUp.widthFactor,
                     color: cnStandardPopUp.color,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
@@ -163,17 +158,20 @@ class CnStandardPopUp extends ChangeNotifier {
   bool isVisible = false;
   Function? onConfirm;
   Function? onCancel;
+  Function? onTapOutside;
   Widget child = const SizedBox();
   EdgeInsets padding = const EdgeInsets.all(20);
   String confirmText = "Ok";
   String cancelText = "Cancel";
   TextStyle? confirmTextStyle;
-  Offset? pos;
   bool jump = true;
   bool showCancel = true;
   bool canConfirm = true;
   Color color = Colors.black;
   int animationTime = 200;
+  double widthFactor = 0.65;
+  double maxHeight = 300;
+  double maxWidth = 600;
 
   void open({
     required BuildContext context,
@@ -183,16 +181,20 @@ class CnStandardPopUp extends ChangeNotifier {
     EdgeInsets? padding,
     String confirmText = "Ok",
     String cancelText = "Cancel",
-    GlobalKey? animationKey,
     Color? color,
     bool showCancel = true,
     bool canConfirm = true,
-    TextStyle? confirmTextStyle
+    TextStyle? confirmTextStyle,
+    double widthFactor = 0.65,
+    double maxHeight = 600,
+    double maxWidth = 300,
+    Function? onTapOutside
   }){
     HapticFeedback.selectionClick();
     jump = true;
     this.onConfirm = onConfirm;
     this.onCancel = onCancel;
+    this.onTapOutside = onTapOutside?? onCancel;
     this.child = child;
     this.padding = padding?? const EdgeInsets.all(20);
     this.confirmText = confirmText;
@@ -201,16 +203,9 @@ class CnStandardPopUp extends ChangeNotifier {
     this.showCancel = showCancel;
     this.canConfirm = canConfirm;
     this.confirmTextStyle = confirmTextStyle;
-
-    if(animationKey != null){
-      RenderBox? box = animationKey.currentContext?.findRenderObject() as RenderBox;
-      final width = box.size.width;
-      final height = box.size.height;
-      Offset position = box.localToGlobal(Offset.zero);
-      pos = Offset(position.dx + width/2, position.dy + height/2);
-    } else{
-      pos = null;
-    }
+    this.widthFactor = widthFactor;
+    this.maxHeight = maxHeight;
+    this.maxWidth = maxWidth;
     refresh();
 
     Future.delayed(const Duration(milliseconds: 50), (){
@@ -233,6 +228,13 @@ class CnStandardPopUp extends ChangeNotifier {
   void cancel(){
     if(onCancel != null){
       onCancel!();
+    }
+    clear();
+  }
+
+  void tapOutside(){
+    if(onTapOutside != null){
+      onTapOutside!();
     }
     clear();
   }
