@@ -338,6 +338,7 @@ class CnSpotifyBar extends ChangeNotifier {
   bool isTryingReconnect = false;
   bool isTryingToConnect = false;
   bool isRebuilding = false;
+  bool tryStayConnected = false;
   String accessToken = "";
   // bool imageGotUpdated = false;
   Image? lastImage;
@@ -368,17 +369,19 @@ class CnSpotifyBar extends ChangeNotifier {
   void _subscribeToPlayerState() {
     _subscription = SpotifySdk.subscribePlayerState().listen((playerState) {
       data = playerState;
-      if (playerState.track == null){
-        print("TRACK IS NULL");
+      if(data?.isPaused ?? false){
+        if(!tryStayConnected){
+          tryStayConnected = true;
+          keepConnectedWhenPaused();
+        }
       } else{
-        print("TRACK IS NOT NULL ${playerState.track?.name}");
+        tryStayConnected = false;
       }
       progressIndicatorKey = UniqueKey();
       notifyListeners();
     });
     _subscriptionConnectionStatus = SpotifySdk.subscribeConnectionStatus().listen((connectionStatus){
       if(!connectionStatus.connected){
-        print("IS NOT CONNECTED");
         disconnect();
       }
     });
@@ -541,11 +544,15 @@ class CnSpotifyBar extends ChangeNotifier {
 
     isHandlingControlAction = true;
     try {
-      await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
+      await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw TimeoutException("Timeout, do disconnect")).then((value) => {
         // Future.delayed(const Duration(milliseconds: 150), (){
         //   refresh();
         // })
       });
+      // if(!tryStayConnected){
+      //   tryStayConnected = true;
+      //   keepConnectedWhenPaused();
+      // }
       // await SpotifySdk.pause();
     } on Exception catch (_) {
       if(await hasInternet()){
@@ -556,6 +563,7 @@ class CnSpotifyBar extends ChangeNotifier {
         connectToSpotify().then((value) => pause());
       } else{
         await disconnect();
+        // tryStayConnected = false;
       }
     }
     isHandlingControlAction = false;
@@ -621,6 +629,17 @@ class CnSpotifyBar extends ChangeNotifier {
     Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), ()async{
       cnAnimatedColumn.refresh();
     });
+  }
+
+  Future<void> keepConnectedWhenPaused() async{
+    await Future.delayed(const Duration(seconds: 1), (){});
+    if (isConnected && (data?.isPaused?? false) && tryStayConnected){
+      await pause();
+      print("keep connected");
+      keepConnectedWhenPaused();
+    } else{
+      tryStayConnected = false;
+    }
   }
 
   Future<void> disconnect() async {

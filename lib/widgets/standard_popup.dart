@@ -13,15 +13,16 @@ class StandardPopUp extends StatefulWidget {
 }
 
 class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateMixin {
+  late CnStandardPopUp cnStandardPopUp;
   late final AnimationController _controller = AnimationController(
     duration: Duration(milliseconds: cnStandardPopUp.animationTime),
     vsync: this,
   );
   late final Animation<double> _animation = CurvedAnimation(
     parent: _controller,
-    curve: Curves.decelerate,
+    // curve: Curves.decelerate,
+    curve: Curves.easeOutBack
   );
-  late CnStandardPopUp cnStandardPopUp;
 
   @override
   Widget build(BuildContext context) {

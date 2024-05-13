@@ -395,9 +395,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             }
                             /// Check if the workout name already exists, but only when the current name is different from the
                             /// initializing name. Otherwise editing an existing workout could lead to error
-                            else if(workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name) &&
-                                    cnNewWorkout.workout.name != cnNewWorkout.originalWorkout.name &&
-                                    cnNewWorkout.workout.isTemplate
+                            else if(cnNewWorkout.workout.isTemplate  &&                                                           /// only check if template
+                                    cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase() && /// Name is not equal to initial name when opening editing
+                                    workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name)                          /// Name exists in database
                             ){
                               return 'Workout name already exists';
                             }
@@ -746,19 +746,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       cnNewWorkout.exerciseNewNameMapping[ex.name] = cnNewWorkout.workout.exercises.firstWhere((exercise) => exercise.id == ex.id).name;
     }
 
-    if(cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name
+    if((cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name && cnNewWorkout.originalWorkout.name.isNotEmpty)
         || cnNewWorkout.exerciseNewNameMapping.isNotEmpty){
-      print("MAPPING");
-      print(cnNewWorkout.exerciseNewNameMapping);
       return true;
     }
-
-    // for(Exercise ex in cnNewWorkout.originalWorkout.exercises){
-    //   final changes = cnNewWorkout.workout.exercises.where((exercise) => exercise.id == ex.id && exercise.name != ex.name).toList();
-    //   if(changes.isNotEmpty){
-    //     return true;
-    //   }
-    // }
 
     return false;
   }

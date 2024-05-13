@@ -142,6 +142,8 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
 }
 
 String validateDoubleTextInput(String text){
+  print("GOT VALUE: $text");
+  text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
     final count = ".".allMatches(text).length;
     if(count > 1){
@@ -151,6 +153,8 @@ String validateDoubleTextInput(String text){
   if(text.characters.first == "."){
     text = "0$text";
   }
+  print("RETURN VALUE: $text");
+  print("");
   return text;
 }
 

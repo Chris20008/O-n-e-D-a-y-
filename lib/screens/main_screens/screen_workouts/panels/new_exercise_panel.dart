@@ -8,7 +8,6 @@ import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
 import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
-import 'new_workout_panel.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -312,6 +311,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   cnNewExercise.exercise.sets[index].weight = newValue;
                                                   if(newValue == null){
                                                     cnNewExercise.controllers[index][0].clear();
+                                                  } else{
+                                                    cnNewExercise.controllers[index][0].text = value;
                                                   }
                                                 }
                                                 else{

@@ -34,7 +34,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   );
   late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
     parent: _controllerSelectorExUpdate,
-    curve: Curves.decelerate,
+    // curve: Curves.decelerate,
+      curve: Curves.easeOutBack
   );
   late final AnimationController _controllerSelectorExPerLink = AnimationController(
     duration: const Duration(milliseconds: 200),
@@ -42,7 +43,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   );
   late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
     parent: _controllerSelectorExPerLink,
-    curve: Curves.decelerate,
+    // curve: Curves.decelerate,
+      curve: Curves.easeOutBack
   );
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
@@ -478,6 +480,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                   newEx.sets[indexSet].weight = newValue;
                                                                   if(newValue == null){
                                                                     cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
+                                                                  } else{
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
                                                                   }
                                                                 }
                                                                 else{
