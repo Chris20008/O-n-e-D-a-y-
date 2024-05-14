@@ -30,6 +30,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   @override
   void initState() {
+    handleOrientation();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
   }
