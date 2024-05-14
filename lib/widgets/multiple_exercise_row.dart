@@ -22,6 +22,7 @@ class MultipleExerciseRow extends StatelessWidget {
   final double _width = 36;
   final double _topBottomPadding = 5;
   final double _iconSize = 13;
+  final double _leftRightPadding = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -136,9 +137,10 @@ class MultipleExerciseRow extends StatelessWidget {
                             children: [
                             for (var set in ex.sets)
                               set.weight == null || set.amount == null?
+                              /// Create empty box as placeholder
                               SizedBox(
-                                height: _height+_topBottomPadding+_topBottomPadding,
-                                width: _width
+                                height: _height+ _topBottomPadding*2,
+                                width: _width + _leftRightPadding*2
                               ) :
                               /// Each Set
                               ClipRRect(

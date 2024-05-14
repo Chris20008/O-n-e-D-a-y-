@@ -153,3 +153,21 @@ class StatisticExercise{
     required this.date
   });
 }
+
+class DismissedSingleSet{
+  String? linkName;
+  String exName;
+  int index;
+  SingleSet dismissedSet;
+  SingleSet dismissedTemplateSet;
+  List<TextEditingController>? dismissedControllers;
+
+  DismissedSingleSet({
+    this.linkName,
+    required this.exName,
+    required this.index,
+    required this.dismissedSet,
+    required this.dismissedTemplateSet,
+    required this.dismissedControllers
+  });
+}

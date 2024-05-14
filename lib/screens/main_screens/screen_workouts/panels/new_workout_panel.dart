@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
@@ -109,6 +110,30 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     physics: const BouncingScrollPhysics(),
                                     padding: const EdgeInsets.all(0),
                                     shrinkWrap: true,
+                                    proxyDecorator: (
+                                        Widget child, int index, Animation<double> animation) {
+                                      return AnimatedBuilder(
+                                        animation: animation,
+                                        builder: (BuildContext context, Widget? child) {
+                                          final double animValue = Curves.easeInOut.transform(animation.value);
+                                          final double scale = lerpDouble(1, 1.06, animValue)!;
+                                          return Transform.scale(
+                                            scale: scale,
+                                            child: ClipRRect(
+                                              borderRadius: BorderRadius.circular(8),
+                                              child: Material(
+                                                child: Container(
+                                                    padding: const EdgeInsets.only(left: 2),
+                                                    color: Colors.grey.withOpacity(0.05),
+                                                    child: child
+                                                  ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: child,
+                                      );
+                                    },
                                     onReorder: (int oldIndex, int newIndex){
                                       setState(() {
                                         if (oldIndex < newIndex) {

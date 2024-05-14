@@ -7,6 +7,7 @@ import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
@@ -34,8 +35,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   );
   late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
     parent: _controllerSelectorExUpdate,
-    // curve: Curves.decelerate,
-      curve: Curves.easeOutBack
+    curve: Curves.decelerate,
+      // curve: Curves.easeOutBack
   );
   late final AnimationController _controllerSelectorExPerLink = AnimationController(
     duration: const Duration(milliseconds: 200),
@@ -43,8 +44,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   );
   late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
     parent: _controllerSelectorExPerLink,
-    // curve: Curves.decelerate,
-      curve: Curves.easeOutBack
+    curve: Curves.decelerate,
+      // curve: Curves.easeOutBack
   );
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
@@ -162,7 +163,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 if(newEx is! Exercise){
                                   newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                                 }
-                                Exercise lastEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
+                                Exercise templateEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
                                 child = Column(
                                   children: [
                                     Row(
@@ -338,253 +339,244 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                       ),
                                     ),
 
-                                    /// Each Set
-                                    ListView.builder(
-                                        physics: const BouncingScrollPhysics(),
-                                        shrinkWrap: true,
-                                        itemCount: newEx.sets.length+1,
-                                        itemBuilder: (BuildContext context, int indexSet) {
-                                          if(indexSet == newEx.sets.length){
-                                            return Row(
-                                              children: [
-                                                Expanded(
-                                                  child: IconButton(
-                                                      alignment: Alignment.center,
-                                                      color: Colors.amber[800],
-                                                      style: ButtonStyle(
-                                                          backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                          shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                    /// Each Set Reorderable
+                                    Column(
+                                      children: [
+                                        ReorderableListView.builder(
+                                            scrollController: ScrollController(),
+                                            physics: const BouncingScrollPhysics(),
+                                            padding: const EdgeInsets.all(0),
+                                            shrinkWrap: true,
+                                            proxyDecorator: (
+                                                Widget child, int index, Animation<double> animation) {
+                                              return AnimatedBuilder(
+                                                animation: animation,
+                                                builder: (BuildContext context, Widget? child) {
+                                                  final double animValue = Curves.easeInOut.transform(animation.value);
+                                                  final double scale = lerpDouble(1, 1.06, animValue)!;
+                                                  return Transform.scale(
+                                                    scale: scale,
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      child: Material(
+                                                          child: Container(
+                                                              padding: const EdgeInsets.only(left: 2),
+                                                              color: Colors.grey.withOpacity(0.1),
+                                                              child: child
+                                                          )
                                                       ),
-                                                      onPressed: () {
-                                                        addSet(newEx, lastEx);
-                                                      },
-                                                      icon: const Icon(
-                                                        Icons.add,
-                                                        size: 20,
-                                                      )
+                                                    ),
+                                                  );
+                                                },
+                                                child: child,
+                                              );
+                                            },
+                                            onReorder: (int oldIndex, int newIndex){
+                                              setState(() {
+                                                if (oldIndex < newIndex) {
+                                                  newIndex -= 1;
+                                                }
+                                                final item = templateEx.sets.removeAt(oldIndex);// cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                                templateEx.sets.insert(newIndex, item);
+                                                final item2 = newEx.sets.removeAt(oldIndex);// cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                                newEx.sets.insert(newIndex, item2);
+                                                final weightAndAmount = cnRunningWorkout.textControllers[newEx.name]?.removeAt(oldIndex);
+                                                cnRunningWorkout.textControllers[newEx.name]?.insert(newIndex, weightAndAmount!);
+                                              });
+                                              cnRunningWorkout.cache();
+                                            },
+                                            itemCount: newEx.sets.length,
+                                            itemBuilder: (BuildContext context, int indexSet) {
+                                              SingleSet set = templateEx.sets[indexSet];
+                                              Widget? child;
+                                              child = Padding(
+                                                // padding: EdgeInsets.zero,
+                                                padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
+                                                child: SizedBox(
+                                                  width: double.maxFinite,
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+
+                                                      /// Set
+                                                      SizedBox(
+                                                          width: _widthOfTextField,
+                                                          child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
+                                                      ),
+
+                                                      /// Button to copy templates data
+                                                      getButtonInsertTemplatesData(set: set, newEx: newEx, indexSet: indexSet),
+
+                                                      /// Weight and Amount
+                                                      Expanded(
+                                                        flex: 2,
+                                                        child: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.center,
+                                                          children: [
+
+                                                            /// Weight
+                                                            SizedBox(
+                                                              width: _widthOfTextField,
+                                                              height: _heightOfSetRow,
+                                                              child: Center(
+                                                                child: TextField(
+                                                                  maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
+                                                                  textAlign: TextAlign.center,
+                                                                  keyboardType: const TextInputType.numberWithOptions(
+                                                                      decimal: true,
+                                                                      signed: false
+                                                                  ),
+                                                                  keyboardAppearance: Brightness.dark,
+                                                                  controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
+                                                                  onTap: (){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][0].value.text.length);
+                                                                  },
+                                                                  decoration: InputDecoration(
+                                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                                      // isDense: true,
+                                                                      counterText: "",
+                                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                                                                      hintFadeDuration: const Duration(milliseconds: 200),
+                                                                      hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
+                                                                      hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15))
+                                                                  ),
+                                                                  style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text),
+                                                                  onChanged: (value){
+                                                                    value = value.trim();
+                                                                    if(value.isNotEmpty){
+                                                                      value = validateDoubleTextInput(value);
+                                                                      final newValue = double.tryParse(value);
+                                                                      newEx.sets[indexSet].weight = newValue;
+                                                                      if(newValue == null){
+                                                                        cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
+                                                                      } else{
+                                                                        cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
+                                                                      }
+                                                                    }
+                                                                    else{
+                                                                      newEx.sets[indexSet].weight = null;
+                                                                    }
+                                                                    cnRunningWorkout.cache();
+                                                                    setState(() => {});
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+
+                                                            const SizedBox(width: 10,),
+
+                                                            /// Amount
+                                                            SizedBox(
+                                                              width: _widthOfTextField,
+                                                              height: _heightOfSetRow,
+                                                              child: Center(
+                                                                child: TextField(
+                                                                  maxLength: 3,
+                                                                  textAlign: TextAlign.center,
+                                                                  keyboardType: const TextInputType.numberWithOptions(
+                                                                      decimal: false,
+                                                                      signed: false
+                                                                  ),
+                                                                  keyboardAppearance: Brightness.dark,
+                                                                  controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
+                                                                  onTap: (){
+                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][1].value.text.length);
+                                                                  },
+                                                                  decoration: InputDecoration(
+                                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                                      // isDense: true,
+                                                                      counterText: "",
+                                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                                                                      hintText: "${set.amount?? ""}",
+                                                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
+                                                                  ),
+                                                                  style: const TextStyle(
+                                                                    fontSize: 18,
+                                                                  ),
+                                                                  onChanged: (value){
+                                                                    value = value.trim();
+                                                                    if(value.isNotEmpty){
+                                                                      final newValue = int.tryParse(value);
+                                                                      newEx.sets[indexSet].amount = newValue;
+                                                                      if(newValue == null){
+                                                                        cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
+                                                                      }
+                                                                      if(value.length == 1){
+                                                                        setState(() => {});
+                                                                      }
+                                                                    }
+                                                                    else{
+                                                                      newEx.sets[indexSet].amount = null;
+                                                                      setState(() => {});
+                                                                    }
+                                                                    cnRunningWorkout.cache();
+                                                                  },
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
-                                              ],
-                                            );
-                                          }
+                                              );
 
-                                          SingleSet set = lastEx.sets[indexSet];
-                                          Widget? child;
-                                          child = Padding(
-                                            // padding: EdgeInsets.zero,
-                                            padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
-                                            child: SizedBox(
-                                              width: double.maxFinite,
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                children: [
-
-                                                  /// Set
-                                                  SizedBox(
-                                                      width: _widthOfTextField,
-                                                      child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
-                                                  ),
-
-                                                  /// Button to copy templates data
-                                                  Expanded(
-                                                    flex: 2,
-                                                    child: IgnorePointer(
-                                                      ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                  cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
-                                                                  set.weight != null &&
-                                                                  set.amount != null),
-                                                      child: SizedBox(
-                                                        height: _heightOfSetRow,
-                                                        child: ElevatedButton(
-                                                          style: ButtonStyle(
-                                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
-                                                          ),
-                                                          onPressed: (){
-                                                            if(set.weight?.toString() != null &&
-                                                               set.amount?.toString() != null &&
-                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                               cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
-                                                            ){
-                                                              vibrateConfirm();
-                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weight.toString().endsWith(".0")? set.weight?.toInt().toString() : set.weight.toString())?? "";
-                                                              newEx.sets[indexSet].weight = set.weight;
-                                                              cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
-                                                              newEx.sets[indexSet].amount = set.amount;
-                                                              cnRunningWorkout.refresh();
-                                                              cnRunningWorkout.cache();
-                                                            } else{
-                                                              setState(() {
-                                                                FocusScope.of(context).unfocus();
-                                                              });
-                                                            }
-                                                          },
-                                                          child: Center(
-                                                            child: OverflowSafeText(
-                                                              maxLines: 1,
-                                                              set.weight != null && set.amount != null? "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""} kg x ${set.amount?? ""}" : "",
-                                                              style: TextStyle(
-                                                                  color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                                                                          cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
-                                                                    ?Colors.white
-                                                                    : Colors.white.withOpacity(0.2)
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    )
-                                                  ),
-
-                                                  /// Weight and Amount
-                                                  Expanded(
-                                                    flex: 2,
-                                                    child: Row(
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      children: [
-
-                                                        /// Weight
-                                                        SizedBox(
-                                                          width: _widthOfTextField,
-                                                          height: _heightOfSetRow,
-                                                          child: Center(
-                                                            child: TextField(
-                                                              maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
-                                                              textAlign: TextAlign.center,
-                                                              keyboardType: const TextInputType.numberWithOptions(
-                                                                  decimal: true,
-                                                                  signed: false
-                                                              ),
-                                                              keyboardAppearance: Brightness.dark,
-                                                              controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
-                                                              onTap: (){
-                                                                cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][0].value.text.length);
-                                                              },
-                                                              decoration: InputDecoration(
-                                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                                  // isDense: true,
-                                                                  counterText: "",
-                                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                                  hintFadeDuration: const Duration(milliseconds: 200),
-                                                                  hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
-                                                                  hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15))
-                                                              ),
-                                                              style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text),
-                                                              onChanged: (value){
-                                                                value = value.trim();
-                                                                if(value.isNotEmpty){
-                                                                  value = validateDoubleTextInput(value);
-                                                                  final newValue = double.tryParse(value);
-                                                                  newEx.sets[indexSet].weight = newValue;
-                                                                  if(newValue == null){
-                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
-                                                                  } else{
-                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
-                                                                  }
-                                                                }
-                                                                else{
-                                                                  newEx.sets[indexSet].weight = null;
-                                                                }
-                                                                cnRunningWorkout.cache();
-                                                                setState(() => {});
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-
-                                                        const SizedBox(width: 10,),
-
-                                                        /// Amount
-                                                        SizedBox(
-                                                          width: _widthOfTextField,
-                                                          height: _heightOfSetRow,
-                                                          child: Center(
-                                                            child: TextField(
-                                                              maxLength: 3,
-                                                              textAlign: TextAlign.center,
-                                                              keyboardType: const TextInputType.numberWithOptions(
-                                                                  decimal: false,
-                                                                  signed: false
-                                                              ),
-                                                              keyboardAppearance: Brightness.dark,
-                                                              controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
-                                                              onTap: (){
-                                                                cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][1].value.text.length);
-                                                              },
-                                                              decoration: InputDecoration(
-                                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                                  // isDense: true,
-                                                                  counterText: "",
-                                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                                  hintText: "${set.amount?? ""}",
-                                                                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
-                                                              ),
-                                                              style: const TextStyle(
-                                                                fontSize: 18,
-                                                              ),
-                                                              onChanged: (value){
-                                                                value = value.trim();
-                                                                if(value.isNotEmpty){
-                                                                  final newValue = int.tryParse(value);
-                                                                  newEx.sets[indexSet].amount = newValue;
-                                                                  if(newValue == null){
-                                                                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
-                                                                  }
-                                                                  if(value.length == 1){
-                                                                    setState(() => {});
-                                                                  }
-                                                                }
-                                                                else{
-                                                                  newEx.sets[indexSet].amount = null;
-                                                                  setState(() => {});
-                                                                }
-                                                                cnRunningWorkout.cache();
-                                                              },
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
+                                              return Slidable(
+                                                key: cnRunningWorkout.slideableKeys[newEx.name]![indexSet],
+                                                // key: UniqueKey(),
+                                                startActionPane: ActionPane(
+                                                  motion: const ScrollMotion(),
+                                                  dismissible: DismissiblePane(
+                                                      onDismissed: () {
+                                                        dismiss(newEx, templateEx, indexSet);
+                                                      }),
+                                                  children: [
+                                                    SlidableAction(
+                                                      flex:10,
+                                                      onPressed: (BuildContext context){
+                                                        dismiss(newEx, templateEx, indexSet);
+                                                      },
+                                                      borderRadius: BorderRadius.circular(15),
+                                                      backgroundColor: const Color(0xFFA12D2C),
+                                                      foregroundColor: Colors.white,
+                                                      icon: Icons.delete,
                                                     ),
+                                                    SlidableAction(
+                                                      flex: 1,
+                                                      onPressed: (BuildContext context){},
+                                                      backgroundColor: Colors.transparent,
+                                                      foregroundColor: Colors.transparent,
+                                                      label: '',
+                                                    ),
+                                                  ],
+                                                ),
+                                                child: child,
+                                              );
+                                            }
+                                        ),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: IconButton(
+                                                  alignment: Alignment.center,
+                                                  color: Colors.amber[800],
+                                                  style: ButtonStyle(
+                                                      backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                      shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                                   ),
-                                                ],
+                                                  onPressed: () {
+                                                    addSet(newEx, templateEx);
+                                                  },
+                                                  icon: const Icon(
+                                                    Icons.add,
+                                                    size: 20,
+                                                  )
                                               ),
                                             ),
-                                          );
-
-                                          return Slidable(
-                                            key: cnRunningWorkout.slideableKeys[newEx.name]![indexSet],
-                                            // key: UniqueKey(),
-                                            startActionPane: ActionPane(
-                                              motion: const ScrollMotion(),
-                                              dismissible: DismissiblePane(
-                                                  onDismissed: () {
-                                                    dismiss(newEx, lastEx, indexSet);
-                                                  }),
-                                              children: [
-                                                SlidableAction(
-                                                  flex:10,
-                                                  onPressed: (BuildContext context){
-                                                    dismiss(newEx, lastEx, indexSet);
-                                                  },
-                                                  borderRadius: BorderRadius.circular(15),
-                                                  backgroundColor: const Color(0xFFA12D2C),
-                                                  foregroundColor: Colors.white,
-                                                  icon: Icons.delete,
-                                                ),
-                                                SlidableAction(
-                                                  flex: 1,
-                                                  onPressed: (BuildContext context){},
-                                                  backgroundColor: Colors.transparent,
-                                                  foregroundColor: Colors.transparent,
-                                                  label: '',
-                                                ),
-                                              ],
-                                            ),
-                                            child: child,
-                                          );
-                                        }
+                                          ],
+                                        )
+                                      ],
                                     ),
                                   ],
                                 );
@@ -660,6 +652,19 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                 ),
               ),
             ),
+            if(cnRunningWorkout.dismissedSets.isNotEmpty)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      onPressed: undoDismiss,
+                      icon: Icon(
+                        Icons.undo,
+                        color: Colors.amber[800],
+                      )
+                  ),
+                ),
+              ),
             const StandardPopUp(),
             AnimatedCrossFade(
               firstChild: Container(
@@ -721,6 +726,64 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     );
   }
 
+  Widget getButtonInsertTemplatesData({
+    required SingleSet set,
+    required Exercise newEx,
+    required int indexSet
+  }){
+    return Expanded(
+        flex: 2,
+        child: IgnorePointer(
+          ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+              cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
+              set.weight != null &&
+              set.amount != null),
+          child: SizedBox(
+            height: _heightOfSetRow,
+            child: ElevatedButton(
+              style: ButtonStyle(
+                  shadowColor: MaterialStateProperty.all(Colors.transparent),
+                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
+              ),
+              onPressed: (){
+                if(set.weight?.toString() != null &&
+                    set.amount?.toString() != null &&
+                    cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                    cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
+                ){
+                  vibrateConfirm();
+                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weight.toString().endsWith(".0")? set.weight?.toInt().toString() : set.weight.toString())?? "";
+                  newEx.sets[indexSet].weight = set.weight;
+                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                  newEx.sets[indexSet].amount = set.amount;
+                  cnRunningWorkout.refresh();
+                  cnRunningWorkout.cache();
+                } else{
+                  setState(() {
+                    FocusScope.of(context).unfocus();
+                  });
+                }
+              },
+              child: Center(
+                child: OverflowSafeText(
+                  maxLines: 1,
+                  set.weight != null && set.amount != null? "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""} kg x ${set.amount?? ""}" : "",
+                  style: TextStyle(
+                      color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
+                          cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
+                          ?Colors.white
+                          : Colors.white.withOpacity(0.2)
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+    );
+  }
+
   void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
     setState(() {
       showSelectorExercisePerLink = false;
@@ -755,10 +818,45 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   void dismiss(Exercise ex, Exercise lastEx, int index){
     setState(() {
-      ex.sets.removeAt(index);
-      lastEx.sets.removeAt(index);
-      cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
+      final dismissedSet = ex.sets.removeAt(index);
+      final dismissedTemplateSet = lastEx.sets.removeAt(index);
+      final dismissedControllers = cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
       cnRunningWorkout.slideableKeys[ex.name]?.removeAt(index);
+
+      cnRunningWorkout.dismissedSets.add(
+          DismissedSingleSet(
+              linkName: ex.linkName,
+              exName: ex.name,
+              index: index,
+              dismissedSet: dismissedSet,
+              dismissedTemplateSet: dismissedTemplateSet,
+              dismissedControllers: dismissedControllers
+          )
+      );
+    });
+  }
+
+  void undoDismiss(){
+    if(cnRunningWorkout.dismissedSets.isEmpty){
+      return;
+    }
+    setState(() {
+      final setsToInsert = cnRunningWorkout.dismissedSets.removeLast();
+      final templateEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == setsToInsert.exName).first;
+      late Exercise newEx;
+      if(setsToInsert.linkName != null){
+        newEx = cnRunningWorkout.groupedExercises[setsToInsert.linkName].where((ex) => ex.name == setsToInsert.exName).first;
+      } else{
+        newEx = cnRunningWorkout.groupedExercises[setsToInsert.exName];
+      }
+      templateEx.sets.insert(setsToInsert.index, setsToInsert.dismissedTemplateSet);
+      newEx.sets.insert(setsToInsert.index, setsToInsert.dismissedSet);
+      if(setsToInsert.dismissedControllers != null){
+        cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, setsToInsert.dismissedControllers!);
+      } else{
+        cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, [TextEditingController(), TextEditingController()]);
+      }
+      cnRunningWorkout.slideableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
     });
   }
 
@@ -787,21 +885,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       if(!tempTemplateEx.equals(ex)){
         return true;
       }
-      // /// Not same amount of sets for Exercise => can update Template
-      // if(tempTemplateEx.sets.length != ex.sets.length){
-      //   return true;
-      // }
-      // /// Seat level or rest in seconds have changed => can update Template
-      // if(tempTemplateEx.seatLevel != ex.seatLevel || tempTemplateEx.restInSeconds != ex.restInSeconds){
-      //   return true;
-      // }
-      // /// Check for ech Set
-      // for(List<SingleSet> setPair in zip([tempTemplateEx.sets, ex.sets])){
-      //   /// when weight or amount is not the same => can update Template
-      //   if(setPair[0].amount != setPair[1].amount || setPair[0].weight != setPair[1].weight){
-      //     return true;
-      //   }
-      // }
     }
     return false;
   }
@@ -838,18 +921,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
           });
         });
-        // if(canUpdateTemplate()){
-        //   cnStandardPopUp.clear();
-        //   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-        //     setState(() {
-        //       showSelectorExerciseToUpdate = true;
-        //       selectorExerciseToUpdateKey = UniqueKey();
-        //     });
-        //   });
-        // }
-        // else{
-        //   finishWorkout();
-        // }
       },
       padding: const EdgeInsets.only(top: 20),
       child: Column(
@@ -883,35 +954,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               ),
             ),
           ),
-          // Container(
-          //   height: 0.5,
-          //   width: double.maxFinite,
-          //   color: Colors.grey[700]!.withOpacity(0.5),
-          // ),
-          // SizedBox(
-          //   height: 40,
-          //   width: double.maxFinite,
-          //   child: ElevatedButton(
-          //       onPressed: () {
-          //         cnStandardPopUp.clear();
-          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-          //           setState(() {
-          //             showSelectorExerciseToUpdate = true;
-          //             selectorExerciseToUpdateKey = UniqueKey();
-          //           });
-          //         });
-          //       },
-          //       style: ButtonStyle(
-          //           shadowColor: MaterialStateProperty.all(Colors.transparent),
-          //           surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-          //           backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          //           shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-          //       ),
-          //       child: const Text(
-          //         "Finish And Update Template"
-          //       ),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -990,6 +1032,7 @@ class CnRunningWorkout extends ChangeNotifier {
   late CnConfig cnConfig;
   List<String> linkWithMultipleExercisesStarted = [];
   List<String> exercisesToRemove = [];
+  List<DismissedSingleSet> dismissedSets = [];
 
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -1039,13 +1082,6 @@ class CnRunningWorkout extends ChangeNotifier {
       initGroupedExercises();
       initTextControllers();
       setTextControllerValues(data["testControllerValues"]);
-      // if(isVisible && isRunning){
-      //   Navigator.push(
-      //       context,
-      //       CupertinoPageRoute(
-      //           builder: (context) => const ScreenRunningWorkout()
-      //       ));
-      // }
     }
   }
 
@@ -1068,23 +1104,8 @@ class CnRunningWorkout extends ChangeNotifier {
         ));
     isVisible = true;
   }
-  
-  // void removeNotSelectedExercises(){
-  //   for (MapEntry entry in List.from(groupedExercises.entries)){
-  //     if(entry.value is Exercise) continue;
-  //     groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
-  //   }
-  //   workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
-  // }
 
   void removeNotRelevantExercises(){
-    // for (MapEntry entry in List.from(groupedExercises.entries)){
-    //   if(entry.value is Exercise) {
-    //     continue;
-    //   }
-    //   groupedExercises[entry.key] = groupedExercises[entry.key][selectedIndexes[entry.key]];
-    // }
-    // workout.exercises = List.from(groupedExercises.entries.map((entry) => entry.value));
     workout.exercises.removeWhere((ex) => exercisesToRemove.contains(ex.name));
   }
 
@@ -1137,7 +1158,7 @@ class CnRunningWorkout extends ChangeNotifier {
     };
   }
 
-  Future<void> cache()async{
+  Future<void> cache() async{
     Map data = {
       "workout": workout.asMap(),
       "workoutTemplate": workoutTemplate.asMap(),
@@ -1192,6 +1213,7 @@ class CnRunningWorkout extends ChangeNotifier {
     selectedIndexes.clear();
     groupedExercises.clear();
     exercisesToRemove.clear();
+    dismissedSets.clear();
     newExNames.clear();
     linkWithMultipleExercisesStarted.clear();
     scrollController = ScrollController();
