@@ -554,16 +554,19 @@ class CnSpotifyBar extends ChangeNotifier {
       //   keepConnectedWhenPaused();
       // }
       // await SpotifySdk.pause();
-    } on Exception catch (_) {
-      if(await hasInternet()){
-        accessToken = "";
-        isTryingToConnect = false;
-        isConnected = false;
-        justClosed = false;
-        connectToSpotify().then((value) => pause());
-      } else{
-        await disconnect();
-        // tryStayConnected = false;
+    } on Exception catch (e) {
+      print("Received excpeiotn in PAUSE: ${e.toString()}");
+      if(Platform.isAndroid){
+        if(await hasInternet()){
+          accessToken = "";
+          isTryingToConnect = false;
+          isConnected = false;
+          justClosed = false;
+          connectToSpotify().then((value) => pause());
+        } else{
+          await disconnect();
+          // tryStayConnected = false;
+        }
       }
     }
     isHandlingControlAction = false;
@@ -632,11 +635,15 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Future<void> keepConnectedWhenPaused() async{
-    await Future.delayed(const Duration(seconds: 1), (){});
-    if (isConnected && (data?.isPaused?? false) && tryStayConnected){
-      await pause();
-      print("keep connected");
-      keepConnectedWhenPaused();
+    if(Platform.isAndroid){
+      await Future.delayed(const Duration(seconds: 1), (){});
+      if (isConnected && (data?.isPaused?? false) && tryStayConnected){
+        await pause();
+        print("keep connected");
+        keepConnectedWhenPaused();
+      } else{
+        tryStayConnected = false;
+      }
     } else{
       tryStayConnected = false;
     }
