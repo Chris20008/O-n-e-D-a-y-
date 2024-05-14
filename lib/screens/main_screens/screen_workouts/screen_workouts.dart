@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../objectbox.g.dart';
 import '../../../objects/workout.dart';
+import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
@@ -98,41 +99,41 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // SizedBox(
-                  //   width: 54,
-                  //   height: 54,
-                  //   child: IconButton(
-                  //       iconSize: 25,
-                  //       style: ButtonStyle(
-                  //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  //       ),
-                  //       onPressed: () {
-                  //         saveBackup();
-                  //       },
-                  //       icon: Icon(
-                  //         Icons.backup,
-                  //         color: Colors.amber[800],
-                  //       )
-                  //   ),
-                  // ),
-                  // SizedBox(
-                  //   width: 54,
-                  //   height: 54,
-                  //   child: IconButton(
-                  //       iconSize: 25,
-                  //       style: ButtonStyle(
-                  //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  //       ),
-                  //       onPressed: () {
-                  //         // saveBackup();
-                  //         loadBackup();
-                  //       },
-                  //       icon: Icon(
-                  //         Icons.cloud_download,
-                  //         color: Colors.amber[800],
-                  //       )
-                  //   ),
-                  // ),
+                  SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          saveBackup();
+                        },
+                        icon: Icon(
+                          Icons.backup,
+                          color: Colors.amber[800],
+                        )
+                    ),
+                  ),
+                  SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          // saveBackup();
+                          loadBackup();
+                        },
+                        icon: Icon(
+                          Icons.cloud_download,
+                          color: Colors.amber[800],
+                        )
+                    ),
+                  ),
                   const Spacer(),
                   if(cnNewWorkout.minPanelHeight <= 0)
                     SizedBox(
