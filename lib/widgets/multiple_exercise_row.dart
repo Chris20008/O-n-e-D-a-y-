@@ -38,7 +38,7 @@ class MultipleExerciseRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 90,
+              width: 110,
               child: Column(
 
                 mainAxisAlignment: MainAxisAlignment.start,
