@@ -126,7 +126,7 @@ class _BottomMenuState extends State<BottomMenu> {
       // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
-      cnScreenStatistics.calculateCurrentData();
+      // cnScreenStatistics.calculateCurrentData();
     }
     cnHomepage.refresh();
   }

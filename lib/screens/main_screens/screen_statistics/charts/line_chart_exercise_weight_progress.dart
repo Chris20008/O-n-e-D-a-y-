@@ -37,20 +37,32 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   double minPercent = 1;
   double maxPercent = 1;
   int verticalStepSize = 0;
-  late DateTime minDate;
+  late DateTime minDate = cnScreenStatistics.minDate;
+  late DateTime maxDate = cnScreenStatistics.maxDate;
+  late final width = MediaQuery.of(context).size.width;
   List<FlSpot> spotsMaxWeight = [];
-  List<FlSpot> spotsTotalMovedWeight = [];
+  int offsetMinX = 0;
+  int offsetMaxX = 0;
+  Offset? pointerA;
+  Offset? pointerAPreviousPos;
+  Offset? pointerB;
+  int? pointerAIdentifier;
+  int? pointerBIdentifier;
+  double lastPointerDistance = 0;
+  double focalPointPercent = 0;
+  bool isZooming = false;
+  // List<FlSpot> spotsTotalMovedWeight = [];
   Map<DateTime, double>? maxWeights;
-  Map<DateTime, double>? totalWeights;
+  // Map<DateTime, double>? totalWeights;
 
   @override
   Widget build(BuildContext context) {
 
     // final minMaxWeights = cnScreenStatistics.getMinMaxWeights();
     maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
-    totalWeights = cnScreenStatistics.getTotalMovedWeight();
+    // totalWeights = cnScreenStatistics.getTotalMovedWeight();
 
-    if(/*minMaxWeights == null ||*/ maxWeights == null || totalWeights == null){
+    if(/*minMaxWeights == null ||*/ maxWeights == null /*|| totalWeights == null*/){
       if(cnScreenStatistics.isCalculatingData){
         return const SizedBox(
             height: 100,
@@ -73,78 +85,85 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
     minTotalWeight = 10000;
     maxTotalWeight = 0;
-    totalWeights?.forEach((key, value) {
-      minTotalWeight = minTotalWeight < value? minTotalWeight : value;
-      maxTotalWeight = maxTotalWeight < value? value : maxTotalWeight;
-    });
+    // totalWeights?.forEach((key, value) {
+    //   minTotalWeight = minTotalWeight < value? minTotalWeight : value;
+    //   maxTotalWeight = maxTotalWeight < value? value : maxTotalWeight;
+    // });
 
-    minDate = cnScreenStatistics.intervalSelectorMap[cnScreenStatistics.currentlySelectedIntervalAsText]!["minDate"]!;
-    
+    minDate = cnScreenStatistics.minDate;
+    maxDate = cnScreenStatistics.maxDate;
+
     // if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
     /// Set Spots Max Weight
-      spotsMaxWeight.clear();
-      maxWeights?.forEach((date, weight) {
-        spotsMaxWeight.add(FlSpot(date.day.toDouble(), weight.toDouble()));
-      });
-      maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate);
+    spotsMaxWeight.clear();
+    maxWeights?.forEach((date, weight) {
+      // spotsMaxWeight.add(FlSpot(date.day.toDouble(), weight.toDouble()));
+      final xCoordinate = date.difference(minDate).inDays.toDouble() - offsetMinX;
+      spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
+    });
+    // maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate);
 
     /// Set Spots Total Moved Weight
-      spotsTotalMovedWeight.clear();
-      totalWeights?.forEach((date, totalWeight) {
-        double percent = (totalWeight*1.1) / maxTotalWeight;
-        if(percent.isNaN){
-          percent = totalWeight / maxTotalWeight;
-          if(percent.isNaN){
-            spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), 0));
-            return;
-          }
-        }
-        if(percent < minPercent){
-          minPercent = percent;
-        }
-        if(percent > maxPercent){
-          maxPercent = percent;
-        }
-        spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), maxWeight * percent));
-      });
+    //   spotsTotalMovedWeight.clear();
+      // totalWeights?.forEach((date, totalWeight) {
+      //   double percent = (totalWeight*1.1) / maxTotalWeight;
+      //   if(percent.isNaN){
+      //     percent = totalWeight / maxTotalWeight;
+      //     if(percent.isNaN){
+      //       spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), 0));
+      //       return;
+      //     }
+      //   }
+      //   if(percent < minPercent){
+      //     minPercent = percent;
+      //   }
+      //   if(percent > maxPercent){
+      //     maxPercent = percent;
+      //   }
+      //   spotsTotalMovedWeight.add(FlSpot(date.day.toDouble(), maxWeight * percent));
+      // });
     // }
     // else
-    if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
-      final List<int> daysToAddList = [];
-      maxWeights?.forEach((date, weight) {
-        final distanceToFirstMonthOfQuarter = (date.month-1)%3;
-        int daysToAdd = 0;
-        DateTime tempDate = date.copyWith();
-        for(final _ in range(0, distanceToFirstMonthOfQuarter)){
-          tempDate = tempDate.copyWith(month: tempDate.month - 1);
-          daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
-        }
-        daysToAddList.add(daysToAdd);
-      });
-
-      spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
-      spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
-
-      maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate)
-          + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+1))
-          + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+2));
-    }
-    else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly){
-      final List<int> daysToAddList = [];
-      maxWeights?.forEach((date, weight) {
-        final distanceToFirstMonth = date.month-1;
-        int daysToAdd = 0;
-        DateTime tempDate = date.copyWith();
-        for(final _ in range(0, distanceToFirstMonth)){
-          tempDate = tempDate.copyWith(month: tempDate.month - 1);
-          daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
-        }
-        daysToAddList.add(daysToAdd);
-      });
-      spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
-      spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
-      maxX = 365;
-    }
+    // if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
+    //   final List<int> daysToAddList = [];
+    //   maxWeights?.forEach((date, weight) {
+    //     final distanceToFirstMonthOfQuarter = (date.month-1)%3;
+    //     int daysToAdd = 0;
+    //     DateTime tempDate = date.copyWith();
+    //     for(final _ in range(0, distanceToFirstMonthOfQuarter)){
+    //       tempDate = tempDate.copyWith(month: tempDate.month - 1);
+    //       daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
+    //     }
+    //     daysToAddList.add(daysToAdd);
+    //   });
+    //
+    //   spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
+    //   spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
+    //
+    //   maxX = cnScreenStatistics.getMaxDaysOfMonths(minDate)
+    //       + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+1))
+    //       + cnScreenStatistics.getMaxDaysOfMonths(DateTime(minDate.year,minDate.month+2));
+    // }
+    // else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly){
+    // final List<int> daysToAddList = [];
+    // maxWeights?.forEach((date, weight) {
+    //   final distanceToFirstMonth = date.month-1;
+    //   int daysToAdd = 0;
+    //   DateTime tempDate = date.copyWith();
+    //   for(final _ in range(0, distanceToFirstMonth)){
+    //     tempDate = tempDate.copyWith(month: tempDate.month - 1);
+    //     daysToAdd = daysToAdd + cnScreenStatistics.getMaxDaysOfMonths(tempDate);
+    //   }
+    //   daysToAddList.add(daysToAdd);
+    // });
+    // spotsMaxWeight = spotsMaxWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsMaxWeight.indexOf(spot)], spot.y)).toList();
+    // spotsTotalMovedWeight = spotsTotalMovedWeight.map((spot) => FlSpot(spot.x + daysToAddList[spotsTotalMovedWeight.indexOf(spot)], spot.y)).toList();
+    // maxX = 365;
+    maxX = maxDate.difference(minDate).inDays + 10 - offsetMaxX;
+    print("MAXX: $maxX");
+    print(maxDate);
+    print(minDate);
+    // }
 
     if(spotsMaxWeight.isEmpty){
       return const SizedBox();
@@ -166,7 +185,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
 
     // spotsTotalMovedWeight = spotsMaxWeight.map((e) => FlSpot(e.x, e.y+10)).toList();
-    
+
 
     // print("MIN WEIGHT: $minWeight");
     // print("MAX WEIGHT: $maxWeight");
@@ -182,47 +201,149 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("Max Weight", textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
-            Text("Total Moved Weight", textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors2[0]),),
+            // Text("Total Moved Weight", textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors2[0]),),
           ],
         ),
         const SizedBox(height: 10,),
-        Stack(
-          children: <Widget>[
-            AspectRatio(
-              aspectRatio: 1.2,
-              child: Padding(
-                padding: EdgeInsets.zero,
-                // padding: const EdgeInsets.only(
-                //   right: 18,
-                //   left: 12,
-                //   top: 24,
-                //   bottom: 12,
-                // ),
-                child: LineChart(
-                    mainData()
-                  // showAvg ? avgData() : mainData(),
+        Listener(
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: (PointerDownEvent details){
+            print("POINTER DOWN");
+            print(details.pointer);
+            if(pointerAIdentifier == null){
+              pointerAIdentifier = details.pointer;
+              pointerA = details.position;
+              pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
+              print("SET POINTER A");
+            }
+            else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
+              print("SET POINTER B");
+              pointerBIdentifier = details.pointer;
+              pointerB = details.position;
+              lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+              final minPos = pointerB!.dx < pointerA!.dx? pointerB!.dx : pointerA!.dx;
+              /// the middlepoint between the two pointer in percent minus an offset of 0.2
+              focalPointPercent = (lastPointerDistance/2 + minPos) / width - 0.2;
+            }
+          },
+          onPointerMove: (PointerMoveEvent details){
+            // print(details.pointer);
+            if(details.pointer == pointerAIdentifier){
+              // pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
+              pointerA = details.position;
+              // print("Position Pointer A: ${pointerA?.dx}");
+            }
+            else if(details.pointer == pointerBIdentifier){
+              pointerB = details.position;
+              // print("Position Pointer A: ${pointerB?.dx}");
+            }
+
+            if(pointerA != null && pointerB != null && !isZooming){
+              isZooming = true;
+              final currentVisibleDays = maxDate.difference(minDate).inDays - offsetMinX - offsetMaxX;
+              double sensibility = (currentVisibleDays / 10) * 1;
+              sensibility = sensibility < 1? 1 : sensibility;
+              final maxDays = maxDate.difference(minDate).inDays;
+              final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+              final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
+              print("\nDIFFERENCE: $difference \n");
+              lastPointerDistance = currentPointerDistance;
+              setState(() {
+                int newOffsetMaxX;
+                int newOffsetMinX;
+
+                newOffsetMaxX = (offsetMaxX - difference * (1 - focalPointPercent)).toInt();
+                newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
+                newOffsetMinX = (offsetMinX - difference * focalPointPercent).toInt();
+                newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
+
+                if(newOffsetMinX + newOffsetMaxX + 5 < maxDays){
+                  offsetMinX = newOffsetMinX;
+                  offsetMaxX = newOffsetMaxX;
+                }
+              });
+              Future.delayed(const Duration(milliseconds: 30), (){
+                isZooming = false;
+              });
+            } else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
+              // isZooming = true;
+              final currentVisibleDays = maxDate.difference(minDate).inDays - offsetMinX - offsetMaxX;
+              double sensibility = 1/ (currentVisibleDays / 4.5) * 20;
+              sensibility = sensibility < 1? 1 : sensibility;
+              final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx).toInt() ~/ sensibility;
+
+              int newOffsetMaxX;
+              int newOffsetMinX;
+
+              newOffsetMaxX = offsetMaxX - currentPointerDistance;
+              newOffsetMinX = offsetMinX + currentPointerDistance;
+              if(newOffsetMinX >= 0 && newOffsetMaxX >= 0 && newOffsetMinX != offsetMinX && newOffsetMaxX != offsetMaxX){
+                setState(() {
+                  offsetMinX = newOffsetMinX;
+                  offsetMaxX = newOffsetMaxX;
+                  pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
+                });
+              }
+
+              setState(() {
+              });
+              // Future.delayed(const Duration(milliseconds: 30), (){
+              //   isZooming = false;
+              // });
+            }
+
+          },
+          onPointerUp: (PointerUpEvent details){
+            if(details.pointer == pointerAIdentifier){
+              pointerA = null;
+              pointerAPreviousPos = null;
+              pointerAIdentifier = null;
+              print("RESET POINTER A");
+            } else if(details.pointer == pointerBIdentifier){
+              pointerB = null;
+              pointerBIdentifier = null;
+              print("RESET POINTER B");
+            }
+            isZooming = false;
+          },
+          child: Stack(
+            children: <Widget>[
+              AspectRatio(
+                aspectRatio: 1.2,
+                child: Padding(
+                  padding: EdgeInsets.zero,
+                  // padding: const EdgeInsets.only(
+                  //   right: 18,
+                  //   left: 12,
+                  //   top: 24,
+                  //   bottom: 12,
+                  // ),
+                  child: LineChart(
+                      mainData()
+                    // showAvg ? avgData() : mainData(),
+                  ),
                 ),
               ),
-            ),
-            // SizedBox(
-            //   width: 60,
-            //   height: 34,
-            //   child: TextButton(
-            //     onPressed: () {
-            //       setState(() {
-            //         showAvg = !showAvg;
-            //       });
-            //     },
-            //     child: Text(
-            //       'avg',
-            //       style: TextStyle(
-            //         fontSize: 12,
-            //         color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-          ],
+              // SizedBox(
+              //   width: 60,
+              //   height: 34,
+              //   child: TextButton(
+              //     onPressed: () {
+              //       setState(() {
+              //         showAvg = !showAvg;
+              //       });
+              //     },
+              //     child: Text(
+              //       'avg',
+              //       style: TextStyle(
+              //         fontSize: 12,
+              //         color: showAvg ? Colors.white.withOpacity(0.5) : Colors.white,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ],
     );
@@ -235,41 +356,41 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     );
     Widget text;
 
-    /// Monthly
-    if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
-      if(value.toInt() % 5 == 0){
-        text = Text(value.toInt().toString(), style: style);
-      }
-      else{
-        text = Text('', style: style);
-      }
-    }
-    /// Quarterly
-    else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
-      switch (value.toInt()) {
-        case 15:
-          text = Text(DateFormat('MMM').format(minDate), style: style);
-          break;
-        case 45:
-          text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+1)), style: style);
-          break;
-        case 75:
-          text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+2)), style: style);
-          break;
-        default:
-          text = Text('', style: style);
-          break;
-      }
-    }
+    // /// Monthly
+    // if(cnScreenStatistics.selectedIntervalSize == TimeInterval.monthly){
+    //   if(value.toInt() % 5 == 0){
+    //     text = Text(value.toInt().toString(), style: style);
+    //   }
+    //   else{
+    //     text = Text('', style: style);
+    //   }
+    // }
+    // /// Quarterly
+    // else if(cnScreenStatistics.selectedIntervalSize == TimeInterval.quarterly){
+    //   switch (value.toInt()) {
+    //     case 15:
+    //       text = Text(DateFormat('MMM').format(minDate), style: style);
+    //       break;
+    //     case 45:
+    //       text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+1)), style: style);
+    //       break;
+    //     case 75:
+    //       text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+2)), style: style);
+    //       break;
+    //     default:
+    //       text = Text('', style: style);
+    //       break;
+    //   }
+    // }
     /// Yearly
-    else{
+    // else{
       if((value.toInt()-15) % 30 == 0){
         text = Text(DateFormat('MMM').format(minDate.copyWith(month: minDate.month+(value.toInt() ~/ 30))), style: style);
       }
       else{
         text = Text('', style: style);
       }
-    }
+    // }
 
     return SideTitleWidget(
       axisSide: meta.axisSide,
@@ -292,21 +413,21 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     return Text(text, style: style, textAlign: TextAlign.left);
   }
 
-  Widget rightTitleWidgets(double value, TitleMeta meta) {
-    final style = TextStyle(
-      fontWeight: FontWeight.bold,
-      fontSize: 12,
-        color: gradientColors2[0]
-    );
-    String text;
-    if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
-      text = '${(((value.toInt() / ((maxWeight*maxPercent))) * (maxTotalWeight) + 5) / 1000).toStringAsFixed(2)} t';
-      // text = '${(((value.toInt() / ((maxWeight*(maxPercent/1.1))+5)) * (maxTotalWeight)) / 1000).toStringAsFixed(2)} t';
-    } else{
-      return Container();
-    }
-    return Text(text, style: style, textAlign: TextAlign.left);
-  }
+  // Widget rightTitleWidgets(double value, TitleMeta meta) {
+  //   final style = TextStyle(
+  //     fontWeight: FontWeight.bold,
+  //     fontSize: 12,
+  //       color: gradientColors2[0]
+  //   );
+  //   String text;
+  //   if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
+  //     text = '${(((value.toInt() / ((maxWeight*maxPercent))) * (maxTotalWeight) + 5) / 1000).toStringAsFixed(2)} t';
+  //     // text = '${(((value.toInt() / ((maxWeight*(maxPercent/1.1))+5)) * (maxTotalWeight)) / 1000).toStringAsFixed(2)} t';
+  //   } else{
+  //     return Container();
+  //   }
+  //   return Text(text, style: style, textAlign: TextAlign.left);
+  // }
 
   LineChartData mainData() {
     return LineChartData(
@@ -346,9 +467,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       ),
       titlesData: FlTitlesData(
         show: true,
-        // rightTitles: const AxisTitles(
-        //   sideTitles: SideTitles(showTitles: false),
-        // ),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
         topTitles: const AxisTitles(
           sideTitles: SideTitles(showTitles: false),
         ),
@@ -368,15 +489,15 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             reservedSize: 42,
           ),
         ),
-        rightTitles: AxisTitles(
-          // axisNameWidget: RotatedBox(quarterTurns:1, child: Text("Test")),
-          sideTitles: SideTitles(
-            showTitles: true,
-            interval: verticalStepSize.toDouble(),
-            getTitlesWidget: rightTitleWidgets,
-            reservedSize: 42,
-          ),
-        ),
+        // rightTitles: AxisTitles(
+        //   // axisNameWidget: RotatedBox(quarterTurns:1, child: Text("Test")),
+        //   sideTitles: SideTitles(
+        //     showTitles: true,
+        //     interval: verticalStepSize.toDouble(),
+        //     getTitlesWidget: rightTitleWidgets,
+        //     reservedSize: 42,
+        //   ),
+        // ),
       ),
       borderData: FlBorderData(
         show: true,
@@ -410,38 +531,38 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             ),
           ),
         ),
-        LineChartBarData(
-          curveSmoothness: 0.1,
-          spots: spotsTotalMovedWeight,
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: gradientColors2,
-          ),
-          barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: true,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            gradient: LinearGradient(
-              colors: gradientColors2
-                  .map((color) => color.withOpacity(0.3))
-                  .toList(),
-            ),
-          ),
-        ),
+        // LineChartBarData(
+        //   curveSmoothness: 0.1,
+        //   spots: spotsTotalMovedWeight,
+        //   isCurved: true,
+        //   gradient: LinearGradient(
+        //     colors: gradientColors2,
+        //   ),
+        //   barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
+        //   isStrokeCapRound: true,
+        //   dotData: const FlDotData(
+        //     show: true,
+        //   ),
+        //   belowBarData: BarAreaData(
+        //     show: true,
+        //     gradient: LinearGradient(
+        //       colors: gradientColors2
+        //           .map((color) => color.withOpacity(0.3))
+        //           .toList(),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
 
   String getSpotData(LineBarSpot spot){
     Map<DateTime, double> data;
-    if(spot.barIndex == 0){
-      data = maxWeights!;
-    } else{
-      data = totalWeights!;
-    }
+    // if(spot.barIndex == 0){
+    data = maxWeights!;
+    // } else{
+      // data = totalWeights!;
+    // }
     return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex]}";
   }
 

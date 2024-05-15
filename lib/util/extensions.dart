@@ -43,4 +43,8 @@ extension DateOnlyCompare on DateTime {
     final endOfToday = DateTime.now().copyWith(hour: 23, minute: 59, second: 59);
     return isAfter(endOfToday);
   }
+
+  bool isLeapYear(){
+    return (year%4==0 && (year%100!=0 || year%400==0));
+  }
 }

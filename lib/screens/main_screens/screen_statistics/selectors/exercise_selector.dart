@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../../objects/exercise.dart';
 import '../screen_statistics.dart';
 
 class ExerciseSelector extends StatefulWidget {
@@ -48,13 +47,11 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
     print("REBUILD EX SELECTOR");
 
-    if(cnScreenStatistics.selectedWorkout == null || cnScreenStatistics.selectedWorkout!.exercises.isEmpty){
-      print("RETURN EMPTY");
+    cnScreenStatistics.selectedExerciseName ??= cnScreenStatistics.allExerciseNames.firstOrNull;
+
+    if(cnScreenStatistics.selectedExerciseName == null){
       return const SizedBox();
     }
-
-
-    // cnScreenStatistics.selectedWorkout ??= cnScreenStatistics.intervalSelectorMap.keys.first;
 
     return Column(
       children: [
@@ -69,19 +66,19 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                 itemExtent: 32,
                 // This sets the initial item.
                 scrollController: FixedExtentScrollController(
-                  initialItem: cnScreenStatistics.selectedWorkout!.exercises.indexOf(cnScreenStatistics.selectedExercise!),
+                  initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
                 ),
                 // This is called when selected item is changed.
                 onSelectedItemChanged: (int index) {
                   // setState(() {
-                  cnScreenStatistics.selectedExercise = cnScreenStatistics.selectedWorkout!.exercises[index];
+                  cnScreenStatistics.selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
                   if(Platform.isAndroid){
                     HapticFeedback.selectionClick();
                   }
                   // });
                 },
-                children: cnScreenStatistics.selectedWorkout!.exercises.map((Exercise ex) {
-                  return Center(child: OverflowSafeText(ex.name, maxLines: 1, minFontSize: 12));
+                children: cnScreenStatistics.allExerciseNames.map((String exName) {
+                  return Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12));
                   // return Center(child: Text(ex.name));
                 }).toList()
             ),
@@ -91,9 +88,10 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
             mainAxisSize: MainAxisSize.min,
             children: [
               OverflowSafeText(
-                  cnScreenStatistics.selectedExercise!.name,
+                  cnScreenStatistics.selectedExerciseName!,
                   style: const TextStyle(
                     fontSize: 22.0,
+                    color: Colors.white
                   ),
               ),
               // Text(
@@ -103,7 +101,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
               //   ),
               // ),
               const SizedBox(width: 10,),
-              const Icon(Icons.arrow_forward_ios, size: 15,)
+              const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
             ],
           ),
         ),

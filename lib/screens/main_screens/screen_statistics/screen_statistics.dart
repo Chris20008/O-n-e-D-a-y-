@@ -1,14 +1,17 @@
+import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/interval_selector.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/util/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
+import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import 'charts/line_chart_exercise_weight_progress.dart';
 import 'exercise_summary_per_interval.dart';
@@ -33,15 +36,15 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 
         children: [
           const SizedBox(height: 10),
-          const IntervalSizeSelector(),
+          // const IntervalSizeSelector(),
           const SizedBox(height: 20),
-          const IntervalSelector(),
+          // const IntervalSelector(),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 5),
               children: [
                 const SizedBox(height: 20),
-                const ExerciseSummaryPerInterval(),
+                // const ExerciseSummaryPerInterval(),
                 const ExerciseSelector(),
                 const SizedBox(height: 20,),
                 LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
@@ -96,11 +99,13 @@ class CnScreenStatistics extends ChangeNotifier {
   /// Hold the currently selected Interval as plain Text which can be used
   /// as a key to enter 'intervalSelectorMap'
   late String currentlySelectedIntervalAsText = DateFormat('MMMM y').format(DateTime.now());
-  TimeInterval selectedIntervalSize = TimeInterval.monthly;
-  Workout? selectedWorkout;
-  Exercise? selectedExercise;
+  TimeInterval selectedIntervalSize = TimeInterval.yearly;
+  // Workout? selectedWorkout;
+  // Exercise? selectedExercise;
   Workout? previousSelectedWorkout;
   Exercise? previousSelectedExercise;
+  late List<String> allExerciseNames = getAllExerciseNames();
+  String? selectedExerciseName;
 
 
   ///
@@ -109,271 +114,303 @@ class CnScreenStatistics extends ChangeNotifier {
 
   void init() async{
     isInitialized = true;
-    setMinDate();
-    refreshIntervalSelectorMap();
-    calculateCurrentData();
-  }
-
-  void refreshIntervalSelectorMap(){
-    intervalSelectorMap.clear();
-    bool isSmaller = true;
-    late DateTime tempMinDate;
-    switch (selectedIntervalSize){
-      case TimeInterval.yearly:
-        tempMinDate = DateTime(minDate.year, 1, 1, 0, 0, 0, 0, 0);
-        break;
-      case TimeInterval.quarterly:
-        final subtractionFromMonth = (minDate.month-1)%3;
-        tempMinDate = DateTime(minDate.year, minDate.month - subtractionFromMonth, 1, 0, 0, 0, 0, 0);
-        break;
-      default:
-        tempMinDate = minDate.copyWith(day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
-    }
-    while (isSmaller){
-
-      late String intervalKey;
-      switch (selectedIntervalSize){
-        case TimeInterval.yearly:
-          intervalKey = DateFormat('y').format(tempMinDate);
-          break;
-        case TimeInterval.quarterly:
-          intervalKey = DateFormat('QQQ y').format(tempMinDate);
-          break;
-        default:
-          intervalKey = DateFormat('MMMM y').format(tempMinDate);
-      }
-
-      /// set temp max date
-      late DateTime tempMaxDate;
-      switch (selectedIntervalSize){
-
-        /// yearly new temp max date
-        case TimeInterval.yearly:
-          tempMaxDate = tempMinDate.add(
-              Duration(days: isLeapYear(tempMinDate.year)? 366: 365)
-          ).copyWith(
-              hour: 0,
-              minute: 0,
-              second: 0,
-              millisecond: 0,
-              microsecond: 0
-          );
-          break;
-
-        /// quarterly new temp max date
-        case TimeInterval.quarterly:
-          tempMaxDate = tempMinDate.add(
-              Duration(days: getMaxDaysOfMonths(tempMinDate))
-          );
-          for (num _ in range(1, 3)){
-            tempMaxDate = tempMaxDate.add(Duration(days: getMaxDaysOfMonths(tempMaxDate)));
-          }
-          tempMaxDate = tempMaxDate.copyWith(hour: 0, minute: 0, second: 0);
-          intervalKey = DateFormat('QQQ y').format(tempMinDate);
-          break;
-
-        /// monthly new temp max date
-        default:
-          tempMaxDate = tempMinDate.add(
-              Duration(days: getMaxDaysOfMonths(tempMinDate))
-          ).copyWith(
-              hour: 0,
-              minute: 0,
-              second: 0,
-              millisecond: 0,
-              microsecond: 0
-          );
-          /// Due to German TimeCorrection in March and October it can happen, that the month is still
-          /// the same, due to adding one day always adds 24 hours beeing to less in october where one day is 25 hours long
-          if(tempMaxDate.month == tempMinDate.month){
-            tempMaxDate = tempMaxDate.add(const Duration(days: 1)).copyWith(
-                hour: 0,
-                minute: 0,
-                second: 0,
-                millisecond: 0,
-                microsecond: 0
-            );
-          }
-      }
-      intervalSelectorMap[intervalKey] = {
-        "minDate": tempMinDate,
-        "maxDate": tempMaxDate
-      };
-
-      if(DateTime.now().isAfter(tempMinDate) && DateTime.now().isBefore(tempMaxDate)){
-        currentlySelectedIntervalAsText = intervalKey;
-      }
-      if(tempMaxDate.isAfter(maxDate)){
-        isSmaller = false;
-      }
-      else{
-        tempMinDate = tempMaxDate.copyWith(
-            hour: 0,
-            minute: 0,
-            second: 0
-        );
-      }
-
-    }
+    // print(allExerciseNames);
+    // allExerciseNames = getAllExerciseNames();
+    setMinMaxDates();
+    // refreshIntervalSelectorMap();
+    // calculateCurrentData();
   }
   
-  Future<List<Workout>> getWorkoutsInInterval()async{
-    final tempObWorkouts = await objectbox.workoutBox.query(
-        ObWorkout_.isTemplate.equals(false)
-            .and(ObWorkout_.date.betweenDate(intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!, intervalSelectorMap[currentlySelectedIntervalAsText]!["maxDate"]!))
-        ).order(ObWorkout_.date).build().findAsync();
-    return List.from(tempObWorkouts.map((w) => Workout.fromObWorkout(w)));
+  List<String> getAllExerciseNames(){
+    final builder = objectbox.exerciseBox.query();
+    // builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
+    final query = builder.build().property(ObExercise_.name);
+    query.distinct = true;
+    final res = query.find();
+    res.sort();
+    print("ALL EXERCISE NAMES");
+    print(res);
+    return res;
   }
 
-  Future<void> calculateCurrentData()async{
-    // await Future.delayed(const Duration(milliseconds: 200), (){});
-    isCalculatingData = true;
-    Map<String, int> summarized = {};
-    final workouts = await getWorkoutsInInterval();
-    exercisesPerWorkout.clear();
+  // void refreshIntervalSelectorMap(){
+  //   intervalSelectorMap.clear();
+  //   bool isSmaller = true;
+  //   late DateTime tempMinDate;
+  //   switch (selectedIntervalSize){
+  //     case TimeInterval.yearly:
+  //       tempMinDate = DateTime(minDate.year, 1, 1, 0, 0, 0, 0, 0);
+  //       break;
+  //     // case TimeInterval.quarterly:
+  //     //   final subtractionFromMonth = (minDate.month-1)%3;
+  //     //   tempMinDate = DateTime(minDate.year, minDate.month - subtractionFromMonth, 1, 0, 0, 0, 0, 0);
+  //     //   break;
+  //     // default:
+  //     //   tempMinDate = minDate.copyWith(day: 1, hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+  //   }
+  //   while (isSmaller){
+  //
+  //     late String intervalKey;
+  //     switch (selectedIntervalSize){
+  //       case TimeInterval.yearly:
+  //         intervalKey = DateFormat('y').format(tempMinDate);
+  //         break;
+  //       // case TimeInterval.quarterly:
+  //       //   intervalKey = DateFormat('QQQ y').format(tempMinDate);
+  //       //   break;
+  //       // default:
+  //       //   intervalKey = DateFormat('MMMM y').format(tempMinDate);
+  //     }
+  //
+  //     /// set temp max date
+  //     late DateTime tempMaxDate;
+  //     switch (selectedIntervalSize){
+  //
+  //       /// yearly new temp max date
+  //       case TimeInterval.yearly:
+  //         tempMaxDate = tempMinDate.add(
+  //             Duration(days: tempMinDate.isLeapYear()? 366: 365)
+  //         ).copyWith(
+  //             hour: 0,
+  //             minute: 0,
+  //             second: 0,
+  //             millisecond: 0,
+  //             microsecond: 0
+  //         );
+  //         break;
+  //
+  //       /// quarterly new temp max date
+  //       // case TimeInterval.quarterly:
+  //       //   tempMaxDate = tempMinDate.add(
+  //       //       Duration(days: getMaxDaysOfMonths(tempMinDate))
+  //       //   );
+  //       //   for (num _ in range(1, 3)){
+  //       //     tempMaxDate = tempMaxDate.add(Duration(days: getMaxDaysOfMonths(tempMaxDate)));
+  //       //   }
+  //       //   tempMaxDate = tempMaxDate.copyWith(hour: 0, minute: 0, second: 0);
+  //       //   intervalKey = DateFormat('QQQ y').format(tempMinDate);
+  //       //   break;
+  //
+  //       /// monthly new temp max date
+  //       // default:
+  //       //   tempMaxDate = tempMinDate.add(
+  //       //       Duration(days: getMaxDaysOfMonths(tempMinDate))
+  //       //   ).copyWith(
+  //       //       hour: 0,
+  //       //       minute: 0,
+  //       //       second: 0,
+  //       //       millisecond: 0,
+  //       //       microsecond: 0
+  //       //   );
+  //       //   /// Due to German TimeCorrection in March and October it can happen, that the month is still
+  //       //   /// the same, due to adding one day always adds 24 hours beeing to less in october where one day is 25 hours long
+  //       //   if(tempMaxDate.month == tempMinDate.month){
+  //       //     tempMaxDate = tempMaxDate.add(const Duration(days: 1)).copyWith(
+  //       //         hour: 0,
+  //       //         minute: 0,
+  //       //         second: 0,
+  //       //         millisecond: 0,
+  //       //         microsecond: 0
+  //       //     );
+  //       //   }
+  //     }
+  //     intervalSelectorMap[intervalKey] = {
+  //       "minDate": tempMinDate,
+  //       "maxDate": tempMaxDate
+  //     };
+  //
+  //     if(DateTime.now().isAfter(tempMinDate) && DateTime.now().isBefore(tempMaxDate)){
+  //       currentlySelectedIntervalAsText = intervalKey;
+  //     }
+  //     if(tempMaxDate.isAfter(maxDate)){
+  //       isSmaller = false;
+  //     }
+  //     else{
+  //       tempMinDate = tempMaxDate.copyWith(
+  //           hour: 0,
+  //           minute: 0,
+  //           second: 0
+  //       );
+  //     }
+  //
+  //   }
+  // }
+  
+  // Future<List<Workout>> getWorkoutsInInterval()async{
+  //   final tempObWorkouts = await objectbox.workoutBox.query(
+  //       ObWorkout_.isTemplate.equals(false)
+  //           .and(ObWorkout_.date.betweenDate(intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!, intervalSelectorMap[currentlySelectedIntervalAsText]!["maxDate"]!))
+  //       ).order(ObWorkout_.date).build().findAsync();
+  //   return List.from(tempObWorkouts.map((w) => Workout.fromObWorkout(w)));
+  // }
+  //
+  // Future<void> calculateCurrentData()async{
+  //   isCalculatingData = true;
+  //   Map<String, int> summarized = {};
+  //   final workouts = await getWorkoutsInInterval();
+  //   exercisesPerWorkout.clear();
+  //
+  //   for(Workout w in workouts){
+  //     List<StatisticExercise> exercises = exercisesPerWorkout[w.name]?? [];
+  //     for(Exercise ex in w.exercises){
+  //       exercises.addAll(ex.sets.map((set) =>
+  //           StatisticExercise(
+  //               name: ex.name,
+  //               weight: set.weight?? 0,
+  //               amount: set.amount?? 0,
+  //               date: w.date!
+  //           )
+  //       ));
+  //     }
+  //     exercisesPerWorkout[w.name] = exercises;
+  //
+  //     if(summarized.containsKey(w.name)){
+  //       summarized[w.name] = summarized[w.name]! + 1;
+  //     } else{
+  //       summarized[w.name] = 1;
+  //     }
+  //   }
+  //
+  //   sortedSummarized = Map.fromEntries(
+  //       summarized.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value))
+  //   );
+  //
+  //   /// Set selectedWorkout and selectedExercise
+  //   if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty /*&& selectedWorkout == null*/){
+  //     if(sortedSummarized!.keys.contains(previousSelectedWorkout?.name)){
+  //       await setSelectedWorkout(previousSelectedWorkout!.name);
+  //     } else{
+  //       await setSelectedWorkout(sortedSummarized!.keys.first);
+  //     }
+  //   }
+  //
+  //   currentMinDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!;
+  //   currentMaxDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["maxDate"]!;
+  //
+  //   isCalculatingData = false;
+  //   refresh();
+  //   // getSelectedExerciseHistory();
+  // }
+  //
+  // Map<String, int>? getWorkoutsInIntervalSummarized(){
+  //   return sortedSummarized;
+  // }
 
-    for(Workout w in workouts){
-      List<StatisticExercise> exercises = exercisesPerWorkout[w.name]?? [];
-      for(Exercise ex in w.exercises){
-        exercises.addAll(ex.sets.map((set) =>
-            StatisticExercise(
-                name: ex.name,
-                weight: set.weight?? 0,
-                amount: set.amount?? 0,
-                date: w.date!
-            )
-        ));
-      }
-      // print("ALL EXERCISES");
-      // for(final e in exercises){
-      //   print(e.name);
-      //   print(e.date);
-      //   print(e.weight);
-      //   print(e.amount);
-      //   print("");
-      // }
-      exercisesPerWorkout[w.name] = exercises;
+  // Future setSelectedWorkout(String workoutName) async{
+  //   final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
+  //   if(w != null) {
+  //     final newWorkout = Workout.fromObWorkout(w);
+  //     if(newWorkout.name != selectedWorkout?.name && selectedWorkout != null){
+  //       previousSelectedWorkout = Workout.clone(selectedWorkout!);
+  //       lineChartKey = UniqueKey();
+  //     }
+  //     selectedWorkout = newWorkout;
+  //     final exerciseNames = selectedWorkout?.exercises.map((e) => e.name);
+  //
+  //     if(exerciseNames == null || exerciseNames.isEmpty){
+  //       return;
+  //     }
+  //
+  //     if(/*selectedExercise == null &&*/ exerciseNames.contains(previousSelectedExercise?.name)){
+  //       selectedExercise = previousSelectedExercise;
+  //     }
+  //     else{
+  //       selectedExercise = selectedWorkout?.exercises.first;
+  //     }
+  //   } else{
+  //     selectedWorkout = null;
+  //   }
+  // }
 
-      if(summarized.containsKey(w.name)){
-        summarized[w.name] = summarized[w.name]! + 1;
-      } else{
-        summarized[w.name] = 1;
-      }
-    }
+  // Future<List<StatisticExercise>?> getSelectedExerciseHistory()async{
+  //   try{
+  //     final obWorkouts = await objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date).build().findAsync();
+  //     final workouts =  obWorkouts.map((obw) => Workout.fromObWorkout(obw)).toList();
+  //     final exercises = workouts.expand((w) => w.exercises.map((e) => StatisticExercise(name: e.name, weight: e., amount: amount, date: date)));
+  //     final relevantExercises = exercises.where((ex) => ex.name == selectedExerciseName);
+  //     final relevantStatisticExercises = exercises.map((e) => StatisticExercise(name: name, weight: weight, amount: amount, date: date));
+  //     return workouts.map((w) => w.)
+  //     // final exercises = exercisesPerWorkout[selectedWorkout!.name]!
+  //     //     .where((element) => element.name == selectedExercise!.name)
+  //     //     .toList()
+  //     //     .where((element) => element.date.isAfter(currentMinDate) && element.date.isBefore(currentMaxDate))
+  //     //     .toList();
+  //     // return exercises;
+  //   } on TypeError catch (_){
+  //     return null;
+  //   }
+  //
+  // }
 
-    sortedSummarized = Map.fromEntries(
-        summarized.entries.toList()..sort((e1, e2) => e2.value.compareTo(e1.value))
-    );
-
-    /// Set selectedWorkout and selectedExercise
-    if(sortedSummarized != null && sortedSummarized!.keys.isNotEmpty /*&& selectedWorkout == null*/){
-      if(sortedSummarized!.keys.contains(previousSelectedWorkout?.name)){
-        await setSelectedWorkout(previousSelectedWorkout!.name);
-      } else{
-        await setSelectedWorkout(sortedSummarized!.keys.first);
-      }
-    }
-
-    currentMinDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["minDate"]!;
-    currentMaxDate = intervalSelectorMap[currentlySelectedIntervalAsText]!["maxDate"]!;
-
-    isCalculatingData = false;
-    refresh();
-    // getSelectedExerciseHistory();
-  }
-
-  Map<String, int>? getWorkoutsInIntervalSummarized(){
-    return sortedSummarized;
-  }
-
-  Future setSelectedWorkout(String workoutName) async{
-    final ObWorkout? w = await objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName).and(ObWorkout_.isTemplate.equals(true))).build().findFirstAsync();
-    if(w != null) {
-      final newWorkout = Workout.fromObWorkout(w);
-      if(newWorkout.name != selectedWorkout?.name && selectedWorkout != null){
-        previousSelectedWorkout = Workout.clone(selectedWorkout!);
-        lineChartKey = UniqueKey();
-      }
-      selectedWorkout = newWorkout;
-      final exerciseNames = selectedWorkout?.exercises.map((e) => e.name);
-
-      if(exerciseNames == null || exerciseNames.isEmpty){
-        return;
-      }
-
-      if(/*selectedExercise == null &&*/ exerciseNames.contains(previousSelectedExercise?.name)){
-        selectedExercise = previousSelectedExercise;
-      }
-      else{
-        selectedExercise = selectedWorkout?.exercises.first;
-      }
-    } else{
-      selectedWorkout = null;
-    }
-  }
-
-  List<StatisticExercise>? getSelectedExerciseHistory(){
+  Map<DateTime, ObExercise>? getSelectedExerciseHistory(){
     try{
-      final exercises = exercisesPerWorkout[selectedWorkout!.name]!
-          .where((element) => element.name == selectedExercise!.name)
-          .toList()
-          .where((element) => element.date.isAfter(currentMinDate) && element.date.isBefore(currentMaxDate))
-          .toList();
-      return exercises;
+      final List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date).build().find();
+      // final workouts =  obWorkouts.map((obw) => Workout.fromObWorkout(obw)).toList();
+      Map<DateTime, ObExercise> datesAndExercises = {};
+
+      for(ObWorkout obw in obWorkouts){
+        final ObExercise? obEx = obw.exercises.firstWhereOrNull((e) => e.name == selectedExerciseName);
+        if(obEx == null){
+          continue;
+        }
+        datesAndExercises[obw.date] = obEx;
+      }
+      return datesAndExercises;
     } on TypeError catch (_){
       return null;
     }
 
   }
-
-   List<double?>? getMinMaxWeights(){
-    final exercises = getSelectedExerciseHistory();
-    if(exercises == null){
-      return null;
-    }
-    double minWeight = 1000000;
-    double maxWeight = 0;
-    for(StatisticExercise ex in exercises){
-      maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
-      minWeight = minWeight < maxWeight? minWeight : maxWeight;
-    }
-    if(minWeight == 1000000) minWeight = 0;
-    return [minWeight, maxWeight];
-  }
+  //
+  //  List<double?>? getMinMaxWeights(){
+  //   final exercises = getSelectedExerciseHistory();
+  //   if(exercises == null){
+  //     return null;
+  //   }
+  //   double minWeight = 1000000;
+  //   double maxWeight = 0;
+  //   for(StatisticExercise ex in exercises){
+  //     maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
+  //     minWeight = minWeight < maxWeight? minWeight : maxWeight;
+  //   }
+  //   if(minWeight == 1000000) minWeight = 0;
+  //   return [minWeight, maxWeight];
+  // }
 
   Map<DateTime, double>? getMaxWeightsPerDate(){
-    final exercises = getSelectedExerciseHistory();
-    if(exercises == null){
+    final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
+    if(obExercises == null){
       return null;
     }
     Map<DateTime, double> maxWeights = {};
-    for(StatisticExercise ex in exercises){
+    for(MapEntry<DateTime, ObExercise> entry in obExercises.entries){
       // print("DATE: ${ex.date}");
-      final double? currentWeight = maxWeights[ex.date];
-      if(currentWeight != null){
-        maxWeights[ex.date] = currentWeight < ex.weight? ex.weight : currentWeight;
-      } else{
-        maxWeights[ex.date] = ex.weight;
-      }
+      // final double? currentWeight = maxWeights[ex.date];
+      maxWeights[entry.key] = entry.value.weights.max;
+      // if(currentWeight != null){
+      //   maxWeights[ex.date] = currentWeight < ex.weight? ex.weight : currentWeight;
+      // } else{
+      //   maxWeights[ex.date] = ex.weight;
+      // }
     }
     return maxWeights;
   }
-
-  Map<DateTime, double>? getTotalMovedWeight(){
-    final exercises = getSelectedExerciseHistory();
-    if(exercises == null){
-      return null;
-    }
-    Map<DateTime, double> summedWeights = {};
-    for(StatisticExercise ex in exercises){
-      summedWeights[ex.date] = (summedWeights[ex.date]?? 0) + (ex.weight*ex.amount);
-    }
-    print("TOTAL MOVED WEIGHTS");
-    for(MapEntry e in summedWeights.entries){
-      print("DATE ${e.key} WEIGHT: ${e.value}");
-    }
-    return summedWeights;
-  }
+  //
+  // Map<DateTime, double>? getTotalMovedWeight(){
+  //   final exercises = getSelectedExerciseHistory();
+  //   if(exercises == null){
+  //     return null;
+  //   }
+  //   Map<DateTime, double> summedWeights = {};
+  //   for(StatisticExercise ex in exercises){
+  //     summedWeights[ex.date] = (summedWeights[ex.date]?? 0) + (ex.weight*ex.amount);
+  //   }
+  //   print("TOTAL MOVED WEIGHTS");
+  //   for(MapEntry e in summedWeights.entries){
+  //     print("DATE ${e.key} WEIGHT: ${e.value}");
+  //   }
+  //   return summedWeights;
+  // }
 
   // void setCurrentInterval(String interval){
   //   currentlySelectedIntervalAsText = interval;
@@ -434,10 +471,15 @@ class CnScreenStatistics extends ChangeNotifier {
   //   }
   // }
 
-  void setMinDate()async{
+  void setMinMaxDates()async{
     ObWorkout? firstWorkout = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date).build().findFirst();// .getAllAsync();
     if(firstWorkout != null){
       minDate = firstWorkout.date;
+    }
+
+    ObWorkout? lastWorkout = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build().findFirst();
+    if(lastWorkout != null){
+      maxDate = lastWorkout.date;
     }
   }
 
@@ -465,25 +507,25 @@ class CnScreenStatistics extends ChangeNotifier {
       case 4 || 6 || 9 || 11:
         return 30;
       case 2:
-        return isLeapYear(date.year)? 29: 28;
+        return date.isLeapYear()? 29: 28;
       default:
         return 31;
     }
   }
 
-  bool isLeapYear(int year){
-    return (year%4==0 && (year%100!=0 || year%400==0));
-  }
+  // bool isLeapYear(int year){
+  //   return (year%4==0 && (year%100!=0 || year%400==0));
+  // }
 
-  void reset(){
-		if(selectedWorkout != null && selectedExercise != null){
-	    previousSelectedWorkout = selectedWorkout;
-	    previousSelectedExercise = selectedExercise;
-		}
-    // selectedWorkout = null;
-    // selectedExercise = null;
-    exercisesPerWorkout.clear();
-  }
+  // void reset(){
+	// 	if(selectedWorkout != null && selectedExercise != null){
+	//     previousSelectedWorkout = selectedWorkout;
+	//     previousSelectedExercise = selectedExercise;
+	// 	}
+  //   // selectedWorkout = null;
+  //   // selectedExercise = null;
+  //   exercisesPerWorkout.clear();
+  // }
 
   void refresh(){
     notifyListeners();

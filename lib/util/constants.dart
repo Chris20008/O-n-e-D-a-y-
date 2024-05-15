@@ -212,8 +212,8 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
 }
 
 enum TimeInterval {
-  monthly ("Monthly"),
-  quarterly ("Quarterly"),
+  // monthly ("Monthly"),
+  // quarterly ("Quarterly"),
   yearly ("Yearly");
 
   const TimeInterval(this.value);
