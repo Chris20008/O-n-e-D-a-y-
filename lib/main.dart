@@ -20,8 +20,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:spotify_sdk/models/player_state.dart';
-import 'package:spotify_sdk/spotify_sdk.dart';
 
 late ObjectBox objectbox;
 
@@ -74,7 +72,6 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
-        ChangeNotifierProvider(create: (context) => PlayerStateStream()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics()),
@@ -146,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
-    print("LAnguage Code");
+    print("Language Code");
     print(cnConfig.config.languageCode);
     if(cnConfig.config.languageCode == null){
       print("IS NULL");
@@ -187,13 +184,13 @@ class _MyHomePageState extends State<MyHomePage> {
       extendBody: true,
       resizeToAvoidBottomInset: false,
       body: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               gradient: LinearGradient(
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
                   colors: [
-                    const Color(0xffc26a0e),
-                    const Color(0xbb110a02)
+                    Color(0xffc26a0e),
+                    Color(0xbb110a02)
 
                     // const Color(0xffb2620e)
                     // const Color(0xbb1c1003),
@@ -297,9 +294,4 @@ class CnHomepage extends ChangeNotifier {
       });
     }
   }
-}
-
-// Klasse zur Verwaltung des Player-Zustands
-class PlayerStateStream extends ChangeNotifier {
-  Stream<PlayerState> get stream => SpotifySdk.subscribePlayerState();
 }

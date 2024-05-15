@@ -18,7 +18,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnStopwatchWidget cnStopwatchWidget;
 
   double paddingLeftRight = 5;
-  final width = WidgetsBinding.instance.window.physicalSize.width;
+  // late final width = WidgetsBinding.instance.window.physicalSize.width;
+  late final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
