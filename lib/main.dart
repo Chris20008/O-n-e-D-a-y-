@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
-import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
-import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -102,7 +102,7 @@ class MyAppState extends State<MyApp> {
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-            useMaterial3: true,
+            // useMaterial3: true,
             splashFactory: InkSparkle.splashFactory,
             cupertinoOverrideTheme: const CupertinoThemeData(
               brightness: Brightness.dark

@@ -3,7 +3,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
-import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'bottom_menu.dart';
 

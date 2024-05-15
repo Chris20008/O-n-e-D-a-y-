@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../main.dart';
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
-import '../screens/screen_running_workout/screen_running_workout.dart';
+import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'bottom_menu.dart';

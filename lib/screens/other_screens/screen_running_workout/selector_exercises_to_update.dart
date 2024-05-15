@@ -2,8 +2,8 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
-import '../../objects/exercise.dart';
-import '../../objects/workout.dart';
+import '../../../objects/exercise.dart';
+import '../../../objects/workout.dart';
 
 class SelectorExercisesToUpdate extends StatefulWidget {
 

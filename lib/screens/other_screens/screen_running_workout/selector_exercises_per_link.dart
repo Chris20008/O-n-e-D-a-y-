@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../objects/exercise.dart';
-import '../../util/constants.dart';
-import '../../widgets/multiple_exercise_row.dart';
+
+import '../../../objects/exercise.dart';
+import '../../../util/constants.dart';
+import '../../../widgets/multiple_exercise_row.dart';
 
 class SelectorExercisesPerLink extends StatefulWidget {
   final Map groupedExercises;

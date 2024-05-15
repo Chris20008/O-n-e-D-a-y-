@@ -6,7 +6,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
 import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
-import '../../../screen_running_workout/screen_running_workout.dart';
+import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
 
 class NewExercisePanel extends StatefulWidget {
@@ -18,7 +18,6 @@ class NewExercisePanel extends StatefulWidget {
 
 class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
-  // late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   final double _iconSize = 25;

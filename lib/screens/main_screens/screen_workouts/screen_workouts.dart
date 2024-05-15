@@ -12,7 +12,7 @@ import '../../../objects/workout.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
-import '../../screen_running_workout/screen_running_workout.dart';
+import '../../other_screens/screen_running_workout/screen_running_workout.dart';
 
 class ScreenWorkout extends StatefulWidget {
   const ScreenWorkout({super.key});
@@ -94,15 +94,14 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
           Container(
             height: double.maxFinite,
             width: double.maxFinite,
-            padding: EdgeInsets.only(right: 5, bottom: 64),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                SafeArea(
-                  bottom: false,
-                  // child: SizedBox()
-                  child: SizedBox(
+            padding: const EdgeInsets.only(right: 5, bottom: 64),
+            child: SafeArea(
+              bottom: false,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(
                     width: 54,
                     height: 54,
                     child: IconButton(
@@ -119,48 +118,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         )
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 54,
-                  height: 54,
-                  child: IconButton(
-                      iconSize: 25,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                      ),
-                      onPressed: () {
-                        // saveBackup();
-                        loadBackup();
-                      },
-                      icon: Icon(
-                        Icons.cloud_download,
-                        color: Colors.amber[800],
-                      )
-                  ),
-                ),
-                // SizedBox(
-                //   width: 54,
-                //   height: 54,
-                //   child: IconButton(
-                //       iconSize: 25,
-                //       style: ButtonStyle(
-                //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                //       ),
-                //       onPressed: () {
-                //         // saveBackup();
-                //         pickBackupPath();
-                //       },
-                //       icon: Icon(
-                //         Icons.cloud_circle_outlined,
-                //         color: Colors.amber[800],
-                //       )
-                //   ),
-                // ),
-                Spacer(),
-                // SizedBox(
-                //   height: cnNewWorkout.minPanelHeight > 0? 64 : 0,
-                // ),
-                if(cnNewWorkout.minPanelHeight <= 0)
                   SizedBox(
                     width: 54,
                     height: 54,
@@ -170,28 +127,49 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                           backgroundColor: MaterialStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
-                          if(cnNewWorkout.isUpdating){
-                            cnNewWorkout.clear();
-                          }
-                          cnNewWorkout.workout.isTemplate = true;
-                          cnNewWorkout.openPanel();
-                          cnHomepage.refresh();
+                          // saveBackup();
+                          loadBackup();
                         },
                         icon: Icon(
-                            Icons.add,
+                          Icons.cloud_download,
                           color: Colors.amber[800],
                         )
                     ),
                   ),
+                  const Spacer(),
+                  if(cnNewWorkout.minPanelHeight <= 0)
+                    SizedBox(
+                      width: 54,
+                      height: 54,
+                      child: IconButton(
+                          iconSize: 25,
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                          ),
+                          onPressed: () {
+                            if(cnNewWorkout.isUpdating){
+                              cnNewWorkout.clear();
+                            }
+                            cnNewWorkout.workout.isTemplate = true;
+                            cnNewWorkout.openPanel();
+                            cnHomepage.refresh();
+                          },
+                          icon: Icon(
+                              Icons.add,
+                            color: Colors.amber[800],
+                          )
+                      ),
+                    ),
 
-                /// Space to be over bottom navigation bar
-                const SafeArea(
-                    top: false,
-                    left: false,
-                    right: false,
-                    child: SizedBox()
-                ),
-              ],
+                  /// Space to be over bottom navigation bar
+                  const SafeArea(
+                      top: false,
+                      left: false,
+                      right: false,
+                      child: SizedBox()
+                  ),
+                ],
+              ),
             ),
           ),
         ],

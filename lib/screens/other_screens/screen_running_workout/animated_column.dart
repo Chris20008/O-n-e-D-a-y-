@@ -1,13 +1,13 @@
-import 'package:fitness_app/screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
-import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../main.dart';
-import '../../objects/exercise.dart';
-import '../../widgets/bottom_menu.dart';
+import '../../../main.dart';
+import '../../../objects/exercise.dart';
+import '../../../widgets/bottom_menu.dart';
 
 class AnimatedColumn extends StatefulWidget {
   const AnimatedColumn({super.key});

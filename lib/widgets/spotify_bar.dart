@@ -14,8 +14,8 @@ import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
 import '../main.dart';
-import '../screens/screen_running_workout/screen_running_workout.dart';
-import '../screens/screen_running_workout/animated_column.dart';
+import '../screens/other_screens/screen_running_workout/animated_column.dart';
+import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -33,7 +33,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  // double width = 350;
   double paddingLeftRight = 5;
   Map<String, double> widths = {
     "portrait": 0,

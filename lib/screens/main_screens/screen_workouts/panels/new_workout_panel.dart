@@ -18,8 +18,8 @@ import '../../../../widgets/bottom_menu.dart';
 import '../../../../widgets/exercise_row.dart';
 import '../../../../widgets/spotify_bar.dart';
 import '../../../../widgets/standard_popup.dart';
+import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../../screen_workout_history/screen_workout_history.dart';
-import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
 import 'new_exercise_panel.dart';
 

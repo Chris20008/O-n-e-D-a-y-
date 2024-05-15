@@ -1,22 +1,23 @@
 import 'dart:ui';
-import 'package:fitness_app/screens/screen_running_workout/selector_exercises_per_link.dart';
-import 'package:fitness_app/screens/screen_running_workout/selector_exercises_to_update.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';
-import 'package:fitness_app/screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
-import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import '../../main.dart';
-import '../../objects/exercise.dart';
-import '../../objects/workout.dart';
-import '../../util/constants.dart';
-import '../../widgets/bottom_menu.dart';
-import '../../widgets/spotify_bar.dart';
-import '../../widgets/standard_popup.dart';
-import '../main_screens/screen_workouts/screen_workouts.dart';
+
+import '../../../main.dart';
+import '../../../objects/exercise.dart';
+import '../../../objects/workout.dart';
+import '../../../util/constants.dart';
+import '../../../widgets/bottom_menu.dart';
+import '../../../widgets/spotify_bar.dart';
+import '../../../widgets/standard_popup.dart';
+import '../../main_screens/screen_workouts/screen_workouts.dart';
+import 'animated_column.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({

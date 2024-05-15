@@ -11,8 +11,8 @@ import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
+import '../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts/panels/new_workout_panel.dart';
-import '../../screen_running_workout/screen_running_workout.dart';
 
 class ScreenWorkoutHistory extends StatefulWidget {
   const ScreenWorkoutHistory({super.key});
