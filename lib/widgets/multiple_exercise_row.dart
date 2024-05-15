@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
@@ -8,6 +9,7 @@ class MultipleExerciseRow extends StatelessWidget {
   final double? fontSize;
   final double? minFontSize;
   final Color? colorFade;
+  final bool comparePreviousExercise;
 
   const MultipleExerciseRow({
     super.key,
@@ -16,6 +18,7 @@ class MultipleExerciseRow extends StatelessWidget {
     this.fontSize,
     this.minFontSize,
     this.colorFade,
+    this.comparePreviousExercise = false
   });
 
   final double _height = 60;
@@ -35,7 +38,7 @@ class MultipleExerciseRow extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(
-              width: 120,
+              width: 90,
               child: Column(
 
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -129,71 +132,10 @@ class MultipleExerciseRow extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        for (Exercise ex in exercises)
+                      children: [...getExerciseRows()
+                        // for (Exercise ex in exercises)
 
-                          /// One Row for each exercise
-                          Row(
-                            children: [
-                            for (var set in ex.sets)
-                              set.weight == null || set.amount == null?
-                              /// Create empty box as placeholder
-                              SizedBox(
-                                height: _height+ _topBottomPadding*2,
-                                width: _width + _leftRightPadding*2
-                              ) :
-                              /// Each Set
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                      left: set == ex.sets.first && colorFade != null? 15 : 3,
-                                      right: set == ex.sets.last && colorFade != null? 30 : 3,
-                                      top: _topBottomPadding,
-                                      bottom: _topBottomPadding),
-                                  child: SizedBox(
-                                    height: _height,
-                                    width: _width,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
 
-                                        /// Background of single set
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Colors.grey[500]!.withOpacity(0.2),
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
-                                        ),
-
-                                        /// One Column for each set (weight / amount)
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 2),
-                                          child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              OverflowSafeText(
-                                                "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight}",
-                                                maxLines: 1,
-                                                fontSize: 14,
-                                                minFontSize: 9
-                                              ),
-                                              Container(
-                                                color: Colors.grey[900],
-                                                height: 1,
-                                                width: _width/2,
-                                              ),
-                                              Text("${set.amount}")
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
                       ],
                     ),
                   ),
@@ -244,6 +186,132 @@ class MultipleExerciseRow extends StatelessWidget {
             )
           ],
         ),
+      ),
+    );
+  }
+
+  List<Widget> getExerciseRows(){
+    List<Widget> children = [];
+    Exercise? previousExercise;
+    for(Exercise ex in exercises){
+      List<Widget> sets = [];
+      ex.sets.forEachIndexed((index, set){
+
+        /// Has weight or amount improved?
+        bool? weightImproved;
+        bool? amountImproved;
+        if(comparePreviousExercise
+            && previousExercise != null
+            && previousExercise.sets.length > index
+            && set.weight != null
+            && set.amount != null
+        ){
+          if(previousExercise.sets[index].weight! < set.weight!.toDouble()){
+            weightImproved = true;
+          }
+          else if(previousExercise.sets[index].weight! > set.weight!.toDouble()){
+            weightImproved = false;
+          }
+          if(previousExercise.sets[index].amount! < set.amount!.toDouble()){
+            amountImproved = true;
+          }
+          else if(previousExercise.sets[index].amount! > set.amount!.toDouble()){
+            amountImproved = false;
+          }
+        }
+        /// null means no comparison with previous possible
+        else{
+          weightImproved = null;
+          amountImproved = null;
+        }
+
+        if(set.weight == null || set.amount == null){
+          /// Create empty box as placeholder
+          sets.add(
+              SizedBox(
+                  height: _height+ _topBottomPadding*2,
+                  width: _width + _leftRightPadding*2
+              )
+          );
+        } else{
+          /// Each Set
+          sets.add(
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: set == ex.sets.first && colorFade != null? 15 : 3,
+                      right: set == ex.sets.last && colorFade != null? 30 : 3,
+                      top: _topBottomPadding,
+                      bottom: _topBottomPadding),
+                  child: SizedBox(
+                    height: _height,
+                    width: _width,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+
+                        /// Background of single set
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[500]!.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+
+                        /// One Column for each set (weight / amount)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              OverflowSafeText(
+                                  "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight}",
+                                  maxLines: 1,
+                                  fontSize: 14,
+                                  minFontSize: 9
+                              ),
+                              Container(
+                                color: Colors.grey[900],
+                                height: 1,
+                                width: _width/2,
+                              ),
+                              Text("${set.amount}")
+                            ],
+                          ),
+                        ),
+                        if(weightImproved != null)
+                          getArrow(weightImproved, true),
+                        if(amountImproved != null)
+                          getArrow(amountImproved, false)
+                      ],
+                    ),
+                  ),
+                ),
+              )
+          );
+        }
+      });
+      /// One Row for each exercise
+      children.add(
+          Row(
+            children: sets,
+          )
+      );
+      previousExercise = ex;
+    }
+    return children;
+  }
+
+  Widget getArrow(bool improved, bool top){
+    return Positioned(
+      top: top? 0 - 4 : null,
+      right: 0 - 4,
+      bottom: top? null : _height/2-_topBottomPadding*2 - 4,
+      child: Icon(
+        improved? Icons.arrow_drop_up_rounded : Icons.arrow_drop_down_rounded,
+        color: improved? Colors.green : Colors.red,
+        size: 20,
       ),
     );
   }

@@ -141,6 +141,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                     exercises: getExercises(index),
                                     fontSize: 15,
                                     colorFade: Theme.of(context).primaryColor,
+                                    comparePreviousExercise: true,
                                   )
                                 ],
                               ),

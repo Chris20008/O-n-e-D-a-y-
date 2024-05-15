@@ -52,6 +52,7 @@ dependencies:
   flutter_dotenv: ^5.1.0
   calendar_date_picker2: ^1.0.2
   scrollable_positioned_list: ^0.3.8
+  collection: ^1.18.0
 
 
   # The following adds the Cupertino Icons font to your application.

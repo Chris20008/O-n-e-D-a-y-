@@ -7,7 +7,6 @@ import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/screens/screen_running_workout/stopwatch.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
@@ -163,7 +162,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 if(newEx is! Exercise){
                                   newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                                 }
-                                Exercise templateEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == newEx.name).first;
+                                Exercise templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == newEx.name).first;
                                 child = Column(
                                   children: [
                                     Row(
@@ -220,10 +219,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         cnStandardPopUp.open(
                                           context: context,
                                           onConfirm: (){
-                                            if(cnRunningWorkout.controllerSeatLevel.text.isNotEmpty){
-                                              newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
-                                              vibrateCancel();
-                                            }
+                                            newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
+                                            vibrateCancel();
                                             cnRunningWorkout.controllerSeatLevel.clear();
                                             cnRunningWorkout.refresh();
                                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -280,9 +277,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         cnStandardPopUp.open(
                                           context: context,
                                           onConfirm: (){
-                                            if(cnRunningWorkout.controllerRestInSeconds.text.isNotEmpty){
-                                              newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
-                                            }
+                                            newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text)?? 0;
+                                            vibrateCancel();
                                             cnRunningWorkout.controllerRestInSeconds.clear();
                                             cnRunningWorkout.refresh();
                                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -697,7 +693,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               child: SelectorExercisesToUpdate(
                 key: selectorExerciseToUpdateKey,
                 workout: Workout.clone(cnRunningWorkout.workout),
-                workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplate),
+                workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplateNotModifiable),
                 onConfirm: finishWorkout,
                 onCancel: (){
                   setState(() {
@@ -834,6 +830,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
           )
       );
     });
+    cnRunningWorkout.cache();
   }
 
   void undoDismiss(){
@@ -842,7 +839,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     }
     setState(() {
       final setsToInsert = cnRunningWorkout.dismissedSets.removeLast();
-      final templateEx = cnRunningWorkout.workoutTemplate.exercises.where((element) => element.name == setsToInsert.exName).first;
+      final templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == setsToInsert.exName).first;
       late Exercise newEx;
       if(setsToInsert.linkName != null){
         newEx = cnRunningWorkout.groupedExercises[setsToInsert.linkName].where((ex) => ex.name == setsToInsert.exName).first;
@@ -858,6 +855,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       }
       cnRunningWorkout.slideableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
     });
+    cnRunningWorkout.cache();
   }
 
   /// Find the first indication of whether or not an Exercise has changed.
@@ -872,16 +870,22 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   bool canUpdateTemplate(){
     Workout tempWo = Workout.clone(cnRunningWorkout.workout);
     tempWo.removeEmptyExercises();
+
     if(tempWo.exercises.isEmpty){
       return false;
     }
-    List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplate.exercises.map((e) => e.name).toList();
+
+    /// Get exercises names of true template
+    List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplateNotModifiable.exercises.map((e) => e.name).toList();
+
+    /// Iterate over every exercise in the current running (new) one
     for(Exercise ex in tempWo.exercises){
-      /// Exercise name does not exist in template yet => can update Template
+      /// Exercise name does not exist in true template yet => new exercise has been added => can update Template
       if(!templateWorkoutExerciseNames.contains(ex.name)){
         return true;
       }
-      Exercise tempTemplateEx = cnRunningWorkout.workoutTemplate.exercises.firstWhere((e) => e.name == ex.name);
+      /// When the exercise name already exists, we check if the exercise of the true template and the current running one are truly the same
+      Exercise tempTemplateEx = cnRunningWorkout.workoutTemplateNotModifiable.exercises.firstWhere((e) => e.name == ex.name);
       if(!tempTemplateEx.equals(ex)){
         return true;
       }
@@ -1005,7 +1009,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
 class CnRunningWorkout extends ChangeNotifier {
   Workout workout = Workout();
-  Workout workoutTemplate = Workout();
+  Workout workoutTemplateModifiable = Workout();
+  Workout workoutTemplateNotModifiable = Workout();
   bool isRunning = false;
   bool isVisible = false;
   ScrollController scrollController = ScrollController();
@@ -1039,7 +1044,7 @@ class CnRunningWorkout extends ChangeNotifier {
   }
   
   void addExercise(Exercise ex){
-    workoutTemplate.exercises.add(Exercise.copy(ex));
+    workoutTemplateModifiable.exercises.add(Exercise.copy(ex));
     workout.exercises.add(ex);
     newExNames.add(ex.name);
     slideableKeys[ex.name] = ex.generateKeyForEachSet();
@@ -1050,7 +1055,8 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void deleteExercise(Exercise ex){
-    workoutTemplate.exercises.removeWhere((e) => e.name == ex.name);
+    workoutTemplateModifiable.exercises.removeWhere((e) => e.name == ex.name);
+    dismissedSets.removeWhere((e) => e.exName == ex.name);
     workout.exercises.removeWhere((e) => e.name == ex.name);
     newExNames.removeWhere((e) => e == ex.name);
     slideableKeys.remove(ex.name);
@@ -1063,7 +1069,8 @@ class CnRunningWorkout extends ChangeNotifier {
     print(data);
     if(
       data.containsKey("workout") &&
-      data.containsKey("workoutTemplate") &&
+      data.containsKey("workoutTemplateModifiable") &&
+      data.containsKey("workoutTemplateNotModifiable") &&
       data.containsKey("isRunning") &&
       data.containsKey("isVisible") &&
       data.containsKey("testControllerValues") &&
@@ -1077,7 +1084,8 @@ class CnRunningWorkout extends ChangeNotifier {
         selectedIndexes[entry.key] = entry.value;
       }
       workout = Workout().fromMap(data["workout"]) ?? Workout();
-      workoutTemplate = Workout().fromMap(data["workoutTemplate"]) ?? Workout();
+      workoutTemplateModifiable = Workout().fromMap(data["workoutTemplateModifiable"]) ?? Workout();
+      workoutTemplateNotModifiable = Workout().fromMap(data["workoutTemplateNotModifiable"]) ?? Workout();
       initSlideableKeys();
       initGroupedExercises();
       initTextControllers();
@@ -1094,6 +1102,7 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
+    cache();
   }
 
   void reopenRunningWorkout(BuildContext context){
@@ -1103,6 +1112,7 @@ class CnRunningWorkout extends ChangeNotifier {
             builder: (context) => const ScreenRunningWorkout()
         ));
     isVisible = true;
+    cache();
   }
 
   void removeNotRelevantExercises(){
@@ -1110,8 +1120,9 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void setWorkoutTemplate(Workout w){
-    workoutTemplate = w;
-    workout = Workout.copy(workoutTemplate);
+    workoutTemplateModifiable = w;
+    workout = Workout.copy(w);
+    workoutTemplateNotModifiable = Workout.copy(w);
     workout.resetAllExercisesSets();
     initSlideableKeys();
     initSelectedIndexes();
@@ -1161,7 +1172,8 @@ class CnRunningWorkout extends ChangeNotifier {
   Future<void> cache() async{
     Map data = {
       "workout": workout.asMap(),
-      "workoutTemplate": workoutTemplate.asMap(),
+      "workoutTemplateModifiable": workoutTemplateModifiable.asMap(),
+      "workoutTemplateNotModifiable": workoutTemplateNotModifiable.asMap(),
       "isRunning": isRunning,
       "isVisible": isVisible,
       "testControllerValues": getTextControllerValues(),
@@ -1172,7 +1184,6 @@ class CnRunningWorkout extends ChangeNotifier {
     await cnConfig.config.save();
   }
 
-  // Map<String, List<List<dynamic>>> getTextControllerValues(){
   Map<String, List<dynamic>> getTextControllerValues(){
     return {
       for (MapEntry entry in textControllers.entries)
