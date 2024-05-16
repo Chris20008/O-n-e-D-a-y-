@@ -74,8 +74,8 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
-        ChangeNotifierProvider(create: (context) => CnScreenStatistics()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
+        ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
         ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
@@ -143,25 +143,20 @@ class _MyHomePageState extends State<MyHomePage> {
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
-    print("Language Code");
-    print(cnConfig.config.languageCode);
     if(cnConfig.config.languageCode == null){
-      print("IS NULL");
       if(context.mounted){
         cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
     } else{
-      print("IS NOT NULL");
       if(context.mounted){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.languageCode);
       }
     }
-    print(cnConfig.config.languageCode);
     // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
-    cnScreenStatistics.init();
+    cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
     if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible){
       Future.delayed(const Duration(milliseconds: 300), (){
         Navigator.push(
@@ -290,7 +285,6 @@ class CnHomepage extends ChangeNotifier {
     if(refreshSpotifyBar){
       Future.delayed(const Duration(milliseconds: 500), (){
         cnSpotifyBar.refresh();
-        print("REFRESH SPOTIFY BAR IN HOMEPAGE");
       });
     }
   }

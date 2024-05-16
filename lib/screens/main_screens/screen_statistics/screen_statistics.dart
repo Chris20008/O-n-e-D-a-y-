@@ -2,20 +2,20 @@ import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
-import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/interval_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
+import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
+import '../../../widgets/standard_popup.dart';
 import 'charts/line_chart_exercise_weight_progress.dart';
-import 'exercise_summary_per_interval.dart';
-import 'selectors/interval_size_selector.dart';
 
 class ScreenStatistics extends StatefulWidget {
   const ScreenStatistics({super.key});
@@ -24,20 +24,60 @@ class ScreenStatistics extends StatefulWidget {
   State<ScreenStatistics> createState() => _ScreenStatisticsState();
 }
 
-class _ScreenStatisticsState extends State<ScreenStatistics> {
+class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBindingObserver {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    /// Using MediaQuery directly inside didChangeMetrics return the previous frame values.
+    /// To receive the latest values after orientation change we need to use
+    /// WidgetsBindings.instance.addPostFrameCallback() inside it
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        // setBottomMenuHeight();
+        handleOrientation();
+        // _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 35 : 30);
+        // final double paddingBottom = MediaQuery.of(context).padding.bottom;
+        // cnBottomMenu.height = paddingBottom + _height;
+      });
+    });
+  }
+
+  void handleOrientation(){
+    cnScreenStatistics.orientation = MediaQuery.of(context).orientation;
+    cnScreenStatistics.height = MediaQuery.of(context).size.height;
+    cnScreenStatistics.width = MediaQuery.of(context).size.width;
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    if(cnScreenStatistics.width == 0 || cnScreenStatistics.height == 0){
+      handleOrientation();
+    }
 
     return SafeArea(
       bottom: false,
       child: Column(
 
         children: [
-          const SizedBox(height: 10),
+          // const SizedBox(height: 10),
           // const IntervalSizeSelector(),
-          const SizedBox(height: 20),
+          // const SizedBox(height: 20),
           // const IntervalSelector(),
           Expanded(
             child: ListView(
@@ -45,7 +85,85 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
               children: [
                 const SizedBox(height: 20),
                 // const ExerciseSummaryPerInterval(),
-                const ExerciseSelector(),
+                SizedBox(
+                  height: 60,
+                  child: Stack(
+                    children: [
+                      const Center(child: ExerciseSelector()),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                            // color: Colors.amber[200]!,
+                            color: Colors.white,
+                            onPressed: (){
+                              cnScreenStatistics.saveCurrentFilterState();
+                              cnStandardPopUp.open(
+                                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+                                  context: context,
+                                  child: Column(
+                                    children: [
+                                      const Text(
+                                        "Filter",
+                                        textAlign: TextAlign.center,
+                                        textScaler: TextScaler.linear(1.2),
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      SizedBox(
+                                          height:60,
+                                          child: Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.arrow_back_ios,
+                                                size: 15,
+                                                color: Color(0xFFC16A03),
+                                              ),
+                                              Expanded(
+                                                child: VerticalScrollWheel(
+                                                  key: UniqueKey(),
+                                                  widthOfChildren: 100,
+                                                  heightOfChildren: 30,
+                                                  onTap: (int index){
+                                                    cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
+                                                    cnScreenStatistics.selectedWorkoutIndex = index;
+                                                  },
+                                                  selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
+                                                  children: List<Widget>.generate(
+                                                      cnScreenStatistics.allWorkoutNames.length, (index) =>
+                                                      OverflowSafeText(
+                                                        cnScreenStatistics.allWorkoutNames[index],
+                                                        maxLines: 1
+                                                      )
+                                                  ),
+                                                ),
+                                              ),
+                                              const Icon(
+                                                Icons.arrow_forward_ios,
+                                                size: 15,
+                                                color: Color(0xFFC16A03),
+                                              ),
+                                            ],
+                                          )
+                                      )
+                                    ],
+                                  ),
+                                  onConfirm: (){
+                                    cnScreenStatistics.refreshData();
+                                    cnScreenStatistics.refresh();
+                                  },
+                                  onCancel: (){
+                                    cnScreenStatistics.restoreLastFilterState();
+                                  },
+                                  color: const Color(0xff2d2d2d)
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.filter_list,
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 20,),
                 LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
                 // LineChartExerciseWeightProgress(),
@@ -62,6 +180,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> {
 class CnScreenStatistics extends ChangeNotifier {
   bool isInitialized = false;
   bool isCalculatingData = false;
+  Orientation orientation = Orientation.portrait;
+  double width = 0;
+  double height = 0;
   Map<int, dynamic> workoutsSorted = {};
   Key lineChartKey = UniqueKey();
   DateTime minDate = DateTime.now();
@@ -104,32 +225,55 @@ class CnScreenStatistics extends ChangeNotifier {
   // Exercise? selectedExercise;
   Workout? previousSelectedWorkout;
   Exercise? previousSelectedExercise;
+  late List<String> allWorkoutNames = getAllWorkoutNames();
   late List<String> allExerciseNames = getAllExerciseNames();
   String? selectedExerciseName;
+  String? selectedWorkoutName;
+  int selectedWorkoutIndex = 0;
+  String? selectedWorkoutNameLast;
+  int selectedWorkoutIndexLast = 0;
+  late CnConfig cnConfig;
 
 
   ///
   Map<String, int>? sortedSummarized;
 
+  CnScreenStatistics(BuildContext context){
+    cnConfig = Provider.of<CnConfig>(context, listen: false);
+  }
 
-  void init() async{
+
+  void init(Map? data) async{
     isInitialized = true;
-    // print(allExerciseNames);
-    // allExerciseNames = getAllExerciseNames();
-    setMinMaxDates();
-    // refreshIntervalSelectorMap();
-    // calculateCurrentData();
+    calcMinMaxDates();
+    // getAllExerciseNames();
+    if(data != null){
+      initCachedData(data);
+    }
+  }
+
+  List<String> getAllWorkoutNames(){
+    final query = objectbox.workoutBox.query().build().property(ObWorkout_.name);
+    query.distinct = true;
+    final res = query.find();
+    res.sort();
+    res.insert(0, "All Workouts");
+    return res;
   }
   
   List<String> getAllExerciseNames(){
     final builder = objectbox.exerciseBox.query();
-    // builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
+    builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
+    if(selectedWorkoutName != null && selectedWorkoutName != "All Workouts") {
+      builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.name.equals(selectedWorkoutName!));
+    }
     final query = builder.build().property(ObExercise_.name);
     query.distinct = true;
     final res = query.find();
     res.sort();
-    print("ALL EXERCISE NAMES");
-    print(res);
+    if(selectedExerciseName == null || !res.contains(selectedExerciseName)){
+      selectedExerciseName = res.firstOrNull;
+    }
     return res;
   }
 
@@ -361,21 +505,23 @@ class CnScreenStatistics extends ChangeNotifier {
     }
 
   }
-  //
-  //  List<double?>? getMinMaxWeights(){
-  //   final exercises = getSelectedExerciseHistory();
-  //   if(exercises == null){
-  //     return null;
-  //   }
-  //   double minWeight = 1000000;
-  //   double maxWeight = 0;
-  //   for(StatisticExercise ex in exercises){
-  //     maxWeight = maxWeight < ex.weight? ex.weight : maxWeight;
-  //     minWeight = minWeight < maxWeight? minWeight : maxWeight;
-  //   }
-  //   if(minWeight == 1000000) minWeight = 0;
-  //   return [minWeight, maxWeight];
-  // }
+
+   List<double?>? getMinMaxWeights(){
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    double minWeight = exercises.values.map((e) => e.weights.min).min;
+    double maxWeight = exercises.values.map((e) => e.weights.max).max;
+    // for(ObExercise ex in exercises.values){
+    //   final min = ex.weights.min;
+    //   final max = ex.weights.max;
+    //   maxWeight = maxWeight < max? max : maxWeight;
+    //   minWeight = minWeight < maxWeight? minWeight : maxWeight;
+    // }
+    // if(minWeight == 1000000) minWeight = 0;
+    return [minWeight, maxWeight];
+  }
 
   Map<DateTime, double>? getMaxWeightsPerDate(){
     final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
@@ -395,7 +541,31 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     return maxWeights;
   }
-  //
+
+  Map<DateTime, double>? getAvgMovedWeightPerSet(){
+      final exercises = getSelectedExerciseHistory();
+      if(exercises == null){
+        return null;
+      }
+      // Map<DateTime, double> summedWeights = {};
+      // for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
+      //   final t = entry.value.weights.sum;
+      //   final avgWeightPerSet = t/entry.value.amounts.length;
+      //   summedWeights[entry.key] = (summedWeights[entry.key]?? 0) + (avgWeightPerSet);
+      // }
+      Map<DateTime, double> summedWeights = {};
+      for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
+        double totalWeight = 0;
+        for(List res in zip([entry.value.weights, entry.value.amounts])){
+          totalWeight = totalWeight + res[0] * res[1];
+        }
+        // final t = entry.value.weights.sum;
+        final avgMovedWeightPerSet = totalWeight/entry.value.amounts.length;
+        summedWeights[entry.key] = (summedWeights[entry.key]?? 0) + (avgMovedWeightPerSet);
+      }
+      return summedWeights;
+    }
+
   // Map<DateTime, double>? getTotalMovedWeight(){
   //   final exercises = getSelectedExerciseHistory();
   //   if(exercises == null){
@@ -471,13 +641,24 @@ class CnScreenStatistics extends ChangeNotifier {
   //   }
   // }
 
-  void setMinMaxDates()async{
-    ObWorkout? firstWorkout = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date).build().findFirst();// .getAllAsync();
+  void calcMinMaxDates()async{
+
+    ObWorkout? firstWorkout;
+    final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
+    if(selectedExerciseName != null) {
+      firstBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+    }
+    firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
     if(firstWorkout != null){
       minDate = firstWorkout.date;
     }
 
-    ObWorkout? lastWorkout = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build().findFirst();
+    ObWorkout? lastWorkout;
+    final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
+    if(selectedExerciseName != null) {
+      lastBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+    }
+    lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
     if(lastWorkout != null){
       maxDate = lastWorkout.date;
     }
@@ -526,6 +707,42 @@ class CnScreenStatistics extends ChangeNotifier {
   //   // selectedExercise = null;
   //   exercisesPerWorkout.clear();
   // }
+
+  void saveCurrentFilterState(){
+    selectedWorkoutNameLast = selectedWorkoutName;
+    selectedWorkoutIndexLast = selectedWorkoutIndex;
+  }
+
+  void restoreLastFilterState(){
+    selectedWorkoutName = selectedWorkoutNameLast;
+    selectedWorkoutIndex = selectedWorkoutIndexLast;
+  }
+
+  void initCachedData(Map data){
+    // print("Received Cached Data");
+    // print(data);
+    if(
+    data.containsKey("selectedExerciseName")
+    ){
+      if(allExerciseNames.contains(data["selectedExerciseName"])){
+        selectedExerciseName = data["selectedExerciseName"];
+      }
+    }
+  }
+
+  void refreshData(){
+    allExerciseNames = getAllExerciseNames();
+    allWorkoutNames = getAllWorkoutNames();
+    calcMinMaxDates();
+  }
+
+  Future<void> cache() async{
+    Map data = {
+      "selectedExerciseName": selectedExerciseName,
+    };
+    cnConfig.config.cnScreenStatistics = data;
+    await cnConfig.config.save();
+  }
 
   void refresh(){
     notifyListeners();

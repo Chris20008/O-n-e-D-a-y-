@@ -28,8 +28,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
 
   @override
   void initState() {
-    print("RELEVANT LINKS");
-    print(widget.relevantLinkNames);
     for(MapEntry e in widget.groupedExercises.entries){
       if(!widget.relevantLinkNames.contains(e.key) || e.value is Exercise){
         continue;
@@ -257,8 +255,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       indexJ = 0;
                                       index += 1;
                                     }
-                                    print("EX TO REMOVE");
-                                    print(exToRemove);
                                     widget.onConfirm(exToRemove: exToRemove);
                                   },
                                   style: ButtonStyle(

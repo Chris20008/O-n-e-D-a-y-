@@ -19,7 +19,7 @@ class BottomMenu extends StatefulWidget {
   State<BottomMenu> createState() => _BottomMenuState();
 }
 
-class _BottomMenuState extends State<BottomMenu> {
+class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
@@ -29,11 +29,45 @@ class _BottomMenuState extends State<BottomMenu> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
-  final double height = Platform.isAndroid? 60 : 50;
+  late Orientation orientation = MediaQuery.of(context).orientation;
+  double _height = 40;
+  double? _iconSize;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    /// Using MediaQuery directly inside didChangeMetrics return the previous frame values.
+    /// To receive the latest values after orientation change we need to use
+    /// WidgetsBindings.instance.addPostFrameCallback() inside it
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {
+        setBottomMenuHeight();
+        // orientation = MediaQuery.of(context).orientation;
+        // _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 35 : 30);
+        // final double paddingBottom = MediaQuery.of(context).padding.bottom;
+        // cnBottomMenu.height = paddingBottom + _height;
+      });
+    });
+  }
+
+  void setBottomMenuHeight(){
+    orientation = MediaQuery.of(context).orientation;
+    _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 40 : 35);
+    final double paddingBottom = MediaQuery.of(context).padding.bottom;
+    cnBottomMenu.height = paddingBottom + _height;
+    _iconSize = orientation == Orientation.portrait? null : 15;
   }
 
   @override
@@ -41,8 +75,9 @@ class _BottomMenuState extends State<BottomMenu> {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     if(cnBottomMenu.height <= 0){
-      final double paddingBottom = MediaQuery.of(context).padding.bottom;
-      cnBottomMenu.height = paddingBottom + height;
+      setBottomMenuHeight();
+      // final double paddingBottom = MediaQuery.of(context).padding.bottom;
+      // cnBottomMenu.height = paddingBottom + _height;
     }
 
     if(!cnBottomMenu.isVisible){
@@ -84,19 +119,20 @@ class _BottomMenuState extends State<BottomMenu> {
             child: BottomNavigationBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
+              selectedFontSize: orientation == Orientation.landscape ? 10 :14,
               showSelectedLabels: true,
               showUnselectedLabels: false,
-              items: const <BottomNavigationBarItem>[
+              items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.history),
+                  icon: Icon(Icons.history, size: _iconSize),
                   label: 'History',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.sports_martial_arts),
+                  icon: Icon(Icons.sports_martial_arts, size: _iconSize),
                   label: 'Templates',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.scatter_plot),
+                  icon: Icon(Icons.scatter_plot, size: _iconSize),
                   label: 'Statistics',
                 ),
               ],
@@ -126,7 +162,8 @@ class _BottomMenuState extends State<BottomMenu> {
       // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
-      // cnScreenStatistics.calculateCurrentData();
+      // cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.refreshData();
     }
     cnHomepage.refresh();
   }

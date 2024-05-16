@@ -96,7 +96,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    print("---------------------- Rebuild SPOTIFY BAR ----------------------");
     if(cnSpotifyBar.width == 0){
       initWidths();
     }
@@ -401,9 +400,6 @@ class CnSpotifyBar extends ChangeNotifier {
   }
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
-
-    print("_______________________ TRACK NAME: ${data?.track?.name}");
-
     if(data?.track?.name == currentTrackName){
       return ClipRRect(
         borderRadius: BorderRadius.circular(7),
@@ -423,7 +419,6 @@ class CnSpotifyBar extends ChangeNotifier {
           // print("GET IMAGE");
           if (snapshot.hasData) {
             currentTrackName = data?.track?.name?? "";
-            print("NEW TRACK NAME: $currentTrackName");
             lastImage = Image.memory(
               snapshot.data!,
               // height: 1000,
@@ -491,13 +486,10 @@ class CnSpotifyBar extends ChangeNotifier {
       if(isConnected){
         _subscribeToPlayerState();
       }
-    }on Exception catch (e) {
-      print("---------- EXCEPTION --------- ${e.toString()}");
+    }on Exception catch (_) {
       accessToken = "";
       isTryingToConnect = false;
     }
-    print("CONNECTED SPOTIFY: $isConnected");
-    // refresh();
     isTryingToConnect = false;
     Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
       cnAnimatedColumn.refresh();
@@ -553,8 +545,7 @@ class CnSpotifyBar extends ChangeNotifier {
       //   keepConnectedWhenPaused();
       // }
       // await SpotifySdk.pause();
-    } on Exception catch (e) {
-      print("Received excpeiotn in PAUSE: ${e.toString()}");
+    } on Exception catch (_) {
       if(Platform.isAndroid){
         if(await hasInternet()){
           accessToken = "";
@@ -608,8 +599,7 @@ class CnSpotifyBar extends ChangeNotifier {
           //   refresh();
           // })
         });
-      } on Exception catch (e) {
-        print("Got Exception in seekToRelative ANDROID: ${e.toString()}");
+      } on Exception catch (_) {
       }
     }
     else{
@@ -618,8 +608,7 @@ class CnSpotifyBar extends ChangeNotifier {
         if(currentData != null){
           await SpotifySdk.seekTo(positionedMilliseconds: currentData.playbackPosition + milliseconds).then((value) => ());/// refresh());
         }
-      } on Exception catch (e) {
-        print("Got Exception in seekToRelative IOS: ${e.toString()}");
+      } on Exception catch (_) {
       }
     }
   }
@@ -638,7 +627,6 @@ class CnSpotifyBar extends ChangeNotifier {
       await Future.delayed(const Duration(seconds: 1), (){});
       if (isConnected && (data?.isPaused?? false) && tryStayConnected){
         await pause();
-        print("keep connected");
         keepConnectedWhenPaused();
       } else{
         tryStayConnected = false;
@@ -669,7 +657,6 @@ class CnSpotifyBar extends ChangeNotifier {
 
   void refresh()async{
     if(!isRebuilding){
-      print("REFRESH SPOTIFY BAR IN CN SPOTIFY");
       isRebuilding = true;
       notifyListeners();
       await Future.delayed(const Duration(milliseconds: 50), (){

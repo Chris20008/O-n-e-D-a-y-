@@ -1066,8 +1066,8 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void initCachedData(Map data){
-    print("Received Cached Data");
-    print(data);
+    // print("Received Cached Data");
+    // print(data);
     if(
       data.containsKey("workout") &&
       data.containsKey("workoutTemplateModifiable") &&

@@ -256,7 +256,6 @@ class CnStopwatchWidget extends ChangeNotifier {
   final Stopwatch stopwatch = Stopwatch();
 
   CnStopwatchWidget(BuildContext context){
-    print("NINT STOPWATCH CN");
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 

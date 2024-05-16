@@ -142,7 +142,6 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
 }
 
 String validateDoubleTextInput(String text){
-  print("GOT VALUE: $text");
   text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
     final count = ".".allMatches(text).length;
@@ -153,8 +152,6 @@ String validateDoubleTextInput(String text){
   if(text.characters.first == "."){
     text = "0$text";
   }
-  print("RETURN VALUE: $text");
-  print("");
   return text;
 }
 
@@ -306,7 +303,6 @@ Future loadBackup() async{
   );
 
   if (result != null) {
-    print("------- GOT RESULT -------");
     File file = File(result.files.single.path!);
     final contents = await file.readAsString();
     final allWorkoutsAsListString = contents.split(";");
@@ -329,17 +325,10 @@ Future loadBackup() async{
   }
 }
 
-void pickBackupPath() async{
-  // FilePickerResult? result = await FilePicker.platform.pickFiles();
-  String? result = await FilePicker.platform.getDirectoryPath();
-
-  if (result != null) {
-    print("------- GOT pickBackupPath RESULT -------");
-    print(result);
-  } else {
-    // User canceled the picker
-  }
-}
+// void pickBackupPath() async{
+//   // FilePickerResult? result = await FilePicker.platform.pickFiles();
+//   String? result = await FilePicker.platform.getDirectoryPath();
+// }
 
 Future<bool> hasInternet()async{
   final conRes = await Connectivity().checkConnectivity();
@@ -532,7 +521,9 @@ Widget buildCalendarDialogButton({
         ? Icon(
           Icons.calendar_month,
           size: 30,
-          color: Colors.amber[800],
+          // color: Colors.amber[800],
+          // color: Colors.amber[200]!
+          color: Colors.white
         )
         : Text(
           DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),

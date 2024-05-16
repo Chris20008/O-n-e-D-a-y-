@@ -39,13 +39,13 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
     );
     // setState(() {});
     cnScreenStatistics.lineChartKey = UniqueKey();
+    cnScreenStatistics.calcMinMaxDates();
     cnScreenStatistics.refresh();
+    cnScreenStatistics.cache();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    print("REBUILD EX SELECTOR");
 
     cnScreenStatistics.selectedExerciseName ??= cnScreenStatistics.allExerciseNames.firstOrNull;
 
@@ -53,59 +53,55 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       return const SizedBox();
     }
 
-    return Column(
-      children: [
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          // Display a CupertinoPicker with list of fruits.
-          onPressed: () => _showDialog(
-            CupertinoPicker(
-                magnification: 1.22,
-                squeeze: 1.2,
-                useMagnifier: true,
-                itemExtent: 32,
-                // This sets the initial item.
-                scrollController: FixedExtentScrollController(
-                  initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
-                ),
-                // This is called when selected item is changed.
-                onSelectedItemChanged: (int index) {
-                  // setState(() {
-                  cnScreenStatistics.selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
-                  if(Platform.isAndroid){
-                    HapticFeedback.selectionClick();
-                  }
-                  // });
-                },
-                children: cnScreenStatistics.allExerciseNames.map((String exName) {
-                  return Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12));
-                  // return Center(child: Text(ex.name));
-                }).toList()
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      // Display a CupertinoPicker with list of fruits.
+      onPressed: () => _showDialog(
+        CupertinoPicker(
+            magnification: 1.22,
+            squeeze: 1.2,
+            useMagnifier: true,
+            itemExtent: 32,
+            // This sets the initial item.
+            scrollController: FixedExtentScrollController(
+              initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OverflowSafeText(
-                  cnScreenStatistics.selectedExerciseName!,
-                  style: const TextStyle(
-                    fontSize: 22.0,
-                    color: Colors.white
-                  ),
-              ),
-              // Text(
-              //   cnScreenStatistics.selectedExercise!.name,
-              //   style: const TextStyle(
-              //     fontSize: 22.0,
-              //   ),
-              // ),
-              const SizedBox(width: 10,),
-              const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
-            ],
-          ),
+            // This is called when selected item is changed.
+            onSelectedItemChanged: (int index) {
+              // setState(() {
+              cnScreenStatistics.selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
+              if(Platform.isAndroid){
+                HapticFeedback.selectionClick();
+              }
+              // });
+            },
+            children: cnScreenStatistics.allExerciseNames.map((String exName) {
+              return Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12));
+              // return Center(child: Text(ex.name));
+            }).toList()
         ),
-      ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          OverflowSafeText(
+              cnScreenStatistics.selectedExerciseName!,
+              style: const TextStyle(
+                fontSize: 22.0,
+                color: Colors.white
+              ),
+          ),
+          // Text(
+          //   cnScreenStatistics.selectedExercise!.name,
+          //   style: const TextStyle(
+          //     fontSize: 22.0,
+          //   ),
+          // ),
+          const SizedBox(width: 10,),
+          const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
+        ],
+      ),
     );
   }
 }

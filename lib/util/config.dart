@@ -6,12 +6,14 @@ class Config{
 
   bool showIntro;
   Map cnRunningWorkout;
+  Map cnScreenStatistics;
   String? languageCode;
   late CustomCacheManager cache;
 
   Config({
     this.showIntro = true,
     this.cnRunningWorkout = const {},
+    this.cnScreenStatistics = const {},
     this.languageCode
   }) {
     cache = CustomCacheManager();
@@ -21,26 +23,28 @@ class Config{
   Map<String, dynamic> toJson() => {
     'showIntro': showIntro,
     "languageCode": languageCode,
-    'cnRunningWorkout': cnRunningWorkout
+    'cnRunningWorkout': cnRunningWorkout,
+    'cnScreenStatistics': cnScreenStatistics
   };
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
       showIntro: json['showIntro']?? false,
       languageCode: json['languageCode'],
-      cnRunningWorkout: json['cnRunningWorkout']?? {}
+      cnRunningWorkout: json['cnRunningWorkout']?? {},
+      cnScreenStatistics: json['cnScreenStatistics']?? {}
     );
   }
 
   Future<bool> save() async{
     try{
       final json = toJson();
-      print("JASON TO CACHE");
-      print(json);
+      // print("JASON TO CACHE");
+      // print(json);
       await cache.saveData(json, "config");
       return true;
     } catch (e){
-      print("Exception while saving: ${e.toString()}");
+      // print("Exception while saving: ${e.toString()}");
       return false;
     }
   }
@@ -57,8 +61,8 @@ class CnConfig extends ChangeNotifier {
 
     final Map<String, dynamic>? tempConfigData = await cache.readData(fileName: "config");
 
-    print("Received Temp Config Data");
-    print(tempConfigData);
+    // print("Received Temp Config Data");
+    // print(tempConfigData);
 
     try{
       if(tempConfigData != null){

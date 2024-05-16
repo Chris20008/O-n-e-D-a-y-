@@ -45,10 +45,6 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
         relevantExercises.add(ex);
       }
     }
-    print("RELEVANT EXERCISES");
-    for(Exercise ex in relevantExercises){
-      print(ex.name);
-    }
     // for(List<Exercise> exs in zip([workout.exercises, widget.workoutTemplate.exercises])){
     //
     // }
