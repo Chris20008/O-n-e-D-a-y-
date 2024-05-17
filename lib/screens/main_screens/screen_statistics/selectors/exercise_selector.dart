@@ -19,6 +19,9 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
   Future _showDialog(Widget child) async{
     HapticFeedback.selectionClick();
+
+    final initExercise = cnScreenStatistics.selectedExerciseName;
+
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -37,11 +40,12 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
         ),
       ),
     );
-    // setState(() {});
-    cnScreenStatistics.lineChartKey = UniqueKey();
-    cnScreenStatistics.calcMinMaxDates();
-    cnScreenStatistics.refresh();
-    cnScreenStatistics.cache();
+    if(initExercise != cnScreenStatistics.selectedExerciseName){
+      cnScreenStatistics.lineChartKey = UniqueKey();
+      cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.refresh();
+      cnScreenStatistics.cache();
+    }
   }
 
   @override

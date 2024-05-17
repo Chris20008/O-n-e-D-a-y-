@@ -27,12 +27,13 @@ class ScreenStatistics extends StatefulWidget {
 class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBindingObserver {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  bool initOrientation = true;
 
   @override
   void initState() {
-    handleOrientation();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // handleOrientation();
   }
 
   @override
@@ -67,7 +68,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
   @override
   Widget build(BuildContext context) {
 
-    if(cnScreenStatistics.width == 0 || cnScreenStatistics.height == 0){
+    if(cnScreenStatistics.width == 0 || cnScreenStatistics.height == 0 || initOrientation){
+      initOrientation = false;
       handleOrientation();
     }
 
@@ -149,6 +151,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                                   ),
                                   onConfirm: (){
                                     cnScreenStatistics.refreshData();
+                                    cnScreenStatistics.lineChartKey = UniqueKey();
                                     cnScreenStatistics.refresh();
                                   },
                                   onCancel: (){
@@ -732,8 +735,8 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void refreshData(){
-    allExerciseNames = getAllExerciseNames();
     allWorkoutNames = getAllWorkoutNames();
+    allExerciseNames = getAllExerciseNames();
     calcMinMaxDates();
   }
 
