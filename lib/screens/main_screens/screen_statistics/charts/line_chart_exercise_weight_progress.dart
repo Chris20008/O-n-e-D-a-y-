@@ -38,7 +38,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   double maxY = 0;
   double minPercent = 1;
   double maxPercent = 1;
-  final double _widthAxisTitles = 42;
+  final double _widthAxisTitles = 50;
   int verticalStepSize = 0;
   late DateTime minDate = cnScreenStatistics.minDate;
   late DateTime maxDate = cnScreenStatistics.maxDate;
