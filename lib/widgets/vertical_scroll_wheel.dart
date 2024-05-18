@@ -26,7 +26,7 @@ class VerticalScrollWheel extends StatefulWidget {
 
 class _VerticalScrollWheelState extends State<VerticalScrollWheel> {
 
-  late ScrollController _scrollController = ScrollController(initialScrollOffset: widget.selectedIndex*widget.widthOfChildren);
+  late final ScrollController _scrollController = ScrollController(initialScrollOffset: widget.selectedIndex*widget.widthOfChildren);
   late int selectedIndex = widget.selectedIndex;
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: true);
 

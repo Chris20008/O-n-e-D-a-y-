@@ -1,3 +1,4 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -97,11 +98,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                 child: cnStandardPopUp.child
                             ),
                           ),
-                          Container(
-                            height: 0.5,
-                            width: double.maxFinite,
-                            color: Colors.grey[700]!.withOpacity(0.5),
-                          ),
+                          horizontalGreySpacer,
                           SizedBox(
                             height: 40,
                             child: Row(
@@ -120,11 +117,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                     )
                                 ),
                                 if(cnStandardPopUp.showCancel)
-                                  Container(
-                                    height: double.maxFinite,
-                                    width: 0.5,
-                                    color: Colors.grey[700]!.withOpacity(0.5),
-                                  ),
+                                  verticalGreySpacer,
                                 if(cnStandardPopUp.showCancel)
                                   Expanded(
                                       child: ElevatedButton(
@@ -245,7 +238,7 @@ class CnStandardPopUp extends ChangeNotifier {
     isVisible = false;
     onConfirm = null;
     onCancel = null;
-
+    HapticFeedback.selectionClick();
     refresh();
   }
 

@@ -144,17 +144,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                               physics: const BouncingScrollPhysics(),
                               shrinkWrap: true,
                               separatorBuilder: (BuildContext context, int index) {
-                                return Column(
-                                  children: [
-                                    const SizedBox(height: 20,),
-                                    Container(
-                                      height: 1,
-                                      width: double.maxFinite - 50,
-                                      color: Colors.amber[900]!.withOpacity(0.6),
-                                    ),
-                                    const SizedBox(height: 20,),
-                                  ],
-                                );
+                                return mySeparator();
                               },
                               itemCount: cnRunningWorkout.groupedExercises.length,
                               itemBuilder: (BuildContext context, int indexExercise) {

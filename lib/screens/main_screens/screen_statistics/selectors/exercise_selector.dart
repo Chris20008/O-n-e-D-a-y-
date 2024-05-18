@@ -41,7 +41,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       ),
     );
     if(initExercise != cnScreenStatistics.selectedExerciseName){
-      cnScreenStatistics.lineChartKey = UniqueKey();
+      // cnScreenStatistics.lineChartKey = UniqueKey();
       cnScreenStatistics.calcMinMaxDates();
       cnScreenStatistics.refresh();
       cnScreenStatistics.cache();

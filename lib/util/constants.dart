@@ -39,6 +39,34 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
+Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4}){
+  return Column(
+    children: [
+      SizedBox(height: heightTop),
+      Container(
+        height: 1,
+        width: double.maxFinite - minusWidth,
+        // color: const Color(0xFFC16A03).withOpacity(opacity),
+          color: Colors.amber[900]!.withOpacity(opacity)
+        // color: Colors.amber[900]!.withOpacity(0.6),
+      ),
+      SizedBox(height: heightBottom),
+    ],
+  );
+}
+
+Widget verticalGreySpacer = Container(
+  height: double.maxFinite,
+  width: 0.5,
+  color: Colors.grey[700]!.withOpacity(0.5),
+);
+
+Widget horizontalGreySpacer = Container(
+  height: 0.5,
+  width: double.maxFinite,
+  color: Colors.grey[700]!.withOpacity(0.5),
+);
+
 // Widget standardDialog({
 //   required Widget child,
 //   EdgeInsets padding = EdgeInsets.zero,

@@ -87,12 +87,16 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                         padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 65),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
-                          return Container(
-                            margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
-                            height: 1,
-                            width: double.maxFinite - 50,
-                            color: Colors.amber[900]!.withOpacity(0.4),
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: mySeparator(heightBottom: 15, heightTop: 15),
                           );
+                          // return Container(
+                          //   margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
+                          //   height: 1,
+                          //   width: double.maxFinite - 50,
+                          //   color: Colors.amber[900]!.withOpacity(0.4),
+                          // );
                         },
                         itemCount: relevantExercises.length,
                         itemBuilder: (context, index){
@@ -244,6 +248,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                     child: const Text("Confirm")
                                 )
                             ),
+                          SizedBox(height: 37, child: verticalGreySpacer),
                           Expanded(
                               child: ElevatedButton(
                                   onPressed: () {

@@ -1,6 +1,4 @@
 import 'dart:math';
-
-import 'package:fitness_app/util/constants.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -40,8 +38,8 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   double maxPercent = 1;
   final double _widthAxisTitles = 50;
   int verticalStepSize = 0;
-  late DateTime minDate = cnScreenStatistics.minDate;
-  late DateTime maxDate = cnScreenStatistics.maxDate;
+  late DateTime minDate;
+  late DateTime maxDate;
   // late final width = MediaQuery.of(context).size.width;
   double width = 0;
   List<FlSpot> spotsMaxWeight = [];
@@ -61,9 +59,16 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
 
+  int animationTime = 500;
+
   @override
   Widget build(BuildContext context) {
+
+    print("REBUILD LINE CHART");
+
     width = MediaQuery.of(context).size.width;
+    minDate = cnScreenStatistics.minDate;
+    maxDate = cnScreenStatistics.maxDate;
 
     final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - offsetMaxX;
     if(tempMaxX > maxVisibleDays){
@@ -81,17 +86,17 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
     avgWeights = cnScreenStatistics.getAvgMovedWeightPerSet();
 
-    if(/*minMaxWeights == null ||*/ maxWeights == null /*|| avgWeights == null*/){
-      if(cnScreenStatistics.isCalculatingData){
-        return const SizedBox(
-            height: 100,
-            width: 100,
-            child: Center(child: CircularProgressIndicator())
-        );
-      } else {
-        return const SizedBox();
-      }
-    }
+    // if(/*minMaxWeights == null ||*/ maxWeights == null /*|| avgWeights == null*/){
+    //   if(cnScreenStatistics.isCalculatingData){
+    //     return const SizedBox(
+    //         height: 100,
+    //         width: 100,
+    //         child: Center(child: CircularProgressIndicator())
+    //     );
+    //   } else {
+    //     return const SizedBox();
+    //   }
+    // }
 
     minWeight = 10000;
     maxWeight = 0;
@@ -143,7 +148,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       }
       spotsAvgWeightPerSet.add(FlSpot(xCoordinate, maxWeight * percent));
     });
-    // print("MAXX: $currentVisibleDays");
+    print("MAXX: $currentVisibleDays");
 
     if(spotsMaxWeight.isEmpty){
       return const SizedBox();
@@ -175,6 +180,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         Listener(
           behavior: HitTestBehavior.translucent,
           onPointerDown: (PointerDownEvent details){
+            animationTime = 0;
             if(pointerAIdentifier == null){
               pointerAIdentifier = details.pointer;
               pointerA = details.position;
@@ -255,14 +261,19 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           },
           onPointerUp: (PointerUpEvent details){
             // if(details.pointer == pointerAIdentifier){
-              pointerA = null;
-              pointerAPreviousPos = null;
-              pointerAIdentifier = null;
+            pointerA = null;
+            pointerAPreviousPos = null;
+            pointerAIdentifier = null;
             // } else if(details.pointer == pointerBIdentifier){
-              pointerB = null;
-              pointerBIdentifier = null;
+            pointerB = null;
+            pointerBIdentifier = null;
             // }
             isZooming = false;
+            Future.delayed(const Duration(milliseconds: 500), (){
+              if(pointerA == null && pointerB == null){
+                animationTime = 500;
+              }
+            });
           },
           child: Stack(
             children: <Widget>[
@@ -278,7 +289,8 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
                   //   bottom: 12,
                   // ),
                   child: LineChart(
-                      duration: const Duration(milliseconds: 0),
+                      duration: Duration(milliseconds: animationTime),
+                      curve: Curves.easeInOut,
                       mainData()
                     // showAvg ? avgData() : mainData(),
                   ),
@@ -310,9 +322,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   }
 
   Widget bottomTitleWidgets(double value, TitleMeta meta) {
-    final style = TextStyle(
+    const style = TextStyle(
       fontWeight: FontWeight.bold,
-      fontSize: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 10 : 16,
+      fontSize: 10,
     );
     Widget text;
 
@@ -321,12 +333,12 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     if(currentVisibleDays < 200 && value % 1.0 > 0.1){
       return SideTitleWidget(
         axisSide: meta.axisSide,
-        child: Text('', style: style)
+        child: const Text('', style: style)
       );
     }
 
     if(value < 5){
-      text = Text('', style: style);
+      text = const Text('', style: style);
     }
     else{
       value -= _leftPadding;
@@ -425,7 +437,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         show: true,
         drawVerticalLine: true,
         horizontalInterval: verticalStepSize.toDouble(),
-        verticalInterval: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 30 : 5,
+        verticalInterval: 30,
         getDrawingHorizontalLine: (value) {
           return FlLine(
             color: Colors.grey[700]!.withOpacity(0.7),
@@ -463,15 +475,6 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             reservedSize: _widthAxisTitles,
           ),
         ),
-        // rightTitles: AxisTitles(
-        //   // axisNameWidget: RotatedBox(quarterTurns:1, child: Text("Test")),
-        //   sideTitles: SideTitles(
-        //     showTitles: true,
-        //     interval: verticalStepSize.toDouble(),
-        //     getTitlesWidget: rightTitleWidgets,
-        //     reservedSize: 42,
-        //   ),
-        // ),
       ),
       borderData: FlBorderData(
         show: true,
@@ -479,9 +482,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       ),
       minX: 0,
       maxX: currentVisibleDays.toDouble(),
-      // minY: minWeight-10 < 0? 0 : minWeight-10,
       minY: minY,
-      // maxY: maxWeight*maxPercent +10,
       maxY: maxY,
       lineBarsData: [
         LineChartBarData(
@@ -491,7 +492,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           gradient: LinearGradient(
             colors: gradientColors,
           ),
-          barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
+          barWidth: 3,
           isStrokeCapRound: true,
           dotData: const FlDotData(
             show: true,
@@ -505,27 +506,20 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             ),
           ),
         ),
-        LineChartBarData(
-          curveSmoothness: 0.1,
-          spots: spotsAvgWeightPerSet,
-          isCurved: true,
-          gradient: LinearGradient(
-            colors: gradientColors2,
+        if(cnScreenStatistics.showAvgWeightPerSetLine)
+          LineChartBarData(
+            curveSmoothness: 0.1,
+            spots: spotsAvgWeightPerSet,
+            isCurved: true,
+            gradient: LinearGradient(
+              colors: gradientColors2,
+            ),
+            barWidth: 3,
+            isStrokeCapRound: true,
+            dotData: const FlDotData(
+              show: true,
+            ),
           ),
-          barWidth: cnScreenStatistics.selectedIntervalSize == TimeInterval.yearly? 3 : 5,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: true,
-          ),
-          // belowBarData: BarAreaData(
-          //   show: true,
-          //   gradient: LinearGradient(
-          //     colors: gradientColors2
-          //         .map((color) => color.withOpacity(0.3))
-          //         .toList(),
-          //   ),
-          // ),
-        ),
       ],
     );
   }
@@ -539,101 +533,4 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     }
     return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex].toInt()}";
   }
-
-  // LineChartData avgData() {
-  //   return LineChartData(
-  //     lineTouchData: const LineTouchData(enabled: false),
-  //     gridData: FlGridData(
-  //       show: true,
-  //       drawHorizontalLine: true,
-  //       verticalInterval: 1,
-  //       horizontalInterval: 1,
-  //       getDrawingVerticalLine: (value) {
-  //         return const FlLine(
-  //           color: Color(0xff37434d),
-  //           strokeWidth: 1,
-  //         );
-  //       },
-  //       getDrawingHorizontalLine: (value) {
-  //         return const FlLine(
-  //           color: Color(0xff37434d),
-  //           strokeWidth: 1,
-  //         );
-  //       },
-  //     ),
-  //     titlesData: FlTitlesData(
-  //       show: true,
-  //       bottomTitles: AxisTitles(
-  //         sideTitles: SideTitles(
-  //           showTitles: true,
-  //           reservedSize: 30,
-  //           getTitlesWidget: bottomTitleWidgets,
-  //           interval: 1,
-  //         ),
-  //       ),
-  //       leftTitles: AxisTitles(
-  //         sideTitles: SideTitles(
-  //           showTitles: true,
-  //           getTitlesWidget: leftTitleWidgets,
-  //           reservedSize: 42,
-  //           interval: 1,
-  //         ),
-  //       ),
-  //       topTitles: const AxisTitles(
-  //         sideTitles: SideTitles(showTitles: false),
-  //       ),
-  //       rightTitles: const AxisTitles(
-  //         sideTitles: SideTitles(showTitles: false),
-  //       ),
-  //     ),
-  //     borderData: FlBorderData(
-  //       show: true,
-  //       border: Border.all(color: const Color(0xff37434d)),
-  //     ),
-  //     minX: 0,
-  //     maxX: 11,
-  //     minY: 0,
-  //     maxY: 6,
-  //     lineBarsData: [
-  //       LineChartBarData(
-  //         spots: const [
-  //           FlSpot(0, 3.44),
-  //           FlSpot(2.6, 3.44),
-  //           FlSpot(4.9, 3.44),
-  //           FlSpot(6.8, 3.44),
-  //           FlSpot(8, 3.44),
-  //           FlSpot(9.5, 3.44),
-  //           FlSpot(11, 3.44),
-  //         ],
-  //         isCurved: true,
-  //         gradient: LinearGradient(
-  //           colors: [
-  //             ColorTween(begin: gradientColors[0], end: gradientColors[1])
-  //                 .lerp(0.2)!,
-  //             ColorTween(begin: gradientColors[0], end: gradientColors[1])
-  //                 .lerp(0.2)!,
-  //           ],
-  //         ),
-  //         barWidth: 5,
-  //         isStrokeCapRound: true,
-  //         dotData: const FlDotData(
-  //           show: false,
-  //         ),
-  //         belowBarData: BarAreaData(
-  //           show: true,
-  //           gradient: LinearGradient(
-  //             colors: [
-  //               ColorTween(begin: gradientColors[0], end: gradientColors[1])
-  //                   .lerp(0.2)!
-  //                   .withOpacity(0.1),
-  //               ColorTween(begin: gradientColors[0], end: gradientColors[1])
-  //                   .lerp(0.2)!
-  //                   .withOpacity(0.1),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
 }
