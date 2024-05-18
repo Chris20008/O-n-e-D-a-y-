@@ -99,8 +99,8 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
           filter: ImageFilter.blur(
               // sigmaX: 10.0,
               // sigmaY: 10.0,
-              sigmaX: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
-              sigmaY: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
+              sigmaX: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? 0 : 10.0,
+              sigmaY: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? 0 : 10.0,
               tileMode: TileMode.mirror
           ),
           child: Theme(
