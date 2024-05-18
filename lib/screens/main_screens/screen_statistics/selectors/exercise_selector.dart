@@ -4,6 +4,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import '../screen_statistics.dart';
 
@@ -80,7 +81,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
               // });
             },
             children: cnScreenStatistics.allExerciseNames.map((String exName) {
-              return Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12));
+              return SizedBox(width: cnScreenStatistics.width-150, child: Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12)));
               // return Center(child: Text(ex.name));
             }).toList()
         ),
@@ -89,19 +90,19 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          OverflowSafeText(
-              cnScreenStatistics.selectedExerciseName!,
-              style: const TextStyle(
-                fontSize: 22.0,
-                color: Colors.white
-              ),
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: cnScreenStatistics.width-100
+            ),
+            child: OverflowSafeText(
+                cnScreenStatistics.selectedExerciseName!,
+                style: const TextStyle(
+                  fontSize: 22.0,
+                  color: Colors.white
+                ),
+                maxLines: 1
+            ),
           ),
-          // Text(
-          //   cnScreenStatistics.selectedExercise!.name,
-          //   style: const TextStyle(
-          //     fontSize: 22.0,
-          //   ),
-          // ),
           const SizedBox(width: 10,),
           const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
         ],

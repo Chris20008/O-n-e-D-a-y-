@@ -101,7 +101,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       height: 60,
       child: Stack(
         children: [
-          const Center(child: ExerciseSelector()),
+          Center(
+            child: const Padding(
+              padding: EdgeInsets.only(left: 50, right: 50),
+              child: ExerciseSelector(),
+            ),
+          ),
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
