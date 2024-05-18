@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/main_screens/screen_statistics/screen_statistics.dart';
@@ -90,21 +91,14 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
-        color: cnNewWorkout.minPanelHeight > 0? const Color(0xff0a0604): Colors.black.withOpacity(0.4),
-          // color: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? null: Colors.black.withOpacity(0.5),
-          // gradient: cnNewWorkout.minPanelHeight > 0 || cnRunningWorkout.isVisible? const LinearGradient(
-          //     begin: Alignment.centerRight,
-          //     end: Alignment.centerLeft,
-          //     colors: [
-          //       // Color(0xff160d05),
-          //       Color(0xff0a0604),
-          //       Color(0xff0a0604)
-          //     ]
-          // ) : null
+        // color: Colors.black.withOpacity(0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? const Color(0xff120a01) /*Color(0xff0a0604)*/ : Colors.black.withOpacity(0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(
+              // sigmaX: 10.0,
+              // sigmaY: 10.0,
               sigmaX: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
               sigmaY: cnNewWorkout.minPanelHeight > 0? 0 : 10.0,
               tileMode: TileMode.mirror
@@ -165,6 +159,11 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       // cnScreenStatistics.calcMinMaxDates();
       cnScreenStatistics.refreshData();
     }
+    if(cnNewWorkout.minPanelHeight > 0 && index != 2){
+      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    } else{
+      SystemChrome.setPreferredOrientations([]);
+    }
     cnHomepage.refresh();
   }
 }
@@ -179,6 +178,11 @@ class CnBottomMenu extends ChangeNotifier {
 
   void _changeIndex(int index) {
     _selectedIndex = index;
+    refresh();
+  }
+
+  void adjustHeight(double value){
+    positionYAxis = height * value;
     refresh();
   }
 

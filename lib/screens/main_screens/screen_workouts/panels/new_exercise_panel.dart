@@ -44,12 +44,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         child: LayoutBuilder(
           builder: (context, constraints){
             return SlidingUpPanel(
+              onPanelSlide: onPanelSlide,
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
               defaultPanelState: PanelState.CLOSED,
               maxHeight: constraints.maxHeight - 50,
               minHeight: 0,
-              color: Colors.transparent,
+              backdropEnabled: true,
+              backdropColor: Colors.black,
+              backdropOpacity: 0.5,
+              color: const Color(0xff120a01),
               isDraggable: true,
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
               panel: ClipRRect(
@@ -58,30 +62,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   children: [
                     Container(
                       padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.centerRight,
-                              end: Alignment.centerLeft,
-                              colors: [
-                                Color(0xff160d05),
-                                Color(0xff0a0604),
-                              ]
-                          )
-                      ),
                       child: GestureDetector(
                         // onTap: () {
                         //   FocusScope.of(context).unfocus();
                         // },
                         child: Column(
                           children: [
-                            Container(
-                              height: 2,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(2)
-                              ),
-                            ),
+                            panelTopBar,
                             const SizedBox(height: 15,),
                             const Text("Exercise", textScaler: TextScaler.linear(1.5)),
                             const SizedBox(height: 10,),
@@ -417,13 +404,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                       alignment: Alignment.bottomCenter,
                       child: Container(
                         height: 60,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                             gradient:  LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  Colors.transparent,
-                                  Colors.black,
+                                  Color(0xff120a01).withOpacity(0.0),
+                                  Color(0xff120a01),
                                 ]
                             )
                         ),
@@ -460,6 +447,22 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         ),
       ),
     );
+  }
+
+  void onPanelSlide(value){
+    cnWorkouts.animationControllerWorkoutPanel.value = 0.5 + value*0.5;
+    // print(value);
+    // print(cnWorkouts.animationControllerWorkoutPanel.value);
+    // if(value == 0){
+    //   FocusScope.of(context).unfocus();
+    //   cnNewWorkout.refresh();
+    // }
+    // else if(value == 1){
+    //   cnNewWorkout.refresh();
+    // }
+    // cnBottomMenu.adjustHeight(value);
+    // cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
+    // cnBottomMenu.refresh();
   }
 
   void dismissExercise(int index){
@@ -540,7 +543,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     panelController.animatePanelToPosition(
         0,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut
+        curve: Curves.decelerate
     ).then((value) => {
       if(doClear){
         clear()

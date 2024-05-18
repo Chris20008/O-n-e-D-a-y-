@@ -166,21 +166,23 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 maxLines: 1
                                             ),
                                         ):
-                                        DropdownMenu<String>(
-                                          initialSelection: newEx.name,
-                                          onSelected: (String? value) {
-                                            setState(() {
-                                              final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                              final t = lists.map((element) => element.value.indexWhere((ex) {
-                                                return ex.name == value;
-                                              })).toList().firstWhere((element) => element >=0);
-                                              cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
-                                            });
-                                            cnRunningWorkout.cache();
-                                          },
-                                          dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
-                                            return DropdownMenuEntry<String>(value: value.name, label: value.name);
-                                          }).toList(),
+                                        Expanded(
+                                          child: DropdownMenu<String>(
+                                            initialSelection: newEx.name,
+                                            onSelected: (String? value) {
+                                              setState(() {
+                                                final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                                final t = lists.map((element) => element.value.indexWhere((ex) {
+                                                  return ex.name == value;
+                                                })).toList().firstWhere((element) => element >=0);
+                                                cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                              });
+                                              cnRunningWorkout.cache();
+                                            },
+                                            dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
+                                              return DropdownMenuEntry<String>(value: value.name, label: value.name);
+                                            }).toList(),
+                                          ),
                                         ),
                                         if(cnRunningWorkout.newExNames.contains(newEx.name))
                                           myIconButton(

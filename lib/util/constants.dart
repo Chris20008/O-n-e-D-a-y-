@@ -55,6 +55,15 @@ Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minu
   );
 }
 
+String getLanguageAsString(BuildContext context){
+  final lan =  Localizations.localeOf(context).toString();
+  if(lan == "en"){
+    return "English";
+  } else{
+    return "Deutsch";
+  }
+}
+
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,
   width: 0.5,
@@ -67,95 +76,43 @@ Widget horizontalGreySpacer = Container(
   color: Colors.grey[700]!.withOpacity(0.5),
 );
 
-// Widget standardDialog({
-//   required Widget child,
-//   EdgeInsets padding = EdgeInsets.zero,
-//   required Function onConfirm,
-//   String confirmText = "Ok",
-//   String cancelText = "Cancel",
-//   TextStyle? confirmTextStyle,
-//   bool showCancel = true,
-//   Function? onCancel,
-// }){
-//   return ClipRRect(
-//     borderRadius: BorderRadius.circular(15),
-//     child: ConstrainedBox(
-//       constraints: const BoxConstraints(
-//           maxWidth: 300.0,
-//           maxHeight: 600
-//       ),
-//       child: Container(
-//           // width: size.width*0.65,
-//           // color: color,
-//           child: SingleChildScrollView(
-//             physics: const BouncingScrollPhysics(),
-//             child: Column(
-//               mainAxisSize: MainAxisSize.min,
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 Padding(
-//                   padding: padding,
-//                   child: SingleChildScrollView(
-//                       padding: const EdgeInsets.all(0.0),
-//                       child: child
-//                   ),
-//                 ),
-//                 Container(
-//                   height: 0.5,
-//                   width: double.maxFinite,
-//                   color: Colors.grey[700]!.withOpacity(0.5),
-//                 ),
-//                 SizedBox(
-//                   height: 40,
-//                   child: Row(
-//                     children: [
-//                       Expanded(
-//                           child: ElevatedButton(
-//                               onPressed: () => onConfirm(),
-//                               style: ButtonStyle(
-//                                   shadowColor: MaterialStateProperty.all(Colors.transparent),
-//                                   surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-//                                   backgroundColor: MaterialStateProperty.all(Colors.transparent),
-//                                   // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-//                                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-//                               ),
-//                               child: Text(confirmText, style: confirmTextStyle)
-//                           )
-//                       ),
-//                       if(showCancel)
-//                         Container(
-//                           height: double.maxFinite,
-//                           width: 0.5,
-//                           color: Colors.grey[700]!.withOpacity(0.5),
-//                         ),
-//                       if(showCancel)
-//                         Expanded(
-//                             child: ElevatedButton(
-//                                 onPressed: () {
-//                                   if(onCancel != null){
-//                                     onCancel();
-//                                   }
-//                                 },
-//                                 style: ButtonStyle(
-//                                     shadowColor: MaterialStateProperty.all(Colors.transparent),
-//                                     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-//                                     backgroundColor: MaterialStateProperty.all(Colors.transparent),
-//                                     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-//                                     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-//                                 ),
-//                                 child: Text(cancelText)
-//                             )
-//                         ),
-//                     ],
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           )
-//       ),
-//     ),
-//   );
-// }
+Widget panelTopBar = Container(
+  height: 2,
+  width: 40,
+  decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.5),
+      borderRadius: BorderRadius.circular(2)
+  ),
+);
+
+Widget standardDialog({
+  required BuildContext context,
+  required Widget child,
+  EdgeInsets padding = const EdgeInsets.all(10),
+  TextStyle? confirmTextStyle,
+}){
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(15),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(
+          minWidth: 150,
+          minHeight: 100,
+          maxWidth: 330,
+          maxHeight: 600
+      ),
+      child: Container(
+          color: Theme.of(context).primaryColor,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: padding,
+              child: child,
+            ),
+          )
+      ),
+    ),
+  );
+}
 
 TextStyle getTextStyleForTextField(String text, {Color? color}){
   return TextStyle(

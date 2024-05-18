@@ -64,8 +64,6 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   @override
   Widget build(BuildContext context) {
 
-    print("REBUILD LINE CHART");
-
     width = MediaQuery.of(context).size.width;
     minDate = cnScreenStatistics.minDate;
     maxDate = cnScreenStatistics.maxDate;
@@ -148,7 +146,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       }
       spotsAvgWeightPerSet.add(FlSpot(xCoordinate, maxWeight * percent));
     });
-    print("MAXX: $currentVisibleDays");
+    // print("MAXX: $currentVisibleDays");
 
     if(spotsMaxWeight.isEmpty){
       return const SizedBox();
@@ -279,7 +277,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             children: <Widget>[
               AspectRatio(
                 // aspectRatio: MediaQuery.of(context).orientation == Orientation.portrait ? 1.2 : 3.5,
-                aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.5 : 0.7)),
+                aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
                 child: Padding(
                   padding: EdgeInsets.zero,
                   // padding: const EdgeInsets.only(

@@ -10,12 +10,15 @@ import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/standard_popup.dart';
+import '../../other_screens/screen_settings.dart';
 import 'charts/line_chart_exercise_weight_progress.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -74,55 +77,92 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       handleOrientation();
     }
 
-    return SafeArea(
-      bottom: false,
-      child: Column(
-
-        children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 5),
+    return Stack(
+      children: [
+        AnimatedBuilder(
+          animation: cnScreenStatistics.animationControllerSettingPanel,
+          builder: (context, child) {
+            double scale = 1.0 - (cnScreenStatistics.animationControllerSettingPanel.value * 0.1);
+            return Transform.scale(
+              scale: scale,
+              child: ClipRRect(
+                  borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
+                  child: child
+              ),
+            );
+          },
+          child: SafeArea(
+            bottom: false,
+            child: Column(
               children: [
-                const SizedBox(height: 20),
-                getHeader(),
-                const SizedBox(height: 20,),
-                LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
-                const SafeArea(top:false, child: SizedBox(height: 30,)),
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    children: [
+                      getHeader(),
+                      const SizedBox(height: 20,),
+                      LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
+                      const SafeArea(top:false, child: SizedBox(height: 30,)),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+        const SettingsPanel()
+      ],
     );
   }
 
   Widget getHeader() {
-    return SizedBox(
-      height: 60,
-      child: Stack(
-        children: [
-          Center(
-            child: const Padding(
-              padding: EdgeInsets.only(left: 50, right: 50),
-              child: ExerciseSelector(),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        IconButton(
+          // color: Colors.amber[200]!,
+            color: Colors.white,
+            onPressed: (){
+              cnScreenStatistics.openSettingsPanel();
+              // Navigator.push(
+              //     context,
+              //     CupertinoPageRoute(
+              //         builder: (context) => const SettingsPanel()
+              //     ));
+            },
+            icon: const Icon(
+              Icons.settings,
+            )
+        ),
+        SizedBox(height: 10,),
+        SizedBox(
+          height: 40,
+          child: Stack(
+            children: [
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 15),
+                  child: ExerciseSelector(),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  // color: Colors.amber[200]!,
+                    color: Colors.white,
+                    onPressed: (){
+                      cnScreenStatistics.saveCurrentFilterState();
+                      openFilterPopUp();
+                    },
+                    icon: const Icon(
+                      Icons.filter_list,
+                    )
+                ),
+              ),
+            ],
           ),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: IconButton(
-              // color: Colors.amber[200]!,
-                color: Colors.white,
-                onPressed: (){
-                  cnScreenStatistics.saveCurrentFilterState();
-                  openFilterPopUp();
-                },
-                icon: const Icon(
-                  Icons.filter_list,
-                )
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -209,8 +249,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                       padding: EdgeInsets.only(left: 15),
                       child: OverflowSafeText(
                         "Shows an additional line in the graph that indicates the average moved weight per set",
-                        // textScaler: TextScaler.linear(0.8),
-                        // fontSize: 4,
                         minFontSize: 9,
                         maxLines: 2,
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
@@ -242,7 +280,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
 class CnScreenStatistics extends ChangeNotifier {
   bool isInitialized = false;
-  // bool isCalculatingData = false;
   Orientation orientation = Orientation.portrait;
   double width = 0;
   double height = 0;
@@ -255,24 +292,14 @@ class CnScreenStatistics extends ChangeNotifier {
   String? selectedWorkoutName;
   int selectedWorkoutIndex = 0;
   bool showAvgWeightPerSetLine = true;
-
   String? selectedWorkoutNameLast;
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
   late CnConfig cnConfig;
 
-  // / minDate of the currenzly selected Interval
-  // DateTime currentMinDate = DateTime.now();
-  // / maxDate of the currently selected Interval
-  // DateTime currentMaxDate = DateTime.now();
-
-  // TimeInterval selectedIntervalSize = TimeInterval.yearly;
-  // Workout? previousSelectedWorkout;
-  // Exercise? previousSelectedExercise;
-
-
-  ///
-  Map<String, int>? sortedSummarized;
+  /// Settings variables
+  late final AnimationController animationControllerSettingPanel;
+  final PanelController panelControllerSettings = PanelController();
 
   CnScreenStatistics(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -411,6 +438,15 @@ class CnScreenStatistics extends ChangeNotifier {
       default:
         return 31;
     }
+  }
+
+  void openSettingsPanel(){
+    HapticFeedback.selectionClick();
+    panelControllerSettings.animatePanelToPosition(
+        1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.decelerate
+    );
   }
 
   void saveCurrentFilterState(){

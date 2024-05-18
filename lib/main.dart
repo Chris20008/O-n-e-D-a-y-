@@ -17,6 +17,7 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -121,7 +122,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
@@ -132,11 +133,26 @@ class _MyHomePageState extends State<MyHomePage> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: true);
   late CnHomepage cnHomepage;
+  late final AnimationController _animationControllerWorkoutPanel = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
+  late final AnimationController _animationControllerSettingPanel = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+  );
 
   @override
   void initState() {
     initObjectBox();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _animationControllerWorkoutPanel.dispose();
+    _animationControllerSettingPanel.dispose();
+    super.dispose();
   }
 
   void initObjectBox() async{
@@ -166,6 +182,8 @@ class _MyHomePageState extends State<MyHomePage> {
             ));
         });
     }
+    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
+    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
   }
 
   @override
@@ -178,95 +196,138 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
-      body: Container(
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    Color(0xffc26a0e),
-                    Color(0xbb110a02)
+      body: PopScope(
+        canPop: false,
+        child: Container(
+            decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      Color(0xffc26a0e),
+                      Color(0xbb110a02)
 
-                    // const Color(0xffb2620e)
-                    // const Color(0xbb1c1003),
+                      // const Color(0xffb2620e)
+                      // const Color(0xbb1c1003),
 
-                    // const Color(0xff84490b),
-                    // Colors.black.withOpacity(0.9),
-                  ]
-              )
-          ),
-          child: Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              // ImageFiltered(
-              //     imageFilter: ImageFilter.blur(
-              //       sigmaX: 50.0,
-              //       sigmaY: 50.0,
-              //     ),
-              //     child: cnSpotifyBar.lastImage
-              // ),
-              // const BackgroundImage(),
-              // if(cnBottomMenu.index != 2)
-              //   AnimatedCrossFade(
-              //       firstChild: const ScreenWorkoutHistory(),
-              //       secondChild: const ScreenWorkout(),
-              //       crossFadeState: cnBottomMenu.index == 0?
-              //       CrossFadeState.showFirst:
-              //       CrossFadeState.showSecond,
-              //       duration: const Duration(milliseconds: 200)
-              //   )
-              // else
-              //   const ScreenStatistics(),
-              //
-              // if(cnBottomMenu.index != 2)
-
-              if(cnBottomMenu.index != 2)
-                Stack(
-                  children: [
-                    AnimatedCrossFade(
-                        firstChild: const ScreenWorkoutHistory(),
-                        secondChild: const ScreenWorkout(),
-                        crossFadeState: cnBottomMenu.index == 0?
-                        CrossFadeState.showFirst:
-                        CrossFadeState.showSecond,
-                        duration: const Duration(milliseconds: 200)
-                    ),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 300), // Animationsdauer
-                      transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                      curve: Curves.easeInOut,
-                      child: const SafeArea(
-                        top: false,
-                        child: Hero(
-                            transitionOnUserGestures: true,
-                            tag: "SpotifyBar",
-                            child: SpotifyBar()
+                      // const Color(0xff84490b),
+                      // Colors.black.withOpacity(0.9),
+                    ]
+                )
+            ),
+            child: Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                if(cnBottomMenu.index != 2)
+                  Stack(
+                    children: [
+                      AnimatedBuilder(
+                        animation: _animationControllerWorkoutPanel,
+                        builder: (context, child) {
+                          double scale = 1.0 - (_animationControllerWorkoutPanel.value * 0.15);
+                          double borderRadius = 30 - (scale*10-9)*20;
+                          borderRadius = borderRadius > 25 ? 25 : borderRadius;
+                          return Transform.scale(
+                            scale: scale,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(borderRadius),
+                                child: child
+                            ),
+                          );
+                        },
+                        child: AnimatedCrossFade(
+                            firstChild: const ScreenWorkoutHistory(),
+                            secondChild: const ScreenWorkout(),
+                            crossFadeState: cnBottomMenu.index == 0?
+                            CrossFadeState.showFirst:
+                            CrossFadeState.showSecond,
+                            duration: const Duration(milliseconds: 200)
                         ),
                       ),
-                    ),
-                    const NewWorkOutPanel(),
-                    const NewExercisePanel(),
-                  ],
-                )
-              else
-                const ScreenStatistics(),
-              // const Align(
-              //     alignment: Alignment.bottomCenter,
-              //     child: BottomMenu()
-              // ),
-              const StandardPopUp()
-            ],
-          ),
 
-        // child: AnimatedCrossFade(
-        //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-        //     // firstChild: Container(height: 50, width: 50,),
-        //     secondChild: ScreenWorkout(key: UniqueKey()),
-        //     crossFadeState: cnBottomMenu.index == 0?
-        //     CrossFadeState.showFirst:
-        //     CrossFadeState.showSecond,
-        //     duration: const Duration(milliseconds: 200)
-        // ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                        curve: Curves.easeInOut,
+                        child: const SafeArea(
+                          top: false,
+                          child: Hero(
+                              transitionOnUserGestures: true,
+                              tag: "SpotifyBar",
+                              child: SpotifyBar()
+                          ),
+                        ),
+                      ),
+
+                      /// Overlay with opacity, when workout panel is opened
+                      /// We use this instead of the panel own backdropEnabled feature, because
+                      /// we scale down the sizes of the workout panel when the exercise panel is opened
+                      /// However the backdrop of the workout panel would be scaled down as well
+                      /// so we use this AnimatedBuilder which is not scaled down, to provide a
+                      /// backdrop while the workout panel is opened
+                      IgnorePointer(
+                        ignoring: true,
+                        child: AnimatedBuilder(
+                          animation: _animationControllerWorkoutPanel,
+                          builder: (BuildContext context, Widget? child) {
+                            double opacity = _animationControllerWorkoutPanel.value;
+                            /// Scales the opacity from 0 -> 0.5 when animationController is between 0 - 0.5
+                            /// And back from 0.5 - > 0 when animationController is between 0.5 - 1
+                            /// We do that, because on exercise panel the backdropEnabled is True, so we don't
+                            /// need this anymore when exercise panel is opened because it would become to dark
+                            /// with backdrop AND this AnimatedBuilder together
+                            opacity = opacity > 0.5 ? 1 - opacity : opacity;
+                            return Container(
+                              color: Colors.black.withOpacity(opacity),
+                            );
+                          },
+                        ),
+                      ),
+                      AnimatedBuilder(
+                          animation: _animationControllerWorkoutPanel,
+                          builder: (context, child) {
+                            double scale = 1.0 - (_animationControllerWorkoutPanel.value * 0.2) + (0.5 * 0.2);
+                            scale = scale > 1 ? 1 : scale;
+                            double topPadding = -(_animationControllerWorkoutPanel.value-0.5)*110;
+                            topPadding = topPadding > 0 ? 0 : topPadding;
+                            // print("TOP PADDING: $topPadding");
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 0),
+                              transform: Matrix4.translationValues(0, topPadding, 0),
+                              child: Transform.scale(
+                                scale: scale,
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
+                                    child: child
+                                ),
+                              ),
+                            );
+                          },
+                          child: const NewWorkOutPanel()
+                      ),
+                      const NewExercisePanel(),
+                    ],
+                  )
+                else
+                  const ScreenStatistics(),
+                // const Align(
+                //     alignment: Alignment.bottomCenter,
+                //     child: BottomMenu()
+                // ),
+                const StandardPopUp()
+              ],
+            ),
+
+          // child: AnimatedCrossFade(
+          //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
+          //     // firstChild: Container(height: 50, width: 50,),
+          //     secondChild: ScreenWorkout(key: UniqueKey()),
+          //     crossFadeState: cnBottomMenu.index == 0?
+          //     CrossFadeState.showFirst:
+          //     CrossFadeState.showSecond,
+          //     duration: const Duration(milliseconds: 200)
+          // ),
+        ),
       ),
       bottomNavigationBar: const BottomMenu(),
     );
