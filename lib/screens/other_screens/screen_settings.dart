@@ -2,10 +2,15 @@ import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statis
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-
+import 'dart:io';
+import 'package:fitness_app/assets/custom_icons/my_icons.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../main.dart';
+import '../../util/config.dart';
 import '../../util/constants.dart';
 
 class SettingsPanel extends StatefulWidget {
@@ -21,6 +26,12 @@ class SettingsPanel extends StatefulWidget {
 class _SettingsPanelState extends State<SettingsPanel> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
+  final Widget trailingArrow = const Icon(
+    Icons.arrow_forward_ios,
+    size: 12,
+    color: Colors.grey,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +67,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                         const SizedBox(height: 10,),
                         panelTopBar,
                         const SizedBox(height: 10,),
-                        const Text("Settings",textScaler: TextScaler.linear(1.4), ),
+                        Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
 
                         /// General
                         CupertinoListSection.insetGrouped(
@@ -64,32 +75,19 @@ class _SettingsPanelState extends State<SettingsPanel> {
                               color: Colors.grey.withOpacity(0.1)
                           ),
                           backgroundColor: Colors.transparent,
-                          header: const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("General", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                          header: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Text(AppLocalizations.of(context)!.settingsGeneral, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                           ),
                           children: [
-                            CupertinoListTile.notched(
+                            CupertinoListTile(
                               leading: const Icon(
                                 Icons.language
                               ),
-                              trailing: Row(
-                                children: [
-                                  Text(
-                                    getLanguageAsString(context),
-                                    style: const TextStyle(color: Colors.grey),
-                                  ),
-                                  const SizedBox(width: 6,),
-                                  const Icon(
-                                    Icons.arrow_forward_ios,
-                                    size: 12,
-                                    color: Colors.grey,
-                                  )
-                                ],
-                              ),
-                              title: const Text("Language", style: TextStyle(color: Colors.white)),
+                              trailing: getSelectLanguageButton(),
+                              title: Text(AppLocalizations.of(context)!.settingsLanguage, style: const TextStyle(color: Colors.white)),
                             ),
-                            CupertinoListTile.notched(
+                            CupertinoListTile(
                               leading: const Icon(
                                   Icons.school
                               ),
@@ -97,15 +95,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   value: true,
                                   activeColor: const Color(0xFFC16A03),
                                   onChanged: (value){
-                                    // if(Platform.isAndroid){
-                                    //   HapticFeedback.selectionClick();
-                                    // }
-                                    // cnScreenStatistics.showAvgWeightPerSetLine = value;
-                                    // cnStandardPopUp.child = getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine);
-                                    // cnStandardPopUp.refresh();
                                   }
                               ),
-                              title: const Text("Show Tutorial", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsTutorial, style: const TextStyle(color: Colors.white)),
                             ),
                           ],
                         ),
@@ -116,10 +108,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
                             color: Colors.grey.withOpacity(0.1)
                           ),
                           backgroundColor: Colors.transparent,
-                          header: const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("Backup", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                          header: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Text(AppLocalizations.of(context)!.settingsBackup, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                           ),
+                          /// More Informations footer
                           footer: GestureDetector(
                             onTap: (){
                               showDialog(
@@ -131,33 +124,36 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   }
                               );
                             },
-                            child: const Padding(
-                              padding: EdgeInsets.only(left: 10),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 10),
                               child: Row(
                                 children: [
-                                  Icon(Icons.info, size:12),
-                                  SizedBox(width: 5,),
-                                  Text("More Informations about Backups", style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                                  const Icon(Icons.info, size:12),
+                                  const SizedBox(width: 5,),
+                                  Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
                                 ],
                               ),
                             ),
                           ),
                           children: [
-                            const CupertinoListTile.notched(
+                            /// Save Backup
+                            CupertinoListTile(
                               onTap: saveBackup,
-                              leading: Icon(
+                              leading: const Icon(
                                   Icons.backup
                               ),
-                              title: Text("Save Backup", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsBackupSave, style: const TextStyle(color: Colors.white)),
                             ),
-                            const CupertinoListTile.notched(
+                            /// Load Backup
+                            CupertinoListTile(
                               onTap: loadBackup,
-                              leading: Icon(
+                              leading: const Icon(
                                   Icons.cloud_download
                               ),
-                              title: Text("Load Backup", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
                             ),
-                            CupertinoListTile.notched(
+                            /// Sync with iCloud
+                            CupertinoListTile(
                               leading: const Stack(
                                 alignment: Alignment.center,
                                 children: [
@@ -176,16 +172,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                               trailing: CupertinoSwitch(
                                   value: true,
                                   activeColor: const Color(0xFFC16A03),
-                                  onChanged: (value){
-                                    // if(Platform.isAndroid){
-                                    //   HapticFeedback.selectionClick();
-                                    // }
-                                    // cnScreenStatistics.showAvgWeightPerSetLine = value;
-                                    // cnStandardPopUp.child = getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine);
-                                    // cnStandardPopUp.refresh();
-                                  }
+                                  onChanged: (value){}
                               ),
-                              title: const Text("Sync via iCloud", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsSynciCloud, style: const TextStyle(color: Colors.white)),
                             ),
                           ],
                         ),
@@ -196,31 +185,47 @@ class _SettingsPanelState extends State<SettingsPanel> {
                               color: Colors.grey.withOpacity(0.1)
                           ),
                           backgroundColor: Colors.transparent,
-                          header: const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text("About", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                          header: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Text(AppLocalizations.of(context)!.settingsAbout, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                           ),
-                          children: const [
-                            CupertinoListTile.notched(
-                              leading: Icon(
+                          children: [
+                            /// Contact
+                            CupertinoListTile(
+                              onTap: () {sendMailto();},
+                              leading: const Icon(
                                   Icons.help_outline
                               ),
-                              title: Text("Contact", style: TextStyle(color: Colors.white)),
+                              trailing: trailingArrow,
+                              title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
                             ),
-                            CupertinoListTile.notched(
-                              leading: Icon(
+                            /// Github
+                            CupertinoListTile(
+                              onTap: () async{
+                                await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
+                              },
+                              leading: const Icon(
+                                  MyIcons.github
+                              ),
+                              trailing: trailingArrow,
+                              title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
+                            ),
+                            /// Term Of Use
+                            CupertinoListTile(
+                              leading: const Icon(
                                   Icons.my_library_books_rounded
                               ),
-                              title: Text("Term of Use", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
                             ),
-                            CupertinoListTile.notched(
-                              leading: Icon(
+                            /// Privacy Policy
+                            CupertinoListTile(
+                              leading: const Icon(
                                   Icons.lock_outline
                               ),
-                              title: Text("Privacy Policy", style: TextStyle(color: Colors.white)),
+                              title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -242,6 +247,59 @@ class _SettingsPanelState extends State<SettingsPanel> {
         child: const Center(
             child: Text("test")
         )
+    );
+  }
+
+  Widget getSelectLanguageButton() {
+    return PullDownButton(
+      itemBuilder: (context) {
+        final currentLanguage = getLanguageAsString(context);
+        return [
+          PullDownMenuItem.selectable(
+            selected: currentLanguage == 'Deutsch',
+            title: 'Deutsch',
+            onTap: () {
+              if(Platform.isAndroid){
+                HapticFeedback.selectionClick();
+              }
+              Future.delayed(const Duration(milliseconds: 200), (){
+                MyApp.of(context)?.setLocale(language: LANGUAGES.de, config: cnConfig);
+              });
+            },
+          ),
+          PullDownMenuItem.selectable(
+            selected: currentLanguage == 'English',
+            title: 'English',
+            onTap: () {
+              if(Platform.isAndroid){
+                HapticFeedback.selectionClick();
+              }
+              Future.delayed(const Duration(milliseconds: 200), (){
+                MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
+              });
+            },
+          ),
+        ];
+      },
+      buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          if(Platform.isAndroid){
+            HapticFeedback.selectionClick();
+          }
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: Row(
+          children: [
+            Text(
+              getLanguageAsString(context),
+              style: const TextStyle(color: Colors.grey, fontSize: 15),
+            ),
+            const SizedBox(width: 6,),
+            trailingArrow
+          ],
+        ),
+      ),
     );
   }
 }

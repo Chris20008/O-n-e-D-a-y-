@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';

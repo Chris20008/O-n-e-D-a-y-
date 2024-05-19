@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+
+  "settings": "Settings",
+  "settingsGeneral": "General",
+  "settingsLanguage": "Sprache",
+  "settingsTutorial": "Tutorial",
+  "settingsBackup": "Backup",
+  "settingsBackupSave": "Save Backup",
+  "settingsBackupLoad": "Load Backup",
+  "settingsSynciCloud": "Sync with iCloud",
+  "settingsBackupMoreInfo": "More Informations about Backups",
+  "settingsAbout": "About",
+  "settingsContact": "Contact",
+  "settingsTermsOfUse": "Terms of Use",
+  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsContribute": "Contribute"
+}

@@ -15,6 +15,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
@@ -53,6 +54,28 @@ Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minu
       SizedBox(height: heightBottom),
     ],
   );
+}
+
+Future openUrl(String url)async{
+  final Uri parsedUrl = Uri.parse(url);
+  if (!await launchUrl(parsedUrl)) {
+    throw Exception('Could not launch $parsedUrl');
+  }
+}
+
+Future<void> sendMailto({
+  String email = "OneDayApp@icloud.com",
+}) async {
+  final String emailSubject = "User Question";
+  final Uri parsedMailto = Uri.parse(
+      "mailto:<$email>?subject=$emailSubject");
+
+  if (!await launchUrl(
+    parsedMailto,
+    mode: LaunchMode.externalApplication,
+  )) {
+    // throw "error"
+  }
 }
 
 String getLanguageAsString(BuildContext context){

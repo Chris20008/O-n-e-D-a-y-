@@ -17,10 +17,10 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 late ObjectBox objectbox;
 
@@ -46,7 +46,7 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  final Language _language = languages[LANGUAGES.de.value];
+  final Language _language = languages[LANGUAGES.en.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
@@ -92,7 +92,7 @@ class MyAppState extends State<MyApp> {
           Locale('de'), /// German
         ],
         localizationsDelegates: const [
-          // AppLocalizations.delegate,
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
@@ -144,7 +144,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   @override
   void initState() {
-    initObjectBox();
+    initMain();
     super.initState();
   }
 
@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     super.dispose();
   }
 
-  void initObjectBox() async{
+  void initMain() async{
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");

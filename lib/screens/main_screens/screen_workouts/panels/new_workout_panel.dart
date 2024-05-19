@@ -61,7 +61,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
           return SlidingUpPanel(
             controller: cnNewWorkout.panelController,
             defaultPanelState: PanelState.CLOSED,
-            maxHeight: constraints.maxHeight - 50,
+            maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
             minHeight: cnNewWorkout.minPanelHeight,
             isDraggable: true,
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
@@ -76,9 +76,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 onTap: () {
                   FocusScope.of(context).unfocus();
                   if(cnNewWorkout.panelController.isPanelClosed){
-                    // HapticFeedback.selectionClick();
+                    HapticFeedback.selectionClick();
+                    // cnNewWorkout.openPanelWithRefresh();
                     cnNewWorkout.openPanel();
-                    // cnNewWorkout.panelController.open();
                   }
                 },
                 child: Stack(
@@ -423,9 +423,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           onTap: ()async{
                             if(cnNewWorkout.panelController.isPanelClosed){
                               Future.delayed(const Duration(milliseconds: 300), (){
-                                // HapticFeedback.selectionClick();
-                                cnNewWorkout.openPanel();
-                                // cnNewWorkout.panelController.open();
+                                HapticFeedback.selectionClick();
+                                /// We need to use the panel controllers own open methode because, when we use our open
+                                /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
+                                /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
+                                /// Maybe due to speed of opening the panel
+                                cnNewWorkout.panelController.open();
                               });
                             }
                           },
@@ -453,9 +456,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
                           onPressed: ()async{
                             if(cnNewWorkout.panelController.isPanelClosed){
-                              // HapticFeedback.selectionClick();
-                              cnNewWorkout.openPanel();
-                              // await cnNewWorkout.panelController.open();
+                              HapticFeedback.selectionClick();
+                              await cnNewWorkout.openPanel();
                             }
                             cnStandardPopUp.open(
                                 context: context,
@@ -884,12 +886,15 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onPanelSlide(value){
+    print("VALUE: $value");
     cnWorkouts.animationControllerWorkoutPanel.value = value*0.5;
     if(value == 0){
+      print("do refresh with unfocus");
       FocusScope.of(context).unfocus();
       cnNewWorkout.refresh();
     }
     else if(value == 1){
+      print("dofrefresh");
       cnNewWorkout.refresh();
     }
     cnBottomMenu.adjustHeight(value);
@@ -967,28 +972,24 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     isCurrentlyRebuilding = false;
   }
 
-  // Color? getLinkColor(String linkName){
-  //   int index = workout.linkedExercises.indexOf(linkName);
-  //   if(index >= 0){
-  //     return linkColors[index % linkColors.length];
-  //   }
-  //   return null;
-  // }
-
-  void openPanel(){
+  void openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
     minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     refresh();
-    panelController.animatePanelToPosition(
-        1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.decelerate
-    );
+    await openPanel();
     /// is needed to move spotifyBar higher when panel is opened
     cnHomepage.refresh();
     // cnWorkouts.refresh();
     // cnWorkoutHistory.refresh();
+  }
+
+  Future<void> openPanel() async{
+    await panelController.animatePanelToPosition(
+        1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.decelerate
+    );
   }
 
   void addToExercisesAndLinksList(dynamic item){
@@ -1104,7 +1105,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     Workout w = Workout.clone(workout);
     /// When same workout
     if(isUpdating && this.workout.id == w.id){
-      openPanel();
+      openPanelWithRefresh();
     }
     /// When different workout
     else{
@@ -1113,7 +1114,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
       setWorkout(w);
       updateExercisesAndLinksList();
       initializeCorrectOrder();
-      openPanel();
+      openPanelWithRefresh();
     }
   }
 

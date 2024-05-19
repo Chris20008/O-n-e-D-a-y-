@@ -148,7 +148,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                               cnNewWorkout.clear();
                             }
                             cnNewWorkout.workout.isTemplate = true;
-                            cnNewWorkout.openPanel();
+                            cnNewWorkout.openPanelWithRefresh();
                             cnHomepage.refresh();
                           },
                           icon: Icon(

@@ -25,5 +25,6 @@ class MyIcons {
   static const _kFontFam = 'MyIcons';
   static const String? _kFontPkg = null;
 
+  static const IconData github = IconData(0xf09b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData spotify = IconData(0xf1bc, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

@@ -36,7 +36,7 @@ dependencies:
   flutter_slidable: ^3.0.1
   objectbox: ^2.5.1
   objectbox_flutter_libs:
-  intl: ^0.18.1
+  intl: any
   quiver: ^3.2.1
   auto_size_text: ^3.0.0
   spotify_sdk: ^2.3.1
@@ -53,6 +53,8 @@ dependencies:
   calendar_date_picker2: ^1.0.2
   scrollable_positioned_list: ^0.3.8
   collection: ^1.18.0
+  pull_down_button: ^0.9.4
+  url_launcher: ^6.2.6
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -85,6 +87,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/assets/
