@@ -17,4 +17,4 @@ samples, guidance on mobile development, and a full API reference.
 
 ## Installation (Work in Progress)
 
-flutter gen-l10n
+Generate App Localizations: flutter gen-l10n
