@@ -32,6 +32,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
     size: 12,
     color: Colors.grey,
   );
+  late final _routeTheme = const PullDownMenuRouteTheme(
+      backgroundColor: CupertinoColors.secondaryLabel
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -80,13 +83,16 @@ class _SettingsPanelState extends State<SettingsPanel> {
                             child: Text(AppLocalizations.of(context)!.settingsGeneral, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                           ),
                           children: [
+                            /// Language
                             CupertinoListTile(
-                              leading: const Icon(
+                              leading:  const Icon(
                                 Icons.language
                               ),
-                              trailing: getSelectLanguageButton(),
-                              title: Text(AppLocalizations.of(context)!.settingsLanguage, style: const TextStyle(color: Colors.white)),
+                              // trailing: getSelectLanguageButton(),
+                              title: getSelectLanguageButton()
+                              // title: Text(AppLocalizations.of(context)!.settingsLanguage, style: const TextStyle(color: Colors.white)),
                             ),
+                            /// Tutorial
                             CupertinoListTile(
                               leading: const Icon(
                                   Icons.school
@@ -115,6 +121,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                           /// More Informations footer
                           footer: GestureDetector(
                             onTap: (){
+                              HapticFeedback.selectionClick();
                               showDialog(
                                   context: context,
                                   builder: (context){
@@ -192,12 +199,13 @@ class _SettingsPanelState extends State<SettingsPanel> {
                           children: [
                             /// Contact
                             CupertinoListTile(
-                              onTap: () {sendMailto();},
+                              // onTap: () {sendMail();},
                               leading: const Icon(
                                   Icons.help_outline
                               ),
-                              trailing: trailingArrow,
-                              title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
+                              // trailing: getSelectContactButton(),
+                              title: getSelectContactButton(),
+                              // title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
                             ),
                             /// Github
                             CupertinoListTile(
@@ -252,6 +260,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectLanguageButton() {
     return PullDownButton(
+      routeTheme: _routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
         return [
@@ -259,9 +268,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             selected: currentLanguage == 'Deutsch',
             title: 'Deutsch',
             onTap: () {
-              if(Platform.isAndroid){
-                HapticFeedback.selectionClick();
-              }
+              HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
                 MyApp.of(context)?.setLocale(language: LANGUAGES.de, config: cnConfig);
               });
@@ -271,9 +278,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             selected: currentLanguage == 'English',
             title: 'English',
             onTap: () {
-              if(Platform.isAndroid){
-                HapticFeedback.selectionClick();
-              }
+              HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
                 MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
               });
@@ -283,14 +288,17 @@ class _SettingsPanelState extends State<SettingsPanel> {
       },
       buttonBuilder: (context, showMenu) => CupertinoButton(
         onPressed: (){
-          if(Platform.isAndroid){
-            HapticFeedback.selectionClick();
-          }
+          HapticFeedback.selectionClick();
           showMenu();
         },
         padding: EdgeInsets.zero,
         child: Row(
           children: [
+            Text(
+                AppLocalizations.of(context)!.settingsLanguage,
+                style: const TextStyle(color: Colors.white)
+            ),
+            const Spacer(),
             Text(
               getLanguageAsString(context),
               style: const TextStyle(color: Colors.grey, fontSize: 15),
@@ -299,6 +307,57 @@ class _SettingsPanelState extends State<SettingsPanel> {
             trailingArrow
           ],
         ),
+      ),
+    );
+  }
+
+  Widget getSelectContactButton() {
+    return PullDownButton(
+      routeTheme: _routeTheme,
+      itemBuilder: (context) {
+        return [
+          PullDownMenuItem(
+            title: 'Ask Question',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                sendMail(subject: "Question");
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: 'Report Problem',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                sendMail(subject: "Report Problem");
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: 'Other',
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                sendMail(subject: "");
+              });
+            },
+          ),
+        ];
+      },
+      buttonBuilder: (context, showMenu) => CupertinoButton(
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            showMenu();
+          },
+          padding: EdgeInsets.zero,
+          child: Row(
+            children: [
+              Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
+              const Spacer(),
+              trailingArrow
+            ],
+          )
       ),
     );
   }

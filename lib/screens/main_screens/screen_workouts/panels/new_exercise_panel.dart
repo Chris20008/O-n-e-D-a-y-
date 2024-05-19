@@ -24,6 +24,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   final double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
   final _formKey = GlobalKey<FormState>();
+  final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
+  final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
 
   @override
   Widget build(BuildContext context) {
@@ -403,43 +405,59 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                     /// faded box bottom screen
                     Align(
                       alignment: Alignment.bottomCenter,
-                      child: Container(
-                        height: 60,
-                        decoration: BoxDecoration(
-                            gradient:  LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Color(0xff120a01).withOpacity(0.0),
-                                  Color(0xff120a01),
-                                ]
-                            )
-                        ),
-                      ),
-                    ),
-                    /// bottom row with icons
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: SizedBox(
+                        height: _totalHeightBottomBox,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
                           children: [
-                            myIconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  cnNewExercise.closePanel(doClear: true);
-                                  _formKey.currentState?.reset();
-                                },
+                            /// faded container
+                            Positioned(
+                              bottom: _heightBottomColoredBox - 0.2,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: _totalHeightBottomBox - _heightBottomColoredBox,
+                                decoration: BoxDecoration(
+                                    gradient:  LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          // Colors.transparent,
+                                          // Colors.black,
+                                          const Color(0xff120a01).withOpacity(0.0),
+                                          const Color(0xff120a01)
+                                        ]
+                                    )
+                                ),
+                              ),
                             ),
-                            myIconButton(
-                                icon: const Icon(Icons.check),
-                                onPressed: closePanelAndSaveExercise
+                            /// just colored container below faded container
+                            Container(
+                              height: _heightBottomColoredBox,
+                              // color: Colors.black,
+                              color: const Color(0xff120a01),
+                            ),
+                            /// bottom row with icons
+                            Padding(
+                              padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  myIconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: onCancel
+                                  ),
+                                  myIconButton(
+                                      icon: const Icon(Icons.check),
+                                      onPressed: closePanelAndSaveExercise
+                                  )
+                                ],
+                              ),
                             )
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -448,6 +466,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         ),
       ),
     );
+  }
+
+  void onCancel(){
+    cnNewExercise.closePanel(doClear: true);
+    _formKey.currentState?.reset();
   }
 
   void onPanelSlide(value){

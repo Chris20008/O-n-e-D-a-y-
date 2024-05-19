@@ -63,8 +63,9 @@ Future openUrl(String url)async{
   }
 }
 
-Future<void> sendMailto({String email = "OneDayApp@icloud.com",}) async {
-  final String emailSubject = "User Question";
+Future<void> sendMail({required String subject}) async {
+  const email = "OneDayApp@icloud.com";
+  final String emailSubject = subject;
   final Uri parsedMailto = Uri.parse("mailto:<$email>?subject=$emailSubject");
   if (!await launchUrl(
     parsedMailto,
