@@ -886,15 +886,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void onPanelSlide(value){
-    print("VALUE: $value");
     cnWorkouts.animationControllerWorkoutPanel.value = value*0.5;
     if(value == 0){
-      print("do refresh with unfocus");
       FocusScope.of(context).unfocus();
       cnNewWorkout.refresh();
     }
     else if(value == 1){
-      print("dofrefresh");
       cnNewWorkout.refresh();
     }
     cnBottomMenu.adjustHeight(value);

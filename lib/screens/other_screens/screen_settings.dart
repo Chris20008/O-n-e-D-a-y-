@@ -50,7 +50,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               return SlidingUpPanel(
                 controller: cnScreenStatistics.panelControllerSettings,
                 defaultPanelState: PanelState.CLOSED,
-                maxHeight: constraints.maxHeight - 50,
+                maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
                 minHeight: 0,
                 isDraggable: true,
                 borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),

@@ -63,18 +63,14 @@ Future openUrl(String url)async{
   }
 }
 
-Future<void> sendMailto({
-  String email = "OneDayApp@icloud.com",
-}) async {
+Future<void> sendMailto({String email = "OneDayApp@icloud.com",}) async {
   final String emailSubject = "User Question";
-  final Uri parsedMailto = Uri.parse(
-      "mailto:<$email>?subject=$emailSubject");
-
+  final Uri parsedMailto = Uri.parse("mailto:<$email>?subject=$emailSubject");
   if (!await launchUrl(
     parsedMailto,
     mode: LaunchMode.externalApplication,
   )) {
-    // throw "error"
+    throw Exception('Could not send Mail');
   }
 }
 

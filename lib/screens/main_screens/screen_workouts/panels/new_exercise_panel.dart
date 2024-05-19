@@ -8,6 +8,7 @@ import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
 import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
+import 'dart:io';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -48,7 +49,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
               defaultPanelState: PanelState.CLOSED,
-              maxHeight: constraints.maxHeight - 50,
+              maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
               minHeight: 0,
               backdropEnabled: true,
               backdropColor: Colors.black,

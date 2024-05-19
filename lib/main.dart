@@ -21,6 +21,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 late ObjectBox objectbox;
 
@@ -221,11 +222,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 if(cnBottomMenu.index != 2)
                   Stack(
                     children: [
+                      /// Animiated Builder to Reduce Size of left and middle screen when workout panel is opened
                       AnimatedBuilder(
                         animation: _animationControllerWorkoutPanel,
                         builder: (context, child) {
-                          double scale = 1.0 - (_animationControllerWorkoutPanel.value * 0.15);
-                          double borderRadius = 30 - (scale*10-9)*20;
+                          double scale = 1.0 - (_animationControllerWorkoutPanel.value * (Platform.isAndroid? 0.15 : 0.2));
+                          double borderRadius = 26 - (scale*10-9)*20;
                           borderRadius = borderRadius > 25 ? 25 : borderRadius;
                           return Transform.scale(
                             scale: scale,
