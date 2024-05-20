@@ -1,13 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -24,6 +21,7 @@ import '../../../other_screens/screen_running_workout/screen_running_workout.dar
 import '../../screen_workout_history/screen_workout_history.dart';
 import '../screen_workouts.dart';
 import 'new_exercise_panel.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
   const NewWorkOutPanel({super.key});
@@ -204,8 +202,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                       onPressed: (){
                                         cnStandardPopUp.open(
                                             context: context,
-                                            child: const Text(
-                                              "Do you really want to delete this workout?",
+                                            child: Text(
+                                              AppLocalizations.of(context)!.panelWoDeleteWorkout,
                                               textAlign: TextAlign.center,
                                               textScaler: TextScaler.linear(1.2),
                                               style: TextStyle(color: Colors.white),
@@ -277,22 +275,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   void openConfirmNameChangePopUp(){
     cnStandardPopUp.open(
         context: context,
-        confirmText: "Yes",
-        cancelText: "No",
+        confirmText: AppLocalizations.of(context)!.yes,
+        cancelText: AppLocalizations.of(context)!.no,
         // maxWidth: MediaQuery.of(context).size.width,
         widthFactor: 0.9,
         padding: const EdgeInsets.all(15),
         child: Column(
           children: [
-            const Text(
-              "Workout name(s) changed",
-              textScaler: TextScaler.linear(1.4),
+            Text(
+              AppLocalizations.of(context)!.panelWoWorkoutNameChanged,
+              textScaler: const TextScaler.linear(1.4),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 15),
-            const Text(
-              "Do you want to apply the new name(s) to workouts created from this template inside your history as well?",
-              textScaler: TextScaler.linear(1),
+            Text(
+              AppLocalizations.of(context)!.panelWoWorkoutNameChangedMessage,
+              textScaler: const TextScaler.linear(1),
               textAlign: TextAlign.center,
             ),
             // const SizedBox(height: 15),
@@ -310,7 +308,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         child: Column(
                           children: [
                             const SizedBox(height: 20,),
-                            const Text("Workout Name", textScaler: TextScaler.linear(1.2),),
+                            Text(AppLocalizations.of(context)!.panelWoWorkoutName, textScaler: const TextScaler.linear(1.2),),
                             const SizedBox(height: 5,),
                             Row(
                               // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -326,9 +324,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         ),
                       ),
                     if(cnNewWorkout.exerciseNewNameMapping.isNotEmpty)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 5, top: 20),
-                        child: Text("Exercise Names", textScaler: TextScaler.linear(1.2),),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 5, top: 20),
+                        child: Text(AppLocalizations.of(context)!.panelWoExerciseNames, textScaler: const TextScaler.linear(1.2),),
                       ),
                     for(MapEntry entry in cnNewWorkout.exerciseNewNameMapping.entries)
                       Padding(
@@ -382,7 +380,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       children: [
                         panelTopBar,
                         const SizedBox(height: 15,),
-                        Text(cnNewWorkout.workout.isTemplate? "Workout Template" : "Finished Workout", textScaler: TextScaler.linear(1.5)),
+                        Text(cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished, textScaler: const TextScaler.linear(1.5)),
                         const SizedBox(height: 10,),
                       ],
                     ),
@@ -408,7 +406,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           validator: (value) {
                             value = value?.trim();
                             if (value == null || value.isEmpty) {
-                              return 'Enter Workout name';
+                              return AppLocalizations.of(context)!.panelWoEnterName;
                             }
                             /// Check if the workout name already exists, but only when the current name is different from the
                             /// initializing name. Otherwise editing an existing workout could lead to error
@@ -416,7 +414,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase() && /// Name is not equal to initial name when opening editing
                                     workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name)                          /// Name exists in database
                             ){
-                              return 'Workout name already exists';
+                              return AppLocalizations.of(context)!.panelWoAlreadyExists;
                             }
                             return null;
                           },
@@ -438,7 +436,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           controller: cnNewWorkout.workoutNameController,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            labelText: 'Name',
+                            labelText: AppLocalizations.of(context)!.name,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                           ),
                           onChanged: (value){
@@ -473,7 +471,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                     isDense: true,
-                                    labelText: 'Group Name',
+                                    labelText: AppLocalizations.of(context)!.groupName,
                                     counterText: "",
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
                                   ),
@@ -526,7 +524,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Date', textScaler: TextScaler.linear(1.3),),
+                        Text(AppLocalizations.of(context)!.panelWoDate, textScaler: const TextScaler.linear(1.3),),
                         const Spacer(),
                         if(cnNewWorkout.workout.date != null)
                         buildCalendarDialogButton(
@@ -549,7 +547,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   ),
                 ),
                 Container(height: 15,),
-                const Text("Exercises", textScaler: TextScaler.linear(1.2)),
+                Text(AppLocalizations.of(context)!.panelWoExercises, textScaler: TextScaler.linear(1.2)),
                 Container(height: 16,),
               ],
             ),
@@ -612,7 +610,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 height: 25,
                 width: 3,
                 decoration: BoxDecoration(
-                    // color: (cnNewWorkout.getLinkColor(cnNewWorkout.exercisesAndLinks[index])?? Colors.grey).withOpacity(0.6),
                     color: (
                         getLinkColor(
                             linkName: cnNewWorkout.exercisesAndLinks[index],
@@ -790,9 +787,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addLink(String linkName){
-    if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
-      linkName = "Curls";
-    }
+    // if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
+    //   linkName = "Curls";
+    // }
     if (cnNewWorkout.workout.linkedExercises.contains(linkName)){
       return;
     }
@@ -1120,11 +1117,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     refreshAllWorkoutDays();
     originalWorkout = Workout.clone(w);
     workoutNameController = TextEditingController(text: w.name);
-    // for(Exercise ex in workout.exercises){
-    //   print(ex.name);
-    //   print(ex.id);
-    //   print("");
-    // }
   }
 
   void clear({bool doRefresh = true}){

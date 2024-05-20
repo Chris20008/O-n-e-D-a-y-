@@ -4,10 +4,11 @@ import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../main.dart';
 import '../../../objects/exercise.dart';
+import '../../../util/constants.dart';
 import '../../../widgets/bottom_menu.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class AnimatedColumn extends StatefulWidget {
   const AnimatedColumn({super.key});
@@ -27,6 +28,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
+  bool canConfirm = true;
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
           AnimatedContainer(
             duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
             transform: Matrix4.translationValues(
-              ///x
+                ///x
                 0,
                 ///y
                 cnStopwatchWidget.isOpened
@@ -81,13 +83,23 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                               _textController.clear();
                             });
                           },
-                          child: TextField(
+                          child: TextFormField(
                             controller: _textController,
                             keyboardAppearance: Brightness.dark,
                             maxLength: 40,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              value = value?.trim();
+                              if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
+                                canConfirm = false;
+                                return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
+                              }
+                              canConfirm = true;
+                              return null;
+                            },
                             decoration: InputDecoration(
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              labelText: "New Exercise Name",
+                              labelText: AppLocalizations.of(context)!.newExerciseName,
                               counterText: "",
                               contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                             ),
@@ -97,8 +109,11 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                             textAlign: TextAlign.center,
                             onChanged: (value){},
                           ),
+                          canConfirm: canConfirm,
                           onConfirm: (){
-                            if(_textController.text.isNotEmpty && !cnRunningWorkout.workout.exercises.map((e) => e.name.toLowerCase()).toList().contains(_textController.text.toLowerCase())){
+                            if(_textController.text.isNotEmpty &&
+                               !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
+                            ){
                               cnRunningWorkout.addExercise(Exercise(name: _textController.text));
                             }
                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -150,69 +165,3 @@ class CnAnimatedColumn extends ChangeNotifier {
     notifyListeners();
   }
 }
-//
-// class AnimatedColumn extends StatefulWidget {
-//   const AnimatedColumn({super.key});
-//
-//   @override
-//   State<AnimatedColumn> createState() => _AnimatedColumnState();
-// }
-//
-// class _AnimatedColumnState extends State<AnimatedColumn> {
-//
-//
-//   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-//   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
-//   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
-//   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-//   late CnAnimatedColumn cnAnimatedColumn;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context);
-//
-//     return SafeArea(
-//       child: Stack(
-//         alignment: Alignment.bottomRight,
-//         children: [
-//           AnimatedContainer(
-//               duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
-//               transform: Matrix4.translationValues(
-//                 ///x
-//                   0,
-//                   ///y
-//                   cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected?
-//                   0 :
-//                   cnStopwatchWidget.isOpened && cnSpotifyBar.isConnected?
-//                   -cnSpotifyBar.height - 5:
-//                   -cnSpotifyBar.height -5,
-//                   ///z
-//                   0),
-//               child: const StopwatchWidget()
-//           ),
-//           AnimatedContainer(
-//             duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
-//             transform: Matrix4.translationValues(0, cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected? -cnStopwatchWidget.heightOfTimer-5: 0, 0),
-//             child: const Hero(
-//                 transitionOnUserGestures: true,
-//                 tag: "SpotifyBar",
-//                 child: SpotifyBar()
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-//
-// class CnAnimatedColumn extends ChangeNotifier {
-//   bool isOpened = false;
-//   bool isRunning = false;
-//   bool isPaused = false;
-//   int animationTimeStopwatch = 300;
-//   // double heightOfTimer = 250;
-//
-//   void refresh()async{
-//     notifyListeners();
-//   }
-// }

@@ -375,11 +375,7 @@ bool workoutNameExistsInTemplates({required String workoutName}){
 }
 
 bool exerciseNameExistsInWorkout({required Workout workout, required String exerciseName}){
-  final List<String> exNames = workout.exercises.map((e) => e.name.toLowerCase()).toList();
-  if(exNames.contains(exerciseName.toLowerCase())){
-    return true;
-  }
-  return false;
+  return workout.exercises.map((e) => e.name.toLowerCase()).contains(exerciseName.toLowerCase());
 }
 
 Widget buildCalendarDialogButton({

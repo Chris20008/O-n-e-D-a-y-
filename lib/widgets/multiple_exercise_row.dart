@@ -104,8 +104,8 @@ class MultipleExerciseRow extends StatelessWidget {
                                     child: OverflowSafeText(
                                         ex.name,
                                         fontSize: fontSize,
-                                        minFontSize: 14,
-                                        maxLines: 1
+                                        minFontSize: 13,
+                                        maxLines: 2
                                     )
                                 ),
                               ),

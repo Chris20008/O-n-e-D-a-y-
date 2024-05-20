@@ -317,7 +317,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
       itemBuilder: (context) {
         return [
           PullDownMenuItem(
-            title: 'Ask Question',
+            title: AppLocalizations.of(context)!.settingsQuestion,
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
@@ -326,7 +326,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             },
           ),
           PullDownMenuItem(
-            title: 'Report Problem',
+            title: AppLocalizations.of(context)!.settingsReportProblem,
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
@@ -335,7 +335,16 @@ class _SettingsPanelState extends State<SettingsPanel> {
             },
           ),
           PullDownMenuItem(
-            title: 'Other',
+            title: AppLocalizations.of(context)!.settingsImprovement,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                sendMail(subject: "Suggestion for Improvement");
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: AppLocalizations.of(context)!.settingsOther,
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){

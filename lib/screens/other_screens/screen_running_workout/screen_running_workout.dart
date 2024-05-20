@@ -6,8 +6,11 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 
 import '../../../main.dart';
 import '../../../objects/exercise.dart';
@@ -18,6 +21,7 @@ import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
 import 'animated_column.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -120,7 +124,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                     child: Container(
                       height: cnBottomMenu.height,
                       color: Colors.black.withOpacity(0.5),
-                      child: Center(child: Text("Finish", style: TextStyle(color: Colors.amber[800]), textScaler: const TextScaler.linear(1.4),)),
+                      child: Center(child: Text(AppLocalizations.of(context)!.finish, style: TextStyle(color: Colors.amber[800]), textScaler: const TextScaler.linear(1.4),)),
                     ),
                   ),
                 ),
@@ -162,39 +166,107 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
                                         Expanded(
                                             child: OverflowSafeText(
-                                                newEx.name,
-                                                maxLines: 1
+                                              newEx.name,
+                                              maxLines: 1,
+                                              style: const TextStyle(color: Colors.white, fontSize: 20),
                                             ),
                                         ):
                                         Expanded(
-                                          child: DropdownMenu<String>(
-                                            initialSelection: newEx.name,
-                                            onSelected: (String? value) {
-                                              setState(() {
-                                                final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                                final t = lists.map((element) => element.value.indexWhere((ex) {
-                                                  return ex.name == value;
-                                                })).toList().firstWhere((element) => element >=0);
-                                                cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
-                                              });
-                                              cnRunningWorkout.cache();
+                                          child: PullDownButton(
+                                            buttonAnchor: PullDownMenuAnchor.start,
+                                            routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
+                                            itemBuilder: (context) {
+                                              final children = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<PullDownMenuItem>((Exercise value) {
+                                                return PullDownMenuItem.selectable(
+                                                  title: value.name,
+                                                  selected: newEx.name == value.name,
+                                                  onTap: () {
+                                                    HapticFeedback.selectionClick();
+                                                    Future.delayed(const Duration(milliseconds: 200), (){
+                                                      setState(() {
+                                                        final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                                        final t = lists.map((element) => element.value.indexWhere((ex) {
+                                                          return ex.name == value.name;
+                                                        })).toList().firstWhere((element) => element >=0);
+                                                        cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                                      });
+                                                      cnRunningWorkout.cache();
+                                                    });
+                                                  },
+                                                );
+                                              }).toList();
+                                              return children;
+                                              // return [
+                                              //   PullDownMenuItem(
+                                              //     title: AppLocalizations.of(context)!.settingsQuestion,
+                                              //     onTap: () {
+                                              //       HapticFeedback.selectionClick();
+                                              //       Future.delayed(const Duration(milliseconds: 200), (){
+                                              //         sendMail(subject: "Question");
+                                              //       });
+                                              //     },
+                                              //   ),
+                                              // ];
                                             },
-                                            dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
-                                              return DropdownMenuEntry<String>(value: value.name, label: value.name);
-                                            }).toList(),
-                                          ),
+                                            buttonBuilder: (context, showMenu) => CupertinoButton(
+                                                onPressed: (){
+                                                  HapticFeedback.selectionClick();
+                                                  showMenu();
+                                                },
+                                                padding: EdgeInsets.zero,
+                                                child: Row(
+                                                  children: [
+                                                    ConstrainedBox(
+                                                      constraints: BoxConstraints(
+                                                          maxWidth: MediaQuery.of(context).size.width-80
+                                                      ),
+                                                      child: OverflowSafeText(
+                                                          newEx.name,
+                                                          style: const TextStyle(color: Colors.white, fontSize: 20),
+                                                          maxLines: 1
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10,),
+                                                    const Icon(
+                                                      Icons.arrow_forward_ios,
+                                                      size: 15,
+                                                      color: Colors.white,
+                                                    )
+                                                  ],
+                                                )
+                                            ),
+                                          )
                                         ),
+                                        // Expanded(
+                                        //   child: DropdownMenu<String>(
+                                        //     initialSelection: newEx.name,
+                                        //     onSelected: (String? value) {
+                                        //       setState(() {
+                                        //         final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                        //         final t = lists.map((element) => element.value.indexWhere((ex) {
+                                        //           return ex.name == value;
+                                        //         })).toList().firstWhere((element) => element >=0);
+                                        //         cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                        //       });
+                                        //       cnRunningWorkout.cache();
+                                        //     },
+                                        //     dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
+                                        //       return DropdownMenuEntry<String>(value: value.name, label: value.name);
+                                        //     }).toList(),
+                                        //   ),
+                                        // ),
                                         if(cnRunningWorkout.newExNames.contains(newEx.name))
                                           myIconButton(
                                             icon:const Icon(Icons.delete_forever),
                                             onPressed: (){
                                               cnStandardPopUp.open(
                                                   context: context,
-                                                  child: const Text(
-                                                    "Do you really want to delete this Exercise?",
+                                                  confirmText: AppLocalizations.of(context)!.yes,
+                                                  child: Text(
+                                                    AppLocalizations.of(context)!.runningWorkoutDeleteExercise,
                                                     textAlign: TextAlign.center,
-                                                    textScaler: TextScaler.linear(1.2),
-                                                    style: TextStyle(color: Colors.white),
+                                                    textScaler: const TextScaler.linear(1.2),
+                                                    style: const TextStyle(color: Colors.white),
                                                   ),
                                                   onConfirm: (){
                                                     cnRunningWorkout.deleteExercise(newEx);
@@ -233,7 +305,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              labelText: "Seat Level",
+                                              labelText: AppLocalizations.of(context)!.seatLevel,
                                               counterText: "",
                                               contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                             ),
@@ -291,7 +363,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              labelText: "Rest In Seconds",
+                                              labelText: AppLocalizations.of(context)!.restInSeconds,
                                               counterText: "",
                                               contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                             ),
@@ -900,7 +972,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     cnStandardPopUp.open(
       context: context,
       showCancel: false,
-      confirmText: "Finish",
+      confirmText: AppLocalizations.of(context)!.finish,
       canConfirm: canFinish,
       confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
       // onConfirm: finishWorkout,
@@ -922,11 +994,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       padding: const EdgeInsets.only(top: 20),
       child: Column(
         children: [
-          const Text(
-              "Finish Workout?",
+          Text(
+            AppLocalizations.of(context)!.runningWorkoutFinishWorkout,
             textAlign: TextAlign.center,
-            textScaler: TextScaler.linear(1.2),
-            style: TextStyle(color: Colors.white),
+            textScaler: const TextScaler.linear(1.2),
+            style: const TextStyle(color: Colors.white),
           ),
           const SizedBox(height: 20,),
           Container(
@@ -946,7 +1018,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
               ),
               child: Text(
-                  "Stop Workout",
+                AppLocalizations.of(context)!.runningWorkoutStopWorkout,
                 style: TextStyle(color: Colors.red.withOpacity(0.6)),
               ),
             ),
@@ -1058,8 +1130,6 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void initCachedData(Map data){
-    // print("Received Cached Data");
-    // print(data);
     if(
       data.containsKey("workout") &&
       data.containsKey("workoutTemplateModifiable") &&

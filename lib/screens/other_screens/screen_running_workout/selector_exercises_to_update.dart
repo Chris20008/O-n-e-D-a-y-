@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SelectorExercisesToUpdate extends StatefulWidget {
 
@@ -45,24 +46,12 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
         relevantExercises.add(ex);
       }
     }
-    // for(List<Exercise> exs in zip([workout.exercises, widget.workoutTemplate.exercises])){
-    //
-    // }
-    // isCheckedList = List<bool>.generate(workout.exercises.length, (index) => true);
     isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    // print("IS VISIBLE");
-    // print(widget.isVisible);
-    //
-    // if(workout.exercises.isEmpty && widget.isVisible){
-    //   widget.onConfirm();
-    //   return const SizedBox();
-    // }
 
     return Stack(
       children: [
@@ -84,19 +73,13 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     color: Theme.of(context).primaryColor,
                     child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
-                        padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 65),
+                        padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 85),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
                           return Padding(
                             padding: const EdgeInsets.only(left: 15, right: 15),
                             child: mySeparator(heightBottom: 15, heightTop: 15),
                           );
-                          // return Container(
-                          //   margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
-                          //   height: 1,
-                          //   width: double.maxFinite - 50,
-                          //   color: Colors.amber[900]!.withOpacity(0.4),
-                          // );
                         },
                         itemCount: relevantExercises.length,
                         itemBuilder: (context, index){
@@ -138,7 +121,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                     ],
                                   ),
                                   MultipleExerciseRow(
-                                    exercises: getExercises(index),
+                                    exercises: getExercises(index, context),
                                     fontSize: 15,
                                     colorFade: Theme.of(context).primaryColor,
                                     comparePreviousExercise: true,
@@ -151,17 +134,20 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     ),
                   ),
                   Container(
-                    height: 50,
+                    height: 80,
                     color: Theme.of(context).primaryColor,
                     child: Center(
-                        child: Text(
-                          relevantExercises.isEmpty? "No Exercise To Update" : "Select Exercises To Update",
-                          textScaler: const TextScaler.linear(1.5),
+                        child: OverflowSafeText(
+                          relevantExercises.isEmpty
+                              ? AppLocalizations.of(context)!.runningWorkoutNoExerciseUpdate
+                              : AppLocalizations.of(context)!.runningWorkoutSelectExerciseUpdate,
+                          fontSize: 22,
+                          textAlign: TextAlign.center
                         )
                     ),
                   ),
                   Positioned(
-                    top: 49.8,
+                    top: 79.8,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -242,10 +228,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                         shadowColor: MaterialStateProperty.all(Colors.transparent),
                                         surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
                                         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                        // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                         shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                     ),
-                                    child: const Text("Confirm")
+                                    child: Text(AppLocalizations.of(context)!.confirm)
                                 )
                             ),
                           SizedBox(height: 37, child: verticalGreySpacer),
@@ -258,10 +243,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       shadowColor: MaterialStateProperty.all(Colors.transparent),
                                       surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
                                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                      // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: Text(relevantExercises.isNotEmpty? "Cancel" : "Ok")
+                                  child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : "Ok")
                               )
                           ),
                         ],
@@ -276,12 +260,12 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
     );
   }
 
-  List<Exercise> getExercises(int index){
+  List<Exercise> getExercises(int index, BuildContext context){
     Exercise tempNew = Exercise.copy(relevantExercises[index]);
     Exercise tempTemplate = Exercise.copy(widget.workoutTemplate.exercises.firstWhere((ex) => ex.name == tempNew.name));
 
-    tempNew.name = "New";
-    tempTemplate.name = "Template";
+    tempNew.name = AppLocalizations.of(context)!.myNew;
+    tempTemplate.name = AppLocalizations.of(context)!.template;
 
     return [tempTemplate, tempNew];
   }

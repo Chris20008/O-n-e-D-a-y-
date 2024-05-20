@@ -9,7 +9,6 @@ import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -19,6 +18,7 @@ import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings.dart';
 import 'charts/line_chart_exercise_weight_progress.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenStatistics extends StatefulWidget {
   const ScreenStatistics({super.key});
@@ -133,7 +133,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               Icons.settings,
             )
         ),
-        SizedBox(height: 10,),
+        const SizedBox(height: 10,),
         SizedBox(
           height: 40,
           child: Stack(
@@ -151,7 +151,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     color: Colors.white,
                     onPressed: (){
                       cnScreenStatistics.saveCurrentFilterState();
-                      openFilterPopUp();
+                      openFilterPopUp(context);
                     },
                     icon: const Icon(
                       Icons.filter_list,
@@ -165,13 +165,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     );
   }
 
-  void openFilterPopUp() {
+  void openFilterPopUp(BuildContext context) {
     cnStandardPopUp.open(
         widthFactor: 0.95,
         maxWidth: 350,
         padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
         context: context,
-        child: getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine),
+        child: getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine, context),
         onConfirm: (){
           cnScreenStatistics.refreshData();
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -187,7 +187,11 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     );
   }
 
-  Widget getPopUpChild(bool isOn){
+  Widget getPopUpChild(bool isOn, BuildContext context){
+    List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
+    /// Replace the "ALL Workouts" name in correct language
+    workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
+
     return Column(
       children: [
         const Text(
@@ -218,9 +222,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     },
                     selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
                     children: List<Widget>.generate(
-                        cnScreenStatistics.allWorkoutNames.length, (index) =>
+                        workoutNames.length, (index) =>
                         OverflowSafeText(
-                            cnScreenStatistics.allWorkoutNames[index],
+                            workoutNames[index],
                             maxLines: 1
                         )
                     ),
@@ -243,13 +247,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OverflowSafeText("Average Moved Weight Per Set", maxLines: 1),
+                    OverflowSafeText(AppLocalizations.of(context)!.filterAvgMovWeightHead, maxLines: 2),
                     Padding(
-                      padding: EdgeInsets.only(left: 15),
+                      padding: const EdgeInsets.only(left: 15),
                       child: OverflowSafeText(
-                        "Shows an additional line in the graph that indicates the average moved weight per set",
+                        AppLocalizations.of(context)!.filterAvgMovWeightText,
                         minFontSize: 9,
-                        maxLines: 2,
+                        maxLines: 3,
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ),
@@ -265,7 +269,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showAvgWeightPerSetLine = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine);
+                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine, context);
                     cnStandardPopUp.refresh();
                   }
               )

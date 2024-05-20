@@ -9,6 +9,7 @@ import '../../../../util/constants.dart';
 import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
 import 'dart:io';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -73,7 +74,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                           children: [
                             panelTopBar,
                             const SizedBox(height: 15,),
-                            const Text("Exercise", textScaler: TextScaler.linear(1.5)),
+                            Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5)),
                             const SizedBox(height: 10,),
 
                             /// Exercise name
@@ -85,11 +86,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 validator: (value) {
                                   value = value?.trim();
                                   if (value == null || value.isEmpty) {
-                                    return 'Enter Exercise name';
+                                    return AppLocalizations.of(context)!.panelExEnterName;
                                   } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
                                             cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
                                   ){
-                                    return 'Exercise name already exists in current workout';
+                                    return AppLocalizations.of(context)!.panelExAlreadyExists;
                                   }
                                   return null;
                                 },
@@ -99,7 +100,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 controller: cnNewExercise.exerciseNameController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  labelText: 'Name',
+                                  labelText: AppLocalizations.of(context)!.name,
                                   counterText: "",
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                 ),
@@ -117,7 +118,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                   Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   // Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   const SizedBox(width: 5,),
-                                  const Text("Rest In Seconds", textScaler: TextScaler.linear(1.2),),
+                                  Text(AppLocalizations.of(context)!.restInSeconds, textScaler: const TextScaler.linear(1.2),),
                                   const Spacer(flex: 4,),
                                   SizedBox(
                                     width: 50,
@@ -156,7 +157,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 children: [
                                   Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   const SizedBox(width: 5,),
-                                  const Text("Seat Level", textScaler: TextScaler.linear(1.2),),
+                                  Text(AppLocalizations.of(context)!.
+                                    seatLevel, textScaler: const TextScaler.linear(1.2),),
                                   const Spacer(flex: 4,),
                                   SizedBox(
                                     width: 50,
@@ -197,12 +199,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               ),
                             ),
                             const SizedBox(height: 15,),
-                            const Row(
+                            Row(
                               // mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Expanded(child: Center(child: Text("Set", textScaler: TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text("Weight", textScaler: TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text("Amount", textScaler: TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.set, textScaler: const TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.weight, textScaler: const TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.amount, textScaler: const TextScaler.linear(1.2)))),
                               ],
                             ),
                             Expanded(
@@ -267,8 +269,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               maxLength: 6,
                                               style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
                                               onTap: ()async{
-                                                // cnNewExercise.controllers[index][0].text = "";
-                                                // cnNewExercise.exercise.sets[index].weight = null;
                                                 cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
                                                 if(insetsBottom == 0) {
                                                   await Future.delayed(const Duration(milliseconds: 300));
@@ -475,18 +475,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   void onPanelSlide(value){
     cnWorkouts.animationControllerWorkoutPanel.value = 0.5 + value*0.5;
-    // print(value);
-    // print(cnWorkouts.animationControllerWorkoutPanel.value);
-    // if(value == 0){
-    //   FocusScope.of(context).unfocus();
-    //   cnNewWorkout.refresh();
-    // }
-    // else if(value == 1){
-    //   cnNewWorkout.refresh();
-    // }
-    // cnBottomMenu.adjustHeight(value);
-    // cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
-    // cnBottomMenu.refresh();
   }
 
   void dismissExercise(int index){

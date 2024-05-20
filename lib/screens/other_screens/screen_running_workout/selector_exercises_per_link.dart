@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-
 import '../../../objects/exercise.dart';
 import '../../../util/constants.dart';
 import '../../../widgets/multiple_exercise_row.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SelectorExercisesPerLink extends StatefulWidget {
   final Map groupedExercises;
@@ -36,12 +36,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       for(Exercise ex in groupedExercises[e.key]){
         ex.removeEmptySets();
       }
-      // groupedExercises[e.key].removeWhere((ex) => ex.sets.isEmpty);
     }
-    // groupedExercises = Map.from(widget.groupedExercises);
-    // groupedExercises.removeWhere((key, value) => value is Exercise);
     isCheckedList = groupedExercises.entries.map((e) => List<bool>.generate(e.value.length, (index) => true)).toList();
-    // isCheckedList = List<bool>.generate(groupedExercises.keys.length, (index) => false);
     super.initState();
   }
 
@@ -55,7 +51,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
         GestureDetector(
           onTap: (){
             widget.onCancel();
-            // isCheckedList = List<bool>.generate(widget.workout.exercises.length, (index) => false);
           },
         ),
         Center(
@@ -70,19 +65,13 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                     color: Theme.of(context).primaryColor,
                     child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 60, top: 65),
+                        padding: const EdgeInsets.only(bottom: 60, top: 95),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
                           return Padding(
                             padding: const EdgeInsets.only(left: 15, right: 15),
                             child: mySeparator(heightBottom: 15, heightTop: 15),
                           );
-                          // return Container(
-                          //   margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
-                          //   height: 1,
-                          //   width: double.maxFinite - 50,
-                          //   color: Colors.amber[900]!.withOpacity(0.4),
-                          // );
                         },
                         itemCount: groupedExercises.keys.length,
                         itemBuilder: (context, index){
@@ -92,12 +81,18 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                               children: [
                                 Row(
                                   children: [
-                                    OverflowSafeText(
-                                        "Group: ${linkNames[index]}",
-                                        minFontSize: 20
+                                    Expanded(
+                                      child: Center(
+                                        child: OverflowSafeText(
+                                            "${AppLocalizations.of(context)!.runningWorkoutGroup}: ${linkNames[index]}",
+                                            minFontSize: 20,
+                                            maxLines: 1
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 15,),
                                 for(Exercise ex in groupedExercises[linkNames[index]])
                                   /// show only exercises that actually to have filled sets
                                   /// In a Group with 3 or more Exercises it is likely to happen
@@ -154,17 +149,19 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                     ),
                   ),
                   Container(
-                    height: 50,
+                    height: 80,
+                    padding: const EdgeInsets.all(10),
                     color: Theme.of(context).primaryColor,
-                    child: const Center(
-                        child: Text(
-                          "Select Group Exercises To Track",
-                          textScaler: TextScaler.linear(1.5),
+                    child: Center(
+                        child: OverflowSafeText(
+                          AppLocalizations.of(context)!.runningWorkoutSelectGroup,
+                          textAlign: TextAlign.center,
+                          fontSize: 22,
                         )
                     ),
                   ),
                   Positioned(
-                    top: 49.8,
+                    top: 79.8,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -208,12 +205,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                       height: 30,
                     ),
                   ),
-                  // Positioned(
-                  //   bottom: 40,
-                  //   left: 0,
-                  //   right: 0,
-                  //   child: horizontalGreySpacer,
-                  // ),
                   Positioned(
                       bottom: -5,
                       left: 0,
@@ -245,10 +236,9 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       shadowColor: MaterialStateProperty.all(Colors.transparent),
                                       surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
                                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                      // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: const Text("Confirm")
+                                  child: Text(AppLocalizations.of(context)!.confirm)
                               )
                           ),
                           SizedBox(height: 37, child: verticalGreySpacer),
@@ -264,7 +254,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: Text("Cancel")
+                                  child: Text(AppLocalizations.of(context)!.cancel)
                               )
                           ),
                         ],

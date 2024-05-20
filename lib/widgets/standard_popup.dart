@@ -2,6 +2,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class StandardPopUp extends StatefulWidget {
 
@@ -173,8 +174,8 @@ class CnStandardPopUp extends ChangeNotifier {
     Function? onConfirm,
     Function? onCancel,
     EdgeInsets? padding,
-    String confirmText = "Ok",
-    String cancelText = "Cancel",
+    String? confirmText,
+    String? cancelText,
     Color? color,
     bool showCancel = true,
     bool canConfirm = true,
@@ -191,8 +192,8 @@ class CnStandardPopUp extends ChangeNotifier {
     this.onTapOutside = onTapOutside?? onCancel;
     this.child = child;
     this.padding = padding?? const EdgeInsets.all(20);
-    this.confirmText = confirmText;
-    this.cancelText = cancelText;
+    this.confirmText = confirmText?? AppLocalizations.of(context)!.ok;
+    this.cancelText = cancelText?? AppLocalizations.of(context)!.cancel;
     this.color = color?? Theme.of(context).primaryColor;
     this.showCancel = showCancel;
     this.canConfirm = canConfirm;
