@@ -121,9 +121,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                           setState(() {
                                             if(Platform.isAndroid){
                                               HapticFeedback.selectionClick();
-                                              _tutorial = value;
-                                              cnConfig.setTutorial(_tutorial);
                                             }
+                                            _tutorial = value;
+                                            cnConfig.setTutorial(_tutorial);
                                           });
                                         }
                                     ),
@@ -198,9 +198,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                           setState(() {
                                             if(Platform.isAndroid){
                                               HapticFeedback.selectionClick();
-                                              _automaticBackups = value;
-                                              cnConfig.setAutomaticBackups(_automaticBackups);
                                             }
+                                            _automaticBackups = value;
+                                            cnConfig.setAutomaticBackups(_automaticBackups);
                                           });
                                         }
                                     ),
@@ -232,9 +232,9 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                           setState(() {
                                             if(Platform.isAndroid){
                                               HapticFeedback.selectionClick();
-                                              _syncWithCloud = value;
-                                              cnConfig.setSyncWithCloud(_syncWithCloud);
                                             }
+                                            _syncWithCloud = value;
+                                            cnConfig.setSyncWithCloud(_syncWithCloud);
                                           });
                                         }
                                     ),
