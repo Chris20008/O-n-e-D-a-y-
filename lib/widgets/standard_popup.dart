@@ -156,8 +156,8 @@ class CnStandardPopUp extends ChangeNotifier {
   Function? onTapOutside;
   Widget child = const SizedBox();
   EdgeInsets padding = const EdgeInsets.all(20);
-  String confirmText = "Ok";
-  String cancelText = "Cancel";
+  String confirmText = "";
+  String cancelText = "";
   TextStyle? confirmTextStyle;
   bool jump = true;
   bool showCancel = true;

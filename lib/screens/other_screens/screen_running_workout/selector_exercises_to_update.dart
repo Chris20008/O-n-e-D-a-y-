@@ -245,7 +245,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : "Ok")
+                                  child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok)
                               )
                           ),
                         ],

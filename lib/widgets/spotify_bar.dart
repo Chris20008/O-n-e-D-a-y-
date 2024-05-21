@@ -131,8 +131,19 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                             Row(
                               children: [
                                 Padding(
-                                    padding: const EdgeInsets.all(5),
-                                    child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                                    padding: const EdgeInsets.all(6),
+                                    child: GestureDetector(
+                                        onTap: (){
+                                          /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
+                                          // String? uri = cnSpotifyBar.data?.track?.uri;
+                                          /// Just opens Spotify
+                                          String uri = "spotify:";
+                                          // if(uri != null){
+                                          openUrl(uri);
+                                          // }
+                                        },
+                                        child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                                    )
                                 ),
                                 Expanded(
                                   child: SizedBox(
@@ -145,12 +156,19 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                             child: Container(
                                                 padding: const EdgeInsets.only(left:12, top:2),
                                                 height: cnSpotifyBar.height/2,
-                                                child: AutoSizeText(
-                                                  cnSpotifyBar.data!.track?.name ?? "",
-                                                  maxLines: 1,
-                                                  style: Theme.of(context).textTheme.titleMedium,
-                                                  minFontSize: 13,
-                                                  overflow: TextOverflow.ellipsis,
+                                                child: Row(
+                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      child: AutoSizeText(
+                                                        cnSpotifyBar.data!.track?.name ?? "",
+                                                        maxLines: 1,
+                                                        style: Theme.of(context).textTheme.titleMedium,
+                                                        minFontSize: 13,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 )
                                             ),
                                           ),
@@ -160,7 +178,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                               padding: const EdgeInsets.only(left: 5, bottom:2),
                                               child: Row(
                                                   children:[
-                                                    // const Spacer(flex:1),
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
                                                         constraints: const BoxConstraints(minWidth:35, minHeight:35),
@@ -245,7 +262,18 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                           color: Colors.amber[800],
                                                         )
                                                     ),
-                                                    // const Spacer(flex:6),
+                                                    Expanded(
+                                                      child: AutoSizeText(
+                                                        textAlign: TextAlign.center,
+                                                        cnSpotifyBar.data!.track?.artist.name ?? "",
+                                                        maxLines: 1,
+                                                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                                            color: Colors.grey[400]
+                                                        ),
+                                                        minFontSize: 10,
+                                                        overflow: TextOverflow.ellipsis,
+                                                      ),
+                                                    ),
                                                   ]
                                               ),
                                             ),
@@ -295,9 +323,10 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                       onPressed: () async{
                         cnSpotifyBar.connectToSpotify();
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         MyIcons.spotify,
-                        color: Colors.amber[800],
+                        // color: Colors.amber[800],
+                        color: Color(0xff1ed560)
                       )
                   ),
                 ),
@@ -367,6 +396,7 @@ class CnSpotifyBar extends ChangeNotifier {
   void _subscribeToPlayerState() {
     _subscription = SpotifySdk.subscribePlayerState().listen((playerState) {
       data = playerState;
+      // SpotifySdk.getPlayerState().then((value) => value.track.uri);
       if(data?.isPaused ?? false){
         if(!tryStayConnected){
           tryStayConnected = true;
@@ -401,10 +431,7 @@ class CnSpotifyBar extends ChangeNotifier {
 
   Widget spotifyImageWidget(CnBackgroundImage cn) {
     if(data?.track?.name == currentTrackName){
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(7),
-        child: lastImage?? const SizedBox(),
-      );
+      return lastImage?? const SizedBox();
     }
 
     ImageUri image = data?.track?.imageUri?? ImageUri("None");
@@ -421,7 +448,6 @@ class CnSpotifyBar extends ChangeNotifier {
             currentTrackName = data?.track?.name?? "";
             lastImage = Image.memory(
               snapshot.data!,
-              // height: 1000,
               height: height-10,
               width: height-10,
               gaplessPlayback: true,
@@ -430,8 +456,10 @@ class CnSpotifyBar extends ChangeNotifier {
             setMainColor(lastImage!.image, cn);
           }
           return ClipRRect(
-
-            borderRadius: BorderRadius.circular(7),
+            /// Due to spotify guidelines it is permitted to change the shape of cover art
+            /// https://developer.spotify.com/documentation/design#using-our-content
+            borderRadius: BorderRadius.circular(0),
+            // borderRadius: BorderRadius.circular(7),
             child: lastImage?? const SizedBox(),
           );
         }
@@ -463,6 +491,7 @@ class CnSpotifyBar extends ChangeNotifier {
     if(justClosed){
       isConnected = true;
       justClosed = false;
+      progressIndicatorKey = UniqueKey();
       refresh();
       Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
         cnAnimatedColumn.refresh();

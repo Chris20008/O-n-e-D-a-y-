@@ -205,8 +205,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                             child: Text(
                                               AppLocalizations.of(context)!.panelWoDeleteWorkout,
                                               textAlign: TextAlign.center,
-                                              textScaler: TextScaler.linear(1.2),
-                                              style: TextStyle(color: Colors.white),
+                                              textScaler: const TextScaler.linear(1.2),
+                                              style: const TextStyle(color: Colors.white),
                                             ),
                                             onConfirm: onDelete,
                                             onCancel: (){},
@@ -277,7 +277,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         context: context,
         confirmText: AppLocalizations.of(context)!.yes,
         cancelText: AppLocalizations.of(context)!.no,
-        // maxWidth: MediaQuery.of(context).size.width,
+        maxWidth: MediaQuery.of(context).size.width,
         widthFactor: 0.9,
         padding: const EdgeInsets.all(15),
         child: Column(
@@ -293,15 +293,17 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               textScaler: const TextScaler.linear(1),
               textAlign: TextAlign.center,
             ),
-            // const SizedBox(height: 15),
+            const SizedBox(height: 10),
             ConstrainedBox(
                 constraints: const BoxConstraints(
-                    maxHeight: 300
+                    maxHeight: 400
                 ),
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
+
+                    /// new workout name
                     if(cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 5),
@@ -311,35 +313,38 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             Text(AppLocalizations.of(context)!.panelWoWorkoutName, textScaler: const TextScaler.linear(1.2),),
                             const SizedBox(height: 5,),
                             Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                // const Spacer(),
-                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.originalWorkout.name, maxLines: 2, fontSize: 15, minFontSize: 12))),
+                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.originalWorkout.name, maxLines: 3, fontSize: 15, minFontSize: 10))),
                                 const Expanded(child: Center(child: Icon(Icons.arrow_right_alt))),
-                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.workout.name, maxLines: 2, fontSize: 15, minFontSize: 12))),
+                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.workout.name, maxLines: 3, fontSize: 15, minFontSize: 10))),
                                 // const Spacer(),
                               ],
                             ),
                           ],
                         ),
                       ),
+
+                    /// New exercises names
                     if(cnNewWorkout.exerciseNewNameMapping.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 5, top: 20),
-                        child: Text(AppLocalizations.of(context)!.panelWoExerciseNames, textScaler: const TextScaler.linear(1.2),),
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 5, top: 20),
+                            child: Text(AppLocalizations.of(context)!.panelWoExerciseNames, textScaler: const TextScaler.linear(1.2),),
+                          ),
+                          for(MapEntry entry in cnNewWorkout.exerciseNewNameMapping.entries)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.key, maxLines: 3, fontSize: 15, minFontSize: 10))),
+                                  const Expanded(child: Center(child: Icon(Icons.arrow_right_alt))),
+                                  Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.value, maxLines: 3, fontSize: 15, minFontSize: 10)))
+                                ],
+                              ),
+                            )
+                        ],
                       ),
-                    for(MapEntry entry in cnNewWorkout.exerciseNewNameMapping.entries)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 5),
-                        child: Row(
-                          children: [
-                            // const Spacer(),
-                            Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.key, maxLines: 2, fontSize: 15, minFontSize: 12))),
-                            const Expanded(child: Center(child: Icon(Icons.arrow_right_alt))),
-                            Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.value, maxLines: 2, fontSize: 15, minFontSize: 12)))
-                          ],
-                        ),
-                      )
                   ],
                 ),
               ),
@@ -402,6 +407,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       child: Form(
                         key: _formKey,
                         child: TextFormField(
+                          keyboardAppearance: Brightness.dark,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             value = value?.trim();
@@ -460,10 +466,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             cnStandardPopUp.open(
                                 context: context,
                                 child: TextField(
-                                  maxLength: 15,
-                                  // textAlignVertical: TextAlignVertical.center,
-                                  keyboardType: TextInputType.text,
                                   keyboardAppearance: Brightness.dark,
+                                  maxLength: 15,
+                                  keyboardType: TextInputType.text,
                                   controller: cnNewWorkout.linkNameController,
                                   style: const TextStyle(
                                       fontSize: 20

@@ -59,6 +59,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   final double _iconSize = 20;
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
@@ -299,9 +300,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                             });
                                           },
                                           child: TextField(
+                                            keyboardAppearance: Brightness.dark,
                                             controller: cnRunningWorkout.controllerSeatLevel,
                                             keyboardType: TextInputType.number,
-                                            keyboardAppearance: Brightness.dark,
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -357,9 +358,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                             });
                                           },
                                           child: TextField(
+                                            keyboardAppearance: Brightness.dark,
                                             controller: cnRunningWorkout.controllerRestInSeconds,
                                             keyboardType: TextInputType.number,
-                                            keyboardAppearance: Brightness.dark,
                                             maxLength: 3,
                                             decoration: InputDecoration(
                                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -481,13 +482,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               height: _heightOfSetRow,
                                                               child: Center(
                                                                 child: TextField(
+                                                                  keyboardAppearance: Brightness.dark,
                                                                   maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
                                                                   textAlign: TextAlign.center,
                                                                   keyboardType: const TextInputType.numberWithOptions(
                                                                       decimal: true,
                                                                       signed: false
                                                                   ),
-                                                                  keyboardAppearance: Brightness.dark,
                                                                   controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
                                                                   onTap: (){
                                                                     cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][0].value.text.length);
@@ -532,13 +533,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               height: _heightOfSetRow,
                                                               child: Center(
                                                                 child: TextField(
+                                                                  keyboardAppearance: Brightness.dark,
                                                                   maxLength: 3,
                                                                   textAlign: TextAlign.center,
                                                                   keyboardType: const TextInputType.numberWithOptions(
                                                                       decimal: false,
                                                                       signed: false
                                                                   ),
-                                                                  keyboardAppearance: Brightness.dark,
                                                                   controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
                                                                   onTap: (){
                                                                     cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][1].value.text.length);
@@ -1067,7 +1068,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnWorkouts.refreshAllWorkouts();
       }
       await stopWorkout(time: 0);
-      saveBackup();
+      if(cnConfig.automaticBackups){
+        saveBackup(withCloud: cnConfig.syncWithCloud ?? false);
+      }
     });
   }
 }

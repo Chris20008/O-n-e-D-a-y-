@@ -84,8 +84,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                             });
                           },
                           child: TextFormField(
-                            controller: _textController,
                             keyboardAppearance: Brightness.dark,
+                            controller: _textController,
                             maxLength: 40,
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: (value) {

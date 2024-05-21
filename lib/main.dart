@@ -160,13 +160,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     objectbox = await ObjectBox.create();
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
-    if(cnConfig.config.languageCode == null){
+    if(cnConfig.config.settings["languageCode"] == null){
       if(context.mounted){
         cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
     } else{
       if(context.mounted){
-        MyApp.of(context)?.setLocale(languageCode: cnConfig.config.languageCode);
+        MyApp.of(context)?.setLocale(languageCode: cnConfig.config.settings["languageCode"]);
       }
     }
     // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);

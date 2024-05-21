@@ -27,7 +27,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   @override
   void initState() {
     try{
-      if(widget.data != null){
+      if(widget.data != null && widget.data!.track != null){
         _currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
       }
       if (cnStopwatchWidget.isOpened){

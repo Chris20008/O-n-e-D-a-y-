@@ -98,41 +98,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // SizedBox(
-                  //   width: 54,
-                  //   height: 54,
-                  //   child: IconButton(
-                  //       iconSize: 25,
-                  //       style: ButtonStyle(
-                  //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  //       ),
-                  //       onPressed: () {
-                  //         saveBackup();
-                  //       },
-                  //       icon: Icon(
-                  //         Icons.backup,
-                  //         color: Colors.amber[800],
-                  //       )
-                  //   ),
-                  // ),
-                  // SizedBox(
-                  //   width: 54,
-                  //   height: 54,
-                  //   child: IconButton(
-                  //       iconSize: 25,
-                  //       style: ButtonStyle(
-                  //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  //       ),
-                  //       onPressed: () {
-                  //         // saveBackup();
-                  //         loadBackup();
-                  //       },
-                  //       icon: Icon(
-                  //         Icons.cloud_download,
-                  //         color: Colors.amber[800],
-                  //       )
-                  //   ),
-                  // ),
                   const Spacer(),
                   if(cnNewWorkout.minPanelHeight <= 0)
                     SizedBox(

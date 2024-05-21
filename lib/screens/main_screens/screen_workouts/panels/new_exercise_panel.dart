@@ -81,6 +81,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             Form(
                               key: _formKey,
                               child: TextFormField(
+                                keyboardAppearance: Brightness.dark,
                                 maxLength: 40,
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
                                 validator: (value) {
@@ -123,6 +124,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                   SizedBox(
                                     width: 50,
                                     child: TextField(
+                                      keyboardAppearance: Brightness.dark,
                                       controller: cnNewExercise.restController,
                                       keyboardType: TextInputType.number,
                                       maxLength: 3,
@@ -163,6 +165,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                   SizedBox(
                                     width: 50,
                                     child: TextField(
+                                      keyboardAppearance: Brightness.dark,
                                       controller: cnNewExercise.seatLevelController,
                                       maxLength: 2,
                                       style: const TextStyle(
@@ -265,6 +268,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             height: 35,
                                             color: Colors.transparent,
                                             child: TextField(
+                                              keyboardAppearance: Brightness.dark,
                                               key: cnNewExercise.ensureVisibleKeys[index][0],
                                               maxLength: 6,
                                               style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
@@ -286,7 +290,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   decimal: true,
                                                   signed: false
                                               ),
-                                              keyboardAppearance: Brightness.dark,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                 counterText: "",
@@ -320,6 +323,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             height: 35,
                                             color: Colors.transparent,
                                             child: TextField(
+                                              keyboardAppearance: Brightness.dark,
                                               key: cnNewExercise.ensureVisibleKeys[index][1],
                                               maxLength: 3,
                                               style: const TextStyle(
@@ -340,7 +344,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               textAlign: TextAlign.center,
                                               controller: cnNewExercise.controllers[index][1],
                                               keyboardType: TextInputType.number,
-                                              keyboardAppearance: Brightness.dark,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                 counterText: "",

@@ -194,11 +194,11 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
     return Column(
       children: [
-        const Text(
-          "Filter",
+        Text(
+          AppLocalizations.of(context)!.statisticsFilter,
           textAlign: TextAlign.center,
-          textScaler: TextScaler.linear(1.4),
-          style: TextStyle(color: Colors.white),
+          textScaler: const TextScaler.linear(1.4),
+          style: const TextStyle(color: Colors.white),
         ),
         mySeparator(heightTop: 5, heightBottom: 10, minusWidth: 0),
         SizedBox(
@@ -422,15 +422,15 @@ class CnScreenStatistics extends ChangeNotifier {
     }
   }
 
-  final weekdayMapping = {
-    "Mon": 1,
-    "Tue": 2,
-    "Wed": 3,
-    "Thu": 4,
-    "Fri": 5,
-    "Sat": 6,
-    "Sun": 7,
-  };
+  // final weekdayMapping = {
+  //   "Mon": 1,
+  //   "Tue": 2,
+  //   "Wed": 3,
+  //   "Thu": 4,
+  //   "Fri": 5,
+  //   "Sat": 6,
+  //   "Sun": 7,
+  // };
 
   int getMaxDaysOfMonths(DateTime date){
     switch (date.month){

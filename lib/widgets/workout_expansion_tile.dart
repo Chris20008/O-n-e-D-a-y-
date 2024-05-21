@@ -12,6 +12,7 @@ import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class WorkoutExpansionTile extends StatefulWidget {
   final Function? onExpansionChange;
@@ -196,8 +197,8 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
     cnStandardPopUp.open(
       context: context,
       color: const Color(0xff2d2d2d),
-      confirmText: "Yes",
-      cancelText: "No",
+      confirmText: AppLocalizations.of(context)!.yes,
+      cancelText: AppLocalizations.of(context)!.no,
       onConfirm: () {
         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
           cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
@@ -209,12 +210,12 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
         child: Column(
           children: [
             OverflowSafeText(
-              "Workout ${cnRunningWorkout.workout.name} is already Running",
+              AppLocalizations.of(context)!.woAlreadyRunning(cnRunningWorkout.workout.name),
               textAlign: TextAlign.center
             ),
             const SizedBox(height: 10,),
             OverflowSafeText(
-              "Do you want to stop the current workout and start workout $nameNewWorkout?",
+              AppLocalizations.of(context)!.woAlreadyRunningDelete(nameNewWorkout),
               maxLines: 6,
               textAlign: TextAlign.center,
               fontSize: 14

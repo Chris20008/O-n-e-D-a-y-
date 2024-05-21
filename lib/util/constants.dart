@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -108,19 +109,23 @@ Widget panelTopBar = Container(
 Widget standardDialog({
   required BuildContext context,
   required Widget child,
+  double widthFactor = 0.8,
+  double maxWidth = 330,
+  double maxHeight = 800,
   EdgeInsets padding = const EdgeInsets.all(10),
   TextStyle? confirmTextStyle,
 }){
   return ClipRRect(
     borderRadius: BorderRadius.circular(15),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(
+      constraints: BoxConstraints(
           minWidth: 150,
           minHeight: 100,
-          maxWidth: 330,
-          maxHeight: 600
+          maxWidth: maxWidth,
+          maxHeight: [maxHeight, MediaQuery.of(context).size.height-150].min
       ),
       child: Container(
+          width: MediaQuery.of(context).size.width * widthFactor,
           color: Theme.of(context).primaryColor,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
@@ -244,7 +249,7 @@ Widget OverflowSafeText(
   );
 }
 
-Future<bool> saveBackup() async{
+Future<bool> saveBackup({required bool withCloud}) async{
   Directory? appDocDir = await getDirectory();
   final path = appDocDir?.path;
   /// Seems like having ':' in the filename leads to issues, so we replace them
@@ -253,8 +258,8 @@ Future<bool> saveBackup() async{
   final file = File(fullPath);
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
 
-  if(Platform.isIOS){
-    await saveBackupIOS(fullPath, filename);
+  if(Platform.isIOS && withCloud){
+    await saveBackupiCloud(fullPath, filename);
 
     // final fileList = await ICloudStorage.gather(
     //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
@@ -266,7 +271,7 @@ Future<bool> saveBackup() async{
   return true;
 }
 
-Future saveBackupIOS(String sourceFilePath, String filename)async{
+Future saveBackupiCloud(String sourceFilePath, String filename)async{
   if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
