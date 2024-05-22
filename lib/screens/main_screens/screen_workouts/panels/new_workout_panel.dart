@@ -1,9 +1,8 @@
 import 'dart:io';
-
+import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -18,10 +17,11 @@ import '../../../../widgets/bottom_menu.dart';
 import '../../../../widgets/exercise_row.dart';
 import '../../../../widgets/spotify_bar.dart';
 import '../../../../widgets/standard_popup.dart';
+import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../../screen_workout_history/screen_workout_history.dart';
-import '../../../screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
 import 'new_exercise_panel.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
   const NewWorkOutPanel({super.key});
@@ -40,84 +40,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   final _formKey = GlobalKey<FormState>();
-  final deleteWorkoutKey = GlobalKey();
-  final addLinkKey = GlobalKey();
-
-  // This function displays a CupertinoModalPopup with a reasonable fixed height
-  // which hosts CupertinoDatePicker.
-  // void _showDialog(Widget child) async {
-  //   HapticFeedback.selectionClick();
-  //   await showCupertinoModalPopup<void>(
-  //     context: context,
-  //     builder: (BuildContext context) => Container(
-  //       height: 216,
-  //       padding: const EdgeInsets.only(top: 6.0),
-  //       // The Bottom margin is provided to align the popup above the system
-  //       // navigation bar.
-  //       margin: EdgeInsets.only(
-  //         bottom: MediaQuery.of(context).viewInsets.bottom,
-  //       ),
-  //       // Provide a background color for the popup.
-  //       color: CupertinoColors.systemBackground.resolveFrom(context),
-  //       // Use a SafeArea widget to avoid system overlaps.
-  //       child: SafeArea(
-  //         top: false,
-  //         child: child,
-  //       ),
-  //     ),
-  //   );
-  //   setState(() {});
-  // }
-
-  // void _showDialog(Widget child) async {
-  //   HapticFeedback.selectionClick();
-  //   // final dates = [DateTime.now().subtract(const Duration(days: 2)), DateTime.now().subtract(const Duration(days: 2))];
-  //
-  //   // final date = await showDatePickerDialog(
-  //   //   context: context,
-  //   //   minDate: DateTime(2020, 1, 1),
-  //   //   maxDate: DateTime(2999, 12, 31),
-  //   //   initialDate: cnNewWorkout.workout.date,
-  //   //   selectedDate: cnNewWorkout.workout.date,
-  //   //   currentDate: DateTime.now(),
-  //   //   // enabledCellsDecoration: BoxDecoration(
-  //   //   //   color: Colors.green,
-  //   //   //   borderRadius: BorderRadius.circular(100)
-  //   //   // ),
-  //   //   // disabledCellsDecoration: const BoxDecoration(color: Colors.green),
-  //   //   // currentDateDecoration: BoxDecoration(color: Colors.blue),
-  //   //   enabledCellsTextStyle: const TextStyle(color: Colors.white),
-  //   //   daysOfTheWeekTextStyle: const TextStyle(color:  Colors.white),
-  //   //   barrierColor: Colors.black.withOpacity(0.6)
-  //   // );
-  //   // cnNewWorkout.workout.date = date?? cnNewWorkout.workout.date;
-  //
-  //   // if(Platform.isAndroid){
-  //   HapticFeedback.selectionClick();
-  //   // }
-  //
-  //   // await showCupertinoModalPopup<void>(
-  //   //   context: context,
-  //   //   builder: (BuildContext context) => Container(
-  //   //     height: 216,
-  //   //     padding: const EdgeInsets.only(top: 6.0),
-  //   //     // The Bottom margin is provided to align the popup above the system
-  //   //     // navigation bar.
-  //   //     margin: EdgeInsets.only(
-  //   //       bottom: MediaQuery.of(context).viewInsets.bottom,
-  //   //     ),
-  //   //     // Provide a background color for the popup.
-  //   //     color: CupertinoColors.systemBackground.resolveFrom(context),
-  //   //     // Use a SafeArea widget to avoid system overlaps.
-  //   //     child: SafeArea(
-  //   //       top: false,
-  //   //       child: child,
-  //   //     ),
-  //   //   ),
-  //   // );
-  //
-  //   setState(() {});
-  // }
+  final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
+  final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
 
   @override
   Widget build(BuildContext context) {
@@ -135,159 +59,181 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
           return SlidingUpPanel(
             controller: cnNewWorkout.panelController,
             defaultPanelState: PanelState.CLOSED,
-            maxHeight: constraints.maxHeight - 50,
-            // maxHeight: constraints.maxHeight,
+            maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
             minHeight: cnNewWorkout.minPanelHeight,
             isDraggable: true,
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-            backdropEnabled: true,
-            backdropColor: Colors.black,
-            color: Colors.transparent,
+            // backdropEnabled: true,
+            // backdropColor: Colors.black,
+            color: const Color(0xff120a01),
             onPanelSlide: onPanelSlide,
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-              child: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.centerRight,
-                        end: Alignment.centerLeft,
-                        colors: [
-                          Color(0xff160d05),
-                          Color(0xff0a0604),
-                        ]
-                    )
-                ),
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    FocusScope.of(context).unfocus();
-                    if(cnNewWorkout.panelController.isPanelClosed){
-                      HapticFeedback.selectionClick();
-                      cnNewWorkout.panelController.open();
-                    }
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-                        height: double.maxFinite,
-                        width: double.maxFinite,
-                        color: Colors.transparent,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  FocusScope.of(context).unfocus();
+                  if(cnNewWorkout.panelController.isPanelClosed){
+                    HapticFeedback.selectionClick();
+                    // cnNewWorkout.openPanelWithRefresh();
+                    cnNewWorkout.openPanel();
+                  }
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+                      height: double.maxFinite,
+                      width: double.maxFinite,
+                      // color: Colors.transparent,
+                      child: Stack(
+                        children: [
+                          ListView(
+                            controller: cnNewWorkout.scrollController,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
+                            shrinkWrap: true,
+                            children: [
+                              SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
+                              /// Exercises and Links
+                              ReorderableListView(
+                                  scrollController: ScrollController(),
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.all(0),
+                                  shrinkWrap: true,
+                                  proxyDecorator: (
+                                      Widget child, int index, Animation<double> animation) {
+                                    return AnimatedBuilder(
+                                      animation: animation,
+                                      builder: (BuildContext context, Widget? child) {
+                                        final double animValue = Curves.easeInOut.transform(animation.value);
+                                        final double scale = lerpDouble(1, 1.06, animValue)!;
+                                        return Transform.scale(
+                                          scale: scale,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Material(
+                                              child: Container(
+                                                  padding: const EdgeInsets.only(left: 2),
+                                                  color: Colors.grey.withOpacity(0.05),
+                                                  child: child
+                                                ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: child,
+                                    );
+                                  },
+                                  onReorder: (int oldIndex, int newIndex){
+                                    setState(() {
+                                      if (oldIndex < newIndex) {
+                                        newIndex -= 1;
+                                      }
+                                      final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                      cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
+                                      cnNewWorkout.updateExercisesLinks();
+                                    });
+                                  },
+                                  children: [
+                                    for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
+                                      if(cnNewWorkout.exercisesAndLinks[index] is Exercise)
+                                        getExerciseWithSlideActions(index)
+                                      else if(cnNewWorkout.exercisesAndLinks[index] is String)
+                                        getLinkWithSlideActions(index)
+                                  ]
+                              ),
+                              getAddExerciseButton()
+                            ],
+                          ),
+                          getHeader(),
+                        ],
+                      ),
+                    ),
+
+                    /// faded box bottom screen
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        height: _totalHeightBottomBox,
                         child: Stack(
+                          alignment: Alignment.bottomCenter,
                           children: [
-                            ListView(
-                              controller: cnNewWorkout.scrollController,
-                              physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
-                              shrinkWrap: true,
-                              children: [
-                                SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
-                                /// Exercises and Links
-                                ReorderableListView(
-                                    scrollController: ScrollController(),
-                                    physics: const BouncingScrollPhysics(),
-                                    padding: const EdgeInsets.all(0),
-                                    shrinkWrap: true,
-                                    onReorder: (int oldIndex, int newIndex){
-                                      setState(() {
-                                        if (oldIndex < newIndex) {
-                                          newIndex -= 1;
-                                        }
-                                        final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
-                                        cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
-                                        cnNewWorkout.updateExercisesLinks();
-                                      });
-                                    },
-                                    children: [
-                                      for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
-                                        if(cnNewWorkout.exercisesAndLinks[index] is Exercise)
-                                          getExerciseWithSlideActions(index)
-                                        else if(cnNewWorkout.exercisesAndLinks[index] is String)
-                                          getLinkWithSlideActions(index)
-                                    ]
+                            /// faded container
+                            Positioned(
+                              bottom: _heightBottomColoredBox - 0.2,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: _totalHeightBottomBox - _heightBottomColoredBox,
+                                decoration: BoxDecoration(
+                                    gradient:  LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          // Colors.transparent,
+                                          // Colors.black,
+                                          const Color(0xff120a01).withOpacity(0.0),
+                                          const Color(0xff120a01)
+                                        ]
+                                    )
                                 ),
-                                getAddExerciseButton()
-                              ],
+                              ),
                             ),
-                            getHeader(),
+                            /// just colored container below faded container
+                            Container(
+                              height: _heightBottomColoredBox,
+                              // color: Colors.black,
+                              color: const Color(0xff120a01),
+                            ),
+                            /// bottom row with icons
+                            Padding(
+                              padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  myIconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: onCancel
+                                  ),
+                                  if(cnNewWorkout.isUpdating)
+                                    myIconButton(
+                                      icon:const Icon(Icons.delete_forever),
+                                      onPressed: (){
+                                        cnStandardPopUp.open(
+                                            context: context,
+                                            child: Text(
+                                              AppLocalizations.of(context)!.panelWoDeleteWorkout,
+                                              textAlign: TextAlign.center,
+                                              textScaler: const TextScaler.linear(1.2),
+                                              style: const TextStyle(color: Colors.white),
+                                            ),
+                                            onConfirm: onDelete,
+                                            onCancel: (){},
+                                            color: const Color(0xff2d2d2d)
+                                          // pos: Offset(position.dx + width/2, position.dy + height/2)
+                                        );
+                                      },
+                                    ),
+                                  myIconButton(
+                                      icon: const Icon(Icons.check),
+                                      onPressed: (){
+                                        if(!hasChangedNames()){
+                                          onConfirm();
+                                        }
+                                        else{
+                                          openConfirmNameChangePopUp();
+                                        }
+                                      }
+                                  )
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       ),
-
-                      /// faded box bottom screen
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: SizedBox(
-                          height: 70,
-                          child: Stack(
-                            alignment: Alignment.bottomCenter,
-                            children: [
-                              Positioned(
-                                bottom: 14.8,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  height: 55,
-                                  decoration: const BoxDecoration(
-                                      gradient:  LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black,
-                                          ]
-                                      )
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 15,
-                                color: Colors.black,
-                              ),
-                              /// bottom row with icons
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    myIconButton(
-                                        icon: const Icon(Icons.close),
-                                        onPressed: onCancel
-                                    ),
-                                    if(cnNewWorkout.isUpdating)
-                                      myIconButton(
-                                        key: deleteWorkoutKey,
-                                        icon:const Icon(Icons.delete_forever),
-                                        onPressed: (){
-                                          cnStandardPopUp.open(
-                                              context: context,
-                                              child: const Text(
-                                                "Do you really want to delete this workout?",
-                                                textAlign: TextAlign.center,
-                                                textScaler: TextScaler.linear(1.2),
-                                                style: TextStyle(color: Colors.white),
-                                              ),
-                                              onConfirm: onDelete,
-                                              onCancel: (){},
-                                              animationKey: deleteWorkoutKey,
-                                              color: const Color(0xff2d2d2d)
-                                            // pos: Offset(position.dx + width/2, position.dy + height/2)
-                                          );
-                                        },
-                                      ),
-                                    myIconButton(
-                                        icon: const Icon(Icons.check),
-                                        onPressed: onConfirm
-                                    )
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -326,13 +272,109 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     );
   }
 
+  void openConfirmNameChangePopUp(){
+    cnStandardPopUp.open(
+        context: context,
+        confirmText: AppLocalizations.of(context)!.yes,
+        cancelText: AppLocalizations.of(context)!.no,
+        maxWidth: MediaQuery.of(context).size.width,
+        widthFactor: 0.9,
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          children: [
+            Text(
+              AppLocalizations.of(context)!.panelWoWorkoutNameChanged,
+              textScaler: const TextScaler.linear(1.4),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 15),
+            Text(
+              AppLocalizations.of(context)!.panelWoWorkoutNameChangedMessage,
+              textScaler: const TextScaler.linear(1),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
+            ConstrainedBox(
+                constraints: const BoxConstraints(
+                    maxHeight: 400
+                ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+
+                    /// new workout name
+                    if(cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 20,),
+                            Text(AppLocalizations.of(context)!.panelWoWorkoutName, textScaler: const TextScaler.linear(1.2),),
+                            const SizedBox(height: 5,),
+                            Row(
+                              children: [
+                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.originalWorkout.name, maxLines: 3, fontSize: 15, minFontSize: 10))),
+                                const Expanded(child: Center(child: Icon(Icons.arrow_right_alt))),
+                                Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(cnNewWorkout.workout.name, maxLines: 3, fontSize: 15, minFontSize: 10))),
+                                // const Spacer(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    /// New exercises names
+                    if(cnNewWorkout.exerciseNewNameMapping.isNotEmpty)
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 5, top: 20),
+                            child: Text(AppLocalizations.of(context)!.panelWoExerciseNames, textScaler: const TextScaler.linear(1.2),),
+                          ),
+                          for(MapEntry entry in cnNewWorkout.exerciseNewNameMapping.entries)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                children: [
+                                  Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.key, maxLines: 3, fontSize: 15, minFontSize: 10))),
+                                  const Expanded(child: Center(child: Icon(Icons.arrow_right_alt))),
+                                  Expanded(child: Align(alignment: Alignment.centerLeft ,child: OverflowSafeText(entry.value, maxLines: 3, fontSize: 15, minFontSize: 10)))
+                                ],
+                              ),
+                            )
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+        onConfirm: (){
+          cnNewWorkout.applyNameChanges = true;
+          onConfirm();
+        },
+        onCancel: (){
+          cnNewWorkout.applyNameChanges = false;
+          onConfirm();
+        },
+        onTapOutside: (){
+          cnNewWorkout.applyNameChanges = false;
+        },
+        color: const Color(0xff2d2d2d)
+    );
+  }
+
   Widget getHeader(){
     return ClipRRect(
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-            color: const Color(0xff0a0604),
+            // color: const Color(0xff0a0604),
+            // color: Theme.of(context).primaryColor,
+            color: const Color(0xff120a01),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -341,16 +383,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   children: [
                     Column(
                       children: [
-                        Container(
-                          height: 2,
-                          width: 40,
-                          decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.5),
-                              borderRadius: BorderRadius.circular(2)
-                          ),
-                        ),
+                        panelTopBar,
                         const SizedBox(height: 15,),
-                        Text(cnNewWorkout.workout.isTemplate? "Workout Template" : "Finished Workout", textScaler: TextScaler.linear(1.5)),
+                        Text(cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished, textScaler: const TextScaler.linear(1.5)),
                         const SizedBox(height: 10,),
                       ],
                     ),
@@ -372,19 +407,20 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       child: Form(
                         key: _formKey,
                         child: TextFormField(
+                          keyboardAppearance: Brightness.dark,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             value = value?.trim();
                             if (value == null || value.isEmpty) {
-                              return 'Enter Workout name';
+                              return AppLocalizations.of(context)!.panelWoEnterName;
                             }
                             /// Check if the workout name already exists, but only when the current name is different from the
                             /// initializing name. Otherwise editing an existing workout could lead to error
-                            else if(workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name) &&
-                                    cnNewWorkout.workout.name != cnNewWorkout.originalWorkout.name &&
-                                    cnNewWorkout.workout.isTemplate
+                            else if(cnNewWorkout.workout.isTemplate  &&                                                           /// only check if template
+                                    cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase() && /// Name is not equal to initial name when opening editing
+                                    workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name)                          /// Name exists in database
                             ){
-                              return 'Workout name already exists';
+                              return AppLocalizations.of(context)!.panelWoAlreadyExists;
                             }
                             return null;
                           },
@@ -392,6 +428,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             if(cnNewWorkout.panelController.isPanelClosed){
                               Future.delayed(const Duration(milliseconds: 300), (){
                                 HapticFeedback.selectionClick();
+                                /// We need to use the panel controllers own open methode because, when we use our open
+                                /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
+                                /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
+                                /// Maybe due to speed of opening the panel
                                 cnNewWorkout.panelController.open();
                               });
                             }
@@ -402,7 +442,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                           controller: cnNewWorkout.workoutNameController,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            labelText: 'Name',
+                            labelText: AppLocalizations.of(context)!.name,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                           ),
                           onChanged: (value){
@@ -418,19 +458,17 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         height: 50,
                         child: IconButton(
                           icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
-                          key: addLinkKey,
                           onPressed: ()async{
                             if(cnNewWorkout.panelController.isPanelClosed){
                               HapticFeedback.selectionClick();
-                              await cnNewWorkout.panelController.open();
+                              await cnNewWorkout.openPanel();
                             }
                             cnStandardPopUp.open(
                                 context: context,
                                 child: TextField(
-                                  maxLength: 15,
-                                  // textAlignVertical: TextAlignVertical.center,
-                                  keyboardType: TextInputType.text,
                                   keyboardAppearance: Brightness.dark,
+                                  maxLength: 15,
+                                  keyboardType: TextInputType.text,
                                   controller: cnNewWorkout.linkNameController,
                                   style: const TextStyle(
                                       fontSize: 20
@@ -438,7 +476,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                     isDense: true,
-                                    labelText: 'Group Name',
+                                    labelText: AppLocalizations.of(context)!.groupName,
                                     counterText: "",
                                     contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
                                   ),
@@ -474,7 +512,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                     FocusScope.of(context).unfocus();
                                   });
                                 },
-                                animationKey: addLinkKey,
                                 color: const Color(0xff2d2d2d)
                             );
                           },
@@ -492,46 +529,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        // Expanded(
-                        //   child: OverflowSafeText(
-                        //       "Date",
-                        //       maxLines: 1,
-                        //       fontSize: 25
-                        //   ),
-                        // ),
-                        const Text('Date', textScaler: TextScaler.linear(1.3),),
+                        Text(AppLocalizations.of(context)!.panelWoDate, textScaler: const TextScaler.linear(1.3),),
                         const Spacer(),
                         if(cnNewWorkout.workout.date != null)
-                          // CupertinoButton(
-                          //   onPressed: () async{
-                          //     if(cnNewWorkout.panelController.isPanelClosed){
-                          //       HapticFeedback.selectionClick();
-                          //       await cnNewWorkout.panelController.open();
-                          //     }
-                          //     _showDialog(
-                          //       CupertinoDatePicker(
-                          //         initialDateTime: cnNewWorkout.workout.date,
-                          //         mode: CupertinoDatePickerMode.dateAndTime,
-                          //         use24hFormat: true,
-                          //         showDayOfWeek: true,
-                          //         onDateTimeChanged: (DateTime newDate) {
-                          //           // cnNewWorkout.workout.date = newDate;
-                          //           cnNewWorkout.workout.date = newDate;
-                          //           if(Platform.isAndroid){
-                          //             HapticFeedback.selectionClick();
-                          //           }
-                          //         },
-                          //       ),
-                          //     );
-                          //   },
-                          //   child: Text(
-                          //     DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),
-                          //     // '${cnNewWorkout.workout.date!.month}-${cnNewWorkout.workout.date!.day}-${cnNewWorkout.workout.date!.year}',
-                          //     style: const TextStyle(
-                          //       fontSize: 18,
-                          //     ),
-                          //   ),
-                          // ),
                         buildCalendarDialogButton(
                             context: context,
                             cnNewWorkout: cnNewWorkout,
@@ -552,20 +552,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   ),
                 ),
                 Container(height: 15,),
-                const Text("Exercises", textScaler: TextScaler.linear(1.2)),
+                Text(AppLocalizations.of(context)!.panelWoExercises, textScaler: TextScaler.linear(1.2)),
                 Container(height: 16,),
               ],
             ),
           ),
           Container(
             height: 25,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
                 gradient:  LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Colors.transparent,
-                      Color(0xff0a0604),
+                      // Colors.transparent,
+                      // Color(0xff0a0604),
+                      const Color(0xff120a01).withOpacity(0.0),
+                      const Color(0xff120a01)
                     ]
                 )
             ),
@@ -613,7 +615,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 height: 25,
                 width: 3,
                 decoration: BoxDecoration(
-                    color: (cnNewWorkout.getLinkColor(cnNewWorkout.exercisesAndLinks[index])?? Colors.grey).withOpacity(0.6),
+                    color: (
+                        getLinkColor(
+                            linkName: cnNewWorkout.exercisesAndLinks[index],
+                            workout: cnNewWorkout.workout
+                        )?? Colors.grey
+                    ).withOpacity(0.6),
                     borderRadius: BorderRadius.circular(10)
                 ),
               ),
@@ -664,13 +671,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
-        // dismissible: DismissiblePane(
-        //     confirmDismiss: ()async {
-        //       openExercise(cnNewWorkout.exercisesAndLinks[index]);
-        //       return false;
-        //     },
-        //     onDismissed: () {}
-        // ),
         children: [
           SlidableAction(
             flex: 1,
@@ -729,7 +729,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                     width: 3,
                     height: 50,
                     decoration: BoxDecoration(
-                        color: (cnNewWorkout.getLinkColor((cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName!)?? Colors.grey).withOpacity(0.6),
+                        color: (
+                            getLinkColor(
+                                linkName: (cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName!,
+                                workout: cnNewWorkout.workout
+                            )?? Colors.grey
+                        ).withOpacity(0.6),
                         borderRadius: BorderRadius.circular(10)
                     ),
                   ),
@@ -739,6 +744,32 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         ),
       ),
     );
+  }
+
+  bool hasChangedNames(){
+    if(!cnNewWorkout.workout.isTemplate){
+      return false;
+    }
+
+    /// calculate Exercises that have had a name change
+    final changedExercises = cnNewWorkout.originalWorkout.exercises.where(
+            (exercise) => cnNewWorkout.workout.exercises.any(
+                (ex) => ex.id == exercise.id
+                && ex.name != exercise.name
+        )
+    ).toList();
+
+    /// create exercise name mapping oldName: newName
+    for(Exercise ex in changedExercises){
+      cnNewWorkout.exerciseNewNameMapping[ex.name] = cnNewWorkout.workout.exercises.firstWhere((exercise) => exercise.id == ex.id).name;
+    }
+
+    if((cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name && cnNewWorkout.originalWorkout.name.isNotEmpty)
+        || cnNewWorkout.exerciseNewNameMapping.isNotEmpty){
+      return true;
+    }
+
+    return false;
   }
 
   void dismissExercise(Exercise ex){
@@ -761,9 +792,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addLink(String linkName){
-    if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
-      linkName = "Curls";
-    }
+    // if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
+    //   linkName = "Curls";
+    // }
     if (cnNewWorkout.workout.linkedExercises.contains(linkName)){
       return;
     }
@@ -776,20 +807,25 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   void openExercise(Exercise ex, {bool copied = false}){
     /// Clone exercise to prevent directly change settings in original exercise before saving
     /// f.e. when user goes back or just slides down panel
-    Exercise clonedEx = Exercise.clone(ex);
+    Exercise exToEdit;
+    if(copied){
+      exToEdit = Exercise.copy(ex);
+    } else{
+      exToEdit = Exercise.clone(ex);
+    }
 
     if(copied) {
       /// If copied means a copy of the original exercise is made to create a completely new exercise
-      clonedEx.name = "";
+      exToEdit.name = "";
     } else {
       /// Otherwise the user is editing the exercise so we keep track of the origina name in case
       /// the user changes the exercises name
-      clonedEx.originalName = ex.name;
+      exToEdit.originalName = ex.name;
     }
 
     if(cnNewWorkout.panelController.isPanelOpen){
-      // cnNewExercisePanel.setExercise(clonedEx);
-      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: clonedEx, onConfirm: confirmAddExercise);
+      // cnNewExercisePanel.setExercise(exToEdit);
+      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: exToEdit, onConfirm: confirmAddExercise);
       cnNewExercisePanel.refresh();
     }
   }
@@ -817,7 +853,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnNewExercisePanel.clear();
   }
 
-  void onConfirm(){
+  void onConfirm() async{
     if (_formKey.currentState!.validate()){
       vibrateConfirm();
       cnNewWorkout.updateExercisesOrderInWorkoutObject();
@@ -826,6 +862,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       }
       cnNewWorkout.removeEmptyLinksFromWorkout();
       cnNewWorkout.workout.saveToDatabase();
+      if(cnNewWorkout.applyNameChanges){
+        changeSameNameWorkouts();
+      }
       cnWorkouts.refreshAllWorkouts();
       cnWorkoutHistory.refreshAllWorkouts();
       cnNewWorkout.closePanel(doClear: true);
@@ -834,31 +873,32 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
   }
 
-  void onPanelSlide(value){
-    cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
-    // if(value >= 0.8){
-    //   if(cnSpotifyBar.isVisible){
-    //     // cnSpotifyBar.setVisibility(false);
-    //   }
-    // }
-    // if(value <= 0.2){
-    //   if(!cnSpotifyBar.isVisible){
-    //     // cnSpotifyBar.setVisibility(true);
-    //   }
-    // }
-    // if(value < 0.05 && !cnBottomMenu.isVisible){
-    //   SystemChrome.setPreferredOrientations([]);
-    //
-    // }
-    // else if(value > 0.05 && cnBottomMenu.isVisible){
-    // }
-    if(value == 0 || value == 1){
-      cnNewWorkout.refresh();
+  void changeSameNameWorkouts(){
+    final currentObWorkouts = objectbox.workoutBox.query(ObWorkout_.name.equals(cnNewWorkout.originalWorkout.name)).build().find();
+
+    for(ObWorkout wo in currentObWorkouts){
+      wo.name = cnNewWorkout.workout.name;
+      for(MapEntry mapping in cnNewWorkout.exerciseNewNameMapping.entries){
+        if(wo.exercises.map((e) => e.name).contains(mapping.key)){
+          wo.exercises.firstWhere((e) => e.name == mapping.key).name = mapping.value;
+        }
+      }
+      wo.save();
     }
+  }
+
+  void onPanelSlide(value){
+    cnWorkouts.animationControllerWorkoutPanel.value = value*0.5;
     if(value == 0){
       FocusScope.of(context).unfocus();
+      cnNewWorkout.refresh();
     }
-    cnBottomMenu.refresh();
+    else if(value == 1){
+      cnNewWorkout.refresh();
+    }
+    cnBottomMenu.adjustHeight(value);
+    // cnBottomMenu.positionYAxis = cnBottomMenu.height * value;
+    // cnBottomMenu.refresh();
   }
 
 }
@@ -872,18 +912,11 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   bool isUpdating = false;
   ScrollController scrollController = ScrollController();
   List<dynamic> exercisesAndLinks = [];
-  List<Color> linkColors = [
-    const Color(0xFF5F9561),
-    const Color(0xFFFFEA30),
-    const Color(0xFF558FDF),
-    const Color(0xFFF48E40),
-    const Color(0xFFA349D1),
-    const Color(0xFF8AEAC3),
-    const Color(0xFF4F8447),
-  ];
   double minPanelHeight = 0;
   bool isCurrentlyRebuilding = false;
+  bool applyNameChanges = false;
   double keepShowingPanelHeight = Platform.isAndroid? 180 : 212;
+  Map<String, String> exerciseNewNameMapping = {};
   late CnHomepage cnHomepage;
   late CnWorkouts cnWorkouts;
   late CnWorkoutHistory cnWorkoutHistory;
@@ -917,18 +950,10 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         dates[w.date] = w.name;
       }
     }
-
-    for(final entry in dates.entries){
-      print(entry.key);
-      print(entry.value);
-      print("");
-    }
     return dates;
   }
 
   void refreshAllWorkoutDays(){
-    print("");
-    print("REFRESH");
     allWorkoutDates = getAllWorkoutDays();
   }
 
@@ -946,27 +971,24 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     isCurrentlyRebuilding = false;
   }
 
-  Color? getLinkColor(String linkName){
-    int index = workout.linkedExercises.indexOf(linkName);
-    if(index >= 0){
-      return linkColors[index % linkColors.length];
-    }
-    return null;
-  }
-
-  void openPanel(){
+  void openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
     minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    panelController.animatePanelToPosition(
+    refresh();
+    await openPanel();
+    /// is needed to move spotifyBar higher when panel is opened
+    cnHomepage.refresh();
+    // cnWorkouts.refresh();
+    // cnWorkoutHistory.refresh();
+  }
+
+  Future<void> openPanel() async{
+    await panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut
+        curve: Curves.decelerate
     );
-    refresh();
-    cnHomepage.refresh();
-    cnWorkouts.refresh();
-    cnWorkoutHistory.refresh();
   }
 
   void addToExercisesAndLinksList(dynamic item){
@@ -1080,16 +1102,18 @@ class CnNewWorkOutPanel extends ChangeNotifier {
 
   void editWorkout(Workout workout){
     Workout w = Workout.clone(workout);
+    /// When same workout
     if(isUpdating && this.workout.id == w.id){
-      openPanel();
+      openPanelWithRefresh();
     }
+    /// When different workout
     else{
       clear(doRefresh: false);
       isUpdating = true;
       setWorkout(w);
       updateExercisesAndLinksList();
       initializeCorrectOrder();
-      openPanel();
+      openPanelWithRefresh();
     }
   }
 
@@ -1103,6 +1127,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   void clear({bool doRefresh = true}){
     workout = Workout();
     originalWorkout = Workout();
+    exerciseNewNameMapping.clear();
+    applyNameChanges = false;
     refreshAllWorkoutDays();
     workoutNameController = TextEditingController();
     linkNameController = TextEditingController();

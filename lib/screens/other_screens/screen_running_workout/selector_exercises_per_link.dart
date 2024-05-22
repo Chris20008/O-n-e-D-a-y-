@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../objects/exercise.dart';
-import '../../util/constants.dart';
-import '../../widgets/multiple_exercise_row.dart';
+import '../../../objects/exercise.dart';
+import '../../../util/constants.dart';
+import '../../../widgets/multiple_exercise_row.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SelectorExercisesPerLink extends StatefulWidget {
   final Map groupedExercises;
@@ -27,22 +28,16 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
 
   @override
   void initState() {
-    print("RELEVANT LINKS");
-    print(widget.relevantLinkNames);
     for(MapEntry e in widget.groupedExercises.entries){
       if(!widget.relevantLinkNames.contains(e.key) || e.value is Exercise){
         continue;
       }
-      groupedExercises[e.key] = e.value.map((ex) => Exercise.clone(ex)).toList();
+      groupedExercises[e.key] = e.value.map((ex) => Exercise.copy(ex)).toList();
       for(Exercise ex in groupedExercises[e.key]){
         ex.removeEmptySets();
       }
-      // groupedExercises[e.key].removeWhere((ex) => ex.sets.isEmpty);
     }
-    // groupedExercises = Map.from(widget.groupedExercises);
-    // groupedExercises.removeWhere((key, value) => value is Exercise);
     isCheckedList = groupedExercises.entries.map((e) => List<bool>.generate(e.value.length, (index) => true)).toList();
-    // isCheckedList = List<bool>.generate(groupedExercises.keys.length, (index) => false);
     super.initState();
   }
 
@@ -56,7 +51,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
         GestureDetector(
           onTap: (){
             widget.onCancel();
-            // isCheckedList = List<bool>.generate(widget.workout.exercises.length, (index) => false);
           },
         ),
         Center(
@@ -71,123 +65,103 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                     color: Theme.of(context).primaryColor,
                     child: ListView.separated(
                         physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 60, top: 65),
+                        padding: const EdgeInsets.only(bottom: 60, top: 95),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
-                          return Container(
-                            margin: const EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 15),
-                            height: 1,
-                            width: double.maxFinite - 50,
-                            color: Colors.amber[900]!.withOpacity(0.4),
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: mySeparator(heightBottom: 15, heightTop: 15),
                           );
                         },
                         itemCount: groupedExercises.keys.length,
                         itemBuilder: (context, index){
                           return Padding(
                             padding: const EdgeInsets.only(left: 15),
-                            child: GestureDetector(
-                              onTap: (){
-                                // setState(() {
-                                //   isCheckedList[index] = !isCheckedList[index];
-                                //   if(isCheckedList[index]){
-                                //     vibrateConfirm();
-                                //   } else{
-                                //     vibrateCancel();
-                                //   }
-                                // });
-                              },
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      OverflowSafeText(
-                                          "Group: ${linkNames[index]}",
-                                          minFontSize: 20
-                                      ),
-                                      // Expanded(child: Container(color: Colors.transparent ,height: 50,),),
-                                      // Transform.scale(
-                                      //   scale: 1.4,
-                                      //   child: Checkbox(
-                                      //     checkColor: Colors.white,
-                                      //     value: isCheckedList[index],
-                                      //     shape: const CircleBorder(),
-                                      //     onChanged: (bool? value) {
-                                      //       setState(() {
-                                      //         isCheckedList[index] = value!;
-                                      //       });
-                                      //     },
-                                      //   ),
-                                      // ),
-                                    ],
-                                  ),
-                                  for(Exercise ex in groupedExercises[linkNames[index]])
-                                    /// show only exercises that actually to have filled sets
-                                    /// In a Group with 3 or more Exercises it is likely to happen
-                                    /// that the user fills two exercises. However the not filled
-                                    /// exercises are still in the group. Here we filter for only those
-                                    /// that actually have filled sets
-                                    if(ex.sets.isNotEmpty)
-                                      GestureDetector(
-                                        onTap: (){
-                                          setState(() {
-                                            final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
-                                            isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
-                                            if(!currentState){
-                                              vibrateConfirm();
-                                            } else{
-                                              vibrateCancel();
-                                            }
-                                          });
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: MultipleExerciseRow(
-                                                exercises: [ex],
-                                                fontSize: 15,
-                                                colorFade: Theme.of(context).primaryColor,
-                                              ),
-                                            ),
-                                            Transform.scale(
-                                              scale: 1.4,
-                                              child: Checkbox(
-                                                checkColor: Colors.white,
-                                                value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
-                                                shape: const CircleBorder(),
-                                                onChanged: (bool? value) {
-                                                  setState(() {
-                                                    isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value!;
-                                                    if(value){
-                                                      vibrateConfirm();
-                                                    } else{
-                                                      vibrateCancel();
-                                                    }
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Center(
+                                        child: OverflowSafeText(
+                                            "${AppLocalizations.of(context)!.runningWorkoutGroup}: ${linkNames[index]}",
+                                            minFontSize: 20,
+                                            maxLines: 1
                                         ),
-                                      )
-                                ],
-                              ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15,),
+                                for(Exercise ex in groupedExercises[linkNames[index]])
+                                  /// show only exercises that actually to have filled sets
+                                  /// In a Group with 3 or more Exercises it is likely to happen
+                                  /// that the user fills two exercises. However the not filled
+                                  /// exercises are still in the group. Here we filter for only those
+                                  /// that actually have filled sets
+                                  if(ex.sets.isNotEmpty)
+                                    GestureDetector(
+                                      onTap: (){
+                                        setState(() {
+                                          final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
+                                          isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
+                                          if(!currentState){
+                                            vibrateConfirm();
+                                          } else{
+                                            vibrateCancel();
+                                          }
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: MultipleExerciseRow(
+                                              exercises: [ex],
+                                              fontSize: 15,
+                                              colorFade: Theme.of(context).primaryColor,
+                                            ),
+                                          ),
+                                          Transform.scale(
+                                            scale: 1.4,
+                                            child: Checkbox(
+                                              checkColor: Colors.white,
+                                              value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
+                                              shape: const CircleBorder(),
+                                              onChanged: (bool? value) {
+                                                setState(() {
+                                                  isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value!;
+                                                  if(value){
+                                                    vibrateConfirm();
+                                                  } else{
+                                                    vibrateCancel();
+                                                  }
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                              ],
                             ),
                           );
                         }
                     ),
                   ),
                   Container(
-                    height: 50,
+                    height: 80,
+                    padding: const EdgeInsets.all(10),
                     color: Theme.of(context).primaryColor,
-                    child: const Center(
-                        child: Text(
-                          "Select Group Exercises To Track",
-                          textScaler: TextScaler.linear(1.5),
+                    child: Center(
+                        child: OverflowSafeText(
+                          AppLocalizations.of(context)!.runningWorkoutSelectGroup,
+                          textAlign: TextAlign.center,
+                          fontSize: 22,
                         )
                     ),
                   ),
                   Positioned(
-                    top: 49.8,
+                    top: 79.8,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -256,20 +230,18 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       indexJ = 0;
                                       index += 1;
                                     }
-                                    print("EX TO REMOVE");
-                                    print(exToRemove);
                                     widget.onConfirm(exToRemove: exToRemove);
                                   },
                                   style: ButtonStyle(
                                       shadowColor: MaterialStateProperty.all(Colors.transparent),
                                       surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
                                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                      // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: const Text("Confirm")
+                                  child: Text(AppLocalizations.of(context)!.confirm)
                               )
                           ),
+                          SizedBox(height: 37, child: verticalGreySpacer),
                           Expanded(
                               child: ElevatedButton(
                                   onPressed: () {
@@ -282,7 +254,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
                                       shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
-                                  child: Text("Cancel")
+                                  child: Text(AppLocalizations.of(context)!.cancel)
                               )
                           ),
                         ],

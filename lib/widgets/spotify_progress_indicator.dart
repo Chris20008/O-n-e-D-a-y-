@@ -1,9 +1,10 @@
 import 'package:fitness_app/widgets/spotify_bar.dart';
-import 'package:fitness_app/widgets/stopwatch.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
+
+import '../screens/other_screens/screen_running_workout/stopwatch.dart';
 
 class SpotifyProgressIndicator extends StatefulWidget {
   final PlayerState? data;
@@ -26,7 +27,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   @override
   void initState() {
     try{
-      if(widget.data != null){
+      if(widget.data != null && widget.data!.track != null){
         _currentWidthPercent = (widget.data!.playbackPosition / widget.data!.track!.duration);
       }
       if (cnStopwatchWidget.isOpened){

@@ -4,43 +4,51 @@ import 'custom_cache_manager.dart';
 
 class Config{
 
-  bool showIntro;
+  // bool showIntro;
   Map cnRunningWorkout;
-  String? languageCode;
+  Map cnScreenStatistics;
+  Map settings;
+  // String? languageCode;
   late CustomCacheManager cache;
 
   Config({
-    this.showIntro = true,
+    // this.showIntro = true,
     this.cnRunningWorkout = const {},
-    this.languageCode
+    this.cnScreenStatistics = const {},
+    this.settings = const {}
+    // this.languageCode
   }) {
     cache = CustomCacheManager();
     save();
   }
 
   Map<String, dynamic> toJson() => {
-    'showIntro': showIntro,
-    "languageCode": languageCode,
-    'cnRunningWorkout': cnRunningWorkout
+    // 'showIntro': showIntro,
+    // "languageCode": languageCode,
+    'cnRunningWorkout': cnRunningWorkout,
+    'cnScreenStatistics': cnScreenStatistics,
+    'settings': settings
   };
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
-      showIntro: json['showIntro']?? false,
-      languageCode: json['languageCode'],
-      cnRunningWorkout: json['cnRunningWorkout']?? {}
+      // showIntro: json['showIntro']?? false,
+      // languageCode: json['languageCode'],
+      cnRunningWorkout: json['cnRunningWorkout']?? {},
+      cnScreenStatistics: json['cnScreenStatistics']?? {},
+      settings: json['settings']?? {}
     );
   }
 
   Future<bool> save() async{
     try{
       final json = toJson();
-      print("JASON TO CACHE");
-      print(json);
+      // print("JASON TO CACHE");
+      // print(json);
       await cache.saveData(json, "config");
       return true;
     } catch (e){
-      print("Exception while saving: ${e.toString()}");
+      // print("Exception while saving: ${e.toString()}");
       return false;
     }
   }
@@ -57,8 +65,8 @@ class CnConfig extends ChangeNotifier {
 
     final Map<String, dynamic>? tempConfigData = await cache.readData(fileName: "config");
 
-    print("Received Temp Config Data");
-    print(tempConfigData);
+    // print("Received Temp Config Data");
+    // print(tempConfigData);
 
     try{
       if(tempConfigData != null){
@@ -80,18 +88,39 @@ class CnConfig extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future setShowIntro(bool state) async{
-    config.showIntro = state;
-    await config.save();
-  }
+  // Future setShowIntro(bool state) async{
+  //   config.showIntro = state;
+  //   await config.save();
+  // }
+
+  get languageCode => config.settings["languageCode"];
+  get tutorial => config.settings["tutorial"];
+  get automaticBackups => config.settings["automaticBackups"];
+  get syncWithCloud => config.settings["syncWithCloud"];
+
 
   Future setLanguage(String languageCode) async{
-    config.languageCode = languageCode;
+    config.settings["languageCode"] = languageCode;
     await config.save();
   }
 
   Future setCnRunningWorkout(Map data) async{
     config.cnRunningWorkout = data;
+    await config.save();
+  }
+
+  Future setTutorial(bool value) async{
+    config.settings["tutorial"] = value;
+    await config.save();
+  }
+
+  Future setAutomaticBackups(bool value) async{
+    config.settings["automaticBackups"] = value;
+    await config.save();
+  }
+
+  Future setSyncWithCloud(bool value) async{
+    config.settings["syncWithCloud"] = value;
     await config.save();
   }
 }

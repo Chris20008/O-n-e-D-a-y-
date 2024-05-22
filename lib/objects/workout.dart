@@ -46,7 +46,7 @@ class Workout{
 
   Workout.copy(Workout w): this(
       name: w.name,
-      exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
+      exercises: w.exercises.map((e) => Exercise.copy(e)).toList(),
       date: w.date,
       linkedExercises: List.from(w.linkedExercises)
   );
@@ -54,6 +54,7 @@ class Workout{
   Workout.fromObWorkout(ObWorkout w): this(
       name: w.name,
       exercises: List.from(w.exercises.map((e) => Exercise(
+          id: e.id,
           name: e.name,
           sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt()))),
           restInSeconds: e.restInSeconds,

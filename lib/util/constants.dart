@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -15,11 +16,128 @@ import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'objectbox/ob_exercise.dart';
+
+List<Color> linkColors = [
+  const Color(0xFF5F9561),
+  const Color(0xFFFFEA30),
+  const Color(0xFF558FDF),
+  const Color(0xFFF48E40),
+  const Color(0xFFA349D1),
+  const Color(0xFF8AEAC3),
+  const Color(0xFF4F8447),
+];
+
+Color? getLinkColor({required String linkName, required Workout workout}){
+  int index = workout.linkedExercises.indexOf(linkName);
+  if(index >= 0){
+    return linkColors[index % linkColors.length];
+  }
+  return null;
+}
+
+Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4}){
+  return Column(
+    children: [
+      SizedBox(height: heightTop),
+      Container(
+        height: 1,
+        width: double.maxFinite - minusWidth,
+        // color: const Color(0xFFC16A03).withOpacity(opacity),
+          color: Colors.amber[900]!.withOpacity(opacity)
+        // color: Colors.amber[900]!.withOpacity(0.6),
+      ),
+      SizedBox(height: heightBottom),
+    ],
+  );
+}
+
+Future openUrl(String url)async{
+  final Uri parsedUrl = Uri.parse(url);
+  if (!await launchUrl(parsedUrl)) {
+    throw Exception('Could not launch $parsedUrl');
+  }
+}
+
+Future<void> sendMail({required String subject}) async {
+  const email = "OneDayApp@icloud.com";
+  final String emailSubject = subject;
+  final Uri parsedMailto = Uri.parse("mailto:<$email>?subject=$emailSubject");
+  if (!await launchUrl(
+    parsedMailto,
+    mode: LaunchMode.externalApplication,
+  )) {
+    throw Exception('Could not send Mail');
+  }
+}
+
+String getLanguageAsString(BuildContext context){
+  final lan =  Localizations.localeOf(context).toString();
+  if(lan == "en"){
+    return "English";
+  } else{
+    return "Deutsch";
+  }
+}
+
+Widget verticalGreySpacer = Container(
+  height: double.maxFinite,
+  width: 0.5,
+  color: Colors.grey[700]!.withOpacity(0.5),
+);
+
+Widget horizontalGreySpacer = Container(
+  height: 0.5,
+  width: double.maxFinite,
+  color: Colors.grey[700]!.withOpacity(0.5),
+);
+
+Widget panelTopBar = Container(
+  height: 2,
+  width: 40,
+  decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.5),
+      borderRadius: BorderRadius.circular(2)
+  ),
+);
+
+Widget standardDialog({
+  required BuildContext context,
+  required Widget child,
+  double widthFactor = 0.8,
+  double maxWidth = 330,
+  double maxHeight = 800,
+  EdgeInsets padding = const EdgeInsets.all(10),
+  TextStyle? confirmTextStyle,
+}){
+  return ClipRRect(
+    borderRadius: BorderRadius.circular(15),
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+          minWidth: 150,
+          minHeight: 100,
+          maxWidth: maxWidth,
+          maxHeight: [maxHeight, MediaQuery.of(context).size.height-150].min
+      ),
+      child: Container(
+          width: MediaQuery.of(context).size.width * widthFactor,
+          color: Theme.of(context).primaryColor,
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: padding,
+              child: child,
+            ),
+          )
+      ),
+    ),
+  );
+}
 
 TextStyle getTextStyleForTextField(String text, {Color? color}){
   return TextStyle(
@@ -34,6 +152,7 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
 }
 
 String validateDoubleTextInput(String text){
+  text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
     final count = ".".allMatches(text).length;
     if(count > 1){
@@ -100,8 +219,8 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
 }
 
 enum TimeInterval {
-  monthly ("Monthly"),
-  quarterly ("Quarterly"),
+  // monthly ("Monthly"),
+  // quarterly ("Quarterly"),
   yearly ("Yearly");
 
   const TimeInterval(this.value);
@@ -130,7 +249,7 @@ Widget OverflowSafeText(
   );
 }
 
-Future<bool> saveBackup() async{
+Future<bool> saveBackup({required bool withCloud}) async{
   Directory? appDocDir = await getDirectory();
   final path = appDocDir?.path;
   /// Seems like having ':' in the filename leads to issues, so we replace them
@@ -139,8 +258,8 @@ Future<bool> saveBackup() async{
   final file = File(fullPath);
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
 
-  if(Platform.isIOS){
-    await saveBackupIOS(fullPath, filename);
+  if(Platform.isIOS && withCloud){
+    await saveBackupiCloud(fullPath, filename);
 
     // final fileList = await ICloudStorage.gather(
     //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
@@ -152,7 +271,7 @@ Future<bool> saveBackup() async{
   return true;
 }
 
-Future saveBackupIOS(String sourceFilePath, String filename)async{
+Future saveBackupiCloud(String sourceFilePath, String filename)async{
   if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
@@ -194,7 +313,6 @@ Future loadBackup() async{
   );
 
   if (result != null) {
-    print("------- GOT RESULT -------");
     File file = File(result.files.single.path!);
     final contents = await file.readAsString();
     final allWorkoutsAsListString = contents.split(";");
@@ -217,17 +335,10 @@ Future loadBackup() async{
   }
 }
 
-void pickBackupPath() async{
-  // FilePickerResult? result = await FilePicker.platform.pickFiles();
-  String? result = await FilePicker.platform.getDirectoryPath();
-
-  if (result != null) {
-    print("------- GOT pickBackupPath RESULT -------");
-    print(result);
-  } else {
-    // User canceled the picker
-  }
-}
+// void pickBackupPath() async{
+//   // FilePickerResult? result = await FilePicker.platform.pickFiles();
+//   String? result = await FilePicker.platform.getDirectoryPath();
+// }
 
 Future<bool> hasInternet()async{
   final conRes = await Connectivity().checkConnectivity();
@@ -269,11 +380,7 @@ bool workoutNameExistsInTemplates({required String workoutName}){
 }
 
 bool exerciseNameExistsInWorkout({required Workout workout, required String exerciseName}){
-  final List<String> exNames = workout.exercises.map((e) => e.name.toLowerCase()).toList();
-  if(exNames.contains(exerciseName.toLowerCase())){
-    return true;
-  }
-  return false;
+  return workout.exercises.map((e) => e.name.toLowerCase()).contains(exerciseName.toLowerCase());
 }
 
 Widget buildCalendarDialogButton({
@@ -420,7 +527,9 @@ Widget buildCalendarDialogButton({
         ? Icon(
           Icons.calendar_month,
           size: 30,
-          color: Colors.amber[800],
+          // color: Colors.amber[800],
+          // color: Colors.amber[200]!
+          color: Colors.white
         )
         : Text(
           DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),

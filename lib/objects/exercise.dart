@@ -9,6 +9,7 @@ class Exercise{
   List<SingleSet> sets;
   int restInSeconds;
   int? seatLevel;
+  int id;
 
   String? originalName;
   String? linkName;
@@ -19,6 +20,7 @@ class Exercise{
     this.sets = const [],
     this.restInSeconds = 0,
     this.seatLevel,
+    this.id = -100,
     this.originalName,
     this.linkName
   }){
@@ -29,7 +31,16 @@ class Exercise{
   }
 
   /// Don't clone the original name
+  Exercise.copy(Exercise ex): this(
+      name: ex.name,
+      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
+      restInSeconds: ex.restInSeconds,
+      seatLevel: ex.seatLevel,
+      linkName: ex.linkName
+  );
+
   Exercise.clone(Exercise ex): this(
+      id: ex.id,
       name: ex.name,
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
       restInSeconds: ex.restInSeconds,
@@ -140,5 +151,23 @@ class StatisticExercise{
     required this.weight,
     required this.amount,
     required this.date
+  });
+}
+
+class DismissedSingleSet{
+  String? linkName;
+  String exName;
+  int index;
+  SingleSet dismissedSet;
+  SingleSet dismissedTemplateSet;
+  List<TextEditingController>? dismissedControllers;
+
+  DismissedSingleSet({
+    this.linkName,
+    required this.exName,
+    required this.index,
+    required this.dismissedSet,
+    required this.dismissedTemplateSet,
+    required this.dismissedControllers
   });
 }

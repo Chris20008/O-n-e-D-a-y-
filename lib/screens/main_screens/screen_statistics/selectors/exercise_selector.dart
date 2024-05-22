@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../../../objects/exercise.dart';
 import '../screen_statistics.dart';
 
 class ExerciseSelector extends StatefulWidget {
@@ -20,94 +18,83 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
   Future _showDialog(Widget child) async{
     HapticFeedback.selectionClick();
+
+    final initExercise = cnScreenStatistics.selectedExerciseName;
+
     await showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
         height: 250,
         padding: const EdgeInsets.only(top: 6.0),
-        // The Bottom margin is provided to align the popup above the system navigation bar.
         margin: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        // Provide a background color for the popup.
         color: CupertinoColors.systemBackground.resolveFrom(context),
-        // Use a SafeArea widget to avoid system overlaps.
         child: SafeArea(
           top: false,
           child: child,
         ),
       ),
     );
-    // setState(() {});
-    cnScreenStatistics.lineChartKey = UniqueKey();
-    cnScreenStatistics.refresh();
+    if(initExercise != cnScreenStatistics.selectedExerciseName){
+      cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.refresh();
+      cnScreenStatistics.cache();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
 
-    print("REBUILD EX SELECTOR");
+    cnScreenStatistics.selectedExerciseName ??= cnScreenStatistics.allExerciseNames.firstOrNull;
 
-    if(cnScreenStatistics.selectedWorkout == null || cnScreenStatistics.selectedWorkout!.exercises.isEmpty){
-      print("RETURN EMPTY");
+    if(cnScreenStatistics.selectedExerciseName == null){
       return const SizedBox();
     }
 
-
-    // cnScreenStatistics.selectedWorkout ??= cnScreenStatistics.intervalSelectorMap.keys.first;
-
-    return Column(
-      children: [
-        CupertinoButton(
-          padding: EdgeInsets.zero,
-          // Display a CupertinoPicker with list of fruits.
-          onPressed: () => _showDialog(
-            CupertinoPicker(
-                magnification: 1.22,
-                squeeze: 1.2,
-                useMagnifier: true,
-                itemExtent: 32,
-                // This sets the initial item.
-                scrollController: FixedExtentScrollController(
-                  initialItem: cnScreenStatistics.selectedWorkout!.exercises.indexOf(cnScreenStatistics.selectedExercise!),
+    return CupertinoButton(
+      padding: EdgeInsets.zero,
+      onPressed: () => _showDialog(
+        CupertinoPicker(
+            magnification: 1.22,
+            squeeze: 1.2,
+            useMagnifier: true,
+            itemExtent: 32,
+            scrollController: FixedExtentScrollController(
+              initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
+            ),
+            onSelectedItemChanged: (int index) {
+              cnScreenStatistics.selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
+              if(Platform.isAndroid){
+                HapticFeedback.selectionClick();
+              }
+            },
+            children: cnScreenStatistics.allExerciseNames.map((String exName) {
+              return SizedBox(width: cnScreenStatistics.width-150, child: Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12)));
+            }).toList()
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: cnScreenStatistics.width-100
+            ),
+            child: OverflowSafeText(
+                cnScreenStatistics.selectedExerciseName!,
+                style: const TextStyle(
+                  fontSize: 22.0,
+                  color: Colors.white
                 ),
-                // This is called when selected item is changed.
-                onSelectedItemChanged: (int index) {
-                  // setState(() {
-                  cnScreenStatistics.selectedExercise = cnScreenStatistics.selectedWorkout!.exercises[index];
-                  if(Platform.isAndroid){
-                    HapticFeedback.selectionClick();
-                  }
-                  // });
-                },
-                children: cnScreenStatistics.selectedWorkout!.exercises.map((Exercise ex) {
-                  return Center(child: OverflowSafeText(ex.name, maxLines: 1, minFontSize: 12));
-                  // return Center(child: Text(ex.name));
-                }).toList()
+                maxLines: 1
             ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              OverflowSafeText(
-                  cnScreenStatistics.selectedExercise!.name,
-                  style: const TextStyle(
-                    fontSize: 22.0,
-                  ),
-              ),
-              // Text(
-              //   cnScreenStatistics.selectedExercise!.name,
-              //   style: const TextStyle(
-              //     fontSize: 22.0,
-              //   ),
-              // ),
-              const SizedBox(width: 10,),
-              const Icon(Icons.arrow_forward_ios, size: 15,)
-            ],
-          ),
-        ),
-      ],
+          const SizedBox(width: 10,),
+          const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
+        ],
+      ),
     );
   }
 }

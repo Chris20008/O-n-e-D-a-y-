@@ -2,8 +2,9 @@ import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../screens/screen_running_workout/screen_running_workout.dart';
-import '../screens/screen_running_workout/animated_column.dart';
+import 'screen_running_workout.dart';
+import 'animated_column.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class StopwatchWidget extends StatefulWidget {
   const StopwatchWidget({super.key});
@@ -18,7 +19,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnStopwatchWidget cnStopwatchWidget;
 
   double paddingLeftRight = 5;
-  final width = WidgetsBinding.instance.window.physicalSize.width;
+  // late final width = WidgetsBinding.instance.window.physicalSize.width;
+  late final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +31,6 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
       child: Padding(
           padding: EdgeInsets.only(left:paddingLeftRight, right: paddingLeftRight, bottom: 3),
           child: AnimatedCrossFade(
-            // secondCurve: cnSpotifyBar.isConnected? Curves.easeInOutQuint : Curves.easeInExpo,
-            // secondCurve: Curves.fastOutSlowIn,
-            // secondCurve: Curves.fastLinearToSlowEaseIn,
-            //   sizeCurve: Curves.easeInOutBack,
             sizeCurve: Curves.easeInOut,
             firstChild: ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -82,14 +80,13 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                             color: const Color(0xff333333),
                                             child: InkWell(
                                               onTap: cnStopwatchWidget.cancelTimer,
-                                              child: const SizedBox(
+                                              child: SizedBox(
                                                 height: 70,
                                                 width: 70,
                                                 child: Center(
                                                   child: Text(
-                                                    "Delete",
-                                                    style: TextStyle(color: Color(
-                                                        0xfffdfdfd)),
+                                                    AppLocalizations.of(context)!.delete,
+                                                    style: const TextStyle(color: Color(0xfffdfdfd)),
                                                   ),
                                                 ),
                                               ),
@@ -119,7 +116,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                         onTap: cnStopwatchWidget.isPaused? cnStopwatchWidget.startTimer : cnStopwatchWidget.pauseTimer,
                                         child: Center(
                                           child: Text(
-                                            cnStopwatchWidget.isPaused? "Start" : "Stop",
+                                            cnStopwatchWidget.isPaused? AppLocalizations.of(context)!.start : AppLocalizations.of(context)!.stop,
                                             style: TextStyle(
                                               color: cnStopwatchWidget.isPaused? const Color(0x9627eb15) : const Color(
                                                   0xfffd443a)
@@ -142,9 +139,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
-                        padding: EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(top: 20),
                         child: Text(
-                          // "00:00",
                           cnStopwatchWidget.isRunning?
                             getTimeString() :
                             "00:00",
@@ -231,14 +227,6 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
 
     String seconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
     seconds = seconds.length==1? "0$seconds" : seconds;
-
-    // String milliseconds = (cnStopwatchWidget.stopwatch.elapsed.inMilliseconds%1000).toString();
-    // milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
-    // milliseconds = milliseconds.length==2? "0$milliseconds" : milliseconds;
-    // milliseconds = milliseconds.substring(0,  milliseconds.length>=2 ? 2 : milliseconds.length);
-    // milliseconds = milliseconds.length==1? "0$milliseconds" : milliseconds;
-
-    // return "$minutes:$seconds,$milliseconds";
     return "$minutes:$seconds";
   }
 }
@@ -255,7 +243,6 @@ class CnStopwatchWidget extends ChangeNotifier {
   final Stopwatch stopwatch = Stopwatch();
 
   CnStopwatchWidget(BuildContext context){
-    print("NINT STOPWATCH CN");
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   }
 

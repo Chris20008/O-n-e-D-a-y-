@@ -6,9 +6,10 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
 import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
-import '../../../screen_running_workout/screen_running_workout.dart';
+import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
-import 'new_workout_panel.dart';
+import 'dart:io';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -19,12 +20,13 @@ class NewExercisePanel extends StatefulWidget {
 
 class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
-  // late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   final double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
   final _formKey = GlobalKey<FormState>();
+  final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
+  final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +48,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         child: LayoutBuilder(
           builder: (context, constraints){
             return SlidingUpPanel(
+              onPanelSlide: onPanelSlide,
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
               defaultPanelState: PanelState.CLOSED,
-              maxHeight: constraints.maxHeight - 50,
+              maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
               minHeight: 0,
-              color: Colors.transparent,
+              backdropEnabled: true,
+              backdropColor: Colors.black,
+              backdropOpacity: 0.5,
+              color: const Color(0xff120a01),
               isDraggable: true,
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
               panel: ClipRRect(
@@ -60,48 +66,32 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   children: [
                     Container(
                       padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.centerRight,
-                              end: Alignment.centerLeft,
-                              colors: [
-                                Color(0xff160d05),
-                                Color(0xff0a0604),
-                              ]
-                          )
-                      ),
                       child: GestureDetector(
                         // onTap: () {
                         //   FocusScope.of(context).unfocus();
                         // },
                         child: Column(
                           children: [
-                            Container(
-                              height: 2,
-                              width: 40,
-                              decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(2)
-                              ),
-                            ),
+                            panelTopBar,
                             const SizedBox(height: 15,),
-                            const Text("Exercise", textScaler: TextScaler.linear(1.5)),
+                            Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5)),
                             const SizedBox(height: 10,),
 
                             /// Exercise name
                             Form(
                               key: _formKey,
                               child: TextFormField(
+                                keyboardAppearance: Brightness.dark,
                                 maxLength: 40,
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
                                 validator: (value) {
                                   value = value?.trim();
                                   if (value == null || value.isEmpty) {
-                                    return 'Enter Exercise name';
+                                    return AppLocalizations.of(context)!.panelExEnterName;
                                   } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
                                             cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
                                   ){
-                                    return 'Exercise name already exists in current workout';
+                                    return AppLocalizations.of(context)!.panelExAlreadyExists;
                                   }
                                   return null;
                                 },
@@ -111,7 +101,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 controller: cnNewExercise.exerciseNameController,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  labelText: 'Name',
+                                  labelText: AppLocalizations.of(context)!.name,
                                   counterText: "",
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                 ),
@@ -129,11 +119,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                   Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   // Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   const SizedBox(width: 5,),
-                                  const Text("Rest In Seconds", textScaler: TextScaler.linear(1.2),),
+                                  Text(AppLocalizations.of(context)!.restInSeconds, textScaler: const TextScaler.linear(1.2),),
                                   const Spacer(flex: 4,),
                                   SizedBox(
                                     width: 50,
                                     child: TextField(
+                                      keyboardAppearance: Brightness.dark,
                                       controller: cnNewExercise.restController,
                                       keyboardType: TextInputType.number,
                                       maxLength: 3,
@@ -168,11 +159,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 children: [
                                   Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                   const SizedBox(width: 5,),
-                                  const Text("Seat Level", textScaler: TextScaler.linear(1.2),),
+                                  Text(AppLocalizations.of(context)!.
+                                    seatLevel, textScaler: const TextScaler.linear(1.2),),
                                   const Spacer(flex: 4,),
                                   SizedBox(
                                     width: 50,
                                     child: TextField(
+                                      keyboardAppearance: Brightness.dark,
                                       controller: cnNewExercise.seatLevelController,
                                       maxLength: 2,
                                       style: const TextStyle(
@@ -209,12 +202,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               ),
                             ),
                             const SizedBox(height: 15,),
-                            const Row(
+                            Row(
                               // mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Expanded(child: Center(child: Text("Set", textScaler: TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text("Weight", textScaler: TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text("Amount", textScaler: TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.set, textScaler: const TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.weight, textScaler: const TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.amount, textScaler: const TextScaler.linear(1.2)))),
                               ],
                             ),
                             Expanded(
@@ -275,12 +268,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             height: 35,
                                             color: Colors.transparent,
                                             child: TextField(
+                                              keyboardAppearance: Brightness.dark,
                                               key: cnNewExercise.ensureVisibleKeys[index][0],
                                               maxLength: 6,
                                               style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
                                               onTap: ()async{
-                                                // cnNewExercise.controllers[index][0].text = "";
-                                                // cnNewExercise.exercise.sets[index].weight = null;
                                                 cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
                                                 if(insetsBottom == 0) {
                                                   await Future.delayed(const Duration(milliseconds: 300));
@@ -298,7 +290,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   decimal: true,
                                                   signed: false
                                               ),
-                                              keyboardAppearance: Brightness.dark,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                 counterText: "",
@@ -312,6 +303,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   cnNewExercise.exercise.sets[index].weight = newValue;
                                                   if(newValue == null){
                                                     cnNewExercise.controllers[index][0].clear();
+                                                  } else{
+                                                    cnNewExercise.controllers[index][0].text = value;
                                                   }
                                                 }
                                                 else{
@@ -330,6 +323,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             height: 35,
                                             color: Colors.transparent,
                                             child: TextField(
+                                              keyboardAppearance: Brightness.dark,
                                               key: cnNewExercise.ensureVisibleKeys[index][1],
                                               maxLength: 3,
                                               style: const TextStyle(
@@ -350,7 +344,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               textAlign: TextAlign.center,
                                               controller: cnNewExercise.controllers[index][1],
                                               keyboardType: TextInputType.number,
-                                              keyboardAppearance: Brightness.dark,
                                               decoration: InputDecoration(
                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                 counterText: "",
@@ -415,43 +408,59 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                     /// faded box bottom screen
                     Align(
                       alignment: Alignment.bottomCenter,
-                      child: Container(
-                        height: 60,
-                        decoration: const BoxDecoration(
-                            gradient:  LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.transparent,
-                                  Colors.black,
-                                ]
-                            )
-                        ),
-                      ),
-                    ),
-                    /// bottom row with icons
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 20, left: 30, right: 30),
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: SizedBox(
+                        height: _totalHeightBottomBox,
+                        child: Stack(
+                          alignment: Alignment.bottomCenter,
                           children: [
-                            myIconButton(
-                                icon: const Icon(Icons.close),
-                                onPressed: () {
-                                  cnNewExercise.closePanel(doClear: true);
-                                  _formKey.currentState?.reset();
-                                },
+                            /// faded container
+                            Positioned(
+                              bottom: _heightBottomColoredBox - 0.2,
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                height: _totalHeightBottomBox - _heightBottomColoredBox,
+                                decoration: BoxDecoration(
+                                    gradient:  LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          // Colors.transparent,
+                                          // Colors.black,
+                                          const Color(0xff120a01).withOpacity(0.0),
+                                          const Color(0xff120a01)
+                                        ]
+                                    )
+                                ),
+                              ),
                             ),
-                            myIconButton(
-                                icon: const Icon(Icons.check),
-                                onPressed: closePanelAndSaveExercise
+                            /// just colored container below faded container
+                            Container(
+                              height: _heightBottomColoredBox,
+                              // color: Colors.black,
+                              color: const Color(0xff120a01),
+                            ),
+                            /// bottom row with icons
+                            Padding(
+                              padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  myIconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: onCancel
+                                  ),
+                                  myIconButton(
+                                      icon: const Icon(Icons.check),
+                                      onPressed: closePanelAndSaveExercise
+                                  )
+                                ],
+                              ),
                             )
                           ],
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -460,6 +469,15 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         ),
       ),
     );
+  }
+
+  void onCancel(){
+    cnNewExercise.closePanel(doClear: true);
+    _formKey.currentState?.reset();
+  }
+
+  void onPanelSlide(value){
+    cnWorkouts.animationControllerWorkoutPanel.value = 0.5 + value*0.5;
   }
 
   void dismissExercise(int index){
@@ -540,7 +558,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     panelController.animatePanelToPosition(
         0,
         duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut
+        curve: Curves.decelerate
     ).then((value) => {
       if(doClear){
         clear()

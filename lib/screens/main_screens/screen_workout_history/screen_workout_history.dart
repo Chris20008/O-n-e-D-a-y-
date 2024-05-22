@@ -11,8 +11,9 @@ import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
+import '../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts/panels/new_workout_panel.dart';
-import '../../screen_running_workout/screen_running_workout.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenWorkoutHistory extends StatefulWidget {
   const ScreenWorkoutHistory({super.key});
@@ -80,7 +81,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     if(dateOfNewerWorkout == null){
                       return getChildWithTimeHeader(
                           child: child,
-                          headerText: "Future",
+                          headerText: AppLocalizations.of(context)!.historyFuture,
                           heightSpacer: dateOfNewerWorkout == null? 0 : 40,
                           textScaler: 1.8
                       );
@@ -92,7 +93,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday()){
                       return getChildWithTimeHeader(
                         child: child,
-                        headerText: "Today",
+                        headerText: AppLocalizations.of(context)!.historyToday,
                         heightSpacer: dateOfNewerWorkout == null? 0 : 40,
                         textScaler: 1.8,
                         /// with week header
@@ -106,7 +107,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isYesterday()){
                       return getChildWithTimeHeader(
                           child: child,
-                          headerText: "Yesterday",
+                          headerText: AppLocalizations.of(context)!.historyYesterday,
                           heightSpacer: dateOfNewerWorkout == null? 0 : 40,
                           textScaler: 1.7,
                           /// with week header
@@ -123,7 +124,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         || dateOfNewerWorkout.isInFuture() ){
                       return getChildWithTimeHeader(
                           child: child,
-                          headerText: "Last 7 Days",
+                          headerText: AppLocalizations.of(context)!.historyLast7Days,
                           heightSpacer: dateOfNewerWorkout == null? 0 : 40,
                           textScaler: 1.7,
                           /// with week header
@@ -216,7 +217,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
           color: Colors.black.withOpacity(0.6),
         ),
         child: Text(
-          "week $weekOfYear",
+          "${AppLocalizations.of(context)!.historyWeek} $weekOfYear",
           textScaler: const TextScaler.linear(1),
         ),
       ),
