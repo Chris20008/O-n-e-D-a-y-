@@ -978,7 +978,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
       // onConfirm: finishWorkout,
       onConfirm: () {
-        cnStandardPopUp.clear();
+        // cnStandardPopUp.clear(); // leads to double vibration
         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
           setState(() {
             cnRunningWorkout.checkMultipleExercisesPerLink();
