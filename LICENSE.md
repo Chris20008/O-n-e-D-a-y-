@@ -22,7 +22,7 @@ You may not use the Software for commercial purposes. Non-commercial purposes in
 If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original. This ensures that any derivatives of the App remain open and non-commercial.
 
 ## 5. Contributions to the Project
-You are encouraged to contribute to the development of the Software. You may use the Software to develop new features, fix bugs, or make improvements. Contributions should be submitted via pull requests to the official repository. By submitting a pull request, you agree to allow your contributions to be distributed under the same CC BY-NC 4.0 DEED license.
+You are encouraged to contribute to the development of the Software. You may use the Software to develop new features, fix bugs, or make improvements. Contributions should be submitted via pull requests to the official repository. By submitting a pull request, you agree to allow your contributions to be distributed under the same [CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc-sa/4.0/) license.
 
 ## 6. Restrictions
 ### 6.1 Commercial Use
