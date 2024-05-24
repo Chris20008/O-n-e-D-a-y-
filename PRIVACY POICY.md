@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Effective Date: [Insert Date]**
+**Effective Date: 2024.05.24**
 
 Your privacy is important to us. This Privacy Policy explains how O-n-e-D-a-y- ("the App") collects, uses, and protects your information. By using the App, you agree to the practices described in this policy.
 
