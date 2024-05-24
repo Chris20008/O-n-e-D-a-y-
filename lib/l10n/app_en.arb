@@ -52,6 +52,7 @@
   "settingsImprovement": "Suggestion for Improvement",
   "settingsOther": "Other",
   "settingsFurtherInformationBackup": "Further Information Backup",
+  "settingsImprint": "Imprint",
 
   "filterAvgMovWeightHead": "Average Total Moved Weight",
   "filterAvgMovWeightText": "Shows an additional line in the graph indicating the average total moved weight per set",

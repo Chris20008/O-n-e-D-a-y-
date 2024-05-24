@@ -183,8 +183,8 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
             }
 
             /// ZOOM
-            if(pointerA != null && pointerB != null && !isZooming){
-              isZooming = true;
+            if(pointerA != null && pointerB != null /*&& !isZooming*/){
+              // isZooming = true;
               double sensibility = ((currentVisibleDays) / (1500 / sqrt(currentVisibleDays)));
               final maxDays = maxDate.difference(minDate).inDays;
               final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
@@ -205,9 +205,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
                   offsetMaxX = newOffsetMaxX;
                 }
               });
-              Future.delayed(const Duration(milliseconds: 30), (){
-                isZooming = false;
-              });
+              // Future.delayed(const Duration(milliseconds: 30), (){
+              //   isZooming = false;
+              // });
             }
 
             /// SCROLL

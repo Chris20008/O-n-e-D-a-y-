@@ -283,7 +283,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                   ),
                                 ),
                                 IconButton(
-                                    iconSize: 25,
+                                    iconSize: 30,
                                     style: ButtonStyle(
                                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                     ),
@@ -292,9 +292,13 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                       cnSpotifyBar.close();
                                     },
                                     icon: Icon(
-                                      Icons.cancel,
+                                      Icons.keyboard_arrow_right,
                                       color: Colors.amber[800],
                                     )
+                                    // icon: Icon(
+                                    //   Icons.cancel,
+                                    //   color: Colors.amber[800],
+                                    // )
                                 ),
                                 const SizedBox(width: 3,)
                               ],

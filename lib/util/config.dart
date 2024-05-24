@@ -97,7 +97,12 @@ class CnConfig extends ChangeNotifier {
   get tutorial => config.settings["tutorial"];
   get automaticBackups => config.settings["automaticBackups"];
   get syncWithCloud => config.settings["syncWithCloud"];
+  get countdownTime => config.settings["countdownTime"];
 
+  Future setCountdownTime(int? time) async{
+    config.settings["countdownTime"] = time;
+    await config.save();
+  }
 
   Future setLanguage(String languageCode) async{
     config.settings["languageCode"] = languageCode;

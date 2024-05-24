@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../objectbox.g.dart';
@@ -32,6 +33,49 @@ List<Color> linkColors = [
   const Color(0xFF8AEAC3),
   const Color(0xFF4F8447),
 ];
+
+const List<int> predefinedTimes = [
+  30,
+  60,
+  90,
+  120,
+  150,
+  180,
+  210,
+  240,
+  270,
+  300
+];
+
+String mapRestInSecondsToString({required int restInSeconds, bool short = true}){
+  if (restInSeconds == 0) {
+    return ("-");
+  }
+  else if (restInSeconds < 60) {
+    return "${restInSeconds}s";
+  }
+  else if (restInSeconds % 60 != 0) {
+    int seconds = restInSeconds % 60;
+    final secondsString = seconds > 9? seconds.toString() : "0$seconds";
+    return "${(restInSeconds / 60).floor()}:${secondsString}m";
+  }
+  else {
+    if(short){
+      return "${(restInSeconds / 60).round()}m";
+    }
+    return "${(restInSeconds / 60).floor()}:00m";
+  }
+}
+
+const routeTheme = PullDownMenuRouteTheme(
+    backgroundColor: CupertinoColors.secondaryLabel
+);
+
+const trailingArrow = Icon(
+  Icons.arrow_forward_ios,
+  size: 12,
+  color: Colors.grey,
+);
 
 Color? getLinkColor({required String linkName, required Workout workout}){
   int index = workout.linkedExercises.indexOf(linkName);
@@ -151,6 +195,73 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
   );
 }
 
+Widget getSelectRestInSeconds({
+  required Widget child,
+  required Function(dynamic value) onConfirm
+}) {
+  return PullDownButton(
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List times = List.from(predefinedTimes);
+      times.insert(0, "Clear");
+      times.add("Custom");
+      return List.generate(times.length, (index) => PullDownMenuItem(
+        title: times[index] is String? times[index] : mapRestInSecondsToString(restInSeconds: times[index], short: false),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          FocusManager.instance.primaryFocus?.unfocus();
+          Future.delayed(const Duration(milliseconds: 200), (){
+            onConfirm(times[index]);
+          });
+        }),
+      );
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+      onPressed: (){
+        HapticFeedback.selectionClick();
+        showMenu();
+      },
+      padding: EdgeInsets.zero,
+      child: child
+    ),
+  );
+}
+
+Widget getSelectSeatLevel({
+  required Widget child,
+  required Function(dynamic value) onConfirm
+}) {
+  return PullDownButton(
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List seatLevels = List.generate(21, (index) => index);
+      seatLevels.insert(0, "Clear");
+      return List.generate(seatLevels.length, (index) => PullDownMenuItem(
+          title: seatLevels[index] is String? seatLevels[index] : seatLevels[index].toString(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(seatLevels[index]);
+            });
+          }),
+      );
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    ),
+  );
+}
+
 String validateDoubleTextInput(String text){
   text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
@@ -250,13 +361,17 @@ Widget OverflowSafeText(
 }
 
 Future<bool> saveBackup({required bool withCloud}) async{
+  print("IN BACKUP: With Cloud $withCloud");
   Directory? appDocDir = await getDirectory();
+  print("IN BACKUP: GOT DIRECTORY $appDocDir");
   final path = appDocDir?.path;
   /// Seems like having ':' in the filename leads to issues, so we replace them
   final filename = "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
   final fullPath = '$path/$filename';
   final file = File(fullPath);
+  print("Before saving file");
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
+  print("After saving file");
 
   if(Platform.isIOS && withCloud){
     await saveBackupiCloud(fullPath, filename);
@@ -293,8 +408,11 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
 }
 
 List getWorkoutsAsStringList(){
+  print("IN getWorkoutAsString");
   final allObWorkouts = objectbox.workoutBox.getAll();
+  print("GOT ALL WORKOUTS");
   final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
+  print("transformed allw rokotus as map");
   return allWorkouts;
 }
 

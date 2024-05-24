@@ -28,14 +28,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  final Widget trailingArrow = const Icon(
-    Icons.arrow_forward_ios,
-    size: 12,
-    color: Colors.grey,
-  );
-  late final _routeTheme = const PullDownMenuRouteTheme(
-      backgroundColor: CupertinoColors.secondaryLabel
-  );
+  // final Widget trailingArrow = const Icon(
+  //   Icons.arrow_forward_ios,
+  //   size: 12,
+  //   color: Colors.grey,
+  // );
+  // late final _routeTheme = const PullDownMenuRouteTheme(
+  //     backgroundColor: CupertinoColors.secondaryLabel
+  // );
   bool setOrientation = false;
   // String _languageCode = "en";
   bool _tutorial = true;
@@ -188,7 +188,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   /// Save Backup Automatic
                                   CupertinoListTile(
                                     leading: const Icon(
-                                        true? Icons.cloud_done : Icons.cloud_off
+                                        Icons.cloud_done
                                     ),
                                     title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
                                     trailing: CupertinoSwitch(
@@ -265,13 +265,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                 children: [
                                   /// Contact
                                   CupertinoListTile(
-                                    // onTap: () {sendMail();},
                                     leading: const Icon(
                                         Icons.help_outline
                                     ),
-                                    // trailing: getSelectContactButton(),
                                     title: getSelectContactButton(),
-                                    // title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Github
                                   CupertinoListTile(
@@ -286,17 +283,33 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   ),
                                   /// Term Of Use
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
+                                    },
                                     leading: const Icon(
                                         Icons.my_library_books_rounded
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Privacy Policy
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
+                                    },
                                     leading: const Icon(
                                         Icons.lock_outline
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
+                                  ),
+                                  CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+                                    },
+                                    leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+                                    trailing: trailingArrow,
+                                    title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               ),
@@ -328,7 +341,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectLanguageButton() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
         return [
@@ -381,7 +395,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectContactButton() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
           PullDownMenuItem(
@@ -441,7 +456,8 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectCreateBackup() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
           PullDownMenuItem(
@@ -525,7 +541,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             /// Save Backup Automatic
             CupertinoListTile(
               leading: const Icon(
-                  true? Icons.cloud_done : Icons.cloud_off
+                  Icons.cloud_done
               ),
               title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
             ),
