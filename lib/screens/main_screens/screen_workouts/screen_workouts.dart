@@ -104,17 +104,19 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                       width: 54,
                       height: 54,
                       child: IconButton(
+                          key: cnWorkouts.keyAddWorkout,
                           iconSize: 25,
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(Colors.transparent),
                           ),
                           onPressed: () {
-                            if(cnNewWorkout.isUpdating){
-                              cnNewWorkout.clear();
-                            }
-                            cnNewWorkout.workout.isTemplate = true;
-                            cnNewWorkout.openPanelWithRefresh();
-                            cnHomepage.refresh();
+                            cnNewWorkout.openPanelAsTemplate();
+                            // if(cnNewWorkout.isUpdating){
+                            //   cnNewWorkout.clear();
+                            // }
+                            // cnNewWorkout.workout.isTemplate = true;
+                            // cnNewWorkout.openPanelWithRefresh();
+                            // cnHomepage.refresh();
                           },
                           icon: Icon(
                               Icons.add,
@@ -143,9 +145,12 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 class CnWorkouts extends ChangeNotifier {
   List<Workout> workouts = [];
   Key key = UniqueKey();
+  final GlobalKey _keyAddWorkout = GlobalKey();
   List<bool> opened = [];
   ScrollController scrollController = ScrollController();
   late final AnimationController animationControllerWorkoutPanel;
+
+  GlobalKey get keyAddWorkout => _keyAddWorkout;
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();

@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../objectbox.g.dart';
@@ -84,6 +85,16 @@ String getLanguageAsString(BuildContext context){
     return "Deutsch";
   }
 }
+
+const Widget trailingArrow = Icon(
+  Icons.arrow_forward_ios,
+  size: 12,
+  color: Colors.grey,
+);
+
+const routeTheme = PullDownMenuRouteTheme(
+    backgroundColor: CupertinoColors.secondaryLabel
+);
 
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,

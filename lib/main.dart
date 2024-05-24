@@ -7,6 +7,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
@@ -14,9 +15,11 @@ import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:fitness_app/widgets/tutorial.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -69,7 +72,6 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers:[
-        ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
@@ -77,6 +79,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
+        ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
@@ -107,16 +110,14 @@ class MyAppState extends State<MyApp> {
               brightness: Brightness.dark
             )
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
 
@@ -132,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: true);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false); /// should be true?
   late CnHomepage cnHomepage;
   late final AnimationController _animationControllerWorkoutPanel = AnimationController(
     vsync: this,
@@ -142,6 +143,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     vsync: this,
     duration: const Duration(milliseconds: 300),
   );
+  bool showWelcomeScreen = false;
+  bool closeWelcomeScreen = true;
 
   @override
   void initState() {
@@ -156,8 +159,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     super.dispose();
   }
 
+  void setIntroScreen(){
+    if(cnConfig.tutorial == null || cnConfig.tutorial){
+      // print(object)
+      showWelcomeScreen = true;
+      closeWelcomeScreen = false;
+      cnBottomMenu.adjustHeight(1);
+    }
+    else{
+      showWelcomeScreen = false;
+      closeWelcomeScreen = true;
+    }
+  }
+
   void initMain() async{
     objectbox = await ObjectBox.create();
+    await Future.delayed(const Duration(milliseconds: 300));
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
@@ -169,7 +186,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.settings["languageCode"]);
       }
     }
-    // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
@@ -185,18 +201,42 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
     cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
     cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
+    initTutorial(
+        cnBottomMenu: cnBottomMenu,
+        cnWorkouts: cnWorkouts,
+        cnNewWorkout: cnNewWorkout
+    );
+    cnBottomMenu.setBottomMenuHeight(context);
+    cnBottomMenu.refresh();
+    setIntroScreen();
   }
 
   @override
   Widget build(BuildContext context) {
 
     cnHomepage = Provider.of<CnHomepage>(context);
-    if(cnConfig.isInitialized){
+
+    /// Screen to bee shown until 'await cnConfig.initData();' is finished
+    /// So the config data is been initialized
+    if(!cnConfig.isInitialized){
+      return Scaffold(
+        body: Container(
+          color: Theme.of(context).primaryColor,
+          child: const Center(
+            child: Text(
+                "OneDay",
+                textScaler: TextScaler.linear(2.5),
+                style: TextStyle(decoration: TextDecoration.lineThrough)
+            ),
+          ),
+        ),
+      );
     }
 
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
+      bottomNavigationBar: const BottomMenu(),
       body: PopScope(
         canPop: false,
         child: Container(
@@ -207,12 +247,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     colors: [
                       Color(0xffc26a0e),
                       Color(0xbb110a02)
-
-                      // const Color(0xffb2620e)
-                      // const Color(0xbb1c1003),
-
-                      // const Color(0xff84490b),
-                      // Colors.black.withOpacity(0.9),
                     ]
                 )
             ),
@@ -316,22 +350,54 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 //     alignment: Alignment.bottomCenter,
                 //     child: BottomMenu()
                 // ),
-                const StandardPopUp()
+                const StandardPopUp(),
+                if(showWelcomeScreen)
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 500),
+                    firstChild: WelcomeScreen(
+                      onFinish: (){
+                        setState(() {
+                          closeWelcomeScreen = true;
+                        });
+                        Future.delayed(const Duration(milliseconds: 500), (){
+                          setState(() {
+                            cnBottomMenu.showBottomMenuAnimated();
+                            showTutorial(context, cnNewWorkOutPanel: cnNewWorkout);
+                            showWelcomeScreen = false;
+                          });
+                        });
+                      },
+                    ),
+                    /// Use transparent Container instead of SizedBox to prevent user inputs
+                    /// until tutorial is loaded
+                    secondChild: Container(
+                      color: Colors.transparent,
+                    ),
+                    crossFadeState: closeWelcomeScreen?
+                    CrossFadeState.showSecond :
+                    CrossFadeState.showFirst,
+                    layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Positioned(
+                            key: bottomChildKey,
+                            // top: 0.0,
+                            child: bottomChild,
+                          ),
+                          Positioned(
+                            key: topChildKey,
+                            child: topChild,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
               ],
             ),
-
-          // child: AnimatedCrossFade(
-          //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-          //     // firstChild: Container(height: 50, width: 50,),
-          //     secondChild: ScreenWorkout(key: UniqueKey()),
-          //     crossFadeState: cnBottomMenu.index == 0?
-          //     CrossFadeState.showFirst:
-          //     CrossFadeState.showSecond,
-          //     duration: const Duration(milliseconds: 200)
-          // ),
         ),
       ),
-      bottomNavigationBar: const BottomMenu(),
     );
   }
 }

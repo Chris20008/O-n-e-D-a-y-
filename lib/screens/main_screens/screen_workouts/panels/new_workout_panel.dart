@@ -457,6 +457,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         width: 50,
                         height: 50,
                         child: IconButton(
+                          key: cnNewWorkout.keyAddLink,
                           icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
                           onPressed: ()async{
                             if(cnNewWorkout.panelController.isPanelClosed){
@@ -904,6 +905,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 }
 
 class CnNewWorkOutPanel extends ChangeNotifier {
+  final GlobalKey _keyAddLink = GlobalKey();
   final PanelController panelController = PanelController();
   Workout workout = Workout();
   Workout originalWorkout = Workout();
@@ -921,6 +923,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   late CnWorkouts cnWorkouts;
   late CnWorkoutHistory cnWorkoutHistory;
   late Map<DateTime, dynamic> allWorkoutDates = getAllWorkoutDays();
+
+  GlobalKey get keyAddLink => _keyAddLink;
 
   Map<DateTime, dynamic> getAllWorkoutDays(){
     Map<DateTime, dynamic> dates = {};
@@ -969,6 +973,14 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     refresh();
     await Future.delayed(const Duration(milliseconds: 100), () {});
     isCurrentlyRebuilding = false;
+  }
+
+  void openPanelAsTemplate(){
+    if(isUpdating){
+      clear();
+    }
+    workout.isTemplate = true;
+    openPanelWithRefresh();
   }
 
   void openPanelWithRefresh() async{

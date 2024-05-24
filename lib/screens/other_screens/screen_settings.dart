@@ -2,7 +2,6 @@ import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statis
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -28,14 +27,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  final Widget trailingArrow = const Icon(
-    Icons.arrow_forward_ios,
-    size: 12,
-    color: Colors.grey,
-  );
-  late final _routeTheme = const PullDownMenuRouteTheme(
-      backgroundColor: CupertinoColors.secondaryLabel
-  );
   bool setOrientation = false;
   // String _languageCode = "en";
   bool _tutorial = true;
@@ -188,7 +179,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   /// Save Backup Automatic
                                   CupertinoListTile(
                                     leading: const Icon(
-                                        true? Icons.cloud_done : Icons.cloud_off
+                                        Icons.cloud_done
                                     ),
                                     title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
                                     trailing: CupertinoSwitch(
@@ -328,7 +319,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectLanguageButton() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
         return [
@@ -381,7 +372,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectContactButton() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
           PullDownMenuItem(
@@ -441,7 +432,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectCreateBackup() {
     return PullDownButton(
-      routeTheme: _routeTheme,
+      routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
           PullDownMenuItem(
@@ -525,7 +516,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             /// Save Backup Automatic
             CupertinoListTile(
               leading: const Icon(
-                  true? Icons.cloud_done : Icons.cloud_off
+                  Icons.cloud_done
               ),
               title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
             ),
