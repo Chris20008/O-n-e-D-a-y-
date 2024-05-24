@@ -46,7 +46,7 @@ We may update our Privacy Policy from time to time. We will notify you of any ch
 ## 8. Your Consent
 By using the App, you consent to this Privacy Policy.
 
-## 9. Contact Us
+## 9. Contact Information
 If you have any questions or concerns about this Privacy Policy, please contact us at:
 
 [OneDayApp@iCloud.com](mailto:OneDayApp@iCloud.com)
