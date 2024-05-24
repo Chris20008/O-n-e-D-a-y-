@@ -25,4 +25,4 @@ If you have any questions or suggestions regarding the App, please feel free to 
 
 Please note that this imprint only Applies to the App and not to external websites or social media profiles.  
 
-By using the App, you agree to our [Terms of Use](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use).
+By using the App, you agree to the [Terms of Use](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use).
