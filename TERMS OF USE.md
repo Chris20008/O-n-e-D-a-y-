@@ -1,6 +1,6 @@
 # Terms of Use
 
-Effective Date: 2024.05.24
+**Effective Date: 2024.05.24**
 
 Welcome to O-n-e-D-a-y- ("the App"). By using this App, you agree to comply with and be bound by these Terms of Use. If you do not agree with these Terms of Use, please do not use the App.
 
