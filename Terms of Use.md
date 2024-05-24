@@ -66,4 +66,10 @@ These Terms of Use constitute the entire agreement between you and the App with 
 No waiver of any term or condition set forth in these Terms of Use shall be deemed a further or continuing waiver of such term or condition or a waiver of any other term or condition, and any failure of the App to assert a right or provision under these Terms of Use shall not constitute a waiver of such right or provision.
 
 ## 12. Contact Information
-If you have any questions about these Terms of Use, please contact me at: [OneDayApp@iCloud.com](mailto:OneDayApp@iCloud.com)
+If you have any questions about these Terms of Use, please contact us at: 
+
+[OneDayApp@iCloud.com](mailto:OneDayApp@iCloud.com)
+
+---
+
+By using OneDay, you acknowledge that you have read, understood, and agreed to be bound by these Terms of Use.
