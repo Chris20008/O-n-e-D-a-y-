@@ -37,7 +37,7 @@ The data tracked and stored by the App is used solely for the purpose of providi
 The App and its entire contents, features, and functionality are owned by the App and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws. The open-source nature of the App is governed by the specific open-source [license](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/LICENSE.md#license-agreement).
 
 ## 6. Disclaimer of Warranties
-The App is provided on an "AS IS" and "AS AVAILABLE" basis. the App makes no representations or warranties of any kind, express or implied, as to the operation of the App or the information, content, or materials included on the App.
+The App is provided on an "AS IS" and "AS AVAILABLE" basis. The App makes no representations or warranties of any kind, express or implied, as to the operation of the App or the information, content, or materials included on the App.
 
 ## 7. Limitation of Liability
 In no event shall the App be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in any way connected with the use of the App, the inability to use the App, or for any information, products, and services obtained through the App.
