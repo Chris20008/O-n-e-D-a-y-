@@ -250,13 +250,17 @@ Widget OverflowSafeText(
 }
 
 Future<bool> saveBackup({required bool withCloud}) async{
+  print("IN BACKUP: With Cloud $withCloud");
   Directory? appDocDir = await getDirectory();
+  print("IN BACKUP: GOT DIRECTORY $appDocDir");
   final path = appDocDir?.path;
   /// Seems like having ':' in the filename leads to issues, so we replace them
   final filename = "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
   final fullPath = '$path/$filename';
   final file = File(fullPath);
+  print("Before saving file");
   await file.writeAsString(getWorkoutsAsStringList().join("; "));
+  print("After saving file");
 
   if(Platform.isIOS && withCloud){
     await saveBackupiCloud(fullPath, filename);
@@ -293,8 +297,11 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
 }
 
 List getWorkoutsAsStringList(){
+  print("IN getWorkoutAsString");
   final allObWorkouts = objectbox.workoutBox.getAll();
+  print("GOT ALL WORKOUTS");
   final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
+  print("transformed allw rokotus as map");
   return allWorkouts;
 }
 

@@ -132,11 +132,7 @@ class MultipleExerciseRow extends StatelessWidget {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [...getExerciseRows()
-                        // for (Exercise ex in exercises)
-
-
-                      ],
+                      children: getExerciseRows(),
                     ),
                   ),
                   if(colorFade != null)
@@ -195,6 +191,10 @@ class MultipleExerciseRow extends StatelessWidget {
     Exercise? previousExercise;
     for(Exercise ex in exercises){
       List<Widget> sets = [];
+      /// Remove empty sets in case the previous exercise had one
+      /// Because from no on, we assume that all weights and amounts
+      /// in previous workout are not null
+      previousExercise?.removeEmptySets();
       ex.sets.forEachIndexed((index, set){
 
         /// Has weight or amount improved?
@@ -206,16 +206,22 @@ class MultipleExerciseRow extends StatelessWidget {
             && set.weight != null
             && set.amount != null
         ){
-          if(previousExercise.sets[index].weight! < set.weight!.toDouble()){
+          // print("SHOULD COMPARE");
+          // print(previousExercise.name);
+          // print("INDEX: $index");
+          // print(previousExercise.sets.length);
+          // print(previousExercise.sets.first.weight);
+          // print(previousExercise.sets.first.amount);
+          if(previousExercise.sets[index].weight! < set.weight!){
             weightImproved = true;
           }
-          else if(previousExercise.sets[index].weight! > set.weight!.toDouble()){
+          else if(previousExercise.sets[index].weight! > set.weight!){
             weightImproved = false;
           }
-          if(previousExercise.sets[index].amount! < set.amount!.toDouble()){
+          if(previousExercise.sets[index].amount! < set.amount!){
             amountImproved = true;
           }
-          else if(previousExercise.sets[index].amount! > set.amount!.toDouble()){
+          else if(previousExercise.sets[index].amount! > set.amount!){
             amountImproved = false;
           }
         }
@@ -233,7 +239,8 @@ class MultipleExerciseRow extends StatelessWidget {
                   width: _width + _leftRightPadding*2
               )
           );
-        } else{
+        }
+        else{
           /// Each Set
           sets.add(
               ClipRRect(

@@ -53,22 +53,17 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     /// To receive the latest values after orientation change we need to use
     /// WidgetsBindings.instance.addPostFrameCallback() inside it
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setState(() {
-        setBottomMenuHeight();
-        // orientation = MediaQuery.of(context).orientation;
-        // _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 35 : 30);
-        // final double paddingBottom = MediaQuery.of(context).padding.bottom;
-        // cnBottomMenu.height = paddingBottom + _height;
-      });
+      setBottomMenuHeight();
     });
   }
 
-  void setBottomMenuHeight(){
+  void setBottomMenuHeight({bool withRefresh = true}){
     orientation = MediaQuery.of(context).orientation;
     _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 40 : 35);
     final double paddingBottom = MediaQuery.of(context).padding.bottom;
     cnBottomMenu.height = paddingBottom + _height;
     _iconSize = orientation == Orientation.portrait? null : 15;
+    cnBottomMenu.refresh();
   }
 
   @override
@@ -76,7 +71,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     if(cnBottomMenu.height <= 0){
-      setBottomMenuHeight();
+      setBottomMenuHeight(withRefresh: false);
       // final double paddingBottom = MediaQuery.of(context).padding.bottom;
       // cnBottomMenu.height = paddingBottom + _height;
     }

@@ -20,11 +20,12 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
 
   double paddingLeftRight = 5;
   // late final width = WidgetsBinding.instance.window.physicalSize.width;
-  late final width = MediaQuery.of(context).size.width;
+  // late final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
     cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
+    double width = MediaQuery.of(context).size.width;
 
     return Align(
       alignment: Alignment.bottomRight,
@@ -238,7 +239,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = true;
   int animationTimeStopwatch = 300;
-  double heightOfTimer = 250;
+  double heightOfTimer = 240;
   late CnAnimatedColumn cnAnimatedColumn;
   final Stopwatch stopwatch = Stopwatch();
 

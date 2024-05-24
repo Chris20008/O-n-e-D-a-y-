@@ -56,9 +56,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+  /// listen to bottomMenu for height changes
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   final double _iconSize = 20;
   final double _heightOfSetRow = 30;
@@ -774,7 +775,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                 key: selectorExercisePerLinkKey,
                 groupedExercises: cnRunningWorkout.groupedExercises,
                 relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
-                onConfirm: confirmSelectorExPerLink,//finishWorkout,
+                onConfirm: confirmSelectorExPerLink,
                 onCancel: (){
                   setState(() {
                     showSelectorExercisePerLink = false;
@@ -852,7 +853,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       cnRunningWorkout.exercisesToRemove = exToRemove?? [];
     });
     if(canUpdateTemplate()){
-      cnStandardPopUp.clear();
+      // cnStandardPopUp.clear();
       Future.delayed(Duration(milliseconds: delay?? cnStandardPopUp.animationTime), (){
         setState(() {
           showSelectorExerciseToUpdate = true;
@@ -969,6 +970,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   }
 
   void openPopUpFinishWorkout(){
+    print("AUTOMATIC BACKUPS: ${cnConfig.automaticBackups}");
     final bool canFinish = hasStartedWorkout();
     cnStandardPopUp.open(
       context: context,
@@ -976,7 +978,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       confirmText: AppLocalizations.of(context)!.finish,
       canConfirm: canFinish,
       confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
-      // onConfirm: finishWorkout,
       onConfirm: () {
         // cnStandardPopUp.clear(); // leads to double vibration
         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -988,7 +989,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             } else{
               confirmSelectorExPerLink(delay: 0);
             }
-
           });
         });
       },
@@ -1052,6 +1052,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   Future finishWorkout() async{
     int time;
+    // final createBackup = null;
+    final createAutomaticBackup = cnConfig.automaticBackups;
+    if(createAutomaticBackup == null){
+      return;
+    }
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
       time = cnStandardPopUp.animationTime;
@@ -1068,6 +1073,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnWorkouts.refreshAllWorkouts();
       }
       await stopWorkout(time: 0);
+      print("CREATE AUTOMATIC BACKUP?: ${cnConfig.automaticBackups}");
       if(cnConfig.automaticBackups){
         saveBackup(withCloud: cnConfig.syncWithCloud ?? false);
       }
