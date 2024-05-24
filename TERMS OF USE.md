@@ -53,7 +53,7 @@ The App reserves the right to modify, suspend, or discontinue, temporarily or pe
 The App may revise these Terms of Use at any time by updating this page. By continuing to use the App after any changes are made, you agree to be bound by the revised Terms of Use. It is your responsibility to check this page periodically for updates.
 
 ## 10. Governing Law and Jurisdiction
-These Terms of Use and any disputes arising out of or related to the App shall be governed by and construed in accordance with the laws of [Your Country/State], without giving effect to any choice or conflict of law provision or rule. Any legal suit, action, or proceeding arising out of or related to these Terms of Use or the App shall be instituted exclusively in the federal or state courts located in [Your Jurisdiction].
+These Terms of Use and any disputes arising out of or related to the App shall be governed by and construed in accordance with the laws of Germany, without giving effect to any choice or conflict of law provision or rule. Any legal suit, action, or proceeding arising out of or related to these Terms of Use or the App shall be instituted exclusively in the federal or state courts located in Bonn.
 
 ## 11. Miscellaneous
 ### 11.1 Severability
