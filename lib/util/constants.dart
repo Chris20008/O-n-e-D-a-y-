@@ -34,7 +34,7 @@ List<Color> linkColors = [
   const Color(0xFF4F8447),
 ];
 
-const List<int> predefinedTimerTimes = [
+const List<int> predefinedTimes = [
   30,
   60,
   90,
@@ -195,12 +195,15 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
   );
 }
 
-Widget getSelectTimerTime({required Widget child, required Function(dynamic value) onConfirm}) {
+Widget getSelectRestInSeconds({
+  required Widget child,
+  required Function(dynamic value) onConfirm
+}) {
   return PullDownButton(
     buttonAnchor: PullDownMenuAnchor.start,
     routeTheme: routeTheme,
     itemBuilder: (context) {
-      List times = List.from(predefinedTimerTimes);
+      List times = List.from(predefinedTimes);
       times.insert(0, "Clear");
       times.add("Custom");
       return List.generate(times.length, (index) => PullDownMenuItem(
@@ -222,6 +225,39 @@ Widget getSelectTimerTime({required Widget child, required Function(dynamic valu
       },
       padding: EdgeInsets.zero,
       child: child
+    ),
+  );
+}
+
+Widget getSelectSeatLevel({
+  required Widget child,
+  required Function(dynamic value) onConfirm
+}) {
+  return PullDownButton(
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List seatLevels = List.generate(21, (index) => index);
+      seatLevels.insert(0, "Clear");
+      return List.generate(seatLevels.length, (index) => PullDownMenuItem(
+          title: seatLevels[index] is String? seatLevels[index] : seatLevels[index].toString(),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(seatLevels[index]);
+            });
+          }),
+      );
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: child
     ),
   );
 }

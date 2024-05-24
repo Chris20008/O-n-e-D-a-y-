@@ -115,136 +115,48 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               ),
                             ),
                             const SizedBox(height: 15,),
-                            getSelectTimerTime(
-                                child: SizedBox(
-                                  height: 35,
-                                  child: Row(
-                                    children: [
-                                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                      const SizedBox(width: 5,),
-                                      Text(AppLocalizations.of(context)!.restInSeconds, style: _style),
-                                      const Spacer(flex: 4,),
-                                      Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
-                                      const SizedBox(width: 10),
-                                      trailingArrow
-                                      // SizedBox(
-                                      //   width: 50,
-                                      //   child: TextField(
-                                      //     keyboardAppearance: Brightness.dark,
-                                      //     controller: cnNewExercise.restController,
-                                      //     keyboardType: TextInputType.number,
-                                      //     maxLength: 3,
-                                      //     decoration: InputDecoration(
-                                      //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                      //       labelText: "",
-                                      //       counterText: "",
-                                      //       contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                      //     ),
-                                      //     style: const TextStyle(
-                                      //         fontSize: 18
-                                      //     ),
-                                      //     textAlign: TextAlign.center,
-                                      //     onChanged: (value){
-                                      //       value = value.trim();
-                                      //       if (value.isNotEmpty){
-                                      //         cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
-                                      //       }
-                                      //       else{
-                                      //         cnNewExercise.exercise.restInSeconds = 0;
-                                      //       }
-                                      //     },
-                                      //   ),
-                                      // ),
-                                    ],
-                                  ),
-                                ),
-                                onConfirm: (dynamic value){
-                                  if(value is int){
-                                    cnNewExercise.exercise.restInSeconds = value;
-                                    cnNewExercise.refresh();
-                                  }
-                                  else{
-                                    if(value == "Clear"){
-                                      cnNewExercise.exercise.restInSeconds = 0;
-                                      cnNewExercise.refresh();
-                                    }
-                                    else{
-                                      cnStandardPopUp.open(
-                                        context: context,
-                                        onConfirm: (){
-                                          cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
-                                          vibrateCancel();
-                                          cnNewExercise.restController.clear();
-                                          cnNewExercise.refresh();
-                                          Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                            FocusScope.of(context).unfocus();
-                                          });
-                                        },
-                                        onCancel: (){
-                                          cnNewExercise.restController.clear();
-                                          Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                            FocusScope.of(context).unfocus();
-                                          });
-                                        },
-                                        child: TextField(
-                                          keyboardAppearance: Brightness.dark,
-                                          controller: cnNewExercise.restController,
-                                          keyboardType: TextInputType.number,
-                                          maxLength: 3,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                            labelText: AppLocalizations.of(context)!.restInSeconds,
-                                            counterText: "",
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                          ),
-                                          style: const TextStyle(
-                                              fontSize: 18
-                                          ),
-                                          textAlign: TextAlign.center,
-                                          onChanged: (value){},
-                                        ),
-                                      );
-                                    }
-                                  }
 
-                                  // Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                  //   FocusScope.of(context).unfocus();
-                                  // });
-                                }
-                            ),
+                            /// Rest in Seconds Row and Selector
+                            getRestInSecondsSelector(),
+
+                            const SizedBox(height: 0,),
+
+                            /// Seat Level Row and Selector
+                            getSeatLevelSelector(),
+
                             // SizedBox(
                             //   height: 35,
                             //   child: Row(
                             //     children: [
-                            //       Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                            //       // Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                            //       Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                             //       const SizedBox(width: 5,),
-                            //       Text(AppLocalizations.of(context)!.restInSeconds, textScaler: const TextScaler.linear(1.2),),
+                            //       Text(AppLocalizations.of(context)!.
+                            //         seatLevel, textScaler: const TextScaler.linear(1.2),),
                             //       const Spacer(flex: 4,),
                             //       SizedBox(
                             //         width: 50,
                             //         child: TextField(
                             //           keyboardAppearance: Brightness.dark,
-                            //           controller: cnNewExercise.restController,
+                            //           controller: cnNewExercise.seatLevelController,
+                            //           maxLength: 2,
+                            //           style: const TextStyle(
+                            //               fontSize: 18,
+                            //           ),
+                            //           textAlign: TextAlign.center,
                             //           keyboardType: TextInputType.number,
-                            //           maxLength: 3,
                             //           decoration: InputDecoration(
                             //             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            //             labelText: "",
+                            //             labelText: '',
                             //             counterText: "",
                             //             contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
                             //           ),
-                            //           style: const TextStyle(
-                            //               fontSize: 18
-                            //           ),
-                            //           textAlign: TextAlign.center,
                             //           onChanged: (value){
                             //             value = value.trim();
                             //             if (value.isNotEmpty){
-                            //               cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
+                            //               cnNewExercise.exercise.seatLevel = int.tryParse(value);
                             //             }
                             //             else{
-                            //               cnNewExercise.exercise.restInSeconds = 0;
+                            //               cnNewExercise.exercise.seatLevel = null;
                             //             }
                             //           },
                             //         ),
@@ -252,47 +164,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             //     ],
                             //   ),
                             // ),
-                            const SizedBox(height: 10,),
-                            SizedBox(
-                              height: 35,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                  const SizedBox(width: 5,),
-                                  Text(AppLocalizations.of(context)!.
-                                    seatLevel, textScaler: const TextScaler.linear(1.2),),
-                                  const Spacer(flex: 4,),
-                                  SizedBox(
-                                    width: 50,
-                                    child: TextField(
-                                      keyboardAppearance: Brightness.dark,
-                                      controller: cnNewExercise.seatLevelController,
-                                      maxLength: 2,
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                        labelText: '',
-                                        counterText: "",
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                      ),
-                                      onChanged: (value){
-                                        value = value.trim();
-                                        if (value.isNotEmpty){
-                                          cnNewExercise.exercise.seatLevel = int.tryParse(value);
-                                        }
-                                        else{
-                                          cnNewExercise.exercise.seatLevel = null;
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
                             const SizedBox(height: 25,),
                             Container(
                               height: 1,
@@ -578,6 +449,18 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   void onPanelSlide(value){
     cnWorkouts.animationControllerWorkoutPanel.value = 0.5 + value*0.5;
+
+    /// Clear panel when it's completely closed
+    if(value == 0){
+      /// add animationTime delay to prevent clearing while opening since opening
+      /// can trigger one call with value 0
+      Future.delayed(Duration(milliseconds: cnNewExercise.animationTime), (){
+        /// After delay we check again if the value is still null
+        if(cnNewExercise.panelController.panelPosition == 0){
+          cnNewExercise.clear();
+        }
+      });
+    }
   }
 
   void dismissExercise(int index){
@@ -610,6 +493,108 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     }
   }
 
+  Widget getRestInSecondsSelector() {
+    return getSelectRestInSeconds(
+        child: SizedBox(
+          height: 35,
+          child: Row(
+            children: [
+              Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+              const SizedBox(width: 5,),
+              Text(AppLocalizations.of(context)!.restInSeconds, style: _style),
+              const Spacer(),
+              Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
+              const SizedBox(width: 10),
+              trailingArrow
+            ],
+          ),
+        ),
+        onConfirm: (dynamic value){
+          if(value is int){
+            cnNewExercise.exercise.restInSeconds = value;
+            cnNewExercise.restController.text = value.toString();
+            cnNewExercise.refresh();
+          }
+          else{
+            if(value == "Clear"){
+              cnNewExercise.exercise.restInSeconds = 0;
+              cnNewExercise.restController.clear();
+              cnNewExercise.refresh();
+            }
+            else{
+              // cnNewExercise.restController.clear();
+              cnStandardPopUp.open(
+                context: context,
+                onConfirm: (){
+                  cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
+                  vibrateCancel();
+                  // cnNewExercise.restController.clear();
+                  cnNewExercise.refresh();
+                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                    FocusScope.of(context).unfocus();
+                  });
+                },
+                onCancel: (){
+                  cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
+                  // cnNewExercise.restController.clear();
+                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                    FocusScope.of(context).unfocus();
+                  });
+                },
+                child: TextField(
+                  keyboardAppearance: Brightness.dark,
+                  controller: cnNewExercise.restController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 3,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    labelText: AppLocalizations.of(context)!.restInSeconds,
+                    counterText: "",
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                  ),
+                  style: const TextStyle(
+                      fontSize: 18
+                  ),
+                  textAlign: TextAlign.center,
+                  onChanged: (value){},
+                ),
+              );
+            }
+          }
+        }
+    );
+  }
+
+  Widget getSeatLevelSelector() {
+    return getSelectSeatLevel(
+      onConfirm: (dynamic value){
+        if(value is int){
+          cnNewExercise.exercise.seatLevel = value;
+          cnNewExercise.refresh();
+        }
+        else if(value == "Clear"){
+          cnNewExercise.exercise.seatLevel = null;
+          cnNewExercise.refresh();
+        }
+      },
+      child: SizedBox(
+        height: 35,
+        child: Row(
+          children: [
+            Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+            const SizedBox(width: 5,),
+            Text(AppLocalizations.of(context)!.seatLevel, style: _style),
+            const Spacer(),
+            const Spacer(flex: 4,),
+            Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
+            const SizedBox(width: 10),
+            trailingArrow
+          ],
+        ),
+      )
+    );
+  }
+
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
@@ -623,6 +608,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController seatLevelController = TextEditingController();
   ScrollController scrollControllerSets = ScrollController();
   Function? onConfirm;
+  final int animationTime = 300;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -649,7 +635,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     HapticFeedback.selectionClick();
     panelController.animatePanelToPosition(
         1,
-        duration: const Duration(milliseconds: 300),
+        duration: Duration(milliseconds: animationTime),
         curve: Curves.easeOut
     );
   }
@@ -657,7 +643,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   void closePanel({bool doClear = false}){
     panelController.animatePanelToPosition(
         0,
-        duration: const Duration(milliseconds: 300),
+        duration: Duration(milliseconds: animationTime),
         curve: Curves.decelerate
     ).then((value) => {
       if(doClear){

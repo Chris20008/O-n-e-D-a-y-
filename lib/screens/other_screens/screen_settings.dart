@@ -265,13 +265,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                 children: [
                                   /// Contact
                                   CupertinoListTile(
-                                    // onTap: () {sendMail();},
                                     leading: const Icon(
                                         Icons.help_outline
                                     ),
-                                    // trailing: getSelectContactButton(),
                                     title: getSelectContactButton(),
-                                    // title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Github
                                   CupertinoListTile(
@@ -286,17 +283,33 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   ),
                                   /// Term Of Use
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
+                                    },
                                     leading: const Icon(
                                         Icons.my_library_books_rounded
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Privacy Policy
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
+                                    },
                                     leading: const Icon(
                                         Icons.lock_outline
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
+                                  ),
+                                  CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+                                    },
+                                    leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+                                    trailing: trailingArrow,
+                                    title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               ),

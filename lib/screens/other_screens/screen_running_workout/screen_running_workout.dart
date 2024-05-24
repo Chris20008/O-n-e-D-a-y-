@@ -58,10 +58,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   final double _iconSize = 20;
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
@@ -105,9 +105,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         if(cnStandardPopUp.isVisible){
           cnStandardPopUp.clear();
         }
-        if(MediaQuery.of(context).viewInsets.bottom > 0){
-          FocusScope.of(context).unfocus();
-        }
+        FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -186,6 +184,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   title: value.name,
                                                   selected: newEx.name == value.name,
                                                   onTap: () {
+                                                    FocusManager.instance.primaryFocus?.unfocus();
                                                     HapticFeedback.selectionClick();
                                                     Future.delayed(const Duration(milliseconds: 200), (){
                                                       setState(() {
@@ -255,145 +254,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                       ],
                                     ),
                                     const SizedBox(height: 5),
-                                    GestureDetector(
-                                      onTap: (){
-                                        cnStandardPopUp.open(
-                                          context: context,
-                                          onConfirm: (){
-                                            newEx.seatLevel = int.tryParse(cnRunningWorkout.controllerSeatLevel.text);
-                                            vibrateCancel();
-                                            cnRunningWorkout.controllerSeatLevel.clear();
-                                            cnRunningWorkout.refresh();
-                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                              FocusScope.of(context).unfocus();
-                                            });
-                                          },
-                                          onCancel: (){
-                                            cnRunningWorkout.controllerSeatLevel.clear();
-                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                              FocusScope.of(context).unfocus();
-                                            });
-                                          },
-                                          child: TextField(
-                                            keyboardAppearance: Brightness.dark,
-                                            controller: cnRunningWorkout.controllerSeatLevel,
-                                            keyboardType: TextInputType.number,
-                                            maxLength: 3,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              labelText: AppLocalizations.of(context)!.seatLevel,
-                                              counterText: "",
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                            ),
-                                            style: const TextStyle(
-                                                fontSize: 18
-                                            ),
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value){},
-                                          ),
-                                        );
-                                      },
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          color: Colors.transparent,
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.start,
-                                            children: [
-                                              Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                              const SizedBox(width: 2,),
-                                              if (newEx.seatLevel == null)
-                                                Text("-", style: _style,)
-                                              else
-                                                Text(newEx.seatLevel.toString(), style: _style,)
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 30,
-                                      child: Row(
-                                        children: [
-                                          getSelectTimerTime(
-                                              child: SizedBox(
-                                                width: 100,
-                                                child: Align(
-                                                  alignment: Alignment.centerLeft,
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.max,
-                                                    children: [
-                                                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                                      const SizedBox(width: 2,),
-                                                      Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
-                                                      const SizedBox(width: 10,)
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              onConfirm: (dynamic value){
-                                                // FocusScope.of(context).unfocus();
-                                                if(value is int){
-                                                  newEx.restInSeconds = value;
-                                                  // vibrateCancel();
-                                                  // cnRunningWorkout.controllerRestInSeconds.clear();
-                                                  cnRunningWorkout.refresh();
-                                                }
-                                                else{
-                                                  if(value == "Clear"){
-                                                    newEx.restInSeconds = 0;
-                                                    cnRunningWorkout.refresh();
-                                                  }
-                                                  else{
-                                                    cnStandardPopUp.open(
-                                                      context: context,
-                                                      onConfirm: (){
-                                                        newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text)?? 0;
-                                                        vibrateCancel();
-                                                        cnRunningWorkout.controllerRestInSeconds.clear();
-                                                        cnRunningWorkout.refresh();
-                                                        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                                          FocusScope.of(context).unfocus();
-                                                        });
-                                                      },
-                                                      onCancel: (){
-                                                        cnRunningWorkout.controllerRestInSeconds.clear();
-                                                        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                                          FocusScope.of(context).unfocus();
-                                                        });
-                                                      },
-                                                      child: TextField(
-                                                        keyboardAppearance: Brightness.dark,
-                                                        controller: cnRunningWorkout.controllerRestInSeconds,
-                                                        keyboardType: TextInputType.number,
-                                                        maxLength: 3,
-                                                        decoration: InputDecoration(
-                                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                          labelText: AppLocalizations.of(context)!.restInSeconds,
-                                                          counterText: "",
-                                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                                        ),
-                                                        style: const TextStyle(
-                                                            fontSize: 18
-                                                        ),
-                                                        textAlign: TextAlign.center,
-                                                        onChanged: (value){},
-                                                      ),
-                                                    );
-                                                  }
-                                                }
 
-                                              // Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                              //   FocusScope.of(context).unfocus();
-                                              // });
-                                            }
-                                          ),
-                                          const Spacer()
-                                        ],
-                                      ),
-                                    ),
+                                    /// Seat Level Row and Selector
+                                    getSeatLevelSelector(newEx),
+
+                                    /// Rest in Seconds Row and Selector
+                                    getRestInSecondsSelector(newEx),
 
                                     /// Each Set Reorderable
                                     Column(
@@ -972,7 +838,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       canConfirm: canFinish,
       confirmTextStyle: canFinish? null : TextStyle(color: Colors.grey.withOpacity(0.2)),
       onConfirm: () {
-        // cnStandardPopUp.clear(); // leads to double vibration
         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
           setState(() {
             cnRunningWorkout.checkMultipleExercisesPerLink();
@@ -1038,6 +903,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         /// will se a blank page which is not wanted
         await Future.delayed(const Duration(milliseconds: 500), (){
           cnRunningWorkout.clear();
+          if(cnStopwatchWidget.isRunning){
+            cnStopwatchWidget.cancelTimer();
+          }
         });
       });
     });
@@ -1067,10 +935,133 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       }
       await stopWorkout(time: 0);
       print("CREATE AUTOMATIC BACKUP?: ${cnConfig.automaticBackups}");
+      if(cnStopwatchWidget.isRunning){
+        cnStopwatchWidget.cancelTimer();
+      }
       if(cnConfig.automaticBackups){
         saveBackup(withCloud: cnConfig.syncWithCloud ?? false);
       }
     });
+  }
+
+  Widget getSeatLevelSelector(Exercise newEx) {
+    return SizedBox(
+      height: 30,
+      child: Row(
+        children: [
+          getSelectSeatLevel(
+              child: SizedBox(
+                width: 100,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Container(
+                    width: 100,
+                    height: 30,
+                    color: Colors.transparent,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                        const SizedBox(width: 2,),
+                        if (newEx.seatLevel == null)
+                          Text("-", style: _style,)
+                        else
+                          Text(newEx.seatLevel.toString(), style: _style,)
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              onConfirm: (dynamic value){
+                if(value is int){
+                  newEx.seatLevel = value;
+                  cnRunningWorkout.refresh();
+                }
+                else if(value == "Clear"){
+                  newEx.seatLevel = null;
+                  cnRunningWorkout.refresh();
+                }
+              }
+          ),
+          const Spacer()
+        ],
+      ),
+    );
+  }
+
+  getRestInSecondsSelector(Exercise newEx) {
+    return SizedBox(
+      height: 30,
+      child: Row(
+        children: [
+          getSelectRestInSeconds(
+              child: SizedBox(
+                width: 100,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                      const SizedBox(width: 2,),
+                      Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
+                      const SizedBox(width: 10,)
+                    ],
+                  ),
+                ),
+              ),
+              onConfirm: (dynamic value){
+                if(value is int){
+                  newEx.restInSeconds = value;
+                  cnRunningWorkout.refresh();
+                }
+                else if(value == "Clear"){
+                  cnRunningWorkout.refresh();
+                }
+                else{
+                  cnRunningWorkout.controllerRestInSeconds.text = newEx.restInSeconds == 0 ? "" : newEx.restInSeconds.toString();
+                  cnStandardPopUp.open(
+                    context: context,
+                    onConfirm: (){
+                      newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text)?? 0;
+                      vibrateCancel();
+                      // cnRunningWorkout.controllerRestInSeconds.clear();
+                      cnRunningWorkout.refresh();
+                      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                        FocusScope.of(context).unfocus();
+                      });
+                    },
+                    onCancel: (){
+                      cnRunningWorkout.controllerRestInSeconds.clear();
+                      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                        FocusScope.of(context).unfocus();
+                      });
+                    },
+                    child: TextField(
+                      keyboardAppearance: Brightness.dark,
+                      controller: cnRunningWorkout.controllerRestInSeconds,
+                      keyboardType: TextInputType.number,
+                      maxLength: 3,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        labelText: AppLocalizations.of(context)!.restInSeconds,
+                        // counterText: "",
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                      ),
+                      style: const TextStyle(
+                          fontSize: 18
+                      ),
+                      textAlign: TextAlign.center,
+                      // onChanged: (value){},
+                    ),
+                  );
+                }
+              }
+          ),
+          const Spacer()
+        ],
+      ),
+    );
   }
 }
 

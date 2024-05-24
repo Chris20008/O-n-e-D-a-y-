@@ -1,7 +1,10 @@
+import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../util/config.dart';
+import '../../../widgets/standard_popup.dart';
 import 'screen_running_workout.dart';
 import 'animated_column.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -16,15 +19,14 @@ class StopwatchWidget extends StatefulWidget {
 class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  late CnStopwatchWidget cnStopwatchWidget;
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
+  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
 
   double paddingLeftRight = 5;
-  // late final width = WidgetsBinding.instance.window.physicalSize.width;
-  // late final width = MediaQuery.of(context).size.width;
 
   @override
   Widget build(BuildContext context) {
-    cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
     double width = MediaQuery.of(context).size.width;
 
     return Align(
@@ -42,6 +44,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
+
+                    /// Stopwatch controls
                     Align(
                         alignment: Alignment.bottomCenter,
                         child: Padding(
@@ -137,14 +141,18 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                           ),
                         )
                     ),
+
+                    /// Stopwatch text
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
                         padding: const EdgeInsets.only(top: 20),
                         child: Text(
-                          cnStopwatchWidget.isRunning?
-                            getTimeString() :
-                            "00:00",
+                          cnStopwatchWidget.isRunning || cnStopwatchWidget.countdownTime != null
+                              ? getTimeString()
+                              // : cnStopwatchWidget.countdownTime != null
+                              // ? cnStopwatchWidget.countdownTime.toString()
+                              : "00:00",
                           style: TextStyle(
                             fontSize: 80,
                             color: Colors.white54,
@@ -172,6 +180,64 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                               color: Colors.amber[800],
                             )
                         ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: getSelectRestInSeconds(
+                        onConfirm: (value){
+                          if (value is int){
+                            cnStopwatchWidget.countdownTime = value;
+                            cnStopwatchWidget.cancelTimer();
+                            cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                          }
+                          else if(value == "Clear"){
+                            cnStopwatchWidget.countdownTime = null;
+                            cnStopwatchWidget.cancelTimer();
+                            cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                          }
+                          else{
+                            cnRunningWorkout.controllerRestInSeconds.clear();
+                            cnStandardPopUp.open(
+                              context: context,
+                              onConfirm: (){
+                                cnStopwatchWidget.countdownTime = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
+                                cnStopwatchWidget.cancelTimer();
+                                cnRunningWorkout.controllerRestInSeconds.clear();
+                                Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                  FocusScope.of(context).unfocus();
+                                  cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                                });
+                              },
+                              onCancel: (){
+                                cnRunningWorkout.controllerRestInSeconds.clear();
+                                Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                  FocusScope.of(context).unfocus();
+                                });
+                              },
+                              child: TextField(
+                                keyboardAppearance: Brightness.dark,
+                                controller: cnRunningWorkout.controllerRestInSeconds,
+                                keyboardType: TextInputType.number,
+                                maxLength: 4,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                  labelText: "Time in Seconds",
+                                  // counterText: "",
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                ),
+                                style: const TextStyle(
+                                    fontSize: 18
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          }
+                        },
+                        child: Icon(
+                          Icons.timelapse_rounded,
+                          color: Colors.amber[800],
+                        )
                       ),
                     )
                   ],
@@ -223,13 +289,36 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   }
 
   String getTimeString() {
-    String minutes = (cnStopwatchWidget.stopwatch.elapsed.inMinutes%60).toString();
-    minutes = minutes.length==1? "0$minutes" : minutes;
+    // String elapsedMinutes = (cnStopwatchWidget.stopwatch.elapsed.inMinutes%60).toString();
+    // elapsedMinutes = elapsedMinutes.length==1? "0$elapsedMinutes" : elapsedMinutes;
+    //
+    // String elapsedSeconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
+    // elapsedSeconds = elapsedSeconds.length==1? "0$elapsedSeconds" : elapsedSeconds;
+    int restCountdownSeconds;
+    if(cnStopwatchWidget.countdownTime != null){
+      restCountdownSeconds = cnStopwatchWidget.countdownTime! - cnStopwatchWidget.stopwatch.elapsed.inSeconds;
+      if(restCountdownSeconds < 0){
+        restCountdownSeconds = 0;
+        Future.delayed(const Duration(milliseconds: 1000), (){
+          cnStopwatchWidget.cancelTimer();
+        });
+      }
+    } else{
+      restCountdownSeconds = cnStopwatchWidget.stopwatch.elapsed.inSeconds;
+    }
 
-    String seconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
-    seconds = seconds.length==1? "0$seconds" : seconds;
-    return "$minutes:$seconds";
+    String elapsedMinutes = (restCountdownSeconds ~/60).toString();
+    elapsedMinutes = elapsedMinutes.length==1? "0$elapsedMinutes" : elapsedMinutes;
+
+    String elapsedSeconds = (restCountdownSeconds%60).toString();
+    elapsedSeconds = elapsedSeconds.length==1? "0$elapsedSeconds" : elapsedSeconds;
+
+    return "$elapsedMinutes:$elapsedSeconds";
   }
+
+  // String getCountdownAsString(){
+  //
+  // }
 }
 
 
@@ -242,6 +331,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   double heightOfTimer = 240;
   late CnAnimatedColumn cnAnimatedColumn;
   final Stopwatch stopwatch = Stopwatch();
+  int? countdownTime;
 
   CnStopwatchWidget(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);

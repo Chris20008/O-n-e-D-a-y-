@@ -132,6 +132,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: true);
   late CnHomepage cnHomepage;
   late final AnimationController _animationControllerWorkoutPanel = AnimationController(
@@ -185,6 +186,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
     cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
     cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
+    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
   }
 
   @override
