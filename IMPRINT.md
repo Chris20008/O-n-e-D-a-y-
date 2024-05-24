@@ -10,7 +10,7 @@ Oxfordstraße 6
 I do not assume any liability for the content of the App. While I strive to keep the information correct and up to date, I cannot guarantee the accuracy, completeness, and timeliness of the content. By
 
 ### Copyright:
-The content and open-source code of the App is protected by the (CC BY-NC 4.0 DEED License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
+The content and open-source code of the App is protected by the [CC BY-NC 4.0 DEED License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 ### Data Privacy:
 The App does not collect or store personal data. Any use of third-party services such as Google Drive or iCloud for data backup is voluntary and subject to the Privacy Policies of the respective provider.
