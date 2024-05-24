@@ -2,7 +2,7 @@
 
 **Effective Date: 2024.05.24**
 
-This License Agreement (the "Agreement") sets forth the terms and conditions under which you (the "Licensee") may use, copy, modify, and distribute the OneDay source code (the "Software"). By using the Software, you agree to comply with and be bound by the terms of this Agreement. If you do not agree with these terms, you must not use the Software.
+This License Agreement (the "Agreement") sets forth the terms and conditions under which you (the "Licensee") may use, copy, modify, and distribute the O-n-e-D-a-y- source code (the "Software"). By using the Software, you agree to comply with and be bound by the terms of this Agreement. If you do not agree with these terms, you must not use the Software.
 
 ## 1. License Grant
 The Software is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License ([CC BY-NC 4.0 DEED](https://creativecommons.org/licenses/by-nc-sa/4.0/)). Under this license, you are free to:
@@ -32,7 +32,7 @@ Any use of the Software or its derivatives for commercial purposes is strictly p
 When redistributing the Software or its derivatives, you must include the following attribution:
 
 ```
-This software is based on OneDay, licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International, visit https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1
+This software is based on O-n-e-D-a-y-, licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International, visit https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1
 ```
 
 ### 6.3 No Endorsement
