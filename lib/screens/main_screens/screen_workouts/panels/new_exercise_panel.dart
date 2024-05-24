@@ -6,6 +6,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
 import '../../../../objects/workout.dart';
 import '../../../../util/constants.dart';
+import '../../../../widgets/standard_popup.dart';
 import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
 import 'dart:io';
@@ -22,11 +23,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   late CnNewExercisePanel cnNewExercise;
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   final double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
   final _formKey = GlobalKey<FormState>();
   final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
   final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
+  final _style = const TextStyle(color: Colors.white, fontSize: 18);
 
   @override
   Widget build(BuildContext context) {
@@ -112,46 +115,143 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               ),
                             ),
                             const SizedBox(height: 15,),
-                            SizedBox(
-                              height: 35,
-                              child: Row(
-                                children: [
-                                  Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                  // Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                  const SizedBox(width: 5,),
-                                  Text(AppLocalizations.of(context)!.restInSeconds, textScaler: const TextScaler.linear(1.2),),
-                                  const Spacer(flex: 4,),
-                                  SizedBox(
-                                    width: 50,
-                                    child: TextField(
-                                      keyboardAppearance: Brightness.dark,
-                                      controller: cnNewExercise.restController,
-                                      keyboardType: TextInputType.number,
-                                      maxLength: 3,
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                        labelText: "",
-                                        counterText: "",
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                      ),
-                                      style: const TextStyle(
-                                          fontSize: 18
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      onChanged: (value){
-                                        value = value.trim();
-                                        if (value.isNotEmpty){
-                                          cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
-                                        }
-                                        else{
-                                          cnNewExercise.exercise.restInSeconds = 0;
-                                        }
-                                      },
-                                    ),
+                            getSelectTimerTime(
+                                child: SizedBox(
+                                  height: 35,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                                      const SizedBox(width: 5,),
+                                      Text(AppLocalizations.of(context)!.restInSeconds, style: _style),
+                                      const Spacer(flex: 4,),
+                                      Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
+                                      const SizedBox(width: 10),
+                                      trailingArrow
+                                      // SizedBox(
+                                      //   width: 50,
+                                      //   child: TextField(
+                                      //     keyboardAppearance: Brightness.dark,
+                                      //     controller: cnNewExercise.restController,
+                                      //     keyboardType: TextInputType.number,
+                                      //     maxLength: 3,
+                                      //     decoration: InputDecoration(
+                                      //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      //       labelText: "",
+                                      //       counterText: "",
+                                      //       contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                                      //     ),
+                                      //     style: const TextStyle(
+                                      //         fontSize: 18
+                                      //     ),
+                                      //     textAlign: TextAlign.center,
+                                      //     onChanged: (value){
+                                      //       value = value.trim();
+                                      //       if (value.isNotEmpty){
+                                      //         cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
+                                      //       }
+                                      //       else{
+                                      //         cnNewExercise.exercise.restInSeconds = 0;
+                                      //       }
+                                      //     },
+                                      //   ),
+                                      // ),
+                                    ],
                                   ),
-                                ],
-                              ),
+                                ),
+                                onConfirm: (dynamic value){
+                                  if(value is int){
+                                    cnNewExercise.exercise.restInSeconds = value;
+                                    cnNewExercise.refresh();
+                                  }
+                                  else{
+                                    if(value == "Clear"){
+                                      cnNewExercise.exercise.restInSeconds = 0;
+                                      cnNewExercise.refresh();
+                                    }
+                                    else{
+                                      cnStandardPopUp.open(
+                                        context: context,
+                                        onConfirm: (){
+                                          cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
+                                          vibrateCancel();
+                                          cnNewExercise.restController.clear();
+                                          cnNewExercise.refresh();
+                                          Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                            FocusScope.of(context).unfocus();
+                                          });
+                                        },
+                                        onCancel: (){
+                                          cnNewExercise.restController.clear();
+                                          Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                            FocusScope.of(context).unfocus();
+                                          });
+                                        },
+                                        child: TextField(
+                                          keyboardAppearance: Brightness.dark,
+                                          controller: cnNewExercise.restController,
+                                          keyboardType: TextInputType.number,
+                                          maxLength: 3,
+                                          decoration: InputDecoration(
+                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                            labelText: AppLocalizations.of(context)!.restInSeconds,
+                                            counterText: "",
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                          ),
+                                          style: const TextStyle(
+                                              fontSize: 18
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          onChanged: (value){},
+                                        ),
+                                      );
+                                    }
+                                  }
+
+                                  // Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                  //   FocusScope.of(context).unfocus();
+                                  // });
+                                }
                             ),
+                            // SizedBox(
+                            //   height: 35,
+                            //   child: Row(
+                            //     children: [
+                            //       Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                            //       // Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                            //       const SizedBox(width: 5,),
+                            //       Text(AppLocalizations.of(context)!.restInSeconds, textScaler: const TextScaler.linear(1.2),),
+                            //       const Spacer(flex: 4,),
+                            //       SizedBox(
+                            //         width: 50,
+                            //         child: TextField(
+                            //           keyboardAppearance: Brightness.dark,
+                            //           controller: cnNewExercise.restController,
+                            //           keyboardType: TextInputType.number,
+                            //           maxLength: 3,
+                            //           decoration: InputDecoration(
+                            //             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            //             labelText: "",
+                            //             counterText: "",
+                            //             contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
+                            //           ),
+                            //           style: const TextStyle(
+                            //               fontSize: 18
+                            //           ),
+                            //           textAlign: TextAlign.center,
+                            //           onChanged: (value){
+                            //             value = value.trim();
+                            //             if (value.isNotEmpty){
+                            //               cnNewExercise.exercise.restInSeconds = int.tryParse(value) ?? 0;
+                            //             }
+                            //             else{
+                            //               cnNewExercise.exercise.restInSeconds = 0;
+                            //             }
+                            //           },
+                            //         ),
+                            //       ),
+                            //     ],
+                            //   ),
+                            // ),
                             const SizedBox(height: 10,),
                             SizedBox(
                               height: 35,

@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../objectbox.g.dart';
@@ -32,6 +33,49 @@ List<Color> linkColors = [
   const Color(0xFF8AEAC3),
   const Color(0xFF4F8447),
 ];
+
+const List<int> predefinedTimerTimes = [
+  30,
+  60,
+  90,
+  120,
+  150,
+  180,
+  210,
+  240,
+  270,
+  300
+];
+
+String mapRestInSecondsToString({required int restInSeconds, bool short = true}){
+  if (restInSeconds == 0) {
+    return ("-");
+  }
+  else if (restInSeconds < 60) {
+    return "${restInSeconds}s";
+  }
+  else if (restInSeconds % 60 != 0) {
+    int seconds = restInSeconds % 60;
+    final secondsString = seconds > 9? seconds.toString() : "0$seconds";
+    return "${(restInSeconds / 60).floor()}:${secondsString}m";
+  }
+  else {
+    if(short){
+      return "${(restInSeconds / 60).round()}m";
+    }
+    return "${(restInSeconds / 60).floor()}:00m";
+  }
+}
+
+const routeTheme = PullDownMenuRouteTheme(
+    backgroundColor: CupertinoColors.secondaryLabel
+);
+
+const trailingArrow = Icon(
+  Icons.arrow_forward_ios,
+  size: 12,
+  color: Colors.grey,
+);
 
 Color? getLinkColor({required String linkName, required Workout workout}){
   int index = workout.linkedExercises.indexOf(linkName);
@@ -148,6 +192,37 @@ TextStyle getTextStyleForTextField(String text, {Color? color}){
     : text.length < 6
     ? 13 : 10,
     color: color,
+  );
+}
+
+Widget getSelectTimerTime({required Widget child, required Function(dynamic value) onConfirm}) {
+  return PullDownButton(
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List times = List.from(predefinedTimerTimes);
+      times.insert(0, "Clear");
+      times.add("Custom");
+      return List.generate(times.length, (index) => PullDownMenuItem(
+        title: times[index] is String? times[index] : mapRestInSecondsToString(restInSeconds: times[index], short: false),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          FocusManager.instance.primaryFocus?.unfocus();
+          Future.delayed(const Duration(milliseconds: 200), (){
+            onConfirm(times[index]);
+          });
+        }),
+      );
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+      onPressed: (){
+        HapticFeedback.selectionClick();
+        showMenu();
+      },
+      padding: EdgeInsets.zero,
+      child: child
+    ),
   );
 }
 

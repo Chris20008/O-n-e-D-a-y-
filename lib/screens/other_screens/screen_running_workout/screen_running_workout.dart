@@ -6,6 +6,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -72,6 +73,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   bool isAlreadyCheckingKeyboardPermanent = false;
   bool showSelectorExerciseToUpdate = false;
   bool showSelectorExercisePerLink = false;
+  final _style = const TextStyle(color: Colors.white, fontSize: 15);
 
   @override
   void initState() {
@@ -165,8 +167,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
-                                        cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise?
-                                        Expanded(
+                                        cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
+                                        ? Expanded(
                                             child: OverflowSafeText(
                                               newEx.name,
                                               maxLines: 1,
@@ -175,6 +177,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         ):
                                         Expanded(
                                           child: PullDownButton(
+                                            onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
                                             buttonAnchor: PullDownMenuAnchor.start,
                                             routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
                                             itemBuilder: (context) {
@@ -198,17 +201,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 );
                                               }).toList();
                                               return children;
-                                              // return [
-                                              //   PullDownMenuItem(
-                                              //     title: AppLocalizations.of(context)!.settingsQuestion,
-                                              //     onTap: () {
-                                              //       HapticFeedback.selectionClick();
-                                              //       Future.delayed(const Duration(milliseconds: 200), (){
-                                              //         sendMail(subject: "Question");
-                                              //       });
-                                              //     },
-                                              //   ),
-                                              // ];
                                             },
                                             buttonBuilder: (context, showMenu) => CupertinoButton(
                                                 onPressed: (){
@@ -239,24 +231,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                             ),
                                           )
                                         ),
-                                        // Expanded(
-                                        //   child: DropdownMenu<String>(
-                                        //     initialSelection: newEx.name,
-                                        //     onSelected: (String? value) {
-                                        //       setState(() {
-                                        //         final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                        //         final t = lists.map((element) => element.value.indexWhere((ex) {
-                                        //           return ex.name == value;
-                                        //         })).toList().firstWhere((element) => element >=0);
-                                        //         cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
-                                        //       });
-                                        //       cnRunningWorkout.cache();
-                                        //     },
-                                        //     dropdownMenuEntries: cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<DropdownMenuEntry<String>>((Exercise value) {
-                                        //       return DropdownMenuEntry<String>(value: value.name, label: value.name);
-                                        //     }).toList(),
-                                        //   ),
-                                        // ),
                                         if(cnRunningWorkout.newExNames.contains(newEx.name))
                                           myIconButton(
                                             icon:const Icon(Icons.delete_forever),
@@ -331,74 +305,93 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
                                               const SizedBox(width: 2,),
                                               if (newEx.seatLevel == null)
-                                                const Text("-", textScaler: TextScaler.linear(1),)
+                                                Text("-", style: _style,)
                                               else
-                                                Text(newEx.seatLevel.toString(), textScaler: const TextScaler.linear(1),)
+                                                Text(newEx.seatLevel.toString(), style: _style,)
                                             ],
                                           ),
                                         ),
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: (){
-                                        cnStandardPopUp.open(
-                                          context: context,
-                                          onConfirm: (){
-                                            newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text)?? 0;
-                                            vibrateCancel();
-                                            cnRunningWorkout.controllerRestInSeconds.clear();
-                                            cnRunningWorkout.refresh();
-                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                              FocusScope.of(context).unfocus();
-                                            });
-                                          },
-                                          onCancel: (){
-                                            cnRunningWorkout.controllerRestInSeconds.clear();
-                                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                              FocusScope.of(context).unfocus();
-                                            });
-                                          },
-                                          child: TextField(
-                                            keyboardAppearance: Brightness.dark,
-                                            controller: cnRunningWorkout.controllerRestInSeconds,
-                                            keyboardType: TextInputType.number,
-                                            maxLength: 3,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              labelText: AppLocalizations.of(context)!.restInSeconds,
-                                              counterText: "",
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                            ),
-                                            style: const TextStyle(
-                                                fontSize: 18
-                                            ),
-                                            textAlign: TextAlign.center,
-                                            onChanged: (value){},
+                                    SizedBox(
+                                      height: 30,
+                                      child: Row(
+                                        children: [
+                                          getSelectTimerTime(
+                                              child: SizedBox(
+                                                width: 100,
+                                                child: Align(
+                                                  alignment: Alignment.centerLeft,
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize.max,
+                                                    children: [
+                                                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                                                      const SizedBox(width: 2,),
+                                                      Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
+                                                      const SizedBox(width: 10,)
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                              onConfirm: (dynamic value){
+                                                // FocusScope.of(context).unfocus();
+                                                if(value is int){
+                                                  newEx.restInSeconds = value;
+                                                  // vibrateCancel();
+                                                  // cnRunningWorkout.controllerRestInSeconds.clear();
+                                                  cnRunningWorkout.refresh();
+                                                }
+                                                else{
+                                                  if(value == "Clear"){
+                                                    newEx.restInSeconds = 0;
+                                                    cnRunningWorkout.refresh();
+                                                  }
+                                                  else{
+                                                    cnStandardPopUp.open(
+                                                      context: context,
+                                                      onConfirm: (){
+                                                        newEx.restInSeconds = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text)?? 0;
+                                                        vibrateCancel();
+                                                        cnRunningWorkout.controllerRestInSeconds.clear();
+                                                        cnRunningWorkout.refresh();
+                                                        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                                          FocusScope.of(context).unfocus();
+                                                        });
+                                                      },
+                                                      onCancel: (){
+                                                        cnRunningWorkout.controllerRestInSeconds.clear();
+                                                        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                                          FocusScope.of(context).unfocus();
+                                                        });
+                                                      },
+                                                      child: TextField(
+                                                        keyboardAppearance: Brightness.dark,
+                                                        controller: cnRunningWorkout.controllerRestInSeconds,
+                                                        keyboardType: TextInputType.number,
+                                                        maxLength: 3,
+                                                        decoration: InputDecoration(
+                                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                          labelText: AppLocalizations.of(context)!.restInSeconds,
+                                                          counterText: "",
+                                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                                        ),
+                                                        style: const TextStyle(
+                                                            fontSize: 18
+                                                        ),
+                                                        textAlign: TextAlign.center,
+                                                        onChanged: (value){},
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+
+                                              // Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                              //   FocusScope.of(context).unfocus();
+                                              // });
+                                            }
                                           ),
-                                        );
-                                      },
-                                      child: Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: Container(
-                                          width: 100,
-                                          height: 30,
-                                          color: Colors.transparent,
-                                          child: Row(
-                                            children: [
-                                              Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                                              const SizedBox(width: 2,),
-                                              if (newEx.restInSeconds == 0)
-                                                const Text("-", textScaler: TextScaler.linear(1),)
-                                              else if (newEx.restInSeconds < 60)
-                                                Text("${newEx.restInSeconds}s", textScaler: const TextScaler.linear(1),)
-                                              else if (newEx.restInSeconds % 60 != 0)
-                                                  Text("${(newEx.restInSeconds/60).floor()}:${newEx.restInSeconds%60}m", textScaler: const TextScaler.linear(1),)
-                                                else
-                                                  Text("${(newEx.restInSeconds/60).round()}m", textScaler: const TextScaler.linear(1),),
-                                              const SizedBox(width: 10,)
-                                            ],
-                                          ),
-                                        ),
+                                          const Spacer()
+                                        ],
                                       ),
                                     ),
 
