@@ -187,6 +187,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
     cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
     cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+    if(Platform.isAndroid && cnConfig.syncWithCloud){
+      cnConfig.signInGoogleDrive();
+    }
   }
 
   @override

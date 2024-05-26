@@ -2,14 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/extensions.dart';
-import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:icloud_storage/icloud_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,11 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
-import 'objectbox/ob_exercise.dart';
 
 List<Color> linkColors = [
   const Color(0xFF5F9561),
@@ -33,6 +27,8 @@ List<Color> linkColors = [
   const Color(0xFF8AEAC3),
   const Color(0xFF4F8447),
 ];
+
+const folderNameGoogleDrive = "OneDay Backups";
 
 const List<int> predefinedTimes = [
   30,
@@ -320,7 +316,7 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   );
   return ClipRRect(
     borderRadius: BorderRadius.circular(40),
-    child: Container(
+    child: SizedBox(
       height: 40,
       width: 40,
       // color: Colors.grey.withOpacity(0.3),
@@ -329,14 +325,14 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   );
 }
 
-enum TimeInterval {
-  // monthly ("Monthly"),
-  // quarterly ("Quarterly"),
-  yearly ("Yearly");
-
-  const TimeInterval(this.value);
-  final String value;
-}
+// enum TimeInterval {
+//   // monthly ("Monthly"),
+//   // quarterly ("Quarterly"),
+//   yearly ("Yearly");
+//
+//   const TimeInterval(this.value);
+//   final String value;
+// }
 
 Widget OverflowSafeText(
     String name,
@@ -360,59 +356,11 @@ Widget OverflowSafeText(
   );
 }
 
-Future<bool> saveBackup({required bool withCloud}) async{
-  print("IN BACKUP: With Cloud $withCloud");
-  Directory? appDocDir = await getDirectory();
-  print("IN BACKUP: GOT DIRECTORY $appDocDir");
-  final path = appDocDir?.path;
-  /// Seems like having ':' in the filename leads to issues, so we replace them
-  final filename = "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
-  final fullPath = '$path/$filename';
-  final file = File(fullPath);
-  print("Before saving file");
-  await file.writeAsString(getWorkoutsAsStringList().join("; "));
-  print("After saving file");
 
-  if(Platform.isIOS && withCloud){
-    await saveBackupiCloud(fullPath, filename);
-
-    // final fileList = await ICloudStorage.gather(
-    //     containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!
-    // );
-    // print("Files gathered");
-    // fileList.forEach((element) {print(element.relativePath);});
-  }
-
-  return true;
-}
-
-Future saveBackupiCloud(String sourceFilePath, String filename)async{
-  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
-    await ICloudStorage.upload(
-      containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
-      filePath: sourceFilePath,
-
-      /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
-      /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
-      destinationRelativePath: 'Documents/backups/$filename',
-      onProgress: (stream) {
-        // final uploadProgressSub = stream.listen(
-        //       (progress) => print('Upload File Progress: $progress'),
-        //   onDone: () => print('Upload File Done'),
-        //   onError: (err) => print('Upload File Error: $err'),
-        //   cancelOnError: true,
-        // );
-      },
-    );
-  }
-}
 
 List getWorkoutsAsStringList(){
-  print("IN getWorkoutAsString");
   final allObWorkouts = objectbox.workoutBox.getAll();
-  print("GOT ALL WORKOUTS");
   final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
-  print("transformed allw rokotus as map");
   return allWorkouts;
 }
 
@@ -424,39 +372,6 @@ Future<Directory?> getDirectory() async{
     return await getApplicationDocumentsDirectory();
   }
 }
-
-Future loadBackup() async{
-  FilePickerResult? result = await FilePicker.platform.pickFiles(
-      initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files"
-  );
-
-  if (result != null) {
-    File file = File(result.files.single.path!);
-    final contents = await file.readAsString();
-    final allWorkoutsAsListString = contents.split(";");
-    final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
-    List<ObWorkout> allObWorkouts = [];
-    List<ObExercise> allObExercises = [];
-    for (Map w in allWorkouts){
-      ObWorkout workout = ObWorkout.fromMap(w);
-      final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
-      workout.addExercises(exs);
-      allObWorkouts.add(workout);
-      allObExercises.addAll(exs);
-    }
-    objectbox.workoutBox.removeAll();
-    objectbox.exerciseBox.removeAll();
-    objectbox.workoutBox.putMany(allObWorkouts);
-    objectbox.exerciseBox.putMany(allObExercises);
-  } else {
-    // User canceled the picker
-  }
-}
-
-// void pickBackupPath() async{
-//   // FilePickerResult? result = await FilePicker.platform.pickFiles();
-//   String? result = await FilePicker.platform.getDirectoryPath();
-// }
 
 Future<bool> hasInternet()async{
   final conRes = await Connectivity().checkConnectivity();
@@ -642,31 +557,16 @@ Widget buildCalendarDialogButton({
       }
     },
     child: buttonIsCalender
-        ? Icon(
+        ? const Icon(
           Icons.calendar_month,
           size: 30,
-          // color: Colors.amber[800],
-          // color: Colors.amber[200]!
           color: Colors.white
         )
         : Text(
           DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),
-          // '${cnNewWorkout.workout.date!.month}-${cnNewWorkout.workout.date!.day}-${cnNewWorkout.workout.date!.year}',
           style: const TextStyle(
             fontSize: 18,
           ),
     )
   );
 }
-// bool exerciseNameExistsInWorkout({required String workoutName, required String exerciseName}){
-//   /// create builder
-//   final builder = objectbox.workoutBox.query(ObWorkout_.name.equals(workoutName, caseSensitive: false).and(ObWorkout_.isTemplate.equals(true)));
-//   /// link builder with exercises
-//   builder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(exerciseName, caseSensitive: false));
-//   /// find first workout
-//   final result = builder.build().findFirst();
-//   if(result == null){
-//     return false;
-//   }
-//   return true;
-// }

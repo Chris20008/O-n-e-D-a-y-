@@ -1,13 +1,13 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
+import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'dart:io';
+import 'dart:io' as io;
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
@@ -28,27 +28,16 @@ class _SettingsPanelState extends State<SettingsPanel> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  // final Widget trailingArrow = const Icon(
-  //   Icons.arrow_forward_ios,
-  //   size: 12,
-  //   color: Colors.grey,
-  // );
-  // late final _routeTheme = const PullDownMenuRouteTheme(
-  //     backgroundColor: CupertinoColors.secondaryLabel
-  // );
   bool setOrientation = false;
-  // String _languageCode = "en";
   bool _tutorial = true;
-  bool _automaticBackups = false;
+  bool _automaticBackups = true;
   bool _syncWithCloud = false;
 
   @override
   void initState() {
-    print("initState SETTINGS");
-    // _languageCode = cnConfig.config.settings["languageCode"] ?? _languageCode;
-    _tutorial = cnConfig.tutorial ?? _tutorial;
-    _automaticBackups = cnConfig.automaticBackups ?? _automaticBackups;
-    _syncWithCloud = cnConfig.syncWithCloud ?? _syncWithCloud;
+    _tutorial = cnConfig.tutorial;
+    _automaticBackups = cnConfig.automaticBackups;
+    _syncWithCloud = cnConfig.syncWithCloud;
     super.initState();
   }
 
@@ -69,7 +58,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               return SlidingUpPanel(
                 controller: cnScreenStatistics.panelControllerSettings,
                 defaultPanelState: PanelState.CLOSED,
-                maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
+                maxHeight: constraints.maxHeight - (io.Platform.isAndroid? 50 : 70),
                 minHeight: 0,
                 isDraggable: true,
                 borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
@@ -119,7 +108,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         activeColor: const Color(0xFFC16A03),
                                         onChanged: (value){
                                           setState(() {
-                                            if(Platform.isAndroid){
+                                            if(io.Platform.isAndroid){
                                               HapticFeedback.selectionClick();
                                             }
                                             _tutorial = value;
@@ -178,7 +167,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   ),
                                   /// Load Backup
                                   CupertinoListTile(
-                                    onTap: loadBackup,
+                                    onTap: () async{
+                                      await loadBackup();
+                                      cnScreenStatistics.refreshData();
+                                      cnScreenStatistics.refresh();
+                                    },
                                     leading: const Icon(
                                         Icons.cloud_download
                                     ),
@@ -196,7 +189,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         activeColor: const Color(0xFFC16A03),
                                         onChanged: (value){
                                           setState(() {
-                                            if(Platform.isAndroid){
+                                            if(io.Platform.isAndroid){
                                               HapticFeedback.selectionClick();
                                             }
                                             _automaticBackups = value;
@@ -228,24 +221,59 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                     trailing: CupertinoSwitch(
                                         value: _syncWithCloud,
                                         activeColor: const Color(0xFFC16A03),
-                                        onChanged: (value){
-                                          setState(() {
-                                            if(Platform.isAndroid){
-                                              HapticFeedback.selectionClick();
+                                        onChanged: (value)async{
+                                          if(io.Platform.isAndroid){
+                                            HapticFeedback.selectionClick();
+                                            if(value == true){
+                                              // cnConfig.signInGoogleDrive();
+                                            } else{
+                                              cnConfig.account = null;
                                             }
-                                            _syncWithCloud = value;
-                                            cnConfig.setSyncWithCloud(_syncWithCloud);
-                                          });
+                                          }
+                                          _syncWithCloud = value;
+                                          cnConfig.setSyncWithCloud(_syncWithCloud);
+                                          setState(() {});
                                         }
                                     ),
                                     title: Padding(
                                       padding: const EdgeInsets.only(right: 5),
-                                      child: OverflowSafeText(
-                                          maxLines: 1,
-                                          Platform.isAndroid
-                                              ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                                              : AppLocalizations.of(context)!.settingsSynciCloud,
-                                          style: const TextStyle(color: Colors.white),
+                                      child: Row(
+                                        // crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          OverflowSafeText(
+                                              maxLines: 1,
+                                            io.Platform.isAndroid
+                                                  ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
+                                                  : AppLocalizations.of(context)!.settingsSynciCloud,
+                                              style: const TextStyle(color: Colors.white),
+                                          ),
+                                          if(_syncWithCloud)
+                                            const SizedBox(width: 10),
+                                          if(_syncWithCloud)
+                                            FutureBuilder(
+                                                future: cnConfig.signInGoogleDrive(),
+                                                builder: (context, connected){
+                                                  if(!connected.hasData){
+                                                    return const Center(
+                                                      child: SizedBox(
+                                                          height: 15,
+                                                          width: 15,
+                                                          child: CircularProgressIndicator(strokeWidth: 2,)
+                                                      ),
+                                                    );
+                                                  }
+                                                  return Icon(
+                                                    cnConfig.account != null
+                                                        ? Icons.check_circle
+                                                        : Icons.close,
+                                                    size: 15,
+                                                    color: cnConfig.account != null
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                  );
+                                                }
+                                            )
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -303,9 +331,13 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                     trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
                                   ),
+                                  /// Imprint
                                   CupertinoListTile(
                                     onTap: () async{
                                       await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+                                      // _handleSignIn();
+                                      // final drive = GoogleDrive();
+                                      // final t = await drive.upload();
                                     },
                                     leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
                                     trailing: trailingArrow,
@@ -325,6 +357,16 @@ class _SettingsPanelState extends State<SettingsPanel> {
         )
     );
   }
+
+  // void google() async{
+  //   final googleSignIn =
+  //   GoogleSignIn.standard(scopes: [DriveApi.driveFileScope]);
+  //   final GoogleSignInAuthentication? auth =
+  //       await googleSignIn.currentUser?.authentication;
+  //   final String? accessToken = auth?.accessToken;
+  // }
+
+
 
   void onPanelSlide(value){
     cnScreenStatistics.animationControllerSettingPanel.value = value;
@@ -465,7 +507,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                saveBackup(withCloud: _syncWithCloud);
+                saveBackup(withCloud: _syncWithCloud, cnConfig: cnConfig);
               });
             },
           ),
@@ -570,7 +612,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               ),
               title: OverflowSafeText(
                   maxLines: 1,
-                  Platform.isAndroid
+                  io.Platform.isAndroid
                       ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
                       : AppLocalizations.of(context)!.settingsSynciCloud,
                   style: const TextStyle(color: Colors.white)
@@ -578,7 +620,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 30),
-                child: Text(Platform.isAndroid
+                child: Text(io.Platform.isAndroid
                     ? AppLocalizations.of(context)!.settingsBackupSyncGoogleDriveExplanation
                     : AppLocalizations.of(context)!.settingsBackupSynciCloudExplanation
                 )
@@ -590,28 +632,119 @@ class _SettingsPanelState extends State<SettingsPanel> {
   }
 }
 
+// class SecureStorage {
+//   final storage = FlutterSecureStorage();
+//
+//   //Save Credentials
+//   Future saveCredentials(AccessToken token, String refreshToken) async {
+//     print(token.expiry.toIso8601String());
+//     await storage.write(key: "type", value: token.type);
+//     await storage.write(key: "data", value: token.data);
+//     await storage.write(key: "expiry", value: token.expiry.toString());
+//     await storage.write(key: "refreshToken", value: refreshToken);
+//   }
+//
+//   //Get Saved Credentials
+//   Future<Map<String, dynamic>?> getCredentials() async {
+//     var result = await storage.readAll();
+//     if (result.length == 0) return null;
+//     return result;
+//   }
+//
+//   //Clear Saved Credentials
+//   Future clear() {
+//     return storage.deleteAll();
+//   }
+// }
 
+// class GoogleDrive {
+//   final storage = SecureStorage();
+//   //Get Authenticated Http Client
+//   Future<http.Client> getHttpClient() async {
+//     //Get Credentials
+//     var credentials = await storage.getCredentials();
+//     if (credentials == null) {
+//       //Needs user authentication
+//       var authClient = await clientViaUserConsent(
+//           ClientId(_clientId),
+//           _scopes,
+//               (url) {
+//         //Open Url in Browser
+//         launch(url);
+//       });
+//       //Save Credentials
+//       await storage.saveCredentials(authClient.credentials.accessToken,
+//           authClient.credentials.refreshToken!);
+//       return authClient;
+//     } else {
+//       print(credentials["expiry"]);
+//       //Already authenticated
+//       return authenticatedClient(
+//           http.Client(),
+//           AccessCredentials(
+//               AccessToken(credentials["type"], credentials["data"],
+//                   DateTime.tryParse(credentials["expiry"])!),
+//               credentials["refreshToken"],
+//               _scopes));
+//     }
+//   }
+// }
 
+// Future<String?> getFolderId(ga.DriveApi drive) async {
+//   final allFiles = await drive.files.list();
+//   for(ga.File f in allFiles.files?? []){
+//     if(f.name == folderNameGoogleDrive){
+//       return f.id;
+//     }
+//   }
+//   return null;
+// }
+//
+// Future<String?> createFolder (ga.DriveApi drive) async{
+//   var fileMetadata = ga.File();
+//   fileMetadata.name = folderNameGoogleDrive;
+//   fileMetadata.mimeType = 'application/vnd.google-apps.folder';
+//
+//   try {
+//     var file = await drive.files.create(fileMetadata);
+//     return file.id;
+//   } catch (e) {
+//     // TODO: Handle error appropriately
+//     print('Unable to create folder: $e');
+//     rethrow;
+//   }
+// }
+//
+// //Upload File
+// Future upload(Map<String, String> authheader) async {
+//   var client = GoogleAuthClient(authheader);
+//   ga.DriveApi drive = ga.DriveApi(client);
+//
+//   String? folderId = await getFolderId(drive)?? await createFolder(drive);
+//
+//   if(folderId != null){
+//     io.File? backupFile = await saveBackup(withCloud: false);
+//
+//     ga.File uploadFile = ga.File();
+//     uploadFile.name = p.basename(backupFile!.path);
+//     uploadFile.parents = [folderId];
+//
+//     var response = await drive.files.create(
+//         uploadFile,
+//         uploadMedia: ga.Media(backupFile.openRead(), backupFile.lengthSync())
+//     );
+//   }
+// }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// class GoogleAuthClient extends http.BaseClient {
+//   final Map<String, String> _headers;
+//
+//   final http.Client _client = http.Client();
+//
+//   GoogleAuthClient(this._headers);
+//
+//   @override
+//   Future<http.StreamedResponse> send(http.BaseRequest request) {
+//     return _client.send(request..headers.addAll(_headers));
+//   }
+// }
