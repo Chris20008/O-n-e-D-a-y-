@@ -914,10 +914,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   Future finishWorkout() async{
     int time;
     // final createBackup = null;
-    final createAutomaticBackup = cnConfig.automaticBackups;
-    if(createAutomaticBackup == null){
-      return;
-    }
+    // final createAutomaticBackup = cnConfig.automaticBackups;
+    // if(createAutomaticBackup == null){
+    //   return;
+    // }
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
       time = cnStandardPopUp.animationTime;
@@ -939,7 +939,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnStopwatchWidget.cancelTimer();
       }
       if(cnConfig.automaticBackups){
-        saveBackup(withCloud: cnConfig.syncWithCloud ?? false);
+        saveBackup(withCloud: cnConfig.syncWithCloud);
       }
     });
   }

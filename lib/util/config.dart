@@ -4,27 +4,24 @@ import 'custom_cache_manager.dart';
 
 class Config{
 
-  // bool showIntro;
   Map cnRunningWorkout;
   Map cnScreenStatistics;
   Map settings;
-  // String? languageCode;
   late CustomCacheManager cache;
 
   Config({
-    // this.showIntro = true,
-    this.cnRunningWorkout = const {},
-    this.cnScreenStatistics = const {},
-    this.settings = const {}
-    // this.languageCode
-  }) {
+    Map? cnRunningWorkout,
+    Map? cnScreenStatistics,
+    Map? settings
+  }) :  cnRunningWorkout = cnRunningWorkout ?? {},
+        cnScreenStatistics = cnScreenStatistics ?? {},
+        settings = settings ?? {}
+  {
     cache = CustomCacheManager();
     save();
   }
 
   Map<String, dynamic> toJson() => {
-    // 'showIntro': showIntro,
-    // "languageCode": languageCode,
     'cnRunningWorkout': cnRunningWorkout,
     'cnScreenStatistics': cnScreenStatistics,
     'settings': settings
@@ -32,8 +29,6 @@ class Config{
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
-      // showIntro: json['showIntro']?? false,
-      // languageCode: json['languageCode'],
       cnRunningWorkout: json['cnRunningWorkout']?? {},
       cnScreenStatistics: json['cnScreenStatistics']?? {},
       settings: json['settings']?? {}
@@ -93,11 +88,11 @@ class CnConfig extends ChangeNotifier {
   //   await config.save();
   // }
 
-  get languageCode => config.settings["languageCode"];
-  get tutorial => config.settings["tutorial"];
-  get automaticBackups => config.settings["automaticBackups"];
-  get syncWithCloud => config.settings["syncWithCloud"];
-  get countdownTime => config.settings["countdownTime"];
+  String? get languageCode => config.settings["languageCode"];
+  bool get tutorial => config.settings["tutorial"]?? true;
+  bool get automaticBackups => config.settings["automaticBackups"]?? true;
+  bool get syncWithCloud => config.settings["syncWithCloud"]?? false;
+  int? get countdownTime => config.settings["countdownTime"];
 
   Future setCountdownTime(int? time) async{
     config.settings["countdownTime"] = time;
