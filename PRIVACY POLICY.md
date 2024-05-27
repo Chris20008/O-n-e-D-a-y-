@@ -54,3 +54,5 @@ If you have any questions or concerns about this Privacy Policy, please contact 
 ---
 
 By using OneDay, you acknowledge that you have read, understood, and agreed to this Privacy Policy.
+
+[Imprint](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint)
