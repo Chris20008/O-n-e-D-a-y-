@@ -45,7 +45,7 @@ The Software is provided "AS IS" and "AS AVAILABLE", without warranty of any kin
 This License Agreement is effective until terminated. Your rights under this Agreement will terminate automatically without notice if you fail to comply with any term(s) of this Agreement. Upon termination, you must cease all use and distribution of the Software.
 
 ## 9. Governing Law
-This Agreement shall be governed by and construed in accordance with the laws of [Your Country/State], without regard to its conflict of laws principles.
+This Agreement shall be governed by and construed in accordance with the laws of Germany, without regard to its conflict of laws principles.
 
 ## 10. Contact Information
 If you have any questions about this License Agreement, please contact us at:
