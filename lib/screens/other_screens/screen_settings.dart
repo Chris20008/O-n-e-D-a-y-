@@ -509,7 +509,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
         context: context,
         maxWidth: 400,
         widthFactor: 0.9,
-        maxHeight: 650,
+        maxHeight: 680,
         child: Column(
           children: [
 
