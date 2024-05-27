@@ -55,3 +55,5 @@ If you have any questions about this License Agreement, please contact us at:
 ---
 
 By using, copying, modifying, or distributing the Software, you acknowledge that you have read, understood, and agreed to be bound by this License Agreement.
+
+[Imprint](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint)
