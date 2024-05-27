@@ -7,7 +7,7 @@ Oxfordstraße 6
 53111 Bonn  
 
 ### Disclaimer:
-I do not assume any liability for the content of the App. While I strive to keep the information correct and up to date, I cannot guarantee the accuracy, completeness, and timeliness of the content. By
+I do not assume any liability for the content of the App. While I strive to keep the information correct and up to date, I cannot guarantee the accuracy, completeness, and timeliness of the content.
 
 ### Copyright:
 The content and open-source code of the App is protected by the [CC BY-NC 4.0 DEED License](https://creativecommons.org/licenses/by-nc-sa/4.0/)
