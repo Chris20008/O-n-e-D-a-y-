@@ -198,7 +198,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         }
                                     ),
                                   ),
-                                  /// Sync with iCloud
+                                  /// Sync with Cloud
                                   CupertinoListTile(
                                     leading: const Stack(
                                         alignment: Alignment.center,
@@ -240,12 +240,14 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                       child: Row(
                                         // crossAxisAlignment: CrossAxisAlignment.end,
                                         children: [
-                                          OverflowSafeText(
-                                              maxLines: 1,
-                                            io.Platform.isAndroid
-                                                  ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                                                  : AppLocalizations.of(context)!.settingsSynciCloud,
-                                              style: const TextStyle(color: Colors.white),
+                                          Expanded(
+                                            child: OverflowSafeText(
+                                                maxLines: 1,
+                                              io.Platform.isAndroid
+                                                    ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
+                                                    : AppLocalizations.of(context)!.settingsSynciCloud,
+                                                style: const TextStyle(color: Colors.white),
+                                            ),
                                           ),
                                           if(_syncWithCloud)
                                             const SizedBox(width: 10),
@@ -335,9 +337,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   CupertinoListTile(
                                     onTap: () async{
                                       await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
-                                      // _handleSignIn();
-                                      // final drive = GoogleDrive();
-                                      // final t = await drive.upload();
                                     },
                                     leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
                                     trailing: trailingArrow,
@@ -357,16 +356,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
         )
     );
   }
-
-  // void google() async{
-  //   final googleSignIn =
-  //   GoogleSignIn.standard(scopes: [DriveApi.driveFileScope]);
-  //   final GoogleSignInAuthentication? auth =
-  //       await googleSignIn.currentUser?.authentication;
-  //   final String? accessToken = auth?.accessToken;
-  // }
-
-
 
   void onPanelSlide(value){
     cnScreenStatistics.animationControllerSettingPanel.value = value;
@@ -515,10 +504,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
           title: AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare,
             onTap: () {
               /// ToDo: implement share functionality
-              // HapticFeedback.selectionClick();
-              // Future.delayed(const Duration(milliseconds: 200), (){
-              //   MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
-              // });
             },
           ),
         ];
@@ -631,120 +616,3 @@ class _SettingsPanelState extends State<SettingsPanel> {
     );
   }
 }
-
-// class SecureStorage {
-//   final storage = FlutterSecureStorage();
-//
-//   //Save Credentials
-//   Future saveCredentials(AccessToken token, String refreshToken) async {
-//     print(token.expiry.toIso8601String());
-//     await storage.write(key: "type", value: token.type);
-//     await storage.write(key: "data", value: token.data);
-//     await storage.write(key: "expiry", value: token.expiry.toString());
-//     await storage.write(key: "refreshToken", value: refreshToken);
-//   }
-//
-//   //Get Saved Credentials
-//   Future<Map<String, dynamic>?> getCredentials() async {
-//     var result = await storage.readAll();
-//     if (result.length == 0) return null;
-//     return result;
-//   }
-//
-//   //Clear Saved Credentials
-//   Future clear() {
-//     return storage.deleteAll();
-//   }
-// }
-
-// class GoogleDrive {
-//   final storage = SecureStorage();
-//   //Get Authenticated Http Client
-//   Future<http.Client> getHttpClient() async {
-//     //Get Credentials
-//     var credentials = await storage.getCredentials();
-//     if (credentials == null) {
-//       //Needs user authentication
-//       var authClient = await clientViaUserConsent(
-//           ClientId(_clientId),
-//           _scopes,
-//               (url) {
-//         //Open Url in Browser
-//         launch(url);
-//       });
-//       //Save Credentials
-//       await storage.saveCredentials(authClient.credentials.accessToken,
-//           authClient.credentials.refreshToken!);
-//       return authClient;
-//     } else {
-//       print(credentials["expiry"]);
-//       //Already authenticated
-//       return authenticatedClient(
-//           http.Client(),
-//           AccessCredentials(
-//               AccessToken(credentials["type"], credentials["data"],
-//                   DateTime.tryParse(credentials["expiry"])!),
-//               credentials["refreshToken"],
-//               _scopes));
-//     }
-//   }
-// }
-
-// Future<String?> getFolderId(ga.DriveApi drive) async {
-//   final allFiles = await drive.files.list();
-//   for(ga.File f in allFiles.files?? []){
-//     if(f.name == folderNameGoogleDrive){
-//       return f.id;
-//     }
-//   }
-//   return null;
-// }
-//
-// Future<String?> createFolder (ga.DriveApi drive) async{
-//   var fileMetadata = ga.File();
-//   fileMetadata.name = folderNameGoogleDrive;
-//   fileMetadata.mimeType = 'application/vnd.google-apps.folder';
-//
-//   try {
-//     var file = await drive.files.create(fileMetadata);
-//     return file.id;
-//   } catch (e) {
-//     // TODO: Handle error appropriately
-//     print('Unable to create folder: $e');
-//     rethrow;
-//   }
-// }
-//
-// //Upload File
-// Future upload(Map<String, String> authheader) async {
-//   var client = GoogleAuthClient(authheader);
-//   ga.DriveApi drive = ga.DriveApi(client);
-//
-//   String? folderId = await getFolderId(drive)?? await createFolder(drive);
-//
-//   if(folderId != null){
-//     io.File? backupFile = await saveBackup(withCloud: false);
-//
-//     ga.File uploadFile = ga.File();
-//     uploadFile.name = p.basename(backupFile!.path);
-//     uploadFile.parents = [folderId];
-//
-//     var response = await drive.files.create(
-//         uploadFile,
-//         uploadMedia: ga.Media(backupFile.openRead(), backupFile.lengthSync())
-//     );
-//   }
-// }
-
-// class GoogleAuthClient extends http.BaseClient {
-//   final Map<String, String> _headers;
-//
-//   final http.Client _client = http.Client();
-//
-//   GoogleAuthClient(this._headers);
-//
-//   @override
-//   Future<http.StreamedResponse> send(http.BaseRequest request) {
-//     return _client.send(request..headers.addAll(_headers));
-//   }
-// }

@@ -88,6 +88,27 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
 /// ############
 /// GoogleDrive load Backup
 /// ############
+Future saveBackUpGoogleDrive(Map<String, String> authHeader, File backupFile) async {
+  var client = GoogleAuthClient(authHeader);
+  ga.DriveApi drive = ga.DriveApi(client);
+
+  /// get folder id if folder exists, otherwise create folder and retrieve id from this instead
+  String? folderId = await getGoogleDriveFolderId(drive)?? await createGoogleDriveFolder(drive);
+
+  if(folderId != null){
+    ga.File uploadFile = ga.File();
+    uploadFile.name = basename(backupFile.path);
+    uploadFile.parents = [folderId];
+
+    var response = await drive.files.create(
+        uploadFile,
+        uploadMedia: ga.Media(backupFile.openRead(), backupFile.lengthSync())
+    );
+
+    return response;
+  }
+}
+
 Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   GoogleSignInAccount? account;
 
@@ -122,27 +143,6 @@ Future<String?> createGoogleDriveFolder(ga.DriveApi drive) async{
     // TODO: Handle error appropriately
     // print('Unable to create folder: $e');
     rethrow;
-  }
-}
-
-Future saveBackUpGoogleDrive(Map<String, String> authHeader, File backupFile) async {
-  var client = GoogleAuthClient(authHeader);
-  ga.DriveApi drive = ga.DriveApi(client);
-
-  /// get folder id if folder exists, otherwise create folder and retrieve id from this instead
-  String? folderId = await getGoogleDriveFolderId(drive)?? await createGoogleDriveFolder(drive);
-
-  if(folderId != null){
-    ga.File uploadFile = ga.File();
-    uploadFile.name = basename(backupFile.path);
-    uploadFile.parents = [folderId];
-
-    var response = await drive.files.create(
-        uploadFile,
-        uploadMedia: ga.Media(backupFile.openRead(), backupFile.lengthSync())
-    );
-
-    return response;
   }
 }
 

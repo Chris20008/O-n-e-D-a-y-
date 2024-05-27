@@ -58,7 +58,6 @@ dependencies:
   googleapis: ^13.1.0
   googleapis_auth: ^1.6.0
   google_sign_in: ^6.2.1
-  flutter_secure_storage: ^9.2.2
   http: ^1.2.1
   path: ^1.9.0
 

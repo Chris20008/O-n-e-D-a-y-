@@ -1015,6 +1015,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   cnRunningWorkout.refresh();
                 }
                 else if(value == "Clear"){
+                  newEx.restInSeconds = 0;
                   cnRunningWorkout.refresh();
                 }
                 else{

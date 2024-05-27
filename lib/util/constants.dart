@@ -53,13 +53,16 @@ String mapRestInSecondsToString({required int restInSeconds, bool short = true})
   else if (restInSeconds % 60 != 0) {
     int seconds = restInSeconds % 60;
     final secondsString = seconds > 9? seconds.toString() : "0$seconds";
-    return "${(restInSeconds / 60).floor()}:${secondsString}m";
+    if(short){
+      return "${(restInSeconds / 60).floor()}:${secondsString}m";
+    }
+    return "${(restInSeconds / 60).floor()}:$secondsString min";
   }
   else {
     if(short){
       return "${(restInSeconds / 60).round()}m";
     }
-    return "${(restInSeconds / 60).floor()}:00m";
+    return "${(restInSeconds / 60).floor()}:00 min";
   }
 }
 
@@ -201,17 +204,22 @@ Widget getSelectRestInSeconds({
     itemBuilder: (context) {
       List times = List.from(predefinedTimes);
       times.insert(0, "Clear");
-      times.add("Custom");
-      return List.generate(times.length, (index) => PullDownMenuItem(
-        title: times[index] is String? times[index] : mapRestInSecondsToString(restInSeconds: times[index], short: false),
-        onTap: () {
-          HapticFeedback.selectionClick();
-          FocusManager.instance.primaryFocus?.unfocus();
-          Future.delayed(const Duration(milliseconds: 200), (){
-            onConfirm(times[index]);
-          });
-        }),
+      times.insert(1, "Custom");
+      List<PullDownMenuItem> timeWidgets = List.generate(times.length, (index) => PullDownMenuItem(
+          title: times[index] is String? times[index] : mapRestInSecondsToString(restInSeconds: times[index], short: false),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(times[index]);
+            });
+          })
       );
+      return [
+        ...timeWidgets.sublist(0, 2),
+        const PullDownMenuDivider.large(),
+        ...timeWidgets.sublist(2),
+      ];
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -235,7 +243,7 @@ Widget getSelectSeatLevel({
     itemBuilder: (context) {
       List seatLevels = List.generate(21, (index) => index);
       seatLevels.insert(0, "Clear");
-      return List.generate(seatLevels.length, (index) => PullDownMenuItem(
+      List<PullDownMenuItem> seatLevelWidgets = List.generate(seatLevels.length, (index) => PullDownMenuItem(
           title: seatLevels[index] is String? seatLevels[index] : seatLevels[index].toString(),
           onTap: () {
             HapticFeedback.selectionClick();
@@ -243,8 +251,13 @@ Widget getSelectSeatLevel({
             Future.delayed(const Duration(milliseconds: 200), (){
               onConfirm(seatLevels[index]);
             });
-          }),
+          })
       );
+      return [
+        seatLevelWidgets.first,
+        const PullDownMenuDivider.large(),
+        ...seatLevelWidgets.sublist(1)
+      ];
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -285,6 +298,9 @@ String checkOnlyOneDecimalPoint(String text){
 Future setIntlLanguage({String? countryCode})async{
   final res = await findSystemLocale();
   Intl.systemLocale = countryCode?? res;
+  // print("SET LAGNUAGE TO: $res");
+  // print(context.mounted);
+  // MyApp.of(context)?.setLocale(languageCode: countryCode?? res);
 }
 
 class Language{
@@ -296,8 +312,15 @@ class Language{
 
 Map languages = {
   "de": Language(languageCode: "de", countryCode: "de_DE"),
-  "en": Language(languageCode: "en", countryCode: "en_US")
+  "de_DE": Language(languageCode: "de", countryCode: "de_DE"),
+  "en": Language(languageCode: "en", countryCode: "en_US"),
+  "en_US": Language(languageCode: "en", countryCode: "en_US")
 };
+
+Future<Language> initFromSystemLanguage()async{
+  final res = await findSystemLocale();
+  return languages[res]?? languages["en"];
+}
 
 enum LANGUAGES{
   de ("de"),
