@@ -1,5 +1,5 @@
 import 'package:fitness_app/util/backup_functions.dart';
-import 'package:fitness_app/util/constants.dart';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -84,7 +84,7 @@ class CnConfig extends ChangeNotifier {
   }
 
   Future<bool> signInGoogleDrive() async {
-    if(account == null){
+    if(account == null && Platform.isAndroid){
       account = await getGoogleDriveAccount();
       await Future.delayed(const Duration(milliseconds: 1000), (){});
     }
