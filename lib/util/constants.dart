@@ -356,6 +356,7 @@ Widget getSet({
             children: [
               Center(
                 child: Container(
+                  margin: const EdgeInsets.only(left: 1.5),
                   width: height * (0.75 + (index + 1).toString().length/4),
                   height: height,
                   decoration: BoxDecoration(

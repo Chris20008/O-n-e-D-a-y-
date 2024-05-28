@@ -79,7 +79,7 @@ class ExerciseRow extends StatelessWidget {
                                       Container(
                                         // color: Colors.grey[900],
                                         color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
-                                        height: 0.5,
+                                        height: 1,
                                         width: 15,
                                       ),
                                       // Container(
