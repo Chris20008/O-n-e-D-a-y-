@@ -52,7 +52,6 @@ class MyAppState extends State<MyApp> {
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
-    print("Set locale:$languageCode");
     final Language lan = languages[languageCode]?? languages[language?.value]?? languages[LANGUAGES.en.value];
     setState(() {
       _locale = Locale.fromSubtags(countryCode: lan.countryCode, languageCode: lan.languageCode);

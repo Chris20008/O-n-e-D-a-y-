@@ -828,7 +828,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   }
 
   void openPopUpFinishWorkout(){
-    print("AUTOMATIC BACKUPS: ${cnConfig.automaticBackups}");
     final bool canFinish = hasStartedWorkout();
     cnStandardPopUp.open(
       context: context,
@@ -933,7 +932,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnWorkouts.refreshAllWorkouts();
       }
       await stopWorkout(time: 0);
-      print("CREATE AUTOMATIC BACKUP?: ${cnConfig.automaticBackups}");
       if(cnStopwatchWidget.isRunning){
         cnStopwatchWidget.cancelTimer();
       }
