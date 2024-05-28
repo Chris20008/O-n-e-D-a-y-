@@ -1,4 +1,5 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
+import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,18 +29,15 @@ class _SettingsPanelState extends State<SettingsPanel> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   bool setOrientation = false;
-  // String _languageCode = "en";
   bool _tutorial = true;
-  bool _automaticBackups = false;
+  bool _automaticBackups = true;
   bool _syncWithCloud = false;
 
   @override
   void initState() {
-    print("initState SETTINGS");
-    // _languageCode = cnConfig.config.settings["languageCode"] ?? _languageCode;
-    _tutorial = cnConfig.tutorial ?? _tutorial;
-    _automaticBackups = cnConfig.automaticBackups ?? _automaticBackups;
-    _syncWithCloud = cnConfig.syncWithCloud ?? _syncWithCloud;
+    _tutorial = cnConfig.tutorial;
+    _automaticBackups = cnConfig.automaticBackups;
+    _syncWithCloud = cnConfig.syncWithCloud;
     super.initState();
   }
 
@@ -169,7 +167,11 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   ),
                                   /// Load Backup
                                   CupertinoListTile(
-                                    onTap: loadBackup,
+                                    onTap: () async{
+                                      await loadBackup();
+                                      cnScreenStatistics.refreshData();
+                                      cnScreenStatistics.refresh();
+                                    },
                                     leading: const Icon(
                                         Icons.cloud_download
                                     ),
@@ -196,7 +198,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         }
                                     ),
                                   ),
-                                  /// Sync with iCloud
+                                  /// Sync with Cloud
                                   CupertinoListTile(
                                     leading: const Stack(
                                         alignment: Alignment.center,
@@ -219,24 +221,64 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                     trailing: CupertinoSwitch(
                                         value: _syncWithCloud,
                                         activeColor: const Color(0xFFC16A03),
-                                        onChanged: (value){
-                                          setState(() {
-                                            if(Platform.isAndroid){
-                                              HapticFeedback.selectionClick();
+                                        onChanged: (value)async{
+                                          if(Platform.isAndroid){
+                                            HapticFeedback.selectionClick();
+                                            if(value == true){
+                                              // cnConfig.signInGoogleDrive();
+                                            } else{
+                                              cnConfig.account = null;
                                             }
-                                            _syncWithCloud = value;
-                                            cnConfig.setSyncWithCloud(_syncWithCloud);
-                                          });
+                                          }
+                                          _syncWithCloud = value;
+                                          cnConfig.setSyncWithCloud(_syncWithCloud);
+                                          setState(() {});
                                         }
                                     ),
                                     title: Padding(
                                       padding: const EdgeInsets.only(right: 5),
-                                      child: OverflowSafeText(
-                                          maxLines: 1,
-                                          Platform.isAndroid
-                                              ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                                              : AppLocalizations.of(context)!.settingsSynciCloud,
-                                          style: const TextStyle(color: Colors.white),
+                                      child: Row(
+                                        // crossAxisAlignment: CrossAxisAlignment.end,
+                                        children: [
+                                          Expanded(
+                                            child: OverflowSafeText(
+                                                maxLines: 1,
+                                              Platform.isAndroid
+                                                    ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
+                                                    : AppLocalizations.of(context)!.settingsSynciCloud,
+                                                style: const TextStyle(color: Colors.white),
+                                            ),
+                                          ),
+                                          if(_syncWithCloud && Platform.isAndroid)
+                                            const SizedBox(width: 10),
+                                          /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
+                                          /// so calling it will lead to an crash
+                                          /// We have to make sure it is only called on Android!
+                                          if(_syncWithCloud && Platform.isAndroid)
+                                            FutureBuilder(
+                                                future: cnConfig.signInGoogleDrive(),
+                                                builder: (context, connected){
+                                                  if(!connected.hasData){
+                                                    return const Center(
+                                                      child: SizedBox(
+                                                          height: 15,
+                                                          width: 15,
+                                                          child: CircularProgressIndicator(strokeWidth: 2,)
+                                                      ),
+                                                    );
+                                                  }
+                                                  return Icon(
+                                                    cnConfig.account != null
+                                                        ? Icons.check_circle
+                                                        : Icons.close,
+                                                    size: 15,
+                                                    color: cnConfig.account != null
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                  );
+                                                }
+                                            )
+                                        ],
                                       ),
                                     ),
                                   ),
@@ -256,13 +298,10 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                 children: [
                                   /// Contact
                                   CupertinoListTile(
-                                    // onTap: () {sendMail();},
                                     leading: const Icon(
                                         Icons.help_outline
                                     ),
-                                    // trailing: getSelectContactButton(),
                                     title: getSelectContactButton(),
-                                    // title: Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Github
                                   CupertinoListTile(
@@ -277,17 +316,34 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                   ),
                                   /// Term Of Use
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
+                                    },
                                     leading: const Icon(
                                         Icons.my_library_books_rounded
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
                                   ),
                                   /// Privacy Policy
                                   CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
+                                    },
                                     leading: const Icon(
                                         Icons.lock_outline
                                     ),
+                                    trailing: trailingArrow,
                                     title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
+                                  ),
+                                  /// Imprint
+                                  CupertinoListTile(
+                                    onTap: () async{
+                                      await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+                                    },
+                                    leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+                                    trailing: trailingArrow,
+                                    title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
                                   ),
                                 ],
                               ),
@@ -319,6 +375,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectLanguageButton() {
     return PullDownButton(
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
@@ -372,6 +429,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectContactButton() {
     return PullDownButton(
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
@@ -432,6 +490,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
 
   Widget getSelectCreateBackup() {
     return PullDownButton(
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
       itemBuilder: (context) {
         return [
@@ -440,7 +499,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                saveBackup(withCloud: _syncWithCloud);
+                saveBackup(withCloud: _syncWithCloud, cnConfig: cnConfig);
               });
             },
           ),
@@ -448,10 +507,6 @@ class _SettingsPanelState extends State<SettingsPanel> {
           title: AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare,
             onTap: () {
               /// ToDo: implement share functionality
-              // HapticFeedback.selectionClick();
-              // Future.delayed(const Duration(milliseconds: 200), (){
-              //   MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
-              // });
             },
           ),
         ];
@@ -484,7 +539,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
         context: context,
         maxWidth: 400,
         widthFactor: 0.9,
-        maxHeight: 650,
+        maxHeight: 680,
         child: Column(
           children: [
 
@@ -564,29 +619,3 @@ class _SettingsPanelState extends State<SettingsPanel> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

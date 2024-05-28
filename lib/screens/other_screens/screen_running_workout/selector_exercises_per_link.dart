@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../objects/exercise.dart';
 import '../../../util/constants.dart';
 import '../../../widgets/multiple_exercise_row.dart';
@@ -50,6 +51,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       children: [
         GestureDetector(
           onTap: (){
+            HapticFeedback.selectionClick();
             widget.onCancel();
           },
         ),
@@ -230,6 +232,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                       indexJ = 0;
                                       index += 1;
                                     }
+                                    HapticFeedback.selectionClick();
                                     widget.onConfirm(exToRemove: exToRemove);
                                   },
                                   style: ButtonStyle(
@@ -245,6 +248,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                           Expanded(
                               child: ElevatedButton(
                                   onPressed: () {
+                                    HapticFeedback.selectionClick();
                                     widget.onCancel();
                                   },
                                   style: ButtonStyle(

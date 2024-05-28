@@ -22,6 +22,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
@@ -134,6 +135,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false); /// should be true?
+  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
   late final AnimationController _animationControllerWorkoutPanel = AnimationController(
     vsync: this,
@@ -179,12 +181,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
       if(context.mounted){
-        cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
+        final res = await findSystemLocale();
+        MyApp.of(context)?.setLocale(languageCode: res);
+        // cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
-    } else{
-      if(context.mounted){
+    }
+    else if(context.mounted && cnConfig.config.settings["languageCode"] != null){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.settings["languageCode"]);
-      }
     }
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
@@ -209,6 +212,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
     setIntroScreen();
+    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+    if(Platform.isAndroid && cnConfig.syncWithCloud){
+      Future.delayed(const Duration(milliseconds: 300), (){
+        cnConfig.signInGoogleDrive();
+      });
+    }
   }
 
   @override

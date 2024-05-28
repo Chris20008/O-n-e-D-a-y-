@@ -1,6 +1,8 @@
+import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:quiver/iterables.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
@@ -57,6 +59,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
       children: [
         GestureDetector(
           onTap: (){
+            HapticFeedback.selectionClick();
             widget.onCancel();
             isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
           },
@@ -237,6 +240,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                           Expanded(
                               child: ElevatedButton(
                                   onPressed: () {
+                                    HapticFeedback.selectionClick();
                                     widget.onCancel();
                                   },
                                   style: ButtonStyle(
@@ -262,7 +266,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
   List<Exercise> getExercises(int index, BuildContext context){
     Exercise tempNew = Exercise.copy(relevantExercises[index]);
-    Exercise tempTemplate = Exercise.copy(widget.workoutTemplate.exercises.firstWhere((ex) => ex.name == tempNew.name));
+    Exercise tempTemplate = Exercise.copy(widget.workoutTemplate.exercises.firstWhereOrNull((ex) => ex.name == tempNew.name) ?? Exercise());
 
     tempNew.name = AppLocalizations.of(context)!.myNew;
     tempTemplate.name = AppLocalizations.of(context)!.template;

@@ -1,30 +1,30 @@
+import 'package:fitness_app/util/backup_functions.dart';
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'custom_cache_manager.dart';
 
 class Config{
 
-  // bool showIntro;
   Map cnRunningWorkout;
   Map cnScreenStatistics;
   Map settings;
-  // String? languageCode;
   late CustomCacheManager cache;
 
   Config({
-    // this.showIntro = true,
-    this.cnRunningWorkout = const {},
-    this.cnScreenStatistics = const {},
-    this.settings = const {}
-    // this.languageCode
-  }) {
+    Map? cnRunningWorkout,
+    Map? cnScreenStatistics,
+    Map? settings
+  }) :  cnRunningWorkout = cnRunningWorkout ?? {},
+        cnScreenStatistics = cnScreenStatistics ?? {},
+        settings = settings ?? {}
+  {
     cache = CustomCacheManager();
     save();
   }
 
   Map<String, dynamic> toJson() => {
-    // 'showIntro': showIntro,
-    // "languageCode": languageCode,
     'cnRunningWorkout': cnRunningWorkout,
     'cnScreenStatistics': cnScreenStatistics,
     'settings': settings
@@ -32,8 +32,6 @@ class Config{
 
   factory Config.fromJson(Map<String, dynamic> json) {
     return Config(
-      // showIntro: json['showIntro']?? false,
-      // languageCode: json['languageCode'],
       cnRunningWorkout: json['cnRunningWorkout']?? {},
       cnScreenStatistics: json['cnScreenStatistics']?? {},
       settings: json['settings']?? {}
@@ -59,6 +57,7 @@ class CnConfig extends ChangeNotifier {
   late CustomCacheManager cache;
   late Config config;
   bool isInitialized = false;
+  GoogleSignInAccount? account;
 
   Future initData() async{
     cache = CustomCacheManager();
@@ -84,6 +83,18 @@ class CnConfig extends ChangeNotifier {
     refresh();
   }
 
+  Future<bool> signInGoogleDrive() async {
+    if(account == null && Platform.isAndroid){
+      account = await getGoogleDriveAccount();
+      await Future.delayed(const Duration(milliseconds: 1000), (){});
+    }
+    return account != null;
+  }
+
+  Future<Map<String, String>?> getGoogleDriveAuthHeaders() async{
+    return await account?.authHeaders;
+  }
+
   void refresh(){
     notifyListeners();
   }
@@ -93,11 +104,16 @@ class CnConfig extends ChangeNotifier {
   //   await config.save();
   // }
 
-  get languageCode => config.settings["languageCode"];
-  get tutorial => config.settings["tutorial"];
-  get automaticBackups => config.settings["automaticBackups"];
-  get syncWithCloud => config.settings["syncWithCloud"];
+  String? get languageCode => config.settings["languageCode"];
+  bool get tutorial => config.settings["tutorial"]?? true;
+  bool get automaticBackups => config.settings["automaticBackups"]?? true;
+  bool get syncWithCloud => config.settings["syncWithCloud"]?? false;
+  int? get countdownTime => config.settings["countdownTime"];
 
+  Future setCountdownTime(int? time) async{
+    config.settings["countdownTime"] = time;
+    await config.save();
+  }
 
   Future setLanguage(String languageCode) async{
     config.settings["languageCode"] = languageCode;

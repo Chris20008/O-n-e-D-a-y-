@@ -1,6 +1,6 @@
-# fitness_app
+# O-n-e-D-a-y-
 
-FitnessApp
+O-n-e-D-a-y-
 
 ## Getting Started
 
@@ -18,3 +18,6 @@ samples, guidance on mobile development, and a full API reference.
 ## Installation (Work in Progress)
 
 Generate App Localizations: flutter gen-l10n
+
+
+[Imprint](https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint)
