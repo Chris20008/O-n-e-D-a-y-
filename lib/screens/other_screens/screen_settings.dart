@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'dart:io' as io;
+import 'dart:io';
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
@@ -58,7 +58,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               return SlidingUpPanel(
                 controller: cnScreenStatistics.panelControllerSettings,
                 defaultPanelState: PanelState.CLOSED,
-                maxHeight: constraints.maxHeight - (io.Platform.isAndroid? 50 : 70),
+                maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
                 minHeight: 0,
                 isDraggable: true,
                 borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
@@ -108,7 +108,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         activeColor: const Color(0xFFC16A03),
                                         onChanged: (value){
                                           setState(() {
-                                            if(io.Platform.isAndroid){
+                                            if(Platform.isAndroid){
                                               HapticFeedback.selectionClick();
                                             }
                                             _tutorial = value;
@@ -189,7 +189,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         activeColor: const Color(0xFFC16A03),
                                         onChanged: (value){
                                           setState(() {
-                                            if(io.Platform.isAndroid){
+                                            if(Platform.isAndroid){
                                               HapticFeedback.selectionClick();
                                             }
                                             _automaticBackups = value;
@@ -222,7 +222,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                         value: _syncWithCloud,
                                         activeColor: const Color(0xFFC16A03),
                                         onChanged: (value)async{
-                                          if(io.Platform.isAndroid){
+                                          if(Platform.isAndroid){
                                             HapticFeedback.selectionClick();
                                             if(value == true){
                                               // cnConfig.signInGoogleDrive();
@@ -243,15 +243,18 @@ class _SettingsPanelState extends State<SettingsPanel> {
                                           Expanded(
                                             child: OverflowSafeText(
                                                 maxLines: 1,
-                                              io.Platform.isAndroid
+                                              Platform.isAndroid
                                                     ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
                                                     : AppLocalizations.of(context)!.settingsSynciCloud,
                                                 style: const TextStyle(color: Colors.white),
                                             ),
                                           ),
-                                          if(_syncWithCloud)
+                                          if(_syncWithCloud && Platform.isAndroid)
                                             const SizedBox(width: 10),
-                                          if(_syncWithCloud)
+                                          /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
+                                          /// so calling it will lead to an crash
+                                          /// We have to make sure it is only called on Android!
+                                          if(_syncWithCloud && Platform.isAndroid)
                                             FutureBuilder(
                                                 future: cnConfig.signInGoogleDrive(),
                                                 builder: (context, connected){
@@ -597,7 +600,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
               ),
               title: OverflowSafeText(
                   maxLines: 1,
-                  io.Platform.isAndroid
+                  Platform.isAndroid
                       ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
                       : AppLocalizations.of(context)!.settingsSynciCloud,
                   style: const TextStyle(color: Colors.white)
@@ -605,7 +608,7 @@ class _SettingsPanelState extends State<SettingsPanel> {
             ),
             Padding(
                 padding: const EdgeInsets.only(left: 30),
-                child: Text(io.Platform.isAndroid
+                child: Text(Platform.isAndroid
                     ? AppLocalizations.of(context)!.settingsBackupSyncGoogleDriveExplanation
                     : AppLocalizations.of(context)!.settingsBackupSynciCloudExplanation
                 )
