@@ -1,4 +1,7 @@
+import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'custom_cache_manager.dart';
 
@@ -54,6 +57,7 @@ class CnConfig extends ChangeNotifier {
   late CustomCacheManager cache;
   late Config config;
   bool isInitialized = false;
+  GoogleSignInAccount? account;
 
   Future initData() async{
     cache = CustomCacheManager();
@@ -77,6 +81,18 @@ class CnConfig extends ChangeNotifier {
     await config.save();
 
     refresh();
+  }
+
+  Future<bool> signInGoogleDrive() async {
+    if(account == null){
+      account = await getGoogleDriveAccount();
+      await Future.delayed(const Duration(milliseconds: 1000), (){});
+    }
+    return account != null;
+  }
+
+  Future<Map<String, String>?> getGoogleDriveAuthHeaders() async{
+    return await account?.authHeaders;
   }
 
   void refresh(){

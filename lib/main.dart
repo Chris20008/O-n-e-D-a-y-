@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
@@ -51,6 +52,7 @@ class MyAppState extends State<MyApp> {
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
+    print("Set locale:$languageCode");
     final Language lan = languages[languageCode]?? languages[language?.value]?? languages[LANGUAGES.en.value];
     setState(() {
       _locale = Locale.fromSubtags(countryCode: lan.countryCode, languageCode: lan.languageCode);
@@ -163,14 +165,15 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
       if(context.mounted){
-        cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
+        final res = await findSystemLocale();
+        MyApp.of(context)?.setLocale(languageCode: res);
+        // cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
     } else{
-      if(context.mounted){
+      if(context.mounted && cnConfig.config.settings["languageCode"] != null){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.settings["languageCode"]);
       }
     }
-    // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
@@ -187,6 +190,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
     cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
     cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+    if(Platform.isAndroid && cnConfig.syncWithCloud){
+      Future.delayed(const Duration(milliseconds: 300), (){
+        cnConfig.signInGoogleDrive();
+      });
+    }
   }
 
   @override
