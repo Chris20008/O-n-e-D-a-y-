@@ -62,21 +62,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget imprintButton(){
     return Align(
       alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        height: 20,
-        child: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: () async{
-            await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
-          },
-          child: Text(
-                AppLocalizations.of(context)!.settingsImprint,
-                style: TextStyle(
-                  color: CupertinoColors.systemGrey,
-                  decoration: TextDecoration.underline,
-                  fontSize: 10
+      child: Padding(
+        padding: Platform.isAndroid? EdgeInsets.zero : const EdgeInsets.only(bottom: 20),
+        child: SizedBox(
+          height: 20,
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+            onPressed: () async{
+              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+            },
+            child: Text(
+                  AppLocalizations.of(context)!.settingsImprint,
+                  style: TextStyle(
+                    color: CupertinoColors.systemGrey,
+                    decoration: TextDecoration.underline,
+                    fontSize: 10
+                  ),
                 ),
-              ),
+          ),
         ),
       ),
     );
