@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false); /// should be true?
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
   late final AnimationController _animationControllerWorkoutPanel = AnimationController(
@@ -162,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   }
 
   void setIntroScreen(){
-    if(cnConfig.tutorial == null || cnConfig.tutorial){
+    if(cnConfig.tutorial){
       // print(object)
       showWelcomeScreen = true;
       closeWelcomeScreen = false;
@@ -290,19 +290,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                         ),
                       ),
 
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                        curve: Curves.easeInOut,
-                        child: const SafeArea(
-                          top: false,
-                          child: Hero(
-                              transitionOnUserGestures: true,
-                              tag: "SpotifyBar",
-                              child: SpotifyBar()
+                      if(cnConfig.useSpotify)
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                          curve: Curves.easeInOut,
+                          child: const SafeArea(
+                            top: false,
+                            child: Hero(
+                                transitionOnUserGestures: true,
+                                tag: "SpotifyBar",
+                                child: SpotifyBar()
+                            ),
                           ),
                         ),
-                      ),
 
                       /// Overlay with opacity, when workout panel is opened
                       /// We use this instead of the panel own backdropEnabled feature, because
@@ -371,7 +372,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                         Future.delayed(const Duration(milliseconds: 500), (){
                           setState(() {
                             cnBottomMenu.showBottomMenuAnimated();
-                            showTutorial(context, cnNewWorkOutPanel: cnNewWorkout);
+                            // showTutorial(context, cnNewWorkOutPanel: cnNewWorkout);
                             showWelcomeScreen = false;
                           });
                         });

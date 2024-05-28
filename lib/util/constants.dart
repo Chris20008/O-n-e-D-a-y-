@@ -128,16 +128,6 @@ String getLanguageAsString(BuildContext context){
   }
 }
 
-const Widget trailingArrow = Icon(
-  Icons.arrow_forward_ios,
-  size: 12,
-  color: Colors.grey,
-);
-
-const routeTheme = PullDownMenuRouteTheme(
-    backgroundColor: CupertinoColors.secondaryLabel
-);
-
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,
   width: 0.5,

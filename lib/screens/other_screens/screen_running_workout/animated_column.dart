@@ -1,5 +1,6 @@
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context);
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
   bool canConfirm = true;
@@ -33,6 +35,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   @override
   Widget build(BuildContext context) {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context);
+    final bool showSpotify = cnConfig.useSpotify;
 
     return SafeArea(
       child: Stack(
@@ -47,8 +50,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                   cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected?
                   0 :
                   cnStopwatchWidget.isOpened && cnSpotifyBar.isConnected?
-                  -cnSpotifyBar.height - 5:
-                  -cnSpotifyBar.height -5,
+                  -(showSpotify? cnSpotifyBar.height - 5 : 0.0):
+                  -(showSpotify? cnSpotifyBar.height - 5 : 0.0),
                   ///z
                   0),
               child: const StopwatchWidget()
@@ -60,8 +63,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 0,
                 ///y
                 cnStopwatchWidget.isOpened
-                    ? -cnStopwatchWidget.heightOfTimer -5 - cnSpotifyBar.height
-                    : - cnSpotifyBar.height*2 -7,
+                    ? - cnStopwatchWidget.heightOfTimer - (showSpotify? cnSpotifyBar.height -5 : 0.0)
+                    : - cnSpotifyBar.height* (showSpotify? 2 : 1) - (showSpotify? -7 : 0),
                 ///z
                 0),
             child: Padding(
@@ -131,23 +134,25 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
               ),
             ),
           ),
-          AnimatedContainer(
-            duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
-            transform: Matrix4.translationValues(
-                ///x
-                0,
-                /// y
-                cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected
-                    ? -cnStopwatchWidget.heightOfTimer - 5
-                    : 0,
-                /// z
-                0),
-            child: const Hero(
-                transitionOnUserGestures: true,
-                tag: "SpotifyBar",
-                child: SpotifyBar()
+
+          if(showSpotify)
+            AnimatedContainer(
+              duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
+              transform: Matrix4.translationValues(
+                  ///x
+                  0,
+                  /// y
+                  cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected
+                      ? -cnStopwatchWidget.heightOfTimer - 5
+                      : 0,
+                  /// z
+                  0),
+              child: const Hero(
+                  transitionOnUserGestures: true,
+                  tag: "SpotifyBar",
+                  child: SpotifyBar()
+              ),
             ),
-          ),
         ],
       ),
     );

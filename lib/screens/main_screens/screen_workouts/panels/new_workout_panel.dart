@@ -991,7 +991,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     await openPanel();
     /// is needed to move spotifyBar higher when panel is opened
     cnHomepage.refresh();
-    // cnWorkouts.refresh();
+    /// is needed to move addWorkout button higher when panel is opened
+    cnWorkouts.refresh();
     // cnWorkoutHistory.refresh();
   }
 

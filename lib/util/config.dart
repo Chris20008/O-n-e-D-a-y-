@@ -1,8 +1,10 @@
 import 'package:fitness_app/util/backup_functions.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/material.dart';
 import 'custom_cache_manager.dart';
 
 class Config{
@@ -57,6 +59,9 @@ class CnConfig extends ChangeNotifier {
   late CustomCacheManager cache;
   late Config config;
   bool isInitialized = false;
+  bool isWaitingForGoogleDriveResponse = false;
+  bool isWaitingForSpotifyResponse = false;
+  bool failedSpotifyConnection = false;
   GoogleSignInAccount? account;
 
   Future initData() async{
@@ -84,11 +89,58 @@ class CnConfig extends ChangeNotifier {
   }
 
   Future<bool> signInGoogleDrive() async {
+    while(isWaitingForGoogleDriveResponse){
+      await Future.delayed(const Duration(milliseconds: 200));
+      if(!isWaitingForGoogleDriveResponse){
+        return account != null;
+      }
+    }
     if(account == null && Platform.isAndroid){
+      isWaitingForGoogleDriveResponse = true;
       account = await getGoogleDriveAccount();
       await Future.delayed(const Duration(milliseconds: 1000), (){});
+      isWaitingForGoogleDriveResponse = false;
+      /// If the connection failed we immediately set the sync value to false
+      /// but give a small delay to show the failed connection to the user
+      print("ACCOUNT: ${account?.id}");
+      if(account == null && !isWaitingForGoogleDriveResponse){
+        await setSyncWithCloud(false);
+        Future.delayed(const Duration(seconds: 1), ()async{
+          refresh();
+        });
+      }
     }
     return account != null;
+  }
+
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500}) async{
+    isWaitingForSpotifyResponse = true;
+    await Future.delayed(Duration(milliseconds: delayMilliseconds));
+    final result = await canLaunchUrl(Uri.parse("spotify:"));
+    isWaitingForSpotifyResponse = false;
+    /// If the connection failed we immediately set the useSpotify value to false
+    /// but give a small delay to show the failed connection to the user
+    if(result != true && !isWaitingForSpotifyResponse){
+      failedSpotifyConnection = true;
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(
+          msg: "Please install Spotify to use this function",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey[800],
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+      await setSpotify(false);
+      Future.delayed(Duration(milliseconds: secondsDelayMilliseconds), ()async{
+        refresh();
+      });
+    } else if(failedSpotifyConnection){
+      failedSpotifyConnection = false;
+      refresh();
+    }
+    return result;
   }
 
   Future<Map<String, String>?> getGoogleDriveAuthHeaders() async{
@@ -109,9 +161,20 @@ class CnConfig extends ChangeNotifier {
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get syncWithCloud => config.settings["syncWithCloud"]?? false;
   int? get countdownTime => config.settings["countdownTime"];
+  bool get useSpotify => config.settings["useSpotify"]?? false;
 
   Future setCountdownTime(int? time) async{
     config.settings["countdownTime"] = time;
+    await config.save();
+  }
+
+  Future setSpotify(bool value) async{
+    config.settings["useSpotify"] = value;
+    await config.save();
+  }
+
+  Future setSpotifyInstalled(bool value) async{
+    config.settings["isSpotifyInstalled"] = value;
     await config.save();
   }
 

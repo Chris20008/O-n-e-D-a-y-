@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,7 @@ import '../screens/other_screens/screen_running_workout/screen_running_workout.d
 import 'background_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
@@ -33,6 +36,9 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnAnimatedColumn cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   double paddingLeftRight = 5;
   Map<String, double> widths = {
     "portrait": 0,
@@ -53,9 +59,10 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
+  void didChangeAppLifecycleState(AppLifecycleState state) async{
    if(state == AppLifecycleState.resumed) {
      cnSpotifyBar.refresh();
+     cnConfig.isSpotifyInstalled(secondsDelayMilliseconds: 100);
    }
   }
 
@@ -459,12 +466,19 @@ class CnSpotifyBar extends ChangeNotifier {
             );
             setMainColor(lastImage!.image, cn);
           }
+          // else if(snapshot.data == null){
+          //   lastImage = null;
+          // }
           return ClipRRect(
             /// Due to spotify guidelines it is permitted to change the shape of cover art
             /// https://developer.spotify.com/documentation/design#using-our-content
             borderRadius: BorderRadius.circular(0),
             // borderRadius: BorderRadius.circular(7),
-            child: lastImage?? const SizedBox(),
+            child: lastImage?? Container(
+              height: height-10,
+              width: height-10,
+              color: CupertinoColors.systemFill,
+            ),
           );
         }
     );
@@ -503,7 +517,20 @@ class CnSpotifyBar extends ChangeNotifier {
       return;
     }
 
-    if(isTryingToConnect || !(await hasInternet())) {
+    if(isTryingToConnect) {
+      return;
+    }
+    else if(!await hasInternet()){
+      Fluttertoast.cancel();
+      Fluttertoast.showToast(
+          msg: "Offline",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.SNACKBAR,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey[800],
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
       return;
     }
 
@@ -519,9 +546,21 @@ class CnSpotifyBar extends ChangeNotifier {
       if(isConnected){
         _subscribeToPlayerState();
       }
-    }on Exception catch (_) {
+    }on Exception catch (e) {
       accessToken = "";
       isTryingToConnect = false;
+      if(e.toString().contains("NotLoggedInException")){
+        Fluttertoast.cancel();
+        Fluttertoast.showToast(
+            msg: "Please Login to Spotify",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey[800],
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
     }
     isTryingToConnect = false;
     Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){

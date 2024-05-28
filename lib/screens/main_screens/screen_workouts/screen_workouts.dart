@@ -1,5 +1,6 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
@@ -25,14 +26,16 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnWorkouts cnWorkouts;
+  late CnConfig cnConfig = Provider.of<CnConfig>(context);
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context);
 
   bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
-    cnWorkouts = Provider.of<CnWorkouts>(context);
     final size = MediaQuery.of(context).size;
+
+    print("REBUILD SCREEN WORKOUTS");
 
     return SizedBox(
       height: size.height,
@@ -88,51 +91,38 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               tag: "Banner",
               child: BannerRunningWorkout()
           ),
-          Container(
-            height: double.maxFinite,
-            width: double.maxFinite,
-            padding: const EdgeInsets.only(right: 5, bottom: 64),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Spacer(),
-                  if(cnNewWorkout.minPanelHeight <= 0)
-                    SizedBox(
-                      width: 54,
-                      height: 54,
-                      child: IconButton(
-                          key: cnWorkouts.keyAddWorkout,
-                          iconSize: 25,
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                          ),
-                          onPressed: () {
-                            cnNewWorkout.openPanelAsTemplate();
-                            // if(cnNewWorkout.isUpdating){
-                            //   cnNewWorkout.clear();
-                            // }
-                            // cnNewWorkout.workout.isTemplate = true;
-                            // cnNewWorkout.openPanelWithRefresh();
-                            // cnHomepage.refresh();
-                          },
-                          icon: Icon(
-                              Icons.add,
-                            color: Colors.amber[800],
-                          )
-                      ),
+          SafeArea(
+            bottom: true,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              transform: Matrix4.translationValues(
+                  /// x
+                  -5,
+                  /// y
+                  -(cnConfig.useSpotify? cnSpotifyBar.height + 4 : 0) - (cnNewWorkout.minPanelHeight>0? (cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0),
+                  /// z
+                  0),
+              curve: Curves.easeInOut,
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: SizedBox(
+                    width: 54,
+                    height: 54,
+                    child: IconButton(
+                        key: cnWorkouts.keyAddWorkout,
+                        iconSize: 25,
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                        ),
+                        onPressed: () {
+                          cnNewWorkout.openPanelAsTemplate();
+                        },
+                        icon: Icon(
+                            Icons.add,
+                          color: Colors.amber[800],
+                        )
                     ),
-
-                  /// Space to be over bottom navigation bar
-                  const SafeArea(
-                      top: false,
-                      left: false,
-                      right: false,
-                      child: SizedBox()
                   ),
-                ],
               ),
             ),
           ),

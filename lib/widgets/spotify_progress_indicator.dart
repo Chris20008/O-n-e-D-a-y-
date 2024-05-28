@@ -47,9 +47,10 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
         try{
           final data = await SpotifySdk.getPlayerState();
           /// check if doRefresh is still true, cause it could have changed to false during 'await'
-          if (_doRefresh && data != null && !data.isPaused){
+          if (_doRefresh && data != null && !data.isPaused && data.track != null){
             setState(() {
               _currentWidthPercent = data.playbackPosition / data.track!.duration;
+              _currentWidthPercent = _currentWidthPercent! < 0.0? 0.0 : _currentWidthPercent! > 1.0? 1.0 : _currentWidthPercent;
               periodicRefresh();
             });
           }
