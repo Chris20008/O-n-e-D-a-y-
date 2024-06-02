@@ -1,11 +1,11 @@
 import 'package:fitness_app/util/backup_functions.dart';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'custom_cache_manager.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Config{
 
@@ -113,7 +113,7 @@ class CnConfig extends ChangeNotifier {
     return account != null;
   }
 
-  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500}) async{
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500, BuildContext? context}) async{
     isWaitingForSpotifyResponse = true;
     await Future.delayed(Duration(milliseconds: delayMilliseconds));
     final result = await canLaunchUrl(Uri.parse("spotify:"));
@@ -124,8 +124,8 @@ class CnConfig extends ChangeNotifier {
       failedSpotifyConnection = true;
       Fluttertoast.cancel();
       Fluttertoast.showToast(
-          msg: "Please install Spotify to use this function",
-          toastLength: Toast.LENGTH_SHORT,
+          msg: context != null? AppLocalizations.of(context)!.spotifyPleaseInstall : "Please install Spotify to use this function",
+          toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.grey[800],
@@ -151,17 +151,19 @@ class CnConfig extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future setShowIntro(bool state) async{
-  //   config.showIntro = state;
-  //   await config.save();
-  // }
-
   String? get languageCode => config.settings["languageCode"];
   bool get tutorial => config.settings["tutorial"]?? true;
+  bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get syncWithCloud => config.settings["syncWithCloud"]?? false;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
+  int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
+
+  Future setCurrentTutorialStep(int? step) async{
+    config.settings["currentTutorialStep"] = step;
+    await config.save();
+  }
 
   Future setCountdownTime(int? time) async{
     config.settings["countdownTime"] = time;
@@ -190,6 +192,11 @@ class CnConfig extends ChangeNotifier {
 
   Future setTutorial(bool value) async{
     config.settings["tutorial"] = value;
+    await config.save();
+  }
+
+  Future setWelcomeScreen(bool value) async{
+    config.settings["welcomeScreen"] = value;
     await config.save();
   }
 

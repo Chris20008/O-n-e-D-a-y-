@@ -17,6 +17,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 List<Color> linkColors = [
   const Color(0xFF5F9561),
@@ -591,5 +592,42 @@ Widget buildCalendarDialogButton({
             fontSize: 18,
           ),
     )
+  );
+}
+
+Widget getExplainExerciseGroups(BuildContext context){
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: <Widget>[
+      Text(
+        AppLocalizations.of(context)!.t3Group,
+        style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            fontSize: 20.0
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 10.0),
+        child: Text(
+          AppLocalizations.of(context)!.t3GroupExplanation,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+      const SizedBox(height: 15),
+      Center(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: SizedBox(
+              width: 230,
+              child: Image.asset(
+                  scale: 0.6,
+                  "${pictureAssetPath}Excercise Groups.jpg"
+              )
+          ),
+        ),
+      ),
+    ],
   );
 }

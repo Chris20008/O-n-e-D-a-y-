@@ -35,8 +35,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
-    print("REBUILD SCREEN WORKOUTS");
-
     return SizedBox(
       height: size.height,
       child: Stack(
@@ -45,7 +43,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
               padding: EdgeInsets.zero,
               addAutomaticKeepAlives: true,
               physics: const BouncingScrollPhysics(),
-              key: cnWorkouts.key,
+              key: cnWorkouts.keyListViewAllTemplates,
               controller: cnWorkouts.scrollController,
               itemCount: cnWorkouts.workouts.length+1,
               itemBuilder: (BuildContext context, int index) {
@@ -112,7 +110,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         key: cnWorkouts.keyAddWorkout,
                         iconSize: 25,
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
                           cnNewWorkout.openPanelAsTemplate();
@@ -134,13 +132,11 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 
 class CnWorkouts extends ChangeNotifier {
   List<Workout> workouts = [];
-  Key key = UniqueKey();
-  final GlobalKey _keyAddWorkout = GlobalKey();
+  final GlobalKey keyListViewAllTemplates = GlobalKey();
+  final GlobalKey keyAddWorkout = GlobalKey();
   List<bool> opened = [];
   ScrollController scrollController = ScrollController();
   late final AnimationController animationControllerWorkoutPanel;
-
-  GlobalKey get keyAddWorkout => _keyAddWorkout;
 
   void refreshAllWorkouts(){
     List<ObWorkout> obWorkouts = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).build().find();

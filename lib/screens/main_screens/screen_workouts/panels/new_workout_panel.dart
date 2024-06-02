@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_add_exercise.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_explain_exercise_drag_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -43,14 +45,36 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
   final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
 
+  void checkTutorialState(){
+    if(tutorialIsRunning && MediaQuery.of(context).viewInsets.bottom == 0){
+      if(currentTutorialStep == 1
+          && cnNewWorkout.workout.name.isNotEmpty
+          && cnNewExercisePanel.panelController.isPanelClosed){
+        initTutorialAddExercise(context);
+        showTutorialAddExercise(context);
+        currentTutorialStep = 2;
+      }
+      if(currentTutorialStep == 3 && cnNewWorkout.workout.exercises.isNotEmpty){
+        Future.delayed(const Duration(milliseconds: 500), (){
+          initTutorialExplainExerciseDragOptions(context);
+          showTutorialExplainExerciseDragOptions(context);
+          currentTutorialStep = 4;
+        });
+
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
+    checkTutorialState();
+
     return PopScope(
       canPop: false,
       onPopInvoked: (doPop){
-        if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen){
+        if (cnNewWorkout.panelController.isPanelOpen && !cnNewExercisePanel.panelController.isPanelOpen && !tutorialIsRunning){
           cnNewWorkout.panelController.close();
         }
       },
@@ -81,7 +105,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                 },
                 child: Stack(
                   children: [
-                    Container(
+                    SizedBox(
                       // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
                       height: double.maxFinite,
                       width: double.maxFinite,
@@ -253,10 +277,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         children: [
           Expanded(
             child: IconButton(
+                key: cnNewWorkout.keyAddExercise,
                 color: Colors.amber[800],
                 style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                    backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+                    shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                 ),
                 onPressed: () {
                   addExercise();
@@ -407,6 +432,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       child: Form(
                         key: _formKey,
                         child: TextFormField(
+                          focusNode: cnNewWorkout.focusNodeTextFieldWorkoutName,
+                          key: cnNewWorkout.keyTextFieldWorkoutName,
                           keyboardAppearance: Brightness.dark,
                           autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
@@ -466,22 +493,49 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             }
                             cnStandardPopUp.open(
                                 context: context,
-                                child: TextField(
-                                  keyboardAppearance: Brightness.dark,
-                                  maxLength: 15,
-                                  keyboardType: TextInputType.text,
-                                  controller: cnNewWorkout.linkNameController,
-                                  style: const TextStyle(
-                                      fontSize: 20
-                                  ),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                    isDense: true,
-                                    labelText: AppLocalizations.of(context)!.groupName,
-                                    counterText: "",
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
-                                  ),
-                                  onChanged: (value){},
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        keyboardAppearance: Brightness.dark,
+                                        maxLength: 15,
+                                        keyboardType: TextInputType.text,
+                                        controller: cnNewWorkout.linkNameController,
+                                        style: const TextStyle(
+                                            fontSize: 20
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          isDense: true,
+                                          labelText: AppLocalizations.of(context)!.groupName,
+                                          counterText: "",
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
+                                          suffixIcon: IconButton(
+                                              onPressed: () async{
+                                                HapticFeedback.selectionClick();
+                                                await showDialog(
+                                                    context: context,
+                                                    builder: (context){
+                                                      return Center(
+                                                          child: standardDialog(
+                                                              context: context,
+                                                              child: getExplainExerciseGroups(context)
+                                                          )
+                                                      );
+                                                    }
+                                                );
+                                                HapticFeedback.selectionClick();
+                                                FocusManager.instance.primaryFocus?.unfocus();
+                                              },
+                                              icon: const Icon(
+                                                  Icons.info_outline_rounded
+                                              )
+                                          )
+                                        ),
+                                        onChanged: (value){},
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 onConfirm: (){
                                   // bool added = false;
@@ -517,8 +571,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             );
                           },
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
+                            backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+                            shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
                           ),
                         ),
                       )
@@ -643,7 +697,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   Widget getExerciseWithSlideActions(int index){
     return Slidable(
-      key: UniqueKey(),
+      key: index == 0 && tutorialIsRunning? cnNewWorkout.keyFirstExercise : UniqueKey(),
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
         dismissible: DismissiblePane(
@@ -787,9 +841,18 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addExercise(){
-    if(cnNewWorkout.panelController.isPanelOpen){
-      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: confirmAddExercise);
+    if(!tutorialIsRunning && cnNewWorkout.panelController.isPanelOpen){
+        cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
     }
+    else if(tutorialIsRunning && cnNewWorkout.panelController.isPanelOpen){
+      if(currentTutorialStep < 2){
+        FocusScope.of(context).unfocus();
+      }
+      else{
+        cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
+      }
+    }
+
   }
 
   void addLink(String linkName){
@@ -826,17 +889,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
     if(cnNewWorkout.panelController.isPanelOpen){
       // cnNewExercisePanel.setExercise(exToEdit);
-      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: exToEdit, onConfirm: confirmAddExercise);
+      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: exToEdit, onConfirm: cnNewWorkout.confirmAddExercise);
       cnNewExercisePanel.refresh();
     }
-  }
-
-  void confirmAddExercise(Exercise ex){
-    cnNewWorkout.workout.addOrUpdateExercise(ex);
-    cnNewWorkout.refreshExercise(ex);
-    cnNewWorkout.updateExercisesAndLinksList();
-    cnNewWorkout.updateExercisesLinks();
-    cnNewWorkout.refresh();
   }
 
   void onCancel(){
@@ -905,7 +960,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 }
 
 class CnNewWorkOutPanel extends ChangeNotifier {
-  final GlobalKey _keyAddLink = GlobalKey();
+  final GlobalKey keyAddLink = GlobalKey();
+  final GlobalKey keyAddExercise = GlobalKey();
+  final GlobalKey keyTextFieldWorkoutName = GlobalKey();
+  final GlobalKey keyFirstExercise = GlobalKey();
+  final FocusNode focusNodeTextFieldWorkoutName = FocusNode();
   final PanelController panelController = PanelController();
   Workout workout = Workout();
   Workout originalWorkout = Workout();
@@ -923,8 +982,6 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   late CnWorkouts cnWorkouts;
   late CnWorkoutHistory cnWorkoutHistory;
   late Map<DateTime, dynamic> allWorkoutDates = getAllWorkoutDays();
-
-  GlobalKey get keyAddLink => _keyAddLink;
 
   Map<DateTime, dynamic> getAllWorkoutDays(){
     Map<DateTime, dynamic> dates = {};
@@ -973,6 +1030,15 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     refresh();
     await Future.delayed(const Duration(milliseconds: 100), () {});
     isCurrentlyRebuilding = false;
+  }
+
+  void confirmAddExercise(Exercise ex){
+
+    workout.addOrUpdateExercise(ex);
+    refreshExercise(ex);
+    updateExercisesAndLinksList();
+    updateExercisesLinks();
+    refresh();
   }
 
   void openPanelAsTemplate(){

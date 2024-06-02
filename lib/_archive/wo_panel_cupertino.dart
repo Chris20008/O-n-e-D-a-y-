@@ -227,8 +227,8 @@
 //             child: IconButton(
 //                 color: Colors.amber[800],
 //                 style: ButtonStyle(
-//                     backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-//                     shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+//                     backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+//                     shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
 //                 ),
 //                 onPressed: () {
 //                   addExercise();
@@ -382,8 +382,8 @@
 //                             );
 //                           },
 //                           style: ButtonStyle(
-//                             backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-//                             shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
+//                             backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+//                             shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
 //                           ),
 //                         ),
 //                       )

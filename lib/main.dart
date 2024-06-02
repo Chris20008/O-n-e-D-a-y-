@@ -15,11 +15,10 @@ import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
-import 'package:fitness_app/widgets/tutorial.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_add_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl_standalone.dart';
@@ -28,6 +27,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
 late ObjectBox objectbox;
+bool tutorialIsRunning = false;
+int currentTutorialStep = 0;
+String pictureAssetPath = "lib/assets/pictures/";
 
 void main() {
 
@@ -134,6 +136,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
@@ -162,8 +165,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   }
 
   void setIntroScreen(){
-    if(cnConfig.tutorial){
-      // print(object)
+    currentTutorialStep = cnConfig.currentTutorialStep;
+    print("Current tutorial step $currentTutorialStep");
+    if(cnConfig.welcomeScreen){
       showWelcomeScreen = true;
       closeWelcomeScreen = false;
       cnBottomMenu.adjustHeight(1);
@@ -171,6 +175,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     else{
       showWelcomeScreen = false;
       closeWelcomeScreen = true;
+    }
+    if(currentTutorialStep < 10 && currentTutorialStep != 0){
+      tutorialIsRunning = true;
     }
   }
 
@@ -193,26 +200,25 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
-    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible){
+    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
+    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
+    cnBottomMenu.setBottomMenuHeight(context);
+    cnBottomMenu.refresh();
+    /// setIntroScreen needs to be after cnBottomMenu.setBottomMenuHeight
+    setIntroScreen();
+    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+
+    /// open screenRunningWorkout when it's saved in config.json and the welcome screen is not shown
+    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible && !showWelcomeScreen){
       Future.delayed(const Duration(milliseconds: 300), (){
         Navigator.push(
             context,
             CupertinoPageRoute(
                 builder: (context) => const ScreenRunningWorkout()
             ));
-        });
+      });
     }
-    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
-    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
-    initTutorial(
-        cnBottomMenu: cnBottomMenu,
-        cnWorkouts: cnWorkouts,
-        cnNewWorkout: cnNewWorkout
-    );
-    cnBottomMenu.setBottomMenuHeight(context);
-    cnBottomMenu.refresh();
-    setIntroScreen();
-    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+
     if(Platform.isAndroid && cnConfig.syncWithCloud){
       Future.delayed(const Duration(milliseconds: 300), (){
         cnConfig.signInGoogleDrive();
@@ -241,6 +247,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         ),
       );
     }
+
+    if(currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
+      print("START TUT ONE");
+      tutorialIsRunning = true;
+      initTutorialAddWorkout(context);
+      showTutorialAddWorkout(context);
+    }
+    print("is runningp $tutorialIsRunning");
 
     return Scaffold(
       extendBody: true,
@@ -365,18 +379,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                   AnimatedCrossFade(
                     duration: const Duration(milliseconds: 500),
                     firstChild: WelcomeScreen(
-                      onFinish: (){
-                        setState(() {
-                          closeWelcomeScreen = true;
-                        });
-                        Future.delayed(const Duration(milliseconds: 500), (){
-                          setState(() {
-                            cnBottomMenu.showBottomMenuAnimated();
-                            // showTutorial(context, cnNewWorkOutPanel: cnNewWorkout);
-                            showWelcomeScreen = false;
-                          });
-                        });
-                      },
+                      onFinish: onFinishWelcomeScreen
                     ),
                     /// Use transparent Container instead of SizedBox to prevent user inputs
                     /// until tutorial is loaded
@@ -409,6 +412,23 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         ),
       ),
     );
+  }
+
+  void onFinishWelcomeScreen(bool doShowTutorial){
+    cnConfig.setWelcomeScreen(false);
+    setState(() {
+      closeWelcomeScreen = true;
+    });
+    Future.delayed(const Duration(milliseconds: 500), (){
+      setState(() {
+        cnBottomMenu.showBottomMenuAnimated();
+        if(doShowTutorial && currentTutorialStep == 0) {
+          initTutorialAddWorkout(context);
+          showTutorialAddWorkout(context);
+        }
+        showWelcomeScreen = false;
+      });
+    });
   }
 }
 

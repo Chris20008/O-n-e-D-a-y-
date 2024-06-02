@@ -4,6 +4,7 @@ import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -110,22 +111,39 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       ),
                                       /// Tutorial
                                       CupertinoListTile(
+                                        onTap: (){
+                                          if(currentTutorialStep != 0){
+                                            cnConfig.setCurrentTutorialStep(0);
+                                            currentTutorialStep = 0;
+                                            tutorialIsRunning = false;
+                                            Fluttertoast.showToast(
+                                                msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                                toastLength: Toast.LENGTH_LONG,
+                                                gravity: ToastGravity.SNACKBAR,
+                                                timeInSecForIosWeb: 1,
+                                                backgroundColor: Colors.grey[800],
+                                                textColor: Colors.white,
+                                                fontSize: 16.0
+                                            );
+                                          }
+                                        },
                                         leading: const Icon(
                                             Icons.school
                                         ),
-                                        trailing: CupertinoSwitch(
-                                            value: cnConfig.tutorial,
-                                            activeColor: const Color(0xFFC16A03),
-                                            onChanged: (value){
-                                              setState(() {
-                                                if(Platform.isAndroid){
-                                                  HapticFeedback.selectionClick();
-                                                }
-                                                cnConfig.setTutorial(value);
-                                              });
-                                            }
-                                        ),
-                                        title: Text(AppLocalizations.of(context)!.settingsTutorial, style: const TextStyle(color: Colors.white)),
+                                        trailing: trailingArrow,
+                                        // trailing: CupertinoSwitch(
+                                        //     value: cnConfig.tutorial,
+                                        //     activeColor: const Color(0xFFC16A03),
+                                        //     onChanged: (value){
+                                        //       setState(() {
+                                        //         if(Platform.isAndroid){
+                                        //           HapticFeedback.selectionClick();
+                                        //         }
+                                        //         cnConfig.setTutorial(value);
+                                        //       });
+                                        //     }
+                                        // ),
+                                        title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
                                       ),
                                       /// Connect to Spotify
                                       CupertinoListTile(
@@ -136,11 +154,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                         ),
                                         title: Row(
                                           children: [
-                                            const Text("Connect to Spotify", style: TextStyle(color: Colors.white)),
+                                            Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
                                             const SizedBox(width: 5),
                                             if(cnConfig.useSpotify)
                                               FutureBuilder(
-                                                  future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500),
+                                                  future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
                                                   builder: (context, connected){
                                                     if(!connected.hasData){
                                                       return const Center(

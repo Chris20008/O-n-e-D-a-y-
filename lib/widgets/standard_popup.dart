@@ -108,11 +108,11 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                     child: ElevatedButton(
                                         onPressed: cnStandardPopUp.confirm,
                                         style: ButtonStyle(
-                                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                            // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                            shadowColor: WidgetStateProperty.all(Colors.transparent),
+                                            surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                            // backgroundColor: WidgetStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                            shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                         ),
                                         child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
                                     )
@@ -124,11 +124,11 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                       child: ElevatedButton(
                                           onPressed: cnStandardPopUp.cancel,
                                           style: ButtonStyle(
-                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                              // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                              shadowColor: WidgetStateProperty.all(Colors.transparent),
+                                              surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+                                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                              // backgroundColor: WidgetStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                              shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                           ),
                                           child: Text(cnStandardPopUp.cancelText)
                                       )

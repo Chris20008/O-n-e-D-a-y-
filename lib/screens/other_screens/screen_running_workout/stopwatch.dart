@@ -168,8 +168,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                         child: IconButton(
                             iconSize: 30,
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                              // shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                             ),
                             onPressed: () {
                               cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
@@ -250,7 +250,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
               child: IconButton(
                   iconSize: 28,
                   style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                    backgroundColor: WidgetStateProperty.all(Colors.transparent),
                   ),
                   onPressed: () {
                     cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);

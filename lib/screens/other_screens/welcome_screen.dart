@@ -12,7 +12,7 @@ import '../../util/constants.dart';
 import 'dart:io';
 
 class WelcomeScreen extends StatefulWidget {
-  final Function onFinish;
+  final Function(bool) onFinish;
   const WelcomeScreen({
     required this.onFinish,
     super.key,
@@ -26,19 +26,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context);
-  final maxIndex = 2;
+  final maxIndex = 3;
   int screenIndex = 0;
 
   @override
   void initState() {
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    // SystemChrome.setPreferredOrientations([]);
-    super.dispose();
   }
 
   @override
@@ -50,7 +44,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           animatedScreen(0, screenOne()),
           animatedScreen(1, screenTwo()),
           animatedScreen(2, screenThree()),
-          nextButton(),
+          animatedScreen(3, screenFour()),
+          if(screenIndex <maxIndex)
+            nextButton(),
           if(screenIndex > 0)
             backButton(),
           imprintButton()
@@ -67,11 +63,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: () async{
+            HapticFeedback.selectionClick();
             await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
           },
           child: Text(
                 AppLocalizations.of(context)!.settingsImprint,
-                style: TextStyle(
+                style: const TextStyle(
                   color: CupertinoColors.systemGrey,
                   decoration: TextDecoration.underline,
                   fontSize: 10
@@ -88,13 +85,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       child: Padding(
         padding: const EdgeInsets.all(10),
         child: CupertinoButton(
-            child: screenIndex == maxIndex? Text("Finish") : Text("Next"),
+            child: Text(AppLocalizations.of(context)!.welcomeNext),
             onPressed: (){
               setState(() {
                 if(screenIndex < maxIndex) {
                   screenIndex += 1;
-                } else{
-                  widget.onFinish();
                 }
               });
             }
@@ -107,9 +102,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Align(
       alignment: Alignment.bottomLeft,
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: CupertinoButton(
-            child: Text("Back"),
+            child: Text(AppLocalizations.of(context)!.welcomeBack),
             onPressed: (){
               setState(() {
                 screenIndex -= 1;
@@ -190,15 +185,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 "👋 Hey Gymrat!",
                 textScaler: TextScaler.linear(1.8),
               ),
-              SizedBox(height: 10,),
+              const SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Welcome to ",
-                    textScaler: TextScaler.linear(1.8),
-                  ),
                   Text(
+                    AppLocalizations.of(context)!.welcome,
+                    textScaler: const TextScaler.linear(1.8),
+                  ),
+                  const Text(
                       "OneDay",
                       textScaler: TextScaler.linear(1.8),
                       style: TextStyle(decoration: TextDecoration.lineThrough)
@@ -211,9 +206,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
         Padding(
           padding: const EdgeInsets.only(left: 100),
-          child: const Text(
-            "Please select your language",
-            textScaler: TextScaler.linear(1.1),
+          child: Text(
+            AppLocalizations.of(context)!.welcomeSelectLanguage,
+            textScaler: const TextScaler.linear(1.1),
           ),
         ),
         Padding(
@@ -237,9 +232,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Center(
-                child: const Text(
-                  "Sync With Cloud",
-                  textScaler: TextScaler.linear(1.8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: OverflowSafeText(
+                    maxLines: 1,
+                    Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive : AppLocalizations.of(context)!.welcomeSynciCloud,
+                    fontSize: 25,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
             ],
@@ -247,44 +247,34 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
 
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               OverflowSafeText(
                 maxLines: 1,
-                "You don't have to create an account",
-                // textScaler: TextScaler.linear(1.2),
+                AppLocalizations.of(context)!.welcomeNoAccount,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OverflowSafeText(
-                    maxLines: 1,
-                    "to use ",
-                  ),
-                  OverflowSafeText(
-                      maxLines: 1,
-                      "OneDay",
-                      style: const TextStyle(decoration: TextDecoration.lineThrough, fontSize: 17)
-                  ),
-                ],
+              OverflowSafeText(
+                maxLines: 1,
+                AppLocalizations.of(context)!.welcomeNoAccount2,
               ),
               const SizedBox(height: 20),
               OverflowSafeText(
                 maxLines: 1,
-                "🙌 Awesome isn't it?",
+                AppLocalizations.of(context)!.welcomeAwesome,
               ),
               const SizedBox(height: 80),
               OverflowSafeText(
-                maxLines: 3,
-                "Local Backups will be created in the App's own storage",
+                maxLines: 2,
+                AppLocalizations.of(context)!.welcomeLocalBackups,
                 textAlign: TextAlign.center
               ),
               const SizedBox(height: 20),
-              const Text(
-                  "You can sync them with Google Drive",
-                  style: TextStyle(fontSize: 17)
+              OverflowSafeText(
+                  maxLines: 2,
+                  Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive2 : AppLocalizations.of(context)!.welcomeSynciCloud2,
+                  textAlign: TextAlign.center
               ),
               const SizedBox(height: 40),
             ],
@@ -432,15 +422,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
-          flex: 3,
+          flex: 5,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Center(
-                child: const Text(
-                  "Control your music🎵",
-                  textScaler: TextScaler.linear(1.8),
+                child: Text(
+                  AppLocalizations.of(context)!.welcomeControlMusic,
+                  textScaler: const TextScaler.linear(1.8),
                 ),
               ),
             ],
@@ -448,32 +438,32 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
 
         Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30),
+          padding: const EdgeInsets.symmetric(horizontal: 30),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                  "Are you always changing Apps during your workout to control your music?",
-                  style: TextStyle(fontSize: 17),
+                AppLocalizations.of(context)!.welcomeMusicQuestion,
+                  style: const TextStyle(fontSize: 17),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
               Text(
-                  "We have to solution for you!",
-                  style: TextStyle(fontSize: 17),
+                AppLocalizations.of(context)!.welcomeMusicSolution,
+                  style: const TextStyle(fontSize: 17),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 50),
               Text(
-                  "You can control your music from within to App if you are using Spotify",
-                  style: TextStyle(fontSize: 17),
+                AppLocalizations.of(context)!.welcomeMusicExplanation,
+                  style: const TextStyle(fontSize: 17),
                 textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
         Expanded(
-          flex: 2,
+          flex: 4,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,11 +477,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 title: Row(
                   children: [
-                    const Text("Connect to Spotify", style: TextStyle(color: Colors.white)),
+                    Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
                     const SizedBox(width: 5),
                     if(cnConfig.useSpotify)
                       FutureBuilder(
-                          future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500),
+                          future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
                           builder: (context, connected){
                             if(!connected.hasData){
                               return const Center(
@@ -531,11 +521,94 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               Container(
                 height: 20,
-                padding: EdgeInsets.only(left: 30),
-                child: cnConfig.failedSpotifyConnection? const Text("Spotify needs to be installed", textAlign: TextAlign.left,) : null
+                padding: const EdgeInsets.only(left: 30),
+                child: cnConfig.failedSpotifyConnection? Text(AppLocalizations.of(context)!.welcomeSpotifyError, textAlign: TextAlign.left,) : null
               ),
-              const SizedBox(height: 80),
+              const SizedBox(height: 90),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget screenFour(){
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 100,),
+              Center(
+                child: Text(
+                  AppLocalizations.of(context)!.welcomeSetupCompleted,
+                  textScaler: const TextScaler.linear(1.8),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.welcomeSetupCompletedMsg,
+                style: const TextStyle(fontSize: 17),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 50),
+              Text(
+                AppLocalizations.of(context)!.welcomeSetupCompletedHopIntoTutorial,
+                style: const TextStyle(fontSize: 17),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          flex: 2,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                // /// Explore myself
+                // CupertinoButton(
+                //
+                //   padding: EdgeInsets.zero,
+                //   onPressed: () {
+                //     widget.onFinish(false);
+                //     SystemChrome.setPreferredOrientations([]);
+                //   },
+                //   child: Text(
+                //     AppLocalizations.of(context)!.welcomeButtonExploreMyself,
+                //     textScaler: const TextScaler.linear(1.2),
+                //   ),
+                // ),
+                //
+                // const SizedBox(height: 10,),
+
+                /// Start Tutorial
+                CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () => widget.onFinish(true),
+                  child: Text(
+                    AppLocalizations.of(context)!.welcomeButtonStartTutorial,
+                    textScaler: const TextScaler.linear(1.2),
+                  ),
+                ),
+                const SizedBox(height: 80),
+              ],
+            ),
           ),
         ),
       ],

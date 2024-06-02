@@ -483,8 +483,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   alignment: Alignment.center,
                                                   color: Colors.amber[800],
                                                   style: ButtonStyle(
-                                                      backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                      shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                                      backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                      shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                                   ),
                                                   onPressed: () {
                                                     addSet(newEx, templateEx);
@@ -663,10 +663,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             height: _heightOfSetRow,
             child: ElevatedButton(
               style: ButtonStyle(
-                  shadowColor: MaterialStateProperty.all(Colors.transparent),
-                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
               ),
               onPressed: (){
                 if(set.weight?.toString() != null &&
@@ -869,10 +869,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             child: ElevatedButton(
               onPressed: () => stopWorkout(),
               style: ButtonStyle(
-                  shadowColor: MaterialStateProperty.all(Colors.transparent),
-                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
               ),
               child: Text(
                 AppLocalizations.of(context)!.runningWorkoutStopWorkout,

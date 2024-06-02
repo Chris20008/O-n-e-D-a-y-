@@ -32,8 +32,6 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
   late Orientation orientation = MediaQuery.of(context).orientation;
-  // double _height = 40;
-  // double? _iconSize;
 
   @override
   void initState() {
@@ -56,6 +54,10 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
         cnBottomMenu.setBottomMenuHeight(context);
+        /// Refresh running workout if its visible since the bottom bar depends on bottom menu height
+        if(cnRunningWorkout.isVisible){
+          cnRunningWorkout.refresh();
+        }
       });
     });
   }

@@ -8,6 +8,7 @@
   "groupName": "Group Name",
   "exercise": "Exercise",
   "restInSeconds": "Rest in Seconds",
+  "restTime": "Rest Time",
   "seatLevel": "Seat Level",
   "set": "Set",
   "weight": "Weight",
@@ -23,18 +24,21 @@
   "template": "Template",
   "woAlreadyRunning": "Workout {currentWorkoutName} is already Running",
   "woAlreadyRunningDelete": "Do you want to stop the current workout and start workout {newWorkoutName}?",
+  "spotifyPleaseLogin": "Please Login to Spotify",
+  "spotifyPleaseInstall": "Please install Spotify to use this function",
 
   "settings": "Settings",
   "settingsGeneral": "General",
   "settingsLanguage": "Language",
-  "settingsTutorial": "Tutorial",
+  "settingsTutorialReset": "Reset Tutorial",
+  "settingsTutorialHasBeenReset": "Tutorial has been reset",
   "settingsBackup": "Backup",
   "settingsBackupSaveManual": "Create manual Backup",
-  "settingsBackupSaveManualExplanation": "You can use this function to create a manual backup. If you have activated cloud synchronization, the backup will also be uploaded to the cloud.\nIf you want to share your current status with someone or just want to save a backup external, you can select the 'Share Backup' function. This does not create a backup in the app or the cloud, but shares it directly to your destination",
+  "settingsBackupSaveManualExplanation": "You can use this function to create a manual backup. If you have activated cloud synchronization, the backup will also be uploaded to the cloud.\nIf you want to share your current status with someone or just want to save a backup external, you can select the 'Share Backup' function. This does not create a backup in the app or the cloud, but shares it directly to your destination.",
   "settingsBackupLoadExplanation": "Click on 'Load backup' to open a pop-up. Here you can select a backup file to be loaded.\nATTENTION! Loading a backup will overwrite the current state of your App.",
-  "settingsBackupSaveAutomaticExplanation": "When this function is activated, an automatic backup is created after each completed workout. This does not apply to canceled workouts. If you have activated cloud synchronization, the backup will also be uploaded to the cloud",
-  "settingsBackupSynciCloudExplanation": "This synchronizes all backups that are created with iCloud. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple iOS devices and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started",
-  "settingsBackupSyncGoogleDriveExplanation": "This synchronizes all backups that are created with Google Drive. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple devices with Google Drive and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started",
+  "settingsBackupSaveAutomaticExplanation": "When this function is activated, an automatic backup is created after each completed workout. This does not apply to canceled workouts. If you have activated cloud synchronization, the backup will also be uploaded to the cloud.",
+  "settingsBackupSynciCloudExplanation": "This synchronizes all backups that are created with iCloud. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple iOS devices and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started.",
+  "settingsBackupSyncGoogleDriveExplanation": "This synchronizes all backups that are created with Google Drive. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple devices with Google Drive and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started.",
   "settingsBackupSaveManualMethodSave": "Create Backup",
   "settingsBackupSaveManualMethodShare": "Share Backup",
   "settingsBackupSaveAutomatic": "Enable automatic Backups",
@@ -53,6 +57,7 @@
   "settingsOther": "Other",
   "settingsFurtherInformationBackup": "Further Information Backup",
   "settingsImprint": "Imprint",
+  "settingsConnectSpotify": "Connect to Spotify",
 
   "filterAvgMovWeightHead": "Average Total Moved Weight",
   "filterAvgMovWeightText": "Shows an additional line in the graph indicating the average total moved weight per set",
@@ -89,5 +94,76 @@
   "runningWorkoutSelectGroup": "Select Group Exercises To Track",
   "runningWorkoutSelectExerciseUpdate": "Select Exercises To Update",
   "runningWorkoutNoExerciseUpdate": "No Exercise To Update",
-  "runningWorkoutAlreadyExists": "Exercise Name already exists"
+  "runningWorkoutAlreadyExists": "Exercise Name already exists",
+
+  "welcomeNext": "Next",
+  "welcomeBack": "Back",
+  "welcome" : "Welcome to ",
+  "welcomeSelectLanguage": "Please select your language",
+  "welcomeSyncGoogleDrive" : "Sync with Google Drive",
+  "welcomeSynciCloud" : "Sync with iCloud",
+  "welcomeNoAccount" : "You don't have to create an account",
+  "welcomeNoAccount2" : "to use O̶n̶e̶D̶a̶y̶ ",
+  "welcomeAwesome" : "\uD83D\uDE4C Awesome isn't it?",
+  "welcomeLocalBackups" : "Local Backups will be created in the App's own storage",
+  "welcomeSyncGoogleDrive2" : "You can sync them with Google Drive",
+  "welcomeSynciCloud2" : "You can sync them with iCloud",
+  "welcomeControlMusic" : "Control your music\uD83C\uDFB5",
+  "welcomeMusicQuestion" : "Are you always changing Apps during your workout to control your music?",
+  "welcomeMusicSolution" : "We have to solution for you!",
+  "welcomeMusicExplanation" : "You can control your music from within O̶n̶e̶D̶a̶y̶ if you are using Spotify",
+  "welcomeSpotify" : "Connect to Spotify",
+  "welcomeSpotifyError" : "Spotify needs to be installed ",
+  "welcomeSetupCompleted" : "Setup Completed✅",
+  "welcomeSetupCompletedMsg" : "Great, you have finished your Setup!",
+  "welcomeSetupCompletedHopIntoTutorial" : "Let's hop right into the tutorial to show you the functions inside the App",
+  "welcomeButtonExploreMyself" : "I wanna explore the App myself",
+  "welcomeButtonStartTutorial" : "Start Tutorial",
+
+  "t1CreateTemplate" : "Let's create your first workout Template",
+  "t1EnterWoName" : "Enter a name for your first workout Template",
+  "t2AddExercise" : "Let's add your first Exercise",
+  "t2SetExerciseOptions" : "Here you can set the name, rest time and seat level for each Exercise",
+  "t2EnterExName" : "Enter a name for your first Exercise",
+  "t3ExOptions" : "Exercise Options",
+  "t3SwipeLeft1" : "Swipe Left",
+  "t3SwipeLeft2" : "to copy or edit an Exercise",
+  "t3SwipeRight1" : "Swipe Right",
+  "t3SwipeRight2" : "to delete an Exercise",
+  "t3LongPress" : "Long press an Exercise to grab and reorder it",
+  "t3Group" : "Exercise Groups",
+  "t3GroupExplanation" : "You can Group exercises. This can be helpful when you have alternating exercises in a workout or just want to have an alternative when your primary exercise is not available\n\nGroups can be dragged and deleted the same way as Exercises\n\nExercises below a Group will automatically be added to this Group. Therefore, Exercises which should not be added to any Group must be placed above the first Group"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

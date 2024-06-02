@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
@@ -80,49 +81,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5)),
                             const SizedBox(height: 10,),
 
-                            /// Exercise name
-                            Form(
-                              key: _formKey,
-                              child: TextFormField(
-                                keyboardAppearance: Brightness.dark,
-                                maxLength: 40,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,
-                                validator: (value) {
-                                  value = value?.trim();
-                                  if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!.panelExEnterName;
-                                  } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
-                                            cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
-                                  ){
-                                    return AppLocalizations.of(context)!.panelExAlreadyExists;
-                                  }
-                                  return null;
-                                },
-                                style: const TextStyle(
-                                    fontSize: 20
-                                ),
-                                controller: cnNewExercise.exerciseNameController,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  labelText: AppLocalizations.of(context)!.name,
-                                  counterText: "",
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                ),
-                                onChanged: (value){
-                                  value = value.trim();
-                                  cnNewExercise.exercise.name = value;
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 15,),
-
-                            /// Rest in Seconds Row and Selector
-                            getRestInSecondsSelector(),
-
-                            const SizedBox(height: 0,),
-
-                            /// Seat Level Row and Selector
-                            getSeatLevelSelector(),
+                            getHeader(),
 
                             // SizedBox(
                             //   height: 35,
@@ -176,9 +135,9 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             Row(
                               // mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
-                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.set, textScaler: const TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.weight, textScaler: const TextScaler.linear(1.2)))),
-                                Expanded(child: Center(child: Text(AppLocalizations.of(context)!.amount, textScaler: const TextScaler.linear(1.2)))),
+                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.weight, maxLines: 1))),
+                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.amount, maxLines: 1))),
                               ],
                             ),
                             Expanded(
@@ -203,8 +162,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               child: IconButton(
                                                   color: Colors.amber[800],
                                                   style: ButtonStyle(
-                                                      backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                      shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                                      backgroundColor: WidgetStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                      shape: WidgetStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                                   ),
                                                   onPressed: () {
                                                     addSet();
@@ -482,14 +441,31 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   void closePanelAndSaveExercise(){
     if (_formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
-      cnNewExercise.exercise.removeEmptySets();
+      final copy = Exercise.copy(cnNewExercise.exercise);
+      copy.removeEmptySets();
 
-      if(cnNewExercise.onConfirm != null){
-        cnNewExercise.onConfirm!(cnNewExercise.exercise);
+      if(copy.sets.isNotEmpty){
+        cnNewExercise.exercise.removeEmptySets();
+        if(cnNewExercise.onConfirm != null){
+          cnNewExercise.onConfirm!(cnNewExercise.exercise);
+        }
+
+        cnNewExercise.closePanel(doClear: true);
+        _formKey.currentState?.reset();
       }
-
-      cnNewExercise.closePanel(doClear: true);
-      _formKey.currentState?.reset();
+      else{
+        setState(() {
+          Fluttertoast.showToast(
+              msg: "Add at least one Set",
+              toastLength: Toast.LENGTH_LONG,
+              gravity: ToastGravity.SNACKBAR,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.grey[800],
+              textColor: Colors.white,
+              fontSize: 16.0
+          );
+        });
+      }
     }
   }
 
@@ -501,7 +477,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             children: [
               Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
               const SizedBox(width: 5,),
-              Text(AppLocalizations.of(context)!.restInSeconds, style: _style),
+              Text(AppLocalizations.of(context)!.restTime, style: _style),
               const Spacer(),
               Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
               const SizedBox(width: 10),
@@ -595,11 +571,67 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
+  getHeader() {
+    return Column(
+      key: cnNewExercise.keyHeader,
+      children: [
+        /// Exercise name
+        Form(
+          key: _formKey,
+          child: TextFormField(
+            focusNode: cnNewExercise.focusNodeTextFieldExerciseName,
+            key: cnNewExercise.keyExerciseName,
+            keyboardAppearance: Brightness.dark,
+            maxLength: 40,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              value = value?.trim();
+              if (value == null || value.isEmpty) {
+                return AppLocalizations.of(context)!.panelExEnterName;
+              } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
+                  cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
+              ){
+                return AppLocalizations.of(context)!.panelExAlreadyExists;
+              }
+              return null;
+            },
+            style: const TextStyle(
+                fontSize: 20
+            ),
+            controller: cnNewExercise.exerciseNameController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              labelText: AppLocalizations.of(context)!.name,
+              counterText: "",
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+            ),
+            onChanged: (value){
+              value = value.trim();
+              cnNewExercise.exercise.name = value;
+            },
+          ),
+        ),
+        const SizedBox(height: 15,),
+
+        /// Rest in Seconds Row and Selector
+        getRestInSecondsSelector(),
+
+        const SizedBox(height: 0,),
+
+        /// Seat Level Row and Selector
+        getSeatLevelSelector(),
+      ],
+    );
+  }
+
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
   final PanelController panelController = PanelController();
 
+  GlobalKey keyHeader = GlobalKey();
+  GlobalKey keyExerciseName = GlobalKey();
+  final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
   Exercise exercise = Exercise();
   Workout workout = Workout();

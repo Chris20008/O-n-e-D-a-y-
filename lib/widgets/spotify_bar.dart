@@ -22,6 +22,7 @@ import 'background_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
@@ -62,7 +63,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async{
    if(state == AppLifecycleState.resumed) {
      cnSpotifyBar.refresh();
-     cnConfig.isSpotifyInstalled(secondsDelayMilliseconds: 100);
+     cnConfig.isSpotifyInstalled(secondsDelayMilliseconds: 100, context: context);
    }
   }
 
@@ -125,7 +126,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                       const BackgroundImage(),
                       if(cnSpotifyBar.data == null)
                         GestureDetector(
-                            onTap: cnSpotifyBar.connectToSpotify,
+                            onTap: () => cnSpotifyBar.connectToSpotify(context),
                             child: Container(
                               height: cnSpotifyBar.height,
                               width: double.maxFinite,
@@ -191,7 +192,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.seekToRelative(-15000);
@@ -208,7 +209,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.skipPrevious();
@@ -225,7 +226,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
@@ -242,7 +243,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.skipNext();
@@ -259,7 +260,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.seekToRelative(15000);
@@ -292,7 +293,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                 IconButton(
                                     iconSize: 30,
                                     style: ButtonStyle(
-                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                      backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                     ),
                                     onPressed: () async{
                                       // cnSpotifyBar.disconnect();
@@ -328,11 +329,11 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                   child: IconButton(
                       iconSize: 25,
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                        backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                        // shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                       ),
                       onPressed: () async{
-                        cnSpotifyBar.connectToSpotify();
+                        cnSpotifyBar.connectToSpotify(context);
                       },
                       icon: const Icon(
                         MyIcons.spotify,
@@ -505,7 +506,7 @@ class CnSpotifyBar extends ChangeNotifier {
     return [color, color2];
   }
 
-  Future connectToSpotify() async{
+  Future connectToSpotify(context) async{
     if(justClosed){
       isConnected = true;
       justClosed = false;
@@ -524,7 +525,7 @@ class CnSpotifyBar extends ChangeNotifier {
       Fluttertoast.cancel();
       Fluttertoast.showToast(
           msg: "Offline",
-          toastLength: Toast.LENGTH_SHORT,
+          toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
           backgroundColor: Colors.grey[800],
@@ -552,8 +553,8 @@ class CnSpotifyBar extends ChangeNotifier {
       if(e.toString().contains("NotLoggedInException")){
         Fluttertoast.cancel();
         Fluttertoast.showToast(
-            msg: "Please Login to Spotify",
-            toastLength: Toast.LENGTH_SHORT,
+            msg: AppLocalizations.of(context)!.spotifyPleaseLogin,
+            toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.SNACKBAR,
             timeInSecForIosWeb: 1,
             backgroundColor: Colors.grey[800],
@@ -617,20 +618,7 @@ class CnSpotifyBar extends ChangeNotifier {
       //   keepConnectedWhenPaused();
       // }
       // await SpotifySdk.pause();
-    } on Exception catch (_) {
-      if(Platform.isAndroid){
-        if(await hasInternet()){
-          accessToken = "";
-          isTryingToConnect = false;
-          isConnected = false;
-          justClosed = false;
-          connectToSpotify().then((value) => pause());
-        } else{
-          await disconnect();
-          // tryStayConnected = false;
-        }
-      }
-    }
+    } on Exception catch (_) {}
     isHandlingControlAction = false;
   }
 
@@ -645,23 +633,17 @@ class CnSpotifyBar extends ChangeNotifier {
         // })
       });
       // await SpotifySdk.resume();
-    } on Exception catch (_) {
-      if(await hasInternet()){
-        await reconnectAfterConnectionLoss();
-      } else{
-        await disconnect();
-      }
-    }
+    } on Exception catch (_) {}
     isHandlingControlAction = false;
   }
 
-  Future<void> reconnectAfterConnectionLoss() async {
-    accessToken = "";
-    isTryingToConnect = false;
-    isConnected = false;
-    justClosed = false;
-    await connectToSpotify();
-  }
+  // Future<void> reconnectAfterConnectionLoss() async {
+  //   accessToken = "";
+  //   isTryingToConnect = false;
+  //   isConnected = false;
+  //   justClosed = false;
+  //   await connectToSpotify();
+  // }
 
   Future<void> seekToRelative(int milliseconds) async {
     if(Platform.isAndroid){
