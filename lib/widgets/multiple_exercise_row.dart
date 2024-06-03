@@ -205,13 +205,8 @@ class MultipleExerciseRow extends StatelessWidget {
             && previousExercise.sets.length > index
             && set.weight != null
             && set.amount != null
+            && set.setType != null
         ){
-          // print("SHOULD COMPARE");
-          // print(previousExercise.name);
-          // print("INDEX: $index");
-          // print(previousExercise.sets.length);
-          // print(previousExercise.sets.first.weight);
-          // print(previousExercise.sets.first.amount);
           if(previousExercise.sets[index].weight! < set.weight!){
             weightImproved = true;
           }
@@ -279,8 +274,9 @@ class MultipleExerciseRow extends StatelessWidget {
                                   minFontSize: 9
                               ),
                               Container(
-                                color: Colors.grey[900],
-                                height: 1,
+                                // color: Colors.grey[900],
+                                color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
+                                height: 0.5,
                                 width: _width/2,
                               ),
                               Text("${set.amount}")
@@ -290,7 +286,10 @@ class MultipleExerciseRow extends StatelessWidget {
                         if(weightImproved != null)
                           getArrow(weightImproved, true),
                         if(amountImproved != null)
-                          getArrow(amountImproved, false)
+                          getArrow(amountImproved, false),
+                        // if(setTypeChanged)
+                        //   getSetType(set.setType!)
+                        // getSetType(1)
                       ],
                     ),
                   ),
@@ -308,6 +307,17 @@ class MultipleExerciseRow extends StatelessWidget {
       previousExercise = ex;
     }
     return children;
+  }
+
+  Widget getSetType(int setType){
+    return Container(
+      width: 5,
+      height: 5,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(2.5),
+        color: setType == 1? Colors.blue : setType == 2? Colors.green : Colors.transparent
+      ),
+    );
   }
 
   Widget getArrow(bool improved, bool top){

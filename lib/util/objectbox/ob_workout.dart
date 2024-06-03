@@ -55,6 +55,7 @@ class ObWorkout{
       "name": ex.name,
       "weights": ex.weights,
       "amounts": ex.amounts,
+      "setTypes": ex.setTypes,
       "restInSeconds": ex.restInSeconds,
       "seatLevel": ex.seatLevel,
       "linkName": ex.linkName

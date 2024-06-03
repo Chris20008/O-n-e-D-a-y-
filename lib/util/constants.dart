@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
@@ -272,6 +272,109 @@ Widget getSelectSeatLevel({
   );
 }
 
+Widget getSet({
+  required int index,
+  required Exercise newEx,
+  required double width,
+  required Function onConfirm
+}){
+  final SingleSet s = newEx.sets[index];
+  return PullDownButton(
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      return [
+        PullDownMenuItem.selectable(
+          selected: false,
+          title: "Clear",
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              // setState(() {
+                s.setType = 0;
+                print("CONFIRM INSIDE GETSET");
+                onConfirm();
+                // cnRunningWorkout.cache();
+              // });
+            });
+          },
+        ),
+        const PullDownMenuDivider.large(),
+        PullDownMenuItem.selectable(
+          selected: s.setType == 1,
+          title: 'Warm-Up Set',
+          icon: Icons.circle,
+          iconColor: Colors.blue,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              // setState(() {
+                s.setType = 1;
+                onConfirm();
+                // cnRunningWorkout.cache();
+              // });
+            });
+          },
+        ),
+        PullDownMenuItem.selectable(
+          selected: s.setType == 2,
+          title: 'Working Set',
+          icon: Icons.circle,
+          iconColor: Colors.green,
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              // setState(() {
+                s.setType = 2;
+                onConfirm();
+                // cnRunningWorkout.cache();
+              // });
+            });
+          },
+        ),
+      ];
+    },
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+      onPressed: (){
+        HapticFeedback.selectionClick();
+        FocusManager.instance.primaryFocus?.unfocus();
+        showMenu();
+      },
+      padding: EdgeInsets.zero,
+      child: SizedBox(
+        height: 40,
+        width: width,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: 35,
+              height: 35,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: s.setType == 1? Colors.blue : s.setType == 2? Colors.green : Colors.transparent,
+                  width: 1.0,
+                ),
+              ),
+            ),
+            Center(
+              child: Text(
+                "${index + 1}",
+                textScaler: const TextScaler.linear(1.2),
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 String validateDoubleTextInput(String text){
   text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
@@ -378,14 +481,6 @@ Widget OverflowSafeText(
     overflow: TextOverflow.ellipsis,
     textAlign: textAlign,
   );
-}
-
-
-
-List getWorkoutsAsStringList(){
-  final allObWorkouts = objectbox.workoutBox.getAll();
-  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
-  return allWorkouts;
 }
 
 Future<Directory?> getDirectory() async{

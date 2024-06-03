@@ -297,9 +297,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 if (oldIndex < newIndex) {
                                                   newIndex -= 1;
                                                 }
-                                                final item = templateEx.sets.removeAt(oldIndex);// cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                                final item = templateEx.sets.removeAt(oldIndex);
                                                 templateEx.sets.insert(newIndex, item);
-                                                final item2 = newEx.sets.removeAt(oldIndex);// cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                                final item2 = newEx.sets.removeAt(oldIndex);
                                                 newEx.sets.insert(newIndex, item2);
                                                 final weightAndAmount = cnRunningWorkout.textControllers[newEx.name]?.removeAt(oldIndex);
                                                 cnRunningWorkout.textControllers[newEx.name]?.insert(newIndex, weightAndAmount!);
@@ -320,9 +320,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                     children: [
 
                                                       /// Set
-                                                      SizedBox(
+                                                      // SizedBox(
+                                                      //     width: _widthOfTextField,
+                                                      //     child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
+                                                      // ),
+                                                      getSet(
+                                                          index: indexSet,
+                                                          newEx: newEx,
                                                           width: _widthOfTextField,
-                                                          child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
+                                                          onConfirm: (){
+                                                            cnRunningWorkout.cache();
+                                                            cnRunningWorkout.refresh();
+                                                          }
                                                       ),
 
                                                       /// Button to copy templates data
@@ -723,6 +732,100 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       finishWorkout();
     }
   }
+
+  // Widget getSet(int index, Exercise newEx){
+  //   final SingleSet s = newEx.sets[index];
+  //   return PullDownButton(
+  //     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+  //     routeTheme: routeTheme,
+  //     itemBuilder: (context) {
+  //       final currentLanguage = getLanguageAsString(context);
+  //       return [
+  //         PullDownMenuItem.selectable(
+  //           selected: false,
+  //           title: "Clear",
+  //           onTap: () {
+  //             HapticFeedback.selectionClick();
+  //             FocusManager.instance.primaryFocus?.unfocus();
+  //             Future.delayed(const Duration(milliseconds: 200), (){
+  //               setState(() {
+  //                 s.setType = 0;
+  //                 cnRunningWorkout.cache();
+  //               });
+  //             });
+  //           },
+  //         ),
+  //         const PullDownMenuDivider.large(),
+  //         PullDownMenuItem.selectable(
+  //           selected: s.setType == 1,
+  //           title: 'Warm-Up Set',
+  //           icon: Icons.circle,
+  //           iconColor: Colors.blue,
+  //           onTap: () {
+  //             HapticFeedback.selectionClick();
+  //             FocusManager.instance.primaryFocus?.unfocus();
+  //             Future.delayed(const Duration(milliseconds: 200), (){
+  //               setState(() {
+  //                 s.setType = 1;
+  //                 cnRunningWorkout.cache();
+  //               });
+  //             });
+  //           },
+  //         ),
+  //         PullDownMenuItem.selectable(
+  //           selected: s.setType == 2,
+  //           title: 'Working Set',
+  //           icon: Icons.circle,
+  //           iconColor: Colors.green,
+  //           onTap: () {
+  //             HapticFeedback.selectionClick();
+  //             FocusManager.instance.primaryFocus?.unfocus();
+  //             Future.delayed(const Duration(milliseconds: 200), (){
+  //               setState(() {
+  //                 s.setType = 2;
+  //                 cnRunningWorkout.cache();
+  //               });
+  //             });
+  //           },
+  //         ),
+  //       ];
+  //     },
+  //     buttonBuilder: (context, showMenu) => CupertinoButton(
+  //       onPressed: (){
+  //         HapticFeedback.selectionClick();
+  //         showMenu();
+  //       },
+  //       padding: EdgeInsets.zero,
+  //       child: SizedBox(
+  //         height: 40,
+  //         width: _widthOfTextField,
+  //         child: Stack(
+  //           alignment: Alignment.center,
+  //           children: [
+  //             Container(
+  //               width: 35,
+  //               height: 35,
+  //               decoration: BoxDecoration(
+  //                 shape: BoxShape.circle,
+  //                 border: Border.all(
+  //                   color: s.setType == 1? Colors.blue : s.setType == 2? Colors.green : Colors.transparent,
+  //                   width: 1.0,
+  //                 ),
+  //               ),
+  //             ),
+  //             Center(
+  //               child: Text(
+  //                 "${index + 1}",
+  //                 textScaler: const TextScaler.linear(1.2),
+  //                 style: const TextStyle(color: Colors.white),
+  //                 ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   void addSet(Exercise ex, Exercise lastEx){
     setState(() {
@@ -1174,10 +1277,13 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void setWorkoutTemplate(Workout w){
+    for(Exercise e in w.exercises){
+      print(e.sets.map((s) => s.setType).toList());
+    }
     workoutTemplateModifiable = w;
     workout = Workout.copy(w);
     workoutTemplateNotModifiable = Workout.copy(w);
-    workout.resetAllExercisesSets();
+    workout.resetAllExercisesSets(keepSetType: true);
     initSlideableKeys();
     initSelectedIndexes();
     initGroupedExercises();

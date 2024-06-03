@@ -56,7 +56,7 @@ class Workout{
       exercises: List.from(w.exercises.map((e) => Exercise(
           id: e.id,
           name: e.name,
-          sets: List.from(zip([e.weights, e.amounts]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt()))),
+          sets: List.from(zip([e.weights, e.amounts, e.setTypes]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt(), setType: set[2].toInt()))),
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel,
           linkName: e.linkName
@@ -82,10 +82,15 @@ class Workout{
           /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
           /// Update amounts and weights of the existing exercise in the template
+          print("EXERCISE COMPARE");
+          print(newExercise.setTypes);
+          print(ex.setTypes);
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
+          ex.setTypes = newExercise.setTypes;
           ex.restInSeconds = newExercise.restInSeconds;
           ex.seatLevel = newExercise.seatLevel;
+          print(ex.setTypes);
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
@@ -126,9 +131,9 @@ class Workout{
     );
   }
 
-  void resetAllExercisesSets(){
+  void resetAllExercisesSets({required bool keepSetType}){
     for (Exercise e in exercises){
-      e.resetSets();
+      e.resetSets(keepSetType: keepSetType);
     }
   }
 

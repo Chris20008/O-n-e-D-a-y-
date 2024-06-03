@@ -45,7 +45,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           animatedScreen(1, screenTwo()),
           animatedScreen(2, screenThree()),
           animatedScreen(3, screenFour()),
-          if(screenIndex <maxIndex)
+          if(screenIndex < maxIndex)
             nextButton(),
           if(screenIndex > 0)
             backButton(),
@@ -155,6 +155,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         },
         padding: EdgeInsets.zero,
         child: Row(
+          // mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
@@ -176,7 +177,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget screenOne(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 3,
@@ -207,17 +208,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.only(left: 100),
-          child: Text(
-            AppLocalizations.of(context)!.welcomeSelectLanguage,
-            textScaler: const TextScaler.linear(1.1),
+        SizedBox(
+          width: MediaQuery.of(context).size.width/2,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.welcomeSelectLanguage,
+                textScaler: const TextScaler.linear(1.1),
+              ),
+              getSelectLanguageButton(),
+            ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 100),
-          child: getSelectLanguageButton(),
-        ),
+
         const Spacer(flex: 1),
       ],
     );
@@ -226,7 +231,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget screenTwo(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 2,
@@ -422,7 +427,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget screenThree(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 5,
@@ -538,7 +543,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget screenFour(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           flex: 3,

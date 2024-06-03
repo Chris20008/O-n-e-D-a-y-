@@ -62,6 +62,12 @@ Future<File?> saveBackup({required bool withCloud, required CnConfig cnConfig}) 
   return file;
 }
 
+List getWorkoutsAsStringList(){
+  final allObWorkouts = objectbox.workoutBox.getAll();
+  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
+  return allWorkouts;
+}
+
 /// ############
 /// iCloud load Backup
 /// ############

@@ -149,6 +149,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                 shrinkWrap: true,
                                 // key: listViewKey,
                                 itemCount: cnNewExercise.exercise.sets.length+1,
+                                // itemCount: cnNewExercise.exercise.sets.length,
                                 itemBuilder: (BuildContext context, int index) {
                                   Widget? child;
                                   if (index == cnNewExercise.exercise.sets.length){
@@ -179,6 +180,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                         SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 60)
                                       ],
                                     );
+                                    return child;
                                   }
                                   else{
                                     child = Padding(
@@ -186,11 +188,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                       child: Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
-                                          SizedBox(
-                                              width: _widthSetWeightAmount,
-                                              height: 40,
-                                              child: Center(child: Text("${index+1}", textScaler: const TextScaler.linear(1.3),))
+                                          getSet(
+                                              index: index,
+                                              newEx: cnNewExercise.exercise,
+                                              width: 50,
+                                              onConfirm: (){
+                                                print("ON CONFIRM");
+                                                cnNewExercise.refresh();
+                                              }
                                           ),
+                                          // SizedBox(
+                                          //     width: _widthSetWeightAmount,
+                                          //     height: 40,
+                                          //     child: Center(child: Text("${index+1}", textScaler: const TextScaler.linear(1.3),))
+                                          // ),
 
                                           /// Weight
                                           Container(
@@ -200,7 +211,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                             child: TextField(
                                               keyboardAppearance: Brightness.dark,
                                               key: cnNewExercise.ensureVisibleKeys[index][0],
-                                              maxLength: 6,
+                                              maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
                                               style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
                                               onTap: ()async{
                                                 cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
@@ -299,7 +310,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                     );
                                   }
                                   return Slidable(
-                                      key: UniqueKey(),
+                                    key: cnNewExercise.slideableKeys[index],
+                                      // key: UniqueKey(),
                                       startActionPane: ActionPane(
                                         motion: const ScrollMotion(),
                                         dismissible: DismissiblePane(
@@ -425,6 +437,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   void dismissExercise(int index){
     setState(() {
       cnNewExercise.exercise.sets.removeAt(index);
+      cnNewExercise.slideableKeys.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
       cnNewExercise.ensureVisibleKeys.removeAt(index);
     });
@@ -433,6 +446,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   void addSet(){
     setState(() {
       cnNewExercise.exercise.addSet();
+      cnNewExercise.slideableKeys.add(UniqueKey());
       cnNewExercise.controllers.add([TextEditingController(),TextEditingController()]);
       cnNewExercise.ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
       cnNewExercise.scrollControllerSets.jumpTo(cnNewExercise.scrollControllerSets.position.pixels+44);
@@ -639,6 +653,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
   ScrollController scrollControllerSets = ScrollController();
+  late List<Key> slideableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
   final int animationTime = 300;
 
@@ -651,6 +666,7 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   void setExercise(Exercise ex){
     exercise = ex;
+    slideableKeys = exercise.generateKeyForEachSet();
     controllers = exercise.sets.map((e) => ([TextEditingController(text: "${e.weight}"), TextEditingController(text: "${e.amount}")])).toList();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
