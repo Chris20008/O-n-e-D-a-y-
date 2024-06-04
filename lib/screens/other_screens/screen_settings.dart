@@ -246,6 +246,9 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       CupertinoListTile(
                                         onTap: () async{
                                           await loadBackup();
+                                          tutorialIsRunning = false;
+                                          currentTutorialStep = 100;
+                                          cnConfig.setCurrentTutorialStep(currentTutorialStep);
                                           cnScreenStatistics.refreshData();
                                           cnScreenStatistics.refresh();
                                         },

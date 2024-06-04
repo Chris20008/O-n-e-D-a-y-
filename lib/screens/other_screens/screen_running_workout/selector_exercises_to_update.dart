@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quiver/iterables.dart';
@@ -66,7 +67,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
         ),
         Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 15),
+            padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).orientation == Orientation.portrait? 60 : 20, horizontal: 15),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Stack(
@@ -116,7 +117,12 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                           shape: const CircleBorder(),
                                           onChanged: (bool? value) {
                                             setState(() {
-                                              isCheckedList[index] = value!;
+                                              isCheckedList[index] = value?? false;
+                                              if(value?? false){
+                                                vibrateConfirm();
+                                              } else{
+                                                vibrateCancel();
+                                              }
                                             });
                                           },
                                         ),

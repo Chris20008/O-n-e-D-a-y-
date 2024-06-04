@@ -57,7 +57,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
         ),
         Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 15),
+            padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).orientation == Orientation.portrait? 60 : 20, horizontal: 15),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Stack(
@@ -131,8 +131,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                               shape: const CircleBorder(),
                                               onChanged: (bool? value) {
                                                 setState(() {
-                                                  isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value!;
-                                                  if(value){
+                                                  isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value?? false;
+                                                  if(value?? false){
                                                     vibrateConfirm();
                                                   } else{
                                                     vibrateCancel();
