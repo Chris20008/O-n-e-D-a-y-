@@ -228,10 +228,10 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                       });
                                     },
                                     style: ButtonStyle(
-                                        shadowColor: WidgetStateProperty.all(Colors.transparent),
-                                        surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
-                                        backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                        shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                        shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                        surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                        shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                     ),
                                     child: Text(AppLocalizations.of(context)!.confirm)
                                 )
@@ -244,10 +244,10 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                     widget.onCancel();
                                   },
                                   style: ButtonStyle(
-                                      shadowColor: WidgetStateProperty.all(Colors.transparent),
-                                      surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
-                                      backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                      shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                      surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                      shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
                                   ),
                                   child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok)
                               )

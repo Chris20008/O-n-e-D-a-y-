@@ -110,7 +110,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         key: cnWorkouts.keyAddWorkout,
                         iconSize: 25,
                         style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
                         ),
                         onPressed: () {
                           cnNewWorkout.openPanelAsTemplate();

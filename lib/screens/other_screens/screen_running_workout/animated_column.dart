@@ -74,7 +74,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 child: IconButton(
                     iconSize: 30,
                     style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
                       cnStandardPopUp.open(
