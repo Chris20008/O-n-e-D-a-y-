@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   );
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
+  bool mainIsInitialized = false;
 
   @override
   void initState() {
@@ -183,7 +184,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void initMain() async{
     objectbox = await ObjectBox.create();
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 100));
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
@@ -220,10 +221,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
 
     if(Platform.isAndroid && cnConfig.syncWithCloud){
-      Future.delayed(const Duration(milliseconds: 300), (){
-        cnConfig.signInGoogleDrive();
+      await Future.delayed(const Duration(milliseconds: 200), () async {
+        await cnConfig.signInGoogleDrive();
+        // print("FINISHED INIT");
       });
     }
+    // print("NOW");
+    // Future.delayed(const Duration(milliseconds: 100), (){
+      setState(() {
+        mainIsInitialized = true;
+      });
+    // });
   }
 
   @override
@@ -233,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
     /// Screen to bee shown until 'await cnConfig.initData();' is finished
     /// So the config data is been initialized
-    if(!cnConfig.isInitialized){
+    if(!mainIsInitialized){
       return Scaffold(
         body: Container(
           // color: Theme.of(context).primaryColor,
@@ -261,9 +269,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     ),
                   ),
                 ),
-                Center(
+                const Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 125),
+                    padding: EdgeInsets.only(top: 125),
                     child: Text(
                         "OneDay",
                         textScaler: TextScaler.linear(4),
@@ -271,13 +279,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     ),
                   ),
                 ),
+                const Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 100),
+                    child: SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Center(child: CircularProgressIndicator())
+                    ),
+                  ),
+                )
               ],
             ),
-            // child: Text(
-            //     "OneDay",
-            //     textScaler: TextScaler.linear(2.5),
-            //     style: TextStyle(decoration: TextDecoration.lineThrough)
-            // ),
           ),
         ),
       );
