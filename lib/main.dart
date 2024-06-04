@@ -236,13 +236,48 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     if(!cnConfig.isInitialized){
       return Scaffold(
         body: Container(
-          color: Theme.of(context).primaryColor,
-          child: const Center(
-            child: Text(
-                "OneDay",
-                textScaler: TextScaler.linear(2.5),
-                style: TextStyle(decoration: TextDecoration.lineThrough)
+          // color: Theme.of(context).primaryColor,
+          height: double.maxFinite,
+          width: double.maxFinite,
+          decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    Color(0xffc26a0e),
+                    Color(0xbb110a02)
+                  ]
+              )
+          ),
+          child: Center(
+            child: Stack(
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 250, maxHeight: 250),
+                    child: Image.asset(
+                        // scale: 0.01,
+                        "${pictureAssetPath}Logo removed HD only dumbell.png"
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 125),
+                    child: Text(
+                        "OneDay",
+                        textScaler: TextScaler.linear(4),
+                        style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white)
+                    ),
+                  ),
+                ),
+              ],
             ),
+            // child: Text(
+            //     "OneDay",
+            //     textScaler: TextScaler.linear(2.5),
+            //     style: TextStyle(decoration: TextDecoration.lineThrough)
+            // ),
           ),
         ),
       );
