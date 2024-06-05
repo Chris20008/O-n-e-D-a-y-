@@ -589,21 +589,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
 
-                // /// Explore myself
-                // CupertinoButton(
-                //
-                //   padding: EdgeInsets.zero,
-                //   onPressed: () {
-                //     widget.onFinish(false);
-                //     SystemChrome.setPreferredOrientations([]);
-                //   },
-                //   child: Text(
-                //     AppLocalizations.of(context)!.welcomeButtonExploreMyself,
-                //     textScaler: const TextScaler.linear(1.2),
-                //   ),
-                // ),
-                //
-                // const SizedBox(height: 10,),
+                /// Explore myself
+                CupertinoButton(
+
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
+                    widget.onFinish(false);
+                    SystemChrome.setPreferredOrientations([]);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.welcomeButtonExploreMyself,
+                    textScaler: const TextScaler.linear(1.2),
+                  ),
+                ),
+
+                const SizedBox(height: 10,),
 
                 /// Start Tutorial
                 CupertinoButton(

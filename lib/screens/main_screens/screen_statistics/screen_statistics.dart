@@ -118,20 +118,23 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(
-          // color: Colors.amber[200]!,
-            color: Colors.white,
-            onPressed: (){
-              cnScreenStatistics.openSettingsPanel();
-              // Navigator.push(
-              //     context,
-              //     CupertinoPageRoute(
-              //         builder: (context) => const SettingsPanel()
-              //     ));
-            },
-            icon: const Icon(
-              Icons.settings,
-            )
+        Align(
+          alignment: Alignment.topRight,
+          child: IconButton(
+            // color: Colors.amber[200]!,
+              color: Colors.white,
+              onPressed: (){
+                cnScreenStatistics.openSettingsPanel();
+                // Navigator.push(
+                //     context,
+                //     CupertinoPageRoute(
+                //         builder: (context) => const SettingsPanel()
+                //     ));
+              },
+              icon: const Icon(
+                Icons.settings,
+              )
+          ),
         ),
         const SizedBox(height: 10,),
         SizedBox(

@@ -146,7 +146,6 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
-      // cnScreenStatistics.calcMinMaxDates();
       cnScreenStatistics.refreshData();
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){

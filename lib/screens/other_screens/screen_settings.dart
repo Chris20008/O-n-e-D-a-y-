@@ -1,4 +1,6 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
+import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
@@ -27,6 +29,9 @@ class SettingsPanel extends StatefulWidget {
 
 class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserver {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnConfig cnConfig = Provider.of<CnConfig>(context);
   bool setOrientation = false;
@@ -245,12 +250,21 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       /// Load Backup
                                       CupertinoListTile(
                                         onTap: () async{
-                                          await loadBackup();
+                                          await loadBackupFromFilePicker(cnHomepage: cnHomepage);
+                                          if(cnConfig.syncWithCloud){
+                                            saveBackup(
+                                                withCloud: true,
+                                                cnConfig: cnConfig,
+                                                currentDataCloud: true,
+                                            );
+                                          }
                                           tutorialIsRunning = false;
                                           currentTutorialStep = 100;
                                           cnConfig.setCurrentTutorialStep(currentTutorialStep);
                                           cnScreenStatistics.refreshData();
                                           cnScreenStatistics.refresh();
+                                          // cnWorkouts.refreshAllWorkouts();
+                                          // cnWorkoutHistory.refreshAllWorkouts();
                                         },
                                         leading: const Icon(
                                             Icons.cloud_download
@@ -579,6 +593,13 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
                 saveBackup(withCloud: cnConfig.syncWithCloud, cnConfig: cnConfig);
+                if(cnConfig.syncWithCloud){
+                  saveBackup(
+                      withCloud: true,
+                      cnConfig: cnConfig,
+                      currentDataCloud: true
+                  );
+                }
               });
             },
           ),

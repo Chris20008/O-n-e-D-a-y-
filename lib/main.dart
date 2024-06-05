@@ -225,6 +225,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     if(Platform.isAndroid && cnConfig.syncWithCloud){
       await Future.delayed(const Duration(milliseconds: 200), () async {
         await cnConfig.signInGoogleDrive();
+
+        if(!showWelcomeScreen){
+          cnHomepage.isSyncingWithCloud = true;
+          cnHomepage.msg = "Sync with Google Drive";
+          loadNewestDataGoogleDrive(
+              cnConfig,
+              cnHomepage: cnHomepage
+          ).then((needRefresh) {
+            print("FINISHED SYNC; DO REFRESH: $needRefresh");
+            if(needRefresh){
+              cnWorkouts.refreshAllWorkouts();
+              cnWorkoutHistory.refreshAllWorkouts();
+            }
+          });
+        }
       });
     }
     setState(() {
@@ -239,7 +254,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
     /// Screen to bee shown until 'await cnConfig.initData();' is finished
     /// So the config data is been initialized
-    if(!mainIsInitialized){
+    /// And also main needs to be initialised
+    /// !cnConfig.isInitialized seems unimportant since, mainIsInitialized can only be true when
+    /// cnConfig.isInitialized is also true, however deleting it leads some to a crash
+    if(!cnConfig.isInitialized || !mainIsInitialized){
       return Scaffold(
         body: Container(
           // color: Theme.of(context).primaryColor,
@@ -454,12 +472,34 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                       );
                     },
                   ),
-                // ElevatedButton(
-                //     onPressed: (){
-                //       getLastFilename(cnConfig);
-                //     },
-                //     child: Text("TEST")
-                // )
+                if(cnHomepage.isSyncingWithCloud)
+                  SafeArea(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 20),
+                      child: Row(
+                        children: [
+                          Text(cnHomepage.msg),
+                          const SizedBox(width: 5),
+                          if(cnHomepage.percent != null)
+                            Text("${(cnHomepage.percent! * 100).round()}%"),
+                          if(cnHomepage.percent != null)
+                          const SizedBox(width: 5),
+                          if(!cnHomepage.syncWithCloudCompleted)
+                            const SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
+                            )
+                          else
+                            const Icon(
+                              Icons.check_circle,
+                              size: 15,
+                              color: Colors.green
+                            )
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
         ),
@@ -467,7 +507,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     );
   }
 
-  void onFinishWelcomeScreen(bool doShowTutorial){
+  void onFinishWelcomeScreen(bool doShowTutorial) {
     cnConfig.setWelcomeScreen(false);
     setState(() {
       closeWelcomeScreen = true;
@@ -478,15 +518,62 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         if(doShowTutorial && currentTutorialStep == 0) {
           initTutorialAddWorkout(context);
           showTutorialAddWorkout(context);
+        } else if(!doShowTutorial){
+          currentTutorialStep = 100;
+          cnConfig.setCurrentTutorialStep(currentTutorialStep);
+          tutorialIsRunning = false;
         }
         showWelcomeScreen = false;
       });
+      if(cnConfig.syncWithCloud /*&& !doShowTutorial*/ && Platform.isAndroid){
+        cnHomepage.isSyncingWithCloud = true;
+        cnHomepage.msg = "Sync with Google Drive";
+        cnHomepage.refresh();
+        loadNewestDataGoogleDrive(
+            cnConfig,
+            cnHomepage: cnHomepage
+        ).then((needRefresh) {
+          if(needRefresh){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+          }
+        });
+      }
     });
   }
 }
 
 class CnHomepage extends ChangeNotifier {
   late CnSpotifyBar cnSpotifyBar;
+  bool isSyncingWithCloud = false;
+  bool syncWithCloudCompleted = false;
+  double? percent;
+  String msg = "";
+
+  updateSyncStatus(double percent){
+    this.percent = percent;
+    this.msg = msg;
+    if(percent > 0 && percent < 1){
+      isSyncingWithCloud = true;
+      syncWithCloudCompleted = false;
+      refresh();
+    } else{
+      finishSync();
+    }
+  }
+
+  finishSync(){
+    syncWithCloudCompleted = true;
+    percent = 1;
+    refresh();
+    Future.delayed(const Duration(seconds: 3), (){
+      isSyncingWithCloud = false;
+      syncWithCloudCompleted = false;
+      percent = null;
+      refresh();
+      msg = "";
+    });
+  }
 
   CnHomepage(BuildContext context){
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);

@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_add_exercise.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_explain_exercise_drag_options.dart';
@@ -41,6 +43,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   final _formKey = GlobalKey<FormState>();
   final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
   final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
@@ -907,6 +910,13 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnWorkoutHistory.refreshAllWorkouts();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
+    if(cnConfig.syncWithCloud){
+      saveBackup(
+          withCloud: true,
+          cnConfig: cnConfig,
+          currentDataCloud: true
+      );
+    }
   }
 
   void onConfirm() async{
@@ -926,6 +936,13 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       cnNewWorkout.closePanel(doClear: true);
       cnNewExercisePanel.clear();
       _formKey.currentState?.reset();
+      if(cnConfig.syncWithCloud){
+        saveBackup(
+            withCloud: true,
+            cnConfig: cnConfig,
+            currentDataCloud: true
+        );
+      }
     }
   }
 

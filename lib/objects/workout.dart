@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
@@ -11,7 +12,6 @@ class Workout{
 
   String name;
   List<Exercise> exercises;
-  Color c = Colors.blue[300] ?? Colors.blue;
   DateTime? date;
   int id;
   bool isTemplate;
@@ -155,6 +155,18 @@ class Workout{
           exercise
       );
     }
+  }
+
+  bool equals(Workout w){
+    if(w.exercises.length != exercises.length){
+      return false;
+    }
+    for(List<Exercise> e in zip([w.exercises, exercises])){
+      if(!e[0].equals(e[1])){
+        return false;
+      }
+    }
+    return w.name == name && w.date == date && w.isTemplate == isTemplate && listEquals(w.linkedExercises, linkedExercises);
   }
 
   void saveToDatabase(){

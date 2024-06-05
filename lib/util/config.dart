@@ -63,6 +63,8 @@ class CnConfig extends ChangeNotifier {
   bool isWaitingForSpotifyResponse = false;
   bool failedSpotifyConnection = false;
   GoogleSignInAccount? account;
+  String? folderIdGoogleDrive;
+  String? currentDataIdGoogleDrive;
 
   Future initData() async{
     cache = CustomCacheManager();

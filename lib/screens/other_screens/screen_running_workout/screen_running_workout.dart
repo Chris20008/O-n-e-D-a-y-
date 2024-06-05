@@ -1040,6 +1040,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       }
       if(cnConfig.automaticBackups){
         saveBackup(withCloud: cnConfig.syncWithCloud, cnConfig: cnConfig);
+        if(cnConfig.syncWithCloud){
+          saveBackup(
+              withCloud: true,
+              cnConfig: cnConfig,
+              currentDataCloud: true
+          );
+        }
       }
     });
   }

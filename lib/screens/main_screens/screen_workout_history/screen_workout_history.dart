@@ -256,11 +256,11 @@ class CnWorkoutHistory extends ChangeNotifier {
   ItemScrollController scrollController = ItemScrollController();
   Map<String, int> indexOfWorkout = {};
 
-  void refreshAllWorkouts(){
+  void refreshAllWorkouts() async{
     workouts.clear();
     indexOfWorkout.clear();
     final builder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build();
-    List<ObWorkout> obWorkouts = builder.find();
+    List<ObWorkout> obWorkouts = await builder.findAsync();
     int index = 0;
     for (ObWorkout w in obWorkouts) {
       workouts.add(Workout.fromObWorkout(w));
