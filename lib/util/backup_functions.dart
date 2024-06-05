@@ -13,6 +13,8 @@ import 'package:googleapis/drive/v3.dart' as ga;
 import 'package:http/http.dart';
 import 'package:path/path.dart';
 
+const folderNameGoogleDrive = "OneDay Backups";
+
 Future loadBackup() async{
   FilePickerResult? result = await FilePicker.platform.pickFiles(
       initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files"
@@ -59,6 +61,7 @@ Future<File?> saveBackup({required bool withCloud, required CnConfig cnConfig}) 
       await saveBackUpGoogleDrive(headers, file);
     }
   }
+  cnConfig.setLastBackupName(filename);
   return file;
 }
 
@@ -115,6 +118,21 @@ Future saveBackUpGoogleDrive(Map<String, String> authHeader, File backupFile) as
   }
 }
 
+Future getLastFilename(CnConfig cnConfig) async{
+  Map<String, String>? headers = await cnConfig.getGoogleDriveAuthHeaders();
+  if(headers != null){
+    var client = GoogleAuthClient(headers);
+    ga.DriveApi drive = ga.DriveApi(client);
+    ga.FileList allFiles = await drive.files.list(orderBy: "createdTime desc", q: "'$folderNameGoogleDrive' in parents");
+    if(allFiles.files != null){
+      for (ga.File f in allFiles.files!) {
+        print(f.name);
+      }
+    }
+    print("Printed all filenames");
+  }
+}
+
 Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   GoogleSignInAccount? account;
 
@@ -122,7 +140,7 @@ Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   try {
     account = await googleSignIn.signIn();
   } catch (error) {
-    // print("GOT ERROR e: $error");
+    //
   }
   return account;
 }

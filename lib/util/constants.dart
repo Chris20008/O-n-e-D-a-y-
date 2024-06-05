@@ -29,8 +29,6 @@ List<Color> linkColors = [
   const Color(0xFF4F8447),
 ];
 
-const folderNameGoogleDrive = "OneDay Backups";
-
 const List<int> predefinedTimes = [
   30,
   60,

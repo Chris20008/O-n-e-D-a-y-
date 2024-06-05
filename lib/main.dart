@@ -8,6 +8,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/animate
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
+import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
@@ -75,7 +76,7 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers:[
-        ChangeNotifierProvider(create: (context) => CnConfig()),
+        // ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
@@ -83,6 +84,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
+        ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
@@ -223,15 +225,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     if(Platform.isAndroid && cnConfig.syncWithCloud){
       await Future.delayed(const Duration(milliseconds: 200), () async {
         await cnConfig.signInGoogleDrive();
-        // print("FINISHED INIT");
       });
     }
-    // print("NOW");
-    // Future.delayed(const Duration(milliseconds: 100), (){
-      setState(() {
-        mainIsInitialized = true;
-      });
-    // });
+    setState(() {
+      mainIsInitialized = true;
+    });
   }
 
   @override
@@ -456,6 +454,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                       );
                     },
                   ),
+                // ElevatedButton(
+                //     onPressed: (){
+                //       getLastFilename(cnConfig);
+                //     },
+                //     child: Text("TEST")
+                // )
               ],
             ),
         ),
