@@ -209,7 +209,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
 
         SizedBox(
-          width: MediaQuery.of(context).size.width/2,
+          width: MediaQuery.of(context).size.width/1.5,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
