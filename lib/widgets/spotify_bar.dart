@@ -35,11 +35,12 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
 // class _SpotifyBarState extends State<SpotifyBar>{
   late CnSpotifyBar cnSpotifyBar = cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnBackgroundImage cnBackgroundImage = Provider.of<CnBackgroundImage>(context, listen: false);
+  late CnBackgroundColor cnBackgroundColor = Provider.of<CnBackgroundColor>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnAnimatedColumn cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
+  Color colorSpotifyButton = Colors.white.withOpacity(0.12);
   double paddingLeftRight = 5;
   Map<String, double> widths = {
     "portrait": 0,
@@ -123,7 +124,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                   width: cnSpotifyBar.width - paddingLeftRight*2,
                   child: Stack(
                     children: [
-                      const BackgroundImage(),
+                      const BackgroundColor(),
                       if(cnSpotifyBar.data == null)
                         GestureDetector(
                             onTap: () => cnSpotifyBar.connectToSpotify(context),
@@ -148,11 +149,49 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                           String uri = "spotify:";
                                           // if(uri != null){
                                           openUrl(uri);
+                                          HapticFeedback.selectionClick();
                                           // }
                                         },
-                                        child: cnSpotifyBar.spotifyImageWidget(cnBackgroundImage)
+                                        child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
                                     )
                                 ),
+                                // Padding(
+                                //   padding: const EdgeInsets.only(left: 5, bottom: 4),
+                                //   child: Column(
+                                //     mainAxisAlignment: MainAxisAlignment.center,
+                                //     crossAxisAlignment: CrossAxisAlignment.start,
+                                //     children: [
+                                //       SizedBox(
+                                //         height: cnSpotifyBar.preservedSpaceOpenSpotify,
+                                //         child: Row(
+                                //           children: [
+                                //             Text("Open Spotify", textScaler: TextScaler.linear(0.6)),
+                                //             const Icon(
+                                //                 MyIcons.spotify,
+                                //                 size: 10,
+                                //                 color: Color(0xff1ed560)
+                                //             ),
+                                //           ],
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //         height: 2,
+                                //       ),
+                                //       GestureDetector(
+                                //           onTap: (){
+                                //             /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
+                                //             // String? uri = cnSpotifyBar.data?.track?.uri;
+                                //             /// Just opens Spotify
+                                //             String uri = "spotify:";
+                                //             // if(uri != null){
+                                //             openUrl(uri);
+                                //             // }
+                                //           },
+                                //           child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
+                                //       )
+                                //     ],
+                                //   ),
+                                // ),
                                 Expanded(
                                   child: SizedBox(
                                     height: cnSpotifyBar.height,
@@ -165,7 +204,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                 padding: const EdgeInsets.only(left:12, top:2),
                                                 height: cnSpotifyBar.height/2,
                                                 child: Row(
-                                                  // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
                                                     Expanded(
                                                       child: AutoSizeText(
@@ -176,6 +214,56 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
+                                                    const SizedBox(width: 5),
+                                                    GestureDetector(
+                                                      onTapDown: (details){
+                                                        setState(() {
+                                                          colorSpotifyButton = Colors.white.withOpacity(0.25);
+                                                        });
+                                                      },
+                                                      onTapCancel: (){
+                                                        setState(() {
+                                                          colorSpotifyButton = Colors.white.withOpacity(0.12);
+                                                        });
+                                                      },
+                                                      onTap: (){
+                                                        /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
+                                                        // String? uri = cnSpotifyBar.data?.track?.uri;
+                                                        /// Just opens Spotify
+                                                        String uri = "spotify:";
+                                                        // if(uri != null){
+                                                        openUrl(uri);
+                                                        HapticFeedback.selectionClick();
+                                                        setState(() {
+                                                          colorSpotifyButton = Colors.white.withOpacity(0.12);
+                                                        });
+                                                        // }
+                                                      },
+                                                      child: Container(
+                                                        height: 20,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius: BorderRadius.circular(20),
+                                                          color: colorSpotifyButton,
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            SizedBox(width: 2,),
+                                                            Text(
+                                                                "Open Spotify",
+                                                                textScaler: TextScaler.linear(0.8),
+                                                                style: Theme.of(context).textTheme.titleSmall
+                                                            ),
+                                                            Icon(
+                                                                MyIcons.spotify,
+                                                                size: 14,
+                                                                color: Color(0xff1ed560)
+                                                            ),
+                                                            SizedBox(width: 2,),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 44,)
                                                   ],
                                                 )
                                             ),
@@ -188,7 +276,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                   children:[
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:35, minHeight:35),
+                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -205,7 +293,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     // const Spacer(flex:2),
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:35, minHeight:35),
+                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -222,7 +310,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     // const Spacer(flex:1),
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:35, minHeight:35),
+                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -239,7 +327,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     // const Spacer(flex:1),
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:35, minHeight:35),
+                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -256,7 +344,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     // const Spacer(flex:2),
                                                     IconButton(
                                                         padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:35, minHeight:35),
+                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -272,7 +360,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     ),
                                                     Expanded(
                                                       child: AutoSizeText(
-                                                        textAlign: TextAlign.center,
+                                                        textAlign: MediaQuery.of(context).orientation == Orientation.portrait? TextAlign.start : TextAlign.center,
                                                         cnSpotifyBar.data!.track?.artist.name ?? "",
                                                         maxLines: 1,
                                                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -282,6 +370,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
+                                                    const SizedBox(width: 30,)
                                                   ]
                                               ),
                                             ),
@@ -290,31 +379,50 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                     ),
                                   ),
                                 ),
-                                IconButton(
-                                    iconSize: 30,
-                                    style: ButtonStyle(
-                                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                    ),
-                                    onPressed: () async{
-                                      // cnSpotifyBar.disconnect();
-                                      cnSpotifyBar.close();
-                                    },
-                                    icon: Icon(
-                                      Icons.keyboard_arrow_right,
-                                      color: Colors.amber[800],
-                                    )
-                                    // icon: Icon(
-                                    //   Icons.cancel,
-                                    //   color: Colors.amber[800],
-                                    // )
-                                ),
-                                const SizedBox(width: 3,)
                               ],
                             ),
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                      iconSize: 30,
+                                      style: ButtonStyle(
+                                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                      ),
+                                      onPressed: () async{
+                                        // cnSpotifyBar.disconnect();
+                                        cnSpotifyBar.close();
+                                      },
+                                      icon: Icon(
+                                        Icons.keyboard_arrow_right,
+                                        color: Colors.amber[800],
+                                      )
+                                    // icon: Icon(
+                                    //   Icons.cancel,
+                                    //   color: Colors.amber[800],
+                                    // )
+                                  ),
+                                  const SizedBox(width: 3,)
+                                ],
+                              ),
                             )
+                            // Align(
+                            //   alignment: Alignment.topRight,
+                            //   child: Padding(
+                            //     padding: const EdgeInsets.all(5.0),
+                            //     child: const Icon(
+                            //         MyIcons.spotify,
+                            //         size: 18,
+                            //         color: Color(0xff1ed560)
+                            //     ),
+                            //   ),
+                            // )
                           ],
                         )
                     ],
@@ -384,6 +492,7 @@ class CnSpotifyBar extends ChangeNotifier {
   List<Color?> currentColorPair = [];
   // int waitCounter = 0;
   double height = 60;
+  double preservedSpaceOpenSpotify = 0;
   double width = 0;
   double heightOfButton = 54;
   late CnAnimatedColumn cnAnimatedColumn;
@@ -441,7 +550,7 @@ class CnSpotifyBar extends ChangeNotifier {
     super.dispose();
   }
 
-  Widget spotifyImageWidget(CnBackgroundImage cn) {
+  Widget spotifyImageWidget(CnBackgroundColor cn) {
     if(data?.track?.name == currentTrackName){
       return lastImage?? const SizedBox();
     }
@@ -460,8 +569,8 @@ class CnSpotifyBar extends ChangeNotifier {
             currentTrackName = data?.track?.name?? "";
             lastImage = Image.memory(
               snapshot.data!,
-              height: height-10,
-              width: height-10,
+              height: height-10 - preservedSpaceOpenSpotify,
+              width: height-10 - preservedSpaceOpenSpotify,
               gaplessPlayback: true,
               fit: BoxFit.fitHeight,
             );
@@ -485,7 +594,7 @@ class CnSpotifyBar extends ChangeNotifier {
     );
   }
 
-  Future setMainColor (ImageProvider imageProvider, CnBackgroundImage cn) async {
+  Future setMainColor (ImageProvider imageProvider, CnBackgroundColor cn) async {
     final PaletteGenerator paletteGenerator = await PaletteGenerator
         .fromImageProvider(imageProvider);
     currentColorPair = await compute(computeColor, paletteGenerator);

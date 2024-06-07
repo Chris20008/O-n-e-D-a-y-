@@ -22,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -80,7 +81,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
-        ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnBackgroundColor()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
@@ -222,23 +223,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       });
     }
 
-    if(Platform.isAndroid && cnConfig.syncWithCloud){
+    if(cnConfig.connectWithCloud){
       await Future.delayed(const Duration(milliseconds: 200), () async {
-        await cnConfig.signInGoogleDrive();
+        if(Platform.isAndroid){
+          await cnConfig.signInGoogleDrive();
+        }
 
-        if(!showWelcomeScreen){
-          cnHomepage.isSyncingWithCloud = true;
-          cnHomepage.msg = "Sync with Google Drive";
-          loadNewestDataGoogleDrive(
-              cnConfig,
-              cnHomepage: cnHomepage
-          ).then((needRefresh) {
-            print("FINISHED SYNC; DO REFRESH: $needRefresh");
-            if(needRefresh){
-              cnWorkouts.refreshAllWorkouts();
-              cnWorkoutHistory.refreshAllWorkouts();
-            }
-          });
+        if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+          trySyncWithCloud();
         }
       });
     }
@@ -338,6 +330,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     ]
                 )
             ),
+          // decoration: const BoxDecoration(
+          //     gradient: LinearGradient(
+          //         begin: Alignment.topRight,
+          //         end: Alignment.bottomLeft,
+          //         colors: [
+          //           Color(0x95c26a0e),
+          //           Color(0x7f110a02)
+          //         ]
+          //     )
+          // ),
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
@@ -355,7 +357,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             scale: scale,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(borderRadius),
-                                child: child
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                            begin: Alignment.topRight,
+                                            end: Alignment.bottomLeft,
+                                            colors: [
+                                              Color(0xffc26a0e),
+                                              Color(0xbb110a02)
+                                            ]
+                                        )
+                                    ),
+                                  child: Container(
+                                      color: Colors.black.withOpacity((_animationControllerWorkoutPanel.value * 1.1).clamp(0, 1)),
+                                      child: child
+                                  ),
+                                )
                             ),
                           );
                         },
@@ -402,6 +419,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             /// need this anymore when exercise panel is opened because it would become to dark
                             /// with backdrop AND this AnimatedBuilder together
                             opacity = opacity > 0.5 ? 1 - opacity : opacity;
+                            opacity = opacity * 0.5;
                             return Container(
                               color: Colors.black.withOpacity(opacity),
                             );
@@ -423,7 +441,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                                 scale: scale,
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                                    child: child
+                                    child: Container(
+                                        child: child
+                                    )
                                 ),
                               ),
                             );
@@ -477,6 +497,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10, left: 20),
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(cnHomepage.msg),
                           const SizedBox(width: 5),
@@ -507,12 +528,56 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     );
   }
 
+  Future<void> trySyncWithCloud() async{
+    cnHomepage.isSyncingWithCloud = true;
+    cnHomepage.msg = "Sync with Google Drive";
+    if(Platform.isAndroid){
+      if(await hasInternet()){
+        cnHomepage.refresh();
+        await loadNewestDataGoogleDrive(
+            cnConfig,
+            cnHomepage: cnHomepage
+        ).then((needRefresh) {
+          if(needRefresh){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+          }
+        });
+      }
+      else{
+        cnHomepage.isSyncingWithCloud = false;
+        cnHomepage.msg = "";
+        Fluttertoast.showToast(
+            msg: "No Internet - Sync with Cloud not possible",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.grey[800],
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    }
+    else{
+      cnHomepage.refresh();
+      // loadNewestDataGoogleDrive(
+      //     cnConfig,
+      //     cnHomepage: cnHomepage
+      // ).then((needRefresh) {
+      //   if(needRefresh){
+      //     cnWorkouts.refreshAllWorkouts();
+      //     cnWorkoutHistory.refreshAllWorkouts();
+      //   }
+      // });
+    }
+  }
+
   void onFinishWelcomeScreen(bool doShowTutorial) {
     cnConfig.setWelcomeScreen(false);
     setState(() {
       closeWelcomeScreen = true;
     });
-    Future.delayed(const Duration(milliseconds: 500), (){
+    Future.delayed(const Duration(milliseconds: 500), ()async{
       setState(() {
         cnBottomMenu.showBottomMenuAnimated();
         if(doShowTutorial && currentTutorialStep == 0) {
@@ -525,19 +590,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
         }
         showWelcomeScreen = false;
       });
-      if(cnConfig.syncWithCloud /*&& !doShowTutorial*/ && Platform.isAndroid){
-        cnHomepage.isSyncingWithCloud = true;
-        cnHomepage.msg = "Sync with Google Drive";
-        cnHomepage.refresh();
-        loadNewestDataGoogleDrive(
-            cnConfig,
-            cnHomepage: cnHomepage
-        ).then((needRefresh) {
-          if(needRefresh){
-            cnWorkouts.refreshAllWorkouts();
-            cnWorkoutHistory.refreshAllWorkouts();
-          }
-        });
+      if(cnConfig.syncMultipleDevices /*&& !doShowTutorial*/){
+        trySyncWithCloud();
       }
     });
   }
@@ -552,7 +606,6 @@ class CnHomepage extends ChangeNotifier {
 
   updateSyncStatus(double percent){
     this.percent = percent;
-    this.msg = msg;
     if(percent > 0 && percent < 1){
       isSyncingWithCloud = true;
       syncWithCloudCompleted = false;

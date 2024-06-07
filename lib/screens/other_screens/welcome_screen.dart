@@ -229,144 +229,196 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Widget screenTwo(){
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 2,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: OverflowSafeText(
-                    maxLines: 1,
-                    Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive : AppLocalizations.of(context)!.welcomeSynciCloud,
-                    fontSize: 25,
-                    textAlign: TextAlign.center,
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: OverflowSafeText(
+                      maxLines: 1,
+                      Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive : AppLocalizations.of(context)!.welcomeSynciCloud,
+                      fontSize: 25,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
 
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              OverflowSafeText(
-                maxLines: 1,
-                AppLocalizations.of(context)!.welcomeNoAccount,
-              ),
-              OverflowSafeText(
-                maxLines: 1,
-                AppLocalizations.of(context)!.welcomeNoAccount2,
-              ),
-              const SizedBox(height: 20),
-              OverflowSafeText(
-                maxLines: 1,
-                AppLocalizations.of(context)!.welcomeAwesome,
-              ),
-              const SizedBox(height: 80),
-              OverflowSafeText(
-                maxLines: 2,
-                AppLocalizations.of(context)!.welcomeLocalBackups,
-                textAlign: TextAlign.center
-              ),
-              const SizedBox(height: 20),
-              OverflowSafeText(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                OverflowSafeText(
+                  maxLines: 1,
+                  AppLocalizations.of(context)!.welcomeNoAccount,
+                ),
+                OverflowSafeText(
+                  maxLines: 1,
+                  AppLocalizations.of(context)!.welcomeNoAccount2,
+                ),
+                const SizedBox(height: 20),
+                OverflowSafeText(
+                  maxLines: 1,
+                  AppLocalizations.of(context)!.welcomeAwesome,
+                ),
+                const SizedBox(height: 80),
+                OverflowSafeText(
                   maxLines: 2,
-                  Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive2 : AppLocalizations.of(context)!.welcomeSynciCloud2,
+                  AppLocalizations.of(context)!.welcomeLocalBackups,
                   textAlign: TextAlign.center
-              ),
-              const SizedBox(height: 40),
-            ],
+                ),
+                const SizedBox(height: 20),
+                OverflowSafeText(
+                    maxLines: 2,
+                    Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive2 : AppLocalizations.of(context)!.welcomeSynciCloud2,
+                    textAlign: TextAlign.center
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          flex: 2,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              /// Save Backup Automatic
-              CupertinoListTile(
-                leading: const Icon(
-                    Icons.cloud_done
-                ),
-                title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-                trailing: CupertinoSwitch(
-                    value: cnConfig.automaticBackups,
-                    activeColor: const Color(0xFFC16A03),
-                    onChanged: (value){
-                      setState(() {
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                        }
-                        cnConfig.setAutomaticBackups(value);
-                      });
-                    }
-                ),
-              ),
-              /// Sync with iCloud
-              CupertinoListTile(
-                leading: const Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                          Icons.cloud
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 1),
-                        child: Center(
-                          child: Icon(
-                            Icons.sync,
-                            size: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ]
-                ),
-                trailing: CupertinoSwitch(
-                    value: cnConfig.syncWithCloud,
-                    activeColor: const Color(0xFFC16A03),
-                    onChanged: (value)async{
-                      if(Platform.isAndroid){
-                        HapticFeedback.selectionClick();
-                        if(!value){
-                          cnConfig.account = null;
-                        }
+          Expanded(
+            flex: 3,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                /// Save Backup Automatic
+                CupertinoListTile(
+                  leading: const Icon(Icons.sync),
+                  title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+                  trailing: CupertinoSwitch(
+                      value: cnConfig.automaticBackups,
+                      activeColor: const Color(0xFFC16A03),
+                      onChanged: (value){
+                        setState(() {
+                          if(Platform.isAndroid){
+                            HapticFeedback.selectionClick();
+                          }
+                          cnConfig.setAutomaticBackups(value);
+                        });
                       }
-                      cnConfig.setSyncWithCloud(value);
-                      setState(() {});
-                    }
+                  ),
                 ),
-                title: Padding(
-                  padding: const EdgeInsets.only(right: 5),
-                  child: Row(
+
+                /// Sync with iCloud
+                getCloudOptionsColumn(
+                    cnConfig: cnConfig,
+                    context: context,
+                    refresh: () => setState(() {})
+                ),
+
+                GestureDetector(
+                  onTap: () async{
+                    HapticFeedback.selectionClick();
+                    await showDialog(
+                        context: context,
+                        builder: (context){
+                          return Center(
+                              child: getBackupDialogChild()
+                          );
+                        }
+                    );
+                    HapticFeedback.selectionClick();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 20),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.info, size:12),
+                        const SizedBox(width: 5,),
+                        Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ),
+          SizedBox(height: 20,)
+        ],
+      ),
+    );
+  }
+
+  Widget screenThree(){
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    AppLocalizations.of(context)!.welcomeControlMusic,
+                    textScaler: const TextScaler.linear(1.8),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.welcomeMusicQuestion,
+                    style: const TextStyle(fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 50),
+                Text(
+                  AppLocalizations.of(context)!.welcomeMusicSolution,
+                    style: const TextStyle(fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 50),
+                Text(
+                  AppLocalizations.of(context)!.welcomeMusicExplanation,
+                    style: const TextStyle(fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 4,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Connect to Spotify
+                CupertinoListTile(
+                  leading: const Icon(
+                      MyIcons.spotify,
+                      // color: Colors.amber[800],
+                      color: Color(0xff1ed560)
+                  ),
+                  title: Row(
                     children: [
-                      Expanded(
-                        child: OverflowSafeText(
-                          maxLines: 1,
-                          Platform.isAndroid
-                              ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                              : AppLocalizations.of(context)!.settingsSynciCloud,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      if(Platform.isAndroid)
-                        SizedBox(width: cnConfig.syncWithCloud? 0 : 15),
-                      /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
-                      /// so calling it will lead to an crash
-                      /// We have to make sure it is only called on Android!
-                      if(cnConfig.syncWithCloud && Platform.isAndroid)
+                      Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
+                      const SizedBox(width: 5),
+                      if(cnConfig.useSpotify)
                         FutureBuilder(
-                            future: cnConfig.signInGoogleDrive(),
+                            future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
                             builder: (context, connected){
                               if(!connected.hasData){
                                 return const Center(
@@ -378,11 +430,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 );
                               }
                               return Icon(
-                                cnConfig.account != null
+                                connected.data == true
                                     ? Icons.check_circle
                                     : Icons.close,
                                 size: 15,
-                                color: cnConfig.account != null
+                                color: connected.data == true
                                     ? Colors.green
                                     : Colors.red,
                               );
@@ -390,153 +442,31 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         )
                     ],
                   ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () async{
-                  HapticFeedback.selectionClick();
-                  await showDialog(
-                      context: context,
-                      builder: (context){
-                        return Center(
-                            child: getBackupDialogChild()
-                        );
+                  trailing: CupertinoSwitch(
+                      value: cnConfig.useSpotify,
+                      activeColor: const Color(0xFFC16A03),
+                      onChanged: (value) async{
+                        setState(() {
+                          if(Platform.isAndroid){
+                            HapticFeedback.selectionClick();
+                          }
+                          cnConfig.setSpotify(value);
+                          cnWorkouts.refresh();
+                        });
                       }
-                  );
-                  HapticFeedback.selectionClick();
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info, size:12),
-                      const SizedBox(width: 5,),
-                      Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
-                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 100),
-            ],
-          )
-        ),
-      ],
-    );
-  }
-
-  Widget screenThree(){
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: Text(
-                  AppLocalizations.of(context)!.welcomeControlMusic,
-                  textScaler: const TextScaler.linear(1.8),
+                Container(
+                  height: 20,
+                  padding: const EdgeInsets.only(left: 30),
+                  child: cnConfig.failedSpotifyConnection? Text(AppLocalizations.of(context)!.welcomeSpotifyError, textAlign: TextAlign.left,) : null
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
-        ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.welcomeMusicQuestion,
-                  style: const TextStyle(fontSize: 17),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 50),
-              Text(
-                AppLocalizations.of(context)!.welcomeMusicSolution,
-                  style: const TextStyle(fontSize: 17),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 50),
-              Text(
-                AppLocalizations.of(context)!.welcomeMusicExplanation,
-                  style: const TextStyle(fontSize: 17),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          flex: 4,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              /// Connect to Spotify
-              CupertinoListTile(
-                leading: const Icon(
-                    MyIcons.spotify,
-                    // color: Colors.amber[800],
-                    color: Color(0xff1ed560)
-                ),
-                title: Row(
-                  children: [
-                    Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
-                    const SizedBox(width: 5),
-                    if(cnConfig.useSpotify)
-                      FutureBuilder(
-                          future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
-                          builder: (context, connected){
-                            if(!connected.hasData){
-                              return const Center(
-                                child: SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: CircularProgressIndicator(strokeWidth: 2,)
-                                ),
-                              );
-                            }
-                            return Icon(
-                              connected.data == true
-                                  ? Icons.check_circle
-                                  : Icons.close,
-                              size: 15,
-                              color: connected.data == true
-                                  ? Colors.green
-                                  : Colors.red,
-                            );
-                          }
-                      )
-                  ],
-                ),
-                trailing: CupertinoSwitch(
-                    value: cnConfig.useSpotify,
-                    activeColor: const Color(0xFFC16A03),
-                    onChanged: (value) async{
-                      setState(() {
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                        }
-                        cnConfig.setSpotify(value);
-                        cnWorkouts.refresh();
-                      });
-                    }
-                ),
-              ),
-              Container(
-                height: 20,
-                padding: const EdgeInsets.only(left: 30),
-                child: cnConfig.failedSpotifyConnection? Text(AppLocalizations.of(context)!.welcomeSpotifyError, textAlign: TextAlign.left,) : null
-              ),
-              const SizedBox(height: 90),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -645,290 +575,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         maxWidth: 400,
         widthFactor: 0.9,
         maxHeight: 680,
-        child: Column(
-          children: [
-
-            /// Save Backup Automatic
-            CupertinoListTile(
-              leading: const Icon(
-                  Icons.cloud_done
-              ),
-              title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-            ),
-            Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation)),
-            const SizedBox(height: 15),
-
-            /// Sync with iCloud
-            CupertinoListTile(
-              leading: const Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                        Icons.cloud
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 1),
-                      child: Center(
-                        child: Icon(
-                          Icons.sync,
-                          size: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ]
-              ),
-              title: OverflowSafeText(
-                  maxLines: 1,
-                  Platform.isAndroid
-                      ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                      : AppLocalizations.of(context)!.settingsSynciCloud,
-                  style: const TextStyle(color: Colors.white)
-              ),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(left: 30),
-                child: Text(Platform.isAndroid
-                    ? AppLocalizations.of(context)!.settingsBackupSyncGoogleDriveExplanation
-                    : AppLocalizations.of(context)!.settingsBackupSynciCloudExplanation
-                )
-            ),
-            const SizedBox(height: 15),
-          ],
-        )
+        child: getBackupDialogWelcomeScreen(context: context),
     );
   }
 }
 
 
 
-
-
-// Widget screenOne(){
-//   return Column(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Expanded(
-//         flex: 3,
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             const Text(
-//               "👋 Hey Gymrat!",
-//               textScaler: TextScaler.linear(1.8),
-//             ),
-//             SizedBox(height: 10,),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.center,
-//               children: [
-//                 const Text(
-//                   "Welcome to ",
-//                   textScaler: TextScaler.linear(1.8),
-//                 ),
-//                 Text(
-//                     "OneDay",
-//                     textScaler: TextScaler.linear(1.8),
-//                     style: TextStyle(decoration: TextDecoration.lineThrough)
-//                 )
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//
-//       Padding(
-//         padding: const EdgeInsets.only(left: 100),
-//         child: const Text(
-//           "Please select your language",
-//           textScaler: TextScaler.linear(1.1),
-//         ),
-//       ),
-//       Padding(
-//         padding: const EdgeInsets.only(left: 100),
-//         child: getSelectLanguageButton(),
-//       ),
-//       const Spacer(flex: 1),
-//     ],
-//   );
-// }
-//
-// Widget screenTwo(){
-//   return Column(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Expanded(
-//         flex: 3,
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             Center(
-//               child: const Text(
-//                 "How thinks work",
-//                 textScaler: TextScaler.linear(1.8),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//
-//       Padding(
-//         padding: EdgeInsets.symmetric(horizontal: 30),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             OverflowSafeText(
-//               maxLines: 1,
-//               "You don't have to create an account",
-//               // textScaler: TextScaler.linear(1.2),
-//             ),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.start,
-//               children: [
-//                 OverflowSafeText(
-//                   maxLines: 1,
-//                   "to use ",
-//                 ),
-//                 OverflowSafeText(
-//                     maxLines: 1,
-//                     "OneDay",
-//                     style: TextStyle(decoration: TextDecoration.lineThrough, fontSize: 17)
-//                 ),
-//               ],
-//             ),
-//             const SizedBox(height: 30),
-//             OverflowSafeText(
-//               maxLines: 1,
-//               "🙌 Awesome isn't it?",
-//             ),
-//             const SizedBox(height: 30),
-//             OverflowSafeText(
-//               maxLines: 3,
-//               "But how can you restore you data when you change your device your ask?",
-//             ),
-//             const SizedBox(height: 30),
-//             const Text(
-//                 "That's a great question!",
-//                 style: TextStyle(fontSize: 17)
-//             )
-//           ],
-//         ),
-//       ),
-//       const Spacer(flex: 1),
-//     ],
-//   );
-// }
-//
-// Widget screenThree(){
-//   return Column(
-//     mainAxisAlignment: MainAxisAlignment.center,
-//     crossAxisAlignment: CrossAxisAlignment.start,
-//     children: [
-//       Expanded(
-//         flex: 3,
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           crossAxisAlignment: CrossAxisAlignment.center,
-//           children: [
-//             Center(
-//               child: const Text(
-//                 "Automatic Backups",
-//                 textScaler: TextScaler.linear(1.8),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//
-//       Padding(
-//         padding: EdgeInsets.symmetric(horizontal: 30),
-//         child: Column(
-//           children: [
-//             Text(
-//                 "You can create manual Backups whenever you want.",
-//                 style: TextStyle(fontSize: 17)
-//             ),
-//             const SizedBox(height: 20),
-//             Text(
-//                 "In Addition, automatic Backups will be created every time you finish a workout if you enable automatic Backups.",
-//                 style: TextStyle(fontSize: 17)
-//             ),
-//             const SizedBox(height: 20),
-//             Text(
-//                 "Those Backups will be stored right on your device in the Apps own storage.",
-//                 style: TextStyle(fontSize: 17)
-//             ),
-//           ],
-//         ),
-//       ),
-//
-//       const SizedBox(height: 40),
-//       /// Save Backup Automatic
-//       CupertinoListTile(
-//         leading: const Icon(
-//             Icons.cloud_done
-//         ),
-//         title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-//         trailing: CupertinoSwitch(
-//             value: cnConfig.automaticBackups?? false,
-//             activeColor: const Color(0xFFC16A03),
-//             onChanged: (value){
-//               setState(() {
-//                 if(Platform.isAndroid){
-//                   HapticFeedback.selectionClick();
-//                 }
-//                 cnConfig.setAutomaticBackups(value);
-//               });
-//             }
-//         ),
-//       ),
-//       // /// Sync with iCloud
-//       // CupertinoListTile(
-//       //   leading: const Stack(
-//       //       alignment: Alignment.center,
-//       //       children: [
-//       //         Icon(
-//       //             Icons.cloud
-//       //         ),
-//       //         Padding(
-//       //           padding: EdgeInsets.only(top: 1),
-//       //           child: Center(
-//       //             child: Icon(
-//       //               Icons.sync,
-//       //               size: 16,
-//       //               color: Colors.black,
-//       //             ),
-//       //           ),
-//       //         ),
-//       //       ]
-//       //   ),
-//       //   trailing: CupertinoSwitch(
-//       //       value: cnConfig.syncWithCloud?? false,
-//       //       activeColor: const Color(0xFFC16A03),
-//       //       onChanged: (value){
-//       //         setState(() {
-//       //           if(Platform.isAndroid){
-//       //             HapticFeedback.selectionClick();
-//       //           }
-//       //           cnConfig.setSyncWithCloud(value);
-//       //         });
-//       //       }
-//       //   ),
-//       //   title: Padding(
-//       //     padding: const EdgeInsets.only(right: 5),
-//       //     child: OverflowSafeText(
-//       //       maxLines: 1,
-//       //       Platform.isAndroid
-//       //           ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-//       //           : AppLocalizations.of(context)!.settingsSynciCloud,
-//       //       style: const TextStyle(color: Colors.white),
-//       //     ),
-//       //   ),
-//       // ),
-//       const Spacer(flex: 1),
-//     ],
-//   );
-// }

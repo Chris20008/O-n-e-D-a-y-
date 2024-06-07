@@ -80,7 +80,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: cnScreenStatistics.width-100
+              maxWidth: cnScreenStatistics.width - 50
             ),
             child: OverflowSafeText(
                 cnScreenStatistics.selectedExerciseName!,

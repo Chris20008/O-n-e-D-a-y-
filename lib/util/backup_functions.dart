@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:collection/collection.dart';
@@ -8,7 +9,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:icloud_storage/icloud_storage.dart';
-import 'constants.dart';
+import 'package:path_provider/path_provider.dart';
 import 'objectbox/ob_exercise.dart';
 import 'objectbox/ob_workout.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
@@ -17,6 +18,22 @@ import 'package:path/path.dart';
 
 const folderNameGoogleDrive = "OneDay Backups";
 const currentDataFileName = "Current_Data.txt";
+/// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
+/// to see the Folder in ICloud File Explorer. Do NOT remove !!!
+const folderPathiCloud = "Documents/backups/";
+StreamSubscription<double>? iosDownloadProgressSub;
+
+Future<String> getLocalPath() async{
+  // if(Platform.isAndroid){
+  // return await getExternalStorageDirectory();
+  // return await getApplicationDocumentsDirectory();
+  // }
+  // else{
+  //   return await getApplicationDocumentsDirectory();
+  // }
+  final directory = await getApplicationDocumentsDirectory();
+  return directory.path;
+}
 
 Future loadBackupFromFilePicker({CnHomepage? cnHomepage}) async{
   FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -33,8 +50,25 @@ Future loadBackupFromFilePicker({CnHomepage? cnHomepage}) async{
 }
 
 Future<bool> loadBackupFromFile(File file, {CnHomepage? cnHomepage}) async{
-  final contents = await file.readAsString();
-  final allWorkoutsAsListString = contents.split(";");
+  final content = await file.readAsString();
+  return await loadBackupFromString(content: content, cnHomepage: cnHomepage);
+  // final allWorkoutsAsListString = contents.split(";");
+  // final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
+  // List<ObWorkout> allObWorkouts = [];
+  // List<ObExercise> allObExercises = [];
+  // for (Map w in allWorkouts){
+  //   ObWorkout workout = ObWorkout.fromMap(workoutMap: w, withId: true);
+  //   final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
+  //   workout.addExercises(exs);
+  //   allObWorkouts.add(workout);
+  //   allObExercises.addAll(exs);
+  // }
+  // final hadDifferences = await loadDifferences(allObWorkouts, cnHomepage: cnHomepage);
+  // return hadDifferences;
+}
+
+Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepage}) async{
+  final allWorkoutsAsListString = content.split(";");
   final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
   List<ObWorkout> allObWorkouts = [];
   List<ObExercise> allObExercises = [];
@@ -129,8 +163,9 @@ Future<File?> saveBackup({
   String? content,
   bool currentDataCloud = false
 }) async{
-  Directory? appDocDir = await getDirectory();
-  final path = appDocDir?.path;
+  // Directory? appDocDir = await getLocalPath();
+  // final path = appDocDir?.path;
+  final path = await getLocalPath();
 
   /// Seems like having ':' in the filename leads to issues, so we replace them
   final filename = currentDataCloud? currentDataFileName : "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
@@ -163,24 +198,33 @@ Future<File?> saveBackup({
   return file;
 }
 
+Future<File?> saveCurrentData(CnConfig cnConfig) async{
+  if(cnConfig.syncMultipleDevices) {
+    return await saveBackup(
+        withCloud: true,
+        cnConfig: cnConfig,
+        currentDataCloud: true
+    );
+  }
+  return null;
+}
+
 List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
   final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
   return allWorkouts;
 }
 
-/// ############
+/// ################################################################################################
 /// iCloud load Backup
-/// ############
+/// ################################################################################################
 Future saveBackupiCloud(String sourceFilePath, String filename)async{
   if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
       filePath: sourceFilePath,
 
-      /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
-      /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
-      destinationRelativePath: 'Documents/backups/$filename',
+      destinationRelativePath: '$folderPathiCloud$filename',
       onProgress: (stream) {
         // final uploadProgressSub = stream.listen(
         //       (progress) => print('Upload File Progress: $progress'),
@@ -192,9 +236,43 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
     );
   }
 }
-/// ############
+
+Future loadNewestDataiCloud(String sourceFilePath, String filename, CnHomepage? cnHomepage)async{
+
+  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
+    // Directory destinationDirectory = await getLocalPath();
+    final path = await getLocalPath();
+    String destinationPath = path + currentDataFileName;
+    await ICloudStorage.download(
+      containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
+      relativePath: folderPathiCloud + currentDataFileName,
+      destinationFilePath: destinationPath,
+      onProgress: (stream) {
+        iosDownloadProgressSub = stream.listen(
+              (progress) => print('Download File Progress: $progress'),
+          onDone: () async{
+            print('Download File Done');
+            File file = File(destinationPath);
+            await loadBackupFromFile(file, cnHomepage: cnHomepage);
+            // file.delete();
+            cancelDownloadProgress();
+          },
+          onError: (err) => print('Download File Error: $err'),
+          cancelOnError: true,
+        );
+      },
+    );
+  }
+}
+
+void cancelDownloadProgress() {
+  Future.delayed(const Duration(seconds: 1), (){
+    iosDownloadProgressSub?.cancel();
+  });
+}
+/// ################################################################################################
 /// GoogleDrive load Backup
-/// ############
+/// ################################################################################################
 Future<ga.File?> saveBackUpGoogleDrive({
   required Map<String, String> authHeader,
   required File file,
@@ -209,26 +287,19 @@ Future<ga.File?> saveBackUpGoogleDrive({
 
   if(folderId != null){
     ga.File uploadFile = ga.File();
-    // uploadFile.name = basename(file.path);
-    // uploadFile.parents = [folderId];
 
     ga.File? response;
 
     /// Overwrite existing file - used for currentData
     if(overwrite){
-      print("Try overwrite");
       final currentDataId = await getCurrentDataId(drive: drive, cnConfig: cnConfig, folderId: folderId);
       if(currentDataId != null){
-        print("Got valid currentDataId");
-        // uploadFile.id = currentDataId;
         response = await drive.files.update(
             uploadFile,
             currentDataId,
           uploadMedia: ga.Media(file.openRead(), file.lengthSync())
         );
-        print("finished upload");
       } else{
-        print("Got no currentDataId");
         overwrite = false;
       }
     }
@@ -268,19 +339,31 @@ Future<bool> loadNewestDataGoogleDrive(CnConfig cnConfig, {CnHomepage? cnHomepag
 
   ga.FileList allFiles = await drive.files.list(orderBy: "modifiedTime desc", q: "'$folderId' in parents and trashed=false and name = '$currentDataFileName'", pageSize: 1);
 
+  /// CurrentData file does not exist
+  if(allFiles.files == null || allFiles.files!.isEmpty){
+    return false;
+  }
+
+  /// Get Data from Google Drive file as Stream
   var response = await drive.files.get(allFiles.files!.first.id!, downloadOptions: ga.DownloadOptions.fullMedia);
   if (response is! ga.Media) throw Exception("invalid response");
+  /// Decode this Stream to receive it as a String
   var content = await utf8.decodeStream(response.stream);
 
-  final localFile = await saveBackup(withCloud: false, cnConfig: cnConfig, content: content);
-  if(localFile != null){
-    final loadedNewData = await loadBackupFromFile(localFile, cnHomepage: cnHomepage);
-    localFile.delete();
-    if(loadedNewData){
-      return true;
-    }
+  final loadedNewData = await loadBackupFromString(content: content, cnHomepage: cnHomepage);
+  if(loadedNewData){
+    return true;
   }
-  print("CREATED SYNC AND BACKUP");
+
+  // /// Create a temp local File from this String data
+  // final tempLocalFile = await saveBackup(withCloud: false, cnConfig: cnConfig, content: content);
+  // if(tempLocalFile != null){
+  //   final loadedNewData = await loadBackupFromFile(tempLocalFile, cnHomepage: cnHomepage);
+  //   tempLocalFile.delete();
+  //   if(loadedNewData){
+  //     return true;
+  //   }
+  // }
   return false;
 }
 

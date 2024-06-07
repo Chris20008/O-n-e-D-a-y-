@@ -910,13 +910,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnWorkoutHistory.refreshAllWorkouts();
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
-    if(cnConfig.syncWithCloud){
-      saveBackup(
-          withCloud: true,
-          cnConfig: cnConfig,
-          currentDataCloud: true
-      );
-    }
+    saveCurrentData(cnConfig);
   }
 
   void onConfirm() async{
@@ -936,13 +930,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       cnNewWorkout.closePanel(doClear: true);
       cnNewExercisePanel.clear();
       _formKey.currentState?.reset();
-      if(cnConfig.syncWithCloud){
-        saveBackup(
-            withCloud: true,
-            cnConfig: cnConfig,
-            currentDataCloud: true
-        );
-      }
+      saveCurrentData(cnConfig);
     }
   }
 

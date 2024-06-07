@@ -93,6 +93,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                           const SizedBox(height: 10),
                           Expanded(
                             child: SingleChildScrollView(
+                              physics: const BouncingScrollPhysics(),
                               controller: sc,
                               child: Column(
                                 children: [
@@ -241,23 +242,17 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     children: [
                                       /// Save Backup Manual
                                       CupertinoListTile(
-                                        // onTap: getSelectCreateBackup,
-                                        leading: const Icon(
-                                            Icons.backup
-                                        ),
+                                        leading: const Icon(Icons.upload),
+                                        // leading: const Icon(
+                                        //     MyIcons.database
+                                        // ),
                                         title:getSelectCreateBackup(),
                                       ),
                                       /// Load Backup
                                       CupertinoListTile(
                                         onTap: () async{
                                           await loadBackupFromFilePicker(cnHomepage: cnHomepage);
-                                          if(cnConfig.syncWithCloud){
-                                            saveBackup(
-                                                withCloud: true,
-                                                cnConfig: cnConfig,
-                                                currentDataCloud: true,
-                                            );
-                                          }
+                                          saveCurrentData(cnConfig);
                                           tutorialIsRunning = false;
                                           currentTutorialStep = 100;
                                           cnConfig.setCurrentTutorialStep(currentTutorialStep);
@@ -266,17 +261,16 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                           // cnWorkouts.refreshAllWorkouts();
                                           // cnWorkoutHistory.refreshAllWorkouts();
                                         },
-                                        leading: const Icon(
-                                            Icons.cloud_download
-                                        ),
+                                        leading: const Icon(Icons.download),
+                                        // leading: const Icon(
+                                        //     Icons.cloud_download
+                                        // ),
                                         title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
                                         trailing: trailingArrow,
                                       ),
                                       /// Save Backup Automatic
                                       CupertinoListTile(
-                                        leading: const Icon(
-                                            Icons.cloud_done
-                                        ),
+                                        leading: const Icon(Icons.sync),
                                         title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
                                         trailing: CupertinoSwitch(
                                             value: cnConfig.automaticBackups,
@@ -291,87 +285,20 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                             }
                                         ),
                                       ),
-                                      /// Sync with Cloud
-                                      CupertinoListTile(
-                                        leading: const Stack(
-                                            alignment: Alignment.center,
-                                            children: [
-                                              Icon(
-                                                  Icons.cloud
-                                              ),
-                                              Padding(
-                                                padding: EdgeInsets.only(top: 1),
-                                                child: Center(
-                                                  child: Icon(
-                                                    Icons.sync,
-                                                    size: 16,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                              ),
-                                            ]
-                                        ),
-                                        trailing: CupertinoSwitch(
-                                            value: cnConfig.syncWithCloud,
-                                            activeColor: const Color(0xFFC16A03),
-                                            onChanged: (value)async{
-                                              if(Platform.isAndroid){
-                                                HapticFeedback.selectionClick();
-                                                if(!value){
-                                                  cnConfig.account = null;
-                                                }
-                                              }
-                                              cnConfig.setSyncWithCloud(value);
-                                              setState(() {});
-                                            }
-                                        ),
-                                        title: Padding(
-                                          padding: const EdgeInsets.only(right: 5),
-                                          child: Row(
-                                            // crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Expanded(
-                                                child: OverflowSafeText(
-                                                  maxLines: 1,
-                                                  Platform.isAndroid
-                                                      ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                                                      : AppLocalizations.of(context)!.settingsSynciCloud,
-                                                  style: const TextStyle(color: Colors.white),
-                                                ),
-                                              ),
-                                              if(Platform.isAndroid)
-                                                SizedBox(width: cnConfig.syncWithCloud? 0 : 15),
-                                              /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
-                                              /// so calling it will lead to an crash
-                                              /// We have to make sure it is only called on Android!
-                                              if(cnConfig.syncWithCloud && Platform.isAndroid)
-                                                FutureBuilder(
-                                                    future: cnConfig.signInGoogleDrive(),
-                                                    builder: (context, connected){
-                                                      if(!connected.hasData){
-                                                        return const Center(
-                                                          child: SizedBox(
-                                                              height: 15,
-                                                              width: 15,
-                                                              child: CircularProgressIndicator(strokeWidth: 2,)
-                                                          ),
-                                                        );
-                                                      }
-                                                      return Icon(
-                                                        cnConfig.account != null
-                                                            ? Icons.check_circle
-                                                            : Icons.close,
-                                                        size: 15,
-                                                        color: cnConfig.account != null
-                                                            ? Colors.green
-                                                            : Colors.red,
-                                                      );
-                                                    }
-                                                )
-                                            ],
-                                          ),
-                                        ),
+
+                                      AnimatedContainer(
+                                        height: cnConfig.showMoreSettingCloud? 5 : 0,
+                                        color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                        duration: const Duration(milliseconds: 300),
                                       ),
+
+
+                                      /// Sync with Cloud
+                                      getCloudOptionsColumn(
+                                          cnConfig: cnConfig,
+                                          context: context,
+                                          refresh: () => setState(() {})
+                                      )
                                     ],
                                   ),
 
@@ -592,14 +519,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                saveBackup(withCloud: cnConfig.syncWithCloud, cnConfig: cnConfig);
-                if(cnConfig.syncWithCloud){
-                  saveBackup(
-                      withCloud: true,
-                      cnConfig: cnConfig,
-                      currentDataCloud: true
-                  );
-                }
+                saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig);
+                saveCurrentData(cnConfig);
               });
             },
           ),
@@ -647,7 +568,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             CupertinoListTile(
               // onTap: getSelectCreateBackup,
               leading: const Icon(
-                  Icons.backup
+                  Icons.upload
               ),
               title: OverflowSafeText(
                   maxLines: 1,
@@ -661,59 +582,14 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             /// Load Backup
             CupertinoListTile(
               leading: const Icon(
-                  Icons.cloud_download
+                  Icons.download
               ),
               title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
             ),
             Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupLoadExplanation)),
             const SizedBox(height: 15),
 
-            /// Save Backup Automatic
-            CupertinoListTile(
-              leading: const Icon(
-                  Icons.cloud_done
-              ),
-              title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-            ),
-            Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation)),
-            const SizedBox(height: 15),
-
-            /// Sync with iCloud
-            CupertinoListTile(
-              leading: const Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                        Icons.cloud
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 1),
-                      child: Center(
-                        child: Icon(
-                          Icons.sync,
-                          size: 16,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                  ]
-              ),
-              title: OverflowSafeText(
-                  maxLines: 1,
-                  Platform.isAndroid
-                      ? AppLocalizations.of(context)!.settingsSyncGoogleDrive
-                      : AppLocalizations.of(context)!.settingsSynciCloud,
-                  style: const TextStyle(color: Colors.white)
-              ),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(left: 30),
-                child: Text(Platform.isAndroid
-                    ? AppLocalizations.of(context)!.settingsBackupSyncGoogleDriveExplanation
-                    : AppLocalizations.of(context)!.settingsBackupSynciCloudExplanation
-                )
-            ),
-            const SizedBox(height: 15),
+            getBackupDialogWelcomeScreen(context: context)
           ],
         )
     );

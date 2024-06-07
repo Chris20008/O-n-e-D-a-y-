@@ -60,7 +60,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               minHeight: 0,
               backdropEnabled: true,
               backdropColor: Colors.black,
-              backdropOpacity: 0.5,
+              backdropOpacity: 0.25,
               color: const Color(0xff120a01),
               isDraggable: true,
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
@@ -189,6 +189,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: [
                                           getSet(
+                                              context: context,
                                               index: index,
                                               newEx: cnNewExercise.exercise,
                                               width: 50,
@@ -197,11 +198,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 cnNewExercise.refresh();
                                               }
                                           ),
-                                          // SizedBox(
-                                          //     width: _widthSetWeightAmount,
-                                          //     height: 40,
-                                          //     child: Center(child: Text("${index+1}", textScaler: const TextScaler.linear(1.3),))
-                                          // ),
 
                                           /// Weight
                                           Container(
@@ -485,6 +481,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   Widget getRestInSecondsSelector() {
     return getSelectRestInSeconds(
+        context: context,
         child: SizedBox(
           height: 35,
           child: Row(
@@ -506,7 +503,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             cnNewExercise.refresh();
           }
           else{
-            if(value == "Clear"){
+            if(value == AppLocalizations.of(context)!.clear){
               cnNewExercise.exercise.restInSeconds = 0;
               cnNewExercise.restController.clear();
               cnNewExercise.refresh();
@@ -557,12 +554,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   Widget getSeatLevelSelector() {
     return getSelectSeatLevel(
+      context: context,
       onConfirm: (dynamic value){
         if(value is int){
           cnNewExercise.exercise.seatLevel = value;
           cnNewExercise.refresh();
         }
-        else if(value == "Clear"){
+        else if(value == AppLocalizations.of(context)!.clear){
           cnNewExercise.exercise.seatLevel = null;
           cnNewExercise.refresh();
         }

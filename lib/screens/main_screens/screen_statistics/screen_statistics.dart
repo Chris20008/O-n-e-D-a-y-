@@ -81,12 +81,27 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         AnimatedBuilder(
           animation: cnScreenStatistics.animationControllerSettingPanel,
           builder: (context, child) {
-            double scale = 1.0 - (cnScreenStatistics.animationControllerSettingPanel.value * 0.1);
+            double scale = 1.0 - ((cnScreenStatistics.animationControllerSettingPanel.value/2) * (Platform.isAndroid? 0.15 : 0.2));
             return Transform.scale(
               scale: scale,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                  child: child
+                  child: Container(
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [
+                                Color(0xffc26a0e),
+                                Color(0xbb110a02)
+                              ]
+                          )
+                      ),
+                      child: Container(
+                          color: Colors.black.withOpacity((cnScreenStatistics.animationControllerSettingPanel.value * 0.5).clamp(0, 1)),
+                          child: child
+                      )
+                  )
               ),
             );
           },
@@ -99,7 +114,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     padding: const EdgeInsets.symmetric(horizontal: 5),
                     children: [
                       getHeader(),
-                      const SizedBox(height: 20,),
+                      // const SizedBox(height: 20,),
                       LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
                       const SafeArea(top:false, child: SizedBox(height: 30,)),
                     ],
@@ -116,53 +131,35 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   Widget getHeader() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Align(
-          alignment: Alignment.topRight,
-          child: IconButton(
-            // color: Colors.amber[200]!,
-              color: Colors.white,
-              onPressed: (){
-                cnScreenStatistics.openSettingsPanel();
-                // Navigator.push(
-                //     context,
-                //     CupertinoPageRoute(
-                //         builder: (context) => const SettingsPanel()
-                //     ));
-              },
-              icon: const Icon(
-                Icons.settings,
-              )
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              // color: Colors.amber[200]!,
+                color: Colors.white,
+                onPressed: (){
+                  cnScreenStatistics.saveCurrentFilterState();
+                  openFilterPopUp(context);
+                },
+                icon: const Icon(
+                  Icons.filter_list,
+                )
+            ),
+            IconButton(
+              // color: Colors.amber[200]!,
+                color: Colors.white,
+                onPressed: (){
+                  cnScreenStatistics.openSettingsPanel();
+                },
+                icon: const Icon(
+                  Icons.settings,
+                )
+            ),
+          ],
         ),
-        const SizedBox(height: 10,),
-        SizedBox(
-          height: 40,
-          child: Stack(
-            children: [
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 15),
-                  child: ExerciseSelector(),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  // color: Colors.amber[200]!,
-                    color: Colors.white,
-                    onPressed: (){
-                      cnScreenStatistics.saveCurrentFilterState();
-                      openFilterPopUp(context);
-                    },
-                    icon: const Icon(
-                      Icons.filter_list,
-                    )
-                ),
-              ),
-            ],
-          ),
+        const Center(
+          child: ExerciseSelector(),
         ),
       ],
     );

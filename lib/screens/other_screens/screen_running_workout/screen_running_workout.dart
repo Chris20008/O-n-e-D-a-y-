@@ -172,63 +172,62 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               style: const TextStyle(color: Colors.white, fontSize: 20),
                                             ),
                                         ):
-                                        Expanded(
-                                          child: PullDownButton(
-                                            onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-                                            buttonAnchor: PullDownMenuAnchor.start,
-                                            routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
-                                            itemBuilder: (context) {
-                                              final children = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<PullDownMenuItem>((Exercise value) {
-                                                return PullDownMenuItem.selectable(
-                                                  title: value.name,
-                                                  selected: newEx.name == value.name,
-                                                  onTap: () {
-                                                    FocusManager.instance.primaryFocus?.unfocus();
-                                                    HapticFeedback.selectionClick();
-                                                    Future.delayed(const Duration(milliseconds: 200), (){
-                                                      setState(() {
-                                                        final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                                        final t = lists.map((element) => element.value.indexWhere((ex) {
-                                                          return ex.name == value.name;
-                                                        })).toList().firstWhere((element) => element >=0);
-                                                        cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
-                                                      });
-                                                      cnRunningWorkout.cache();
-                                                    });
-                                                  },
-                                                );
-                                              }).toList();
-                                              return children;
-                                            },
-                                            buttonBuilder: (context, showMenu) => CupertinoButton(
-                                                onPressed: (){
+                                        PullDownButton(
+                                          onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+                                          buttonAnchor: PullDownMenuAnchor.start,
+                                          routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
+                                          itemBuilder: (context) {
+                                            final children = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<PullDownMenuItem>((Exercise value) {
+                                              return PullDownMenuItem.selectable(
+                                                title: value.name,
+                                                selected: newEx.name == value.name,
+                                                onTap: () {
+                                                  FocusManager.instance.primaryFocus?.unfocus();
                                                   HapticFeedback.selectionClick();
-                                                  showMenu();
+                                                  Future.delayed(const Duration(milliseconds: 200), (){
+                                                    setState(() {
+                                                      final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                                      final t = lists.map((element) => element.value.indexWhere((ex) {
+                                                        return ex.name == value.name;
+                                                      })).toList().firstWhere((element) => element >=0);
+                                                      cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                                    });
+                                                    cnRunningWorkout.cache();
+                                                  });
                                                 },
-                                                padding: EdgeInsets.zero,
-                                                child: Row(
-                                                  children: [
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(
-                                                          maxWidth: MediaQuery.of(context).size.width-80
-                                                      ),
-                                                      child: OverflowSafeText(
-                                                          newEx.name,
-                                                          style: const TextStyle(color: Colors.white, fontSize: 20),
-                                                          maxLines: 1
-                                                      ),
+                                              );
+                                            }).toList();
+                                            return children;
+                                          },
+                                          buttonBuilder: (context, showMenu) => CupertinoButton(
+                                              onPressed: (){
+                                                HapticFeedback.selectionClick();
+                                                showMenu();
+                                              },
+                                              padding: EdgeInsets.zero,
+                                              child: Row(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                        maxWidth: MediaQuery.of(context).size.width-80
                                                     ),
-                                                    const SizedBox(width: 10,),
-                                                    const Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      size: 15,
-                                                      color: Colors.white,
-                                                    )
-                                                  ],
-                                                )
-                                            ),
-                                          )
+                                                    child: OverflowSafeText(
+                                                        newEx.name,
+                                                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                                                        maxLines: 1
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10,),
+                                                  const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  )
+                                                ],
+                                              )
+                                          ),
                                         ),
+                                        const Spacer(),
                                         if(cnRunningWorkout.newExNames.contains(newEx.name))
                                           myIconButton(
                                             icon:const Icon(Icons.delete_forever),
@@ -259,6 +258,65 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
                                     /// Rest in Seconds Row and Selector
                                     getRestInSecondsSelector(newEx),
+
+                                    const SizedBox(height: 15),
+
+                                    /// Text for Set, Template, Weight and Amount
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                            width: _widthOfTextField,
+                                            child: OverflowSafeText(
+                                                AppLocalizations.of(context)!.set,
+                                              textAlign: TextAlign.center,
+                                              // fontSize: 14,
+                                              minFontSize: 12,
+                                              maxLines: 1
+                                            )
+                                        ),
+                                        Expanded(
+                                            flex: 2,
+                                            child: OverflowSafeText(
+                                                AppLocalizations.of(context)!.template,
+                                                textAlign: TextAlign.center,
+                                                // fontSize: 14,
+                                                minFontSize: 12,
+                                                maxLines: 1
+                                            )
+                                        ),
+                                        Expanded(
+                                            flex: 2,
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                SizedBox(
+                                                    width: _widthOfTextField+10,
+                                                    child: OverflowSafeText(
+                                                        AppLocalizations.of(context)!.weight,
+                                                        textAlign: TextAlign.center,
+                                                        // fontSize: 14,
+                                                        minFontSize: 12,
+                                                        maxLines: 1
+                                                    )
+                                                ),
+                                                const SizedBox(width: 4,),
+                                                SizedBox(
+                                                    width: _widthOfTextField+10,
+                                                    child: OverflowSafeText(
+                                                        AppLocalizations.of(context)!.amount,
+                                                        textAlign: TextAlign.center,
+                                                        // fontSize: 14,
+                                                        minFontSize: 12,
+                                                        maxLines: 1
+                                                    )
+                                                )
+                                              ],
+                                            )
+                                        )
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 5),
 
                                     /// Each Set Reorderable
                                     Column(
@@ -311,7 +369,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               SingleSet set = templateEx.sets[indexSet];
                                               Widget? child;
                                               child = Padding(
-                                                // padding: EdgeInsets.zero,
                                                 padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
                                                 child: SizedBox(
                                                   width: double.maxFinite,
@@ -325,6 +382,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                       //     child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
                                                       // ),
                                                       getSet(
+                                                          context: context,
                                                           index: indexSet,
                                                           newEx: newEx,
                                                           width: _widthOfTextField,
@@ -393,7 +451,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                               ),
                                                             ),
 
-                                                            const SizedBox(width: 10,),
+                                                            const SizedBox(width: 12,),
 
                                                             /// Amount
                                                             SizedBox(
@@ -733,100 +791,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     }
   }
 
-  // Widget getSet(int index, Exercise newEx){
-  //   final SingleSet s = newEx.sets[index];
-  //   return PullDownButton(
-  //     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-  //     routeTheme: routeTheme,
-  //     itemBuilder: (context) {
-  //       final currentLanguage = getLanguageAsString(context);
-  //       return [
-  //         PullDownMenuItem.selectable(
-  //           selected: false,
-  //           title: "Clear",
-  //           onTap: () {
-  //             HapticFeedback.selectionClick();
-  //             FocusManager.instance.primaryFocus?.unfocus();
-  //             Future.delayed(const Duration(milliseconds: 200), (){
-  //               setState(() {
-  //                 s.setType = 0;
-  //                 cnRunningWorkout.cache();
-  //               });
-  //             });
-  //           },
-  //         ),
-  //         const PullDownMenuDivider.large(),
-  //         PullDownMenuItem.selectable(
-  //           selected: s.setType == 1,
-  //           title: 'Warm-Up Set',
-  //           icon: Icons.circle,
-  //           iconColor: Colors.blue,
-  //           onTap: () {
-  //             HapticFeedback.selectionClick();
-  //             FocusManager.instance.primaryFocus?.unfocus();
-  //             Future.delayed(const Duration(milliseconds: 200), (){
-  //               setState(() {
-  //                 s.setType = 1;
-  //                 cnRunningWorkout.cache();
-  //               });
-  //             });
-  //           },
-  //         ),
-  //         PullDownMenuItem.selectable(
-  //           selected: s.setType == 2,
-  //           title: 'Working Set',
-  //           icon: Icons.circle,
-  //           iconColor: Colors.green,
-  //           onTap: () {
-  //             HapticFeedback.selectionClick();
-  //             FocusManager.instance.primaryFocus?.unfocus();
-  //             Future.delayed(const Duration(milliseconds: 200), (){
-  //               setState(() {
-  //                 s.setType = 2;
-  //                 cnRunningWorkout.cache();
-  //               });
-  //             });
-  //           },
-  //         ),
-  //       ];
-  //     },
-  //     buttonBuilder: (context, showMenu) => CupertinoButton(
-  //       onPressed: (){
-  //         HapticFeedback.selectionClick();
-  //         showMenu();
-  //       },
-  //       padding: EdgeInsets.zero,
-  //       child: SizedBox(
-  //         height: 40,
-  //         width: _widthOfTextField,
-  //         child: Stack(
-  //           alignment: Alignment.center,
-  //           children: [
-  //             Container(
-  //               width: 35,
-  //               height: 35,
-  //               decoration: BoxDecoration(
-  //                 shape: BoxShape.circle,
-  //                 border: Border.all(
-  //                   color: s.setType == 1? Colors.blue : s.setType == 2? Colors.green : Colors.transparent,
-  //                   width: 1.0,
-  //                 ),
-  //               ),
-  //             ),
-  //             Center(
-  //               child: Text(
-  //                 "${index + 1}",
-  //                 textScaler: const TextScaler.linear(1.2),
-  //                 style: const TextStyle(color: Colors.white),
-  //                 ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   void addSet(Exercise ex, Exercise lastEx){
     setState(() {
       ex.addSet();
@@ -1039,15 +1003,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnStopwatchWidget.cancelTimer();
       }
       if(cnConfig.automaticBackups){
-        saveBackup(withCloud: cnConfig.syncWithCloud, cnConfig: cnConfig);
-        if(cnConfig.syncWithCloud){
-          saveBackup(
-              withCloud: true,
-              cnConfig: cnConfig,
-              currentDataCloud: true
-          );
-        }
+        saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig);
       }
+      saveCurrentData(cnConfig);
     });
   }
 
@@ -1084,11 +1042,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   newEx.seatLevel = value;
                   cnRunningWorkout.refresh();
                 }
-                else if(value == "Clear"){
+                else if(value == AppLocalizations.of(context)!.clear){
                   newEx.seatLevel = null;
                   cnRunningWorkout.refresh();
                 }
-              }
+              },
+            context: context
           ),
           const Spacer()
         ],
@@ -1102,6 +1061,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       child: Row(
         children: [
           getSelectRestInSeconds(
+              context: context,
               child: SizedBox(
                 width: 100,
                 child: Align(
@@ -1122,7 +1082,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   newEx.restInSeconds = value;
                   cnRunningWorkout.refresh();
                 }
-                else if(value == "Clear"){
+                else if(value == AppLocalizations.of(context)!.clear){
                   newEx.restInSeconds = 0;
                   cnRunningWorkout.refresh();
                 }

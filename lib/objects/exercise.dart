@@ -140,7 +140,11 @@ class Exercise{
   }
 
   bool equals(Exercise ex){
-    if(ex.sets.length != sets.length){
+    if(ex.name != name ||
+        seatLevel != ex.seatLevel ||
+        restInSeconds != ex.restInSeconds ||
+        ex.sets.length != sets.length
+    ){
       return false;
     }
     for(List<SingleSet> s in zip([ex.sets, sets])){
@@ -148,7 +152,8 @@ class Exercise{
         return false;
       }
     }
-    return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
+    return true;
+    // return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
   }
 
 }

@@ -62,6 +62,7 @@ class CnConfig extends ChangeNotifier {
   bool isWaitingForGoogleDriveResponse = false;
   bool isWaitingForSpotifyResponse = false;
   bool failedSpotifyConnection = false;
+  bool showMoreSettingCloud = false;
   GoogleSignInAccount? account;
   String? folderIdGoogleDrive;
   String? currentDataIdGoogleDrive;
@@ -102,17 +103,30 @@ class CnConfig extends ChangeNotifier {
       account = await getGoogleDriveAccount();
       await Future.delayed(const Duration(milliseconds: 1000), (){});
       isWaitingForGoogleDriveResponse = false;
+      showMoreSettingCloud = true;
+
       /// If the connection failed we immediately set the sync value to false
       /// but give a small delay to show the failed connection to the user
       print("ACCOUNT: ${account?.id}");
       if(account == null && !isWaitingForGoogleDriveResponse){
-        await setSyncWithCloud(false);
+        await setConnectWithCloud(false);
+        showMoreSettingCloud = false;
         Future.delayed(const Duration(seconds: 1), ()async{
+          refresh();
+        });
+      }
+      else{
+        Future.delayed(const Duration(milliseconds: 100), ()async{
           refresh();
         });
       }
     }
     return account != null;
+  }
+
+  void revokeConnectCloud(){
+    account = null;
+    showMoreSettingCloud = false;
   }
 
   Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500, BuildContext? context}) async{
@@ -157,7 +171,9 @@ class CnConfig extends ChangeNotifier {
   bool get tutorial => config.settings["tutorial"]?? true;
   bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
-  bool get syncWithCloud => config.settings["syncWithCloud"]?? false;
+  bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
+  bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
+  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? false) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
   int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
@@ -213,8 +229,20 @@ class CnConfig extends ChangeNotifier {
     await config.save();
   }
 
-  Future setSyncWithCloud(bool value) async{
-    config.settings["syncWithCloud"] = value;
+  Future setConnectWithCloud(bool value) async{
+    config.settings["connectWithCloud"] = value;
+    await config.save();
+  }
+
+  Future setSyncMultipleDevices(bool value) async{
+    print("Set Sync Multiple Devices: $value");
+    config.settings["syncMultipleDevices"] = value;
+    print(syncMultipleDevices);
+    await config.save();
+  }
+
+  Future setSaveBackupCloud(bool value) async{
+    config.settings["saveBackupCloud"] = value;
     await config.save();
   }
 }
