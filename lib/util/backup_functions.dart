@@ -10,6 +10,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:icloud_storage/icloud_storage.dart';
 import 'package:path_provider/path_provider.dart';
+import 'ios_channel.dart';
 import 'objectbox/ob_exercise.dart';
 import 'objectbox/ob_workout.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
@@ -21,7 +22,6 @@ const currentDataFileName = "Current_Data.txt";
 /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
 /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
 const folderPathiCloud = "Documents/backups/";
-StreamSubscription<double>? iosDownloadProgressSub;
 
 Future<String> getLocalPath() async{
   // if(Platform.isAndroid){
@@ -41,6 +41,7 @@ Future loadBackupFromFilePicker({CnHomepage? cnHomepage}) async{
   );
 
   if (result != null) {
+    print("result file Path: ${result.files.single.path!}");
     File file = File(result.files.single.path!);
     await loadBackupFromFile(file, cnHomepage: cnHomepage);
   } else {
@@ -189,6 +190,7 @@ Future<File?> saveBackup({
     }
   }
 
+  /// Delete local CurrentData File
   if(currentDataCloud){
     await file.delete();
     return null;
@@ -223,53 +225,47 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
     await ICloudStorage.upload(
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
       filePath: sourceFilePath,
-
       destinationRelativePath: '$folderPathiCloud$filename',
-      onProgress: (stream) {
-        // final uploadProgressSub = stream.listen(
-        //       (progress) => print('Upload File Progress: $progress'),
-        //   onDone: () => print('Upload File Done'),
-        //   onError: (err) => print('Upload File Error: $err'),
-        //   cancelOnError: true,
-        // );
-      },
+      // onProgress: (stream) {
+      //   final uploadProgressSub = stream.listen(
+      //         (progress) => print('Upload File Progress: $progress'),
+      //     onDone: () => print('Upload File Done'),
+      //     onError: (err) => print('Upload File Error: $err'),
+      //     cancelOnError: true,
+      //   );
+      // },
     );
   }
 }
 
-Future loadNewestDataiCloud(String sourceFilePath, String filename, CnHomepage? cnHomepage)async{
+Future loadNewestDataiCloud({CnHomepage? cnHomepage})async{
+  if(Platform.isIOS) {
+    String? result = await ICloudService.readFromICloud(currentDataFileName);
+    print("RESULT: $result");
+    if(result == null){
+      return false;
+    }
+    await loadBackupFromString(content: result, cnHomepage: cnHomepage);
 
-  if(Platform.isIOS && dotenv.env["ICLOUD_CONTAINER_ID"] != null) {
-    // Directory destinationDirectory = await getLocalPath();
-    final path = await getLocalPath();
-    String destinationPath = path + currentDataFileName;
-    await ICloudStorage.download(
-      containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
-      relativePath: folderPathiCloud + currentDataFileName,
-      destinationFilePath: destinationPath,
-      onProgress: (stream) {
-        iosDownloadProgressSub = stream.listen(
-              (progress) => print('Download File Progress: $progress'),
-          onDone: () async{
-            print('Download File Done');
-            File file = File(destinationPath);
-            await loadBackupFromFile(file, cnHomepage: cnHomepage);
-            // file.delete();
-            cancelDownloadProgress();
-          },
-          onError: (err) => print('Download File Error: $err'),
-          cancelOnError: true,
-        );
-      },
-    );
   }
 }
 
-void cancelDownloadProgress() {
-  Future.delayed(const Duration(seconds: 1), (){
-    iosDownloadProgressSub?.cancel();
-  });
-}
+// Future<String?> getiCloudContainerFileContent(String filename) async {
+//   try {
+//     String? content = await ICloudService.readFromICloud(filename);
+//     if (content != null) {
+//       print('File content: $content');
+//     } else {
+//       print('File not found');
+//     }
+//     return content;
+//   } catch (e) {
+//     print('Error: $e');
+//   }
+//   return null;
+// }
+
+
 /// ################################################################################################
 /// GoogleDrive load Backup
 /// ################################################################################################

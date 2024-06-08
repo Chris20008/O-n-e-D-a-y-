@@ -223,17 +223,21 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       });
     }
 
-    if(cnConfig.connectWithCloud){
-      await Future.delayed(const Duration(milliseconds: 200), () async {
+
+    await Future.delayed(Duration(milliseconds: Platform.isAndroid? 200 : 0), () async {
+      if(cnConfig.connectWithCloud){
         if(Platform.isAndroid){
           await cnConfig.signInGoogleDrive();
         }
-
+        if(Platform.isIOS){
+          await cnConfig.checkIfICloudAvailable();
+        }
+        print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
         if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
           trySyncWithCloud();
         }
-      });
-    }
+      }
+    });
     setState(() {
       mainIsInitialized = true;
     });
@@ -493,34 +497,55 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     },
                   ),
                 if(cnHomepage.isSyncingWithCloud)
-                  SafeArea(
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(cnHomepage.msg),
-                          const SizedBox(width: 5),
-                          if(cnHomepage.percent != null)
-                            Text("${(cnHomepage.percent! * 100).round()}%"),
-                          if(cnHomepage.percent != null)
-                          const SizedBox(width: 5),
-                          if(!cnHomepage.syncWithCloudCompleted)
-                            const SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
-                            )
-                          else
-                            const Icon(
-                              Icons.check_circle,
-                              size: 15,
-                              color: Colors.green
-                            )
-                        ],
+                  IgnorePointer(
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 0, left: 0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white.withOpacity(0.5)
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(width: 5),
+                              Text(cnHomepage.msg),
+                              const SizedBox(width: 5),
+                              if(cnHomepage.percent != null)
+                                Text("${(cnHomepage.percent! * 100).round()}%"),
+                              if(cnHomepage.percent != null)
+                              const SizedBox(width: 5),
+                              if(!cnHomepage.syncWithCloudCompleted)
+                                const SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
+                                )
+                              else
+                                const Icon(
+                                  Icons.check_circle,
+                                  size: 15,
+                                  color: Colors.green
+                                ),
+                              const SizedBox(width: 5)
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
+                // Center(
+                //   child: ElevatedButton(
+                //     child: Text("Test"),
+                //     onPressed: ()async{
+                //       print("Presses Center button");
+                //       final res = await ICloudService.isICloudAvailable();
+                //       print("RESULT res: $res");
+                //     },
+                //   ),
+                // )
               ],
             ),
         ),
@@ -559,7 +584,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       }
     }
     else{
+      cnHomepage.isSyncingWithCloud = false;
+      cnHomepage.msg = "Sync with iCloud";
       cnHomepage.refresh();
+      loadNewestDataiCloud(cnHomepage: cnHomepage);
       // loadNewestDataGoogleDrive(
       //     cnConfig,
       //     cnHomepage: cnHomepage

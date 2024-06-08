@@ -50,6 +50,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state){
+    // cnConfig.isICloudAvailable = null;
     setState(() {});
   }
 

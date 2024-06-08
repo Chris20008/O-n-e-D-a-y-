@@ -1,4 +1,5 @@
 import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -59,10 +60,11 @@ class CnConfig extends ChangeNotifier {
   late CustomCacheManager cache;
   late Config config;
   bool isInitialized = false;
-  bool isWaitingForGoogleDriveResponse = false;
+  bool isWaitingForCloudResponse = false;
   bool isWaitingForSpotifyResponse = false;
   bool failedSpotifyConnection = false;
   bool showMoreSettingCloud = false;
+  bool? isICloudAvailable;
   GoogleSignInAccount? account;
   String? folderIdGoogleDrive;
   String? currentDataIdGoogleDrive;
@@ -91,24 +93,92 @@ class CnConfig extends ChangeNotifier {
     refresh();
   }
 
-  Future<bool> signInGoogleDrive() async {
-    while(isWaitingForGoogleDriveResponse){
+  // Future<bool> checkIfICloudAvailable() async {
+  //   if(!connectWithCloud){
+  //     return false;
+  //   }
+  //
+  //   if(isICloudAvailable == null){
+  //     isWaitingForCloudResponse = true;
+  //     final res = await ICloudService.isICloudAvailable();
+  //     await Future.delayed(const Duration(milliseconds: 1000), (){});
+  //     isICloudAvailable = res;
+  //     showMoreSettingCloud = isICloudAvailable!;
+  //     if(!isICloudAvailable!){
+  //       await setConnectWithCloud(false);
+  //     }
+  //     isWaitingForCloudResponse = false;
+  //     refresh();
+  //   } else {
+  //     await Future.delayed(const Duration(milliseconds: 1000), (){});
+  //     showMoreSettingCloud = isICloudAvailable!;
+  //     if(!isICloudAvailable!){
+  //       await setConnectWithCloud(false);
+  //     }
+  //   }
+  //
+  //   // while(isWaitingForCloudResponse){
+  //   //   await Future.delayed(const Duration(milliseconds: 200));
+  //   //   if(!isWaitingForCloudResponse){
+  //   //     return isICloudAvailable?? false;
+  //   //   }
+  //   // }
+  //
+  //
+  //   return isICloudAvailable ?? false;
+  // }
+
+  Future<bool> checkIfICloudAvailable() async {
+    while(isWaitingForCloudResponse){
       await Future.delayed(const Duration(milliseconds: 200));
-      if(!isWaitingForGoogleDriveResponse){
+      if(!isWaitingForCloudResponse){
+        return isICloudAvailable!;
+      }
+    }
+    if(isICloudAvailable == null && Platform.isIOS){
+      isWaitingForCloudResponse = true;
+      isICloudAvailable = await ICloudService.isICloudAvailable();
+      print("IS Cloud Available: $isICloudAvailable");
+      await Future.delayed(const Duration(milliseconds: 1000), (){});
+      isWaitingForCloudResponse = false;
+      showMoreSettingCloud = true;
+
+      /// If the connection failed we immediately set the sync value to false
+      /// but give a small delay to show the failed connection to the user
+      if(isICloudAvailable == false && !isWaitingForCloudResponse){
+        revokeConnectCloud();
+        await setConnectWithCloud(false);
+        Future.delayed(const Duration(seconds: 1), ()async{
+          refresh();
+        });
+      }
+      else{
+        Future.delayed(const Duration(milliseconds: 100), ()async{
+          refresh();
+        });
+      }
+    }
+    return isICloudAvailable?? false;
+  }
+
+  Future<bool> signInGoogleDrive() async {
+    while(isWaitingForCloudResponse){
+      await Future.delayed(const Duration(milliseconds: 200));
+      if(!isWaitingForCloudResponse){
         return account != null;
       }
     }
     if(account == null && Platform.isAndroid){
-      isWaitingForGoogleDriveResponse = true;
+      isWaitingForCloudResponse = true;
       account = await getGoogleDriveAccount();
       await Future.delayed(const Duration(milliseconds: 1000), (){});
-      isWaitingForGoogleDriveResponse = false;
+      isWaitingForCloudResponse = false;
       showMoreSettingCloud = true;
 
       /// If the connection failed we immediately set the sync value to false
       /// but give a small delay to show the failed connection to the user
       print("ACCOUNT: ${account?.id}");
-      if(account == null && !isWaitingForGoogleDriveResponse){
+      if(account == null && !isWaitingForCloudResponse){
         await setConnectWithCloud(false);
         showMoreSettingCloud = false;
         Future.delayed(const Duration(seconds: 1), ()async{
@@ -126,6 +196,7 @@ class CnConfig extends ChangeNotifier {
 
   void revokeConnectCloud(){
     account = null;
+    isICloudAvailable = null;
     showMoreSettingCloud = false;
   }
 

@@ -763,12 +763,14 @@ Widget getCloudOptionsColumn({
               onChanged: (value)async{
                 if(Platform.isAndroid){
                   HapticFeedback.selectionClick();
-                  if(!value){
-                    cnConfig.revokeConnectCloud();
-                    // cnConfig.account = null;
-                  }
+                }
+                if(!value){
+                  cnConfig.revokeConnectCloud();
                 }
                 cnConfig.setConnectWithCloud(value);
+                // if(Platform.isIOS){
+                //   cnConfig.showMoreSettingCloud = value;
+                // }
                 refresh();
               }
           ),
@@ -786,14 +788,14 @@ Widget getCloudOptionsColumn({
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                if(Platform.isAndroid)
-                  SizedBox(width: cnConfig.connectWithCloud? 0 : 15),
+                if(!cnConfig.connectWithCloud)
+                  SizedBox(width: 15),
                 /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
                 /// so calling it will lead to an crash
                 /// We have to make sure it is only called on Android!
-                if(cnConfig.connectWithCloud && Platform.isAndroid)
+                if(cnConfig.connectWithCloud)
                   FutureBuilder(
-                      future: cnConfig.signInGoogleDrive(),
+                      future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
                       builder: (context, connected){
                         if(!connected.hasData){
                           return const Center(
@@ -805,11 +807,11 @@ Widget getCloudOptionsColumn({
                           );
                         }
                         return Icon(
-                          cnConfig.account != null
+                          cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
                               ? Icons.check_circle
                               : Icons.close,
                           size: 15,
-                          color: cnConfig.account != null
+                          color: cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
                               ? Colors.green
                               : Colors.red,
                         );
