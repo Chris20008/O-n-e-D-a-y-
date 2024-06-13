@@ -231,15 +231,15 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
               },
               onPointerUp: (PointerUpEvent details){
-                if(details.pointer == pointerAIdentifier){
+                // if(details.pointer == pointerAIdentifier){
                   pointerA = null;
                   pointerAPreviousPos = null;
                   pointerAIdentifier = null;
-                }
-                else if(details.pointer == pointerBIdentifier){
+                // }
+                // else if(details.pointer == pointerBIdentifier){
                   pointerB = null;
                   pointerBIdentifier = null;
-                }
+                // }
                 Future.delayed(const Duration(milliseconds: 500), (){
                   if(pointerA == null && pointerB == null){
                     animationTime = 500;

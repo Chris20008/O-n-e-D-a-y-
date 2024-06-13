@@ -599,8 +599,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               value = value?.trim();
               if (value == null || value.isEmpty) {
                 return AppLocalizations.of(context)!.panelExEnterName;
-              } else if(exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
-                  cnNewExercise.exercise.originalName != cnNewExercise.exercise.name
+              }
+              else if(
+                exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
+                    cnNewExercise.exercise.originalName?.toLowerCase() != cnNewExercise.exercise.name.toLowerCase()
               ){
                 return AppLocalizations.of(context)!.panelExAlreadyExists;
               }
