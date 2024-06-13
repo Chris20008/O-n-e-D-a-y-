@@ -45,7 +45,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
           children: [
             ScrollablePositionedList.separated(
                 shrinkWrap: true,
-                padding: EdgeInsets.only(top: Platform.isAndroid? 80 : 90, left: 20, right: 20, bottom: 0),
+                padding: EdgeInsets.only(top: Platform.isAndroid? 70 : 90, left: 20, right: 20, bottom: 0),
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(height: 10);
                 },
