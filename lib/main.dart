@@ -187,14 +187,13 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void initMain() async{
     objectbox = await ObjectBox.create();
-    await Future.delayed(Duration(milliseconds: Platform.isAndroid? 100 : 700));
+    await Future.delayed(const Duration(milliseconds: 300));
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
       if(context.mounted){
         final res = await findSystemLocale();
         MyApp.of(context)?.setLocale(languageCode: res);
-        // cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
     }
     else if(context.mounted && cnConfig.config.settings["languageCode"] != null){
@@ -208,6 +207,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
+
     /// setIntroScreen needs to be after cnBottomMenu.setBottomMenuHeight
     setIntroScreen();
     cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
@@ -224,20 +224,26 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
 
 
-    await Future.delayed(Duration(milliseconds: Platform.isAndroid? 200 : 0), () async {
-      if(cnConfig.connectWithCloud){
-        if(Platform.isAndroid){
-          await cnConfig.signInGoogleDrive();
-        }
-        if(Platform.isIOS){
-          await cnConfig.checkIfICloudAvailable();
-        }
-        print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
-        if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
-          trySyncWithCloud();
-        }
-      }
-    });
+    /// sign in and sync with cloud
+    await cnConfig.signInCloud();
+    if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+      trySyncWithCloud();
+    }
+
+    // await Future.delayed(const Duration(milliseconds: 200), () async {
+    //   if(cnConfig.connectWithCloud){
+    //     if(Platform.isAndroid){
+    //       await cnConfig.signInGoogleDrive(delayMilliseconds: 0);
+    //     }
+    //     if(Platform.isIOS){
+    //       await cnConfig.checkIfICloudAvailable(delayMilliseconds: 0);
+    //     }
+    //     print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
+    //     if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+    //       trySyncWithCloud();
+    //     }
+    //   }
+    // });
     setState(() {
       mainIsInitialized = true;
     });
@@ -500,7 +506,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                   IgnorePointer(
                     child: SafeArea(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 0, left: 0),
+                        padding: EdgeInsets.only(top: Platform.isAndroid? (cnRunningWorkout.isRunning? 60 : 10) : 0, left: 0),
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),

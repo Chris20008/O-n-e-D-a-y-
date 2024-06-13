@@ -238,32 +238,20 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
   }
 }
 
-Future loadNewestDataiCloud({CnHomepage? cnHomepage})async{
+Future<bool> loadNewestDataiCloud({CnHomepage? cnHomepage})async{
+  bool success;
   if(Platform.isIOS) {
     String? result = await ICloudService.readFromICloud(currentDataFileName);
     print("RESULT: $result");
     if(result == null){
       return false;
     }
-    await loadBackupFromString(content: result, cnHomepage: cnHomepage);
-
+    success = await loadBackupFromString(content: result, cnHomepage: cnHomepage);
+  } else{
+    success = false;
   }
+  return success;
 }
-
-// Future<String?> getiCloudContainerFileContent(String filename) async {
-//   try {
-//     String? content = await ICloudService.readFromICloud(filename);
-//     if (content != null) {
-//       print('File content: $content');
-//     } else {
-//       print('File not found');
-//     }
-//     return content;
-//   } catch (e) {
-//     print('Error: $e');
-//   }
-//   return null;
-// }
 
 
 /// ################################################################################################

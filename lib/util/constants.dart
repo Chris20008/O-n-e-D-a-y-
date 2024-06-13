@@ -280,6 +280,23 @@ Widget getSet({
   double height = 30,
   required BuildContext context
 }){
+
+  PullDownMenuItem rpePullDownMenuItem(SingleSet set, int value){
+    return PullDownMenuItem.selectable(
+      selected: set.setType == value+10,
+      title: 'RPE $value',
+      onTap: () {
+        HapticFeedback.selectionClick();
+        FocusManager.instance.primaryFocus?.unfocus();
+        Future.delayed(const Duration(milliseconds: 200), (){
+          set.setType = value+10;
+          // print(setType);
+          onConfirm();
+        });
+      },
+    );
+  }
+
   final SingleSet s = newEx.sets[index];
   return SizedBox(
     height: height,
@@ -289,8 +306,8 @@ Widget getSet({
       itemBuilder: (context) {
         return [
           PullDownMenuItem.selectable(
-            selected: false,
-            title: AppLocalizations.of(context)!.clear,
+            selected: s.setType == 0,
+            title: 'Working Set',
             onTap: () {
               HapticFeedback.selectionClick();
               FocusManager.instance.primaryFocus?.unfocus();
@@ -318,23 +335,16 @@ Widget getSet({
               });
             },
           ),
-          PullDownMenuItem.selectable(
-            selected: s.setType == 2,
-            title: 'Working Set',
-            icon: Icons.circle,
-            iconColor: Colors.green,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              FocusManager.instance.primaryFocus?.unfocus();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                // setState(() {
-                  s.setType = 2;
-                  onConfirm();
-                  // cnRunningWorkout.cache();
-                // });
-              });
-            },
-          ),
+          rpePullDownMenuItem(s, 1),
+          rpePullDownMenuItem(s, 2),
+          rpePullDownMenuItem(s, 3),
+          rpePullDownMenuItem(s, 4),
+          rpePullDownMenuItem(s, 5),
+          rpePullDownMenuItem(s, 6),
+          rpePullDownMenuItem(s, 7),
+          rpePullDownMenuItem(s, 8),
+          rpePullDownMenuItem(s, 9),
+          rpePullDownMenuItem(s, 10)
         ];
       },
       buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -344,23 +354,23 @@ Widget getSet({
           showMenu();
         },
         padding: EdgeInsets.zero,
-        child: Container(
+        child: SizedBox(
           // color: Colors.red,
           height: height,
           width: width,
           child: Stack(
             // alignment: Alignment.center,
             children: [
+              if(s.setType == 1)
               Center(
                 child: Container(
                   margin: const EdgeInsets.only(left: 1.5),
                   width: height * (0.75 + (index + 1).toString().length/4),
                   height: height,
                   decoration: BoxDecoration(
-                    // shape: BoxShape.,
                     borderRadius: BorderRadius.circular(height/2),
                     border: Border.all(
-                      color: s.setType == 1? Colors.blue : s.setType == 2? Colors.green : Colors.transparent,
+                      color: Colors.blue,
                       width: 0.8,
                     ),
                   ),
@@ -374,6 +384,17 @@ Widget getSet({
                   style: const TextStyle(color: Colors.white),
                 ),
               ),
+              if(s.setType != null && s.setType! > 10)
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child:Padding(
+                    padding: EdgeInsets.only(right: index < 10? (s.setType == 20? 5 : 10) : (s.setType == 20? 0 : 5)),
+                    child: Text(
+                      "${s.setType!-10}",
+                      textScaler: const TextScaler.linear(0.7),
+                    ),
+                  )
+                )
             ],
           ),
         ),

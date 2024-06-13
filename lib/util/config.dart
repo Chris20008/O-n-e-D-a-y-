@@ -128,7 +128,20 @@ class CnConfig extends ChangeNotifier {
   //   return isICloudAvailable ?? false;
   // }
 
-  Future<bool> checkIfICloudAvailable() async {
+  Future signInCloud() async{
+    await Future.delayed(const Duration(milliseconds: 200), () async {
+      if(connectWithCloud){
+        if(Platform.isAndroid){
+          await signInGoogleDrive(delayMilliseconds: 0);
+        }
+        if(Platform.isIOS){
+          await checkIfICloudAvailable(delayMilliseconds: 0);
+        }
+      }
+    });
+  }
+
+  Future<bool> checkIfICloudAvailable({int delayMilliseconds = 1000}) async {
     while(isWaitingForCloudResponse){
       await Future.delayed(const Duration(milliseconds: 200));
       if(!isWaitingForCloudResponse){
@@ -139,7 +152,7 @@ class CnConfig extends ChangeNotifier {
       isWaitingForCloudResponse = true;
       isICloudAvailable = await ICloudService.isICloudAvailable();
       print("IS Cloud Available: $isICloudAvailable");
-      await Future.delayed(const Duration(milliseconds: 1000), (){});
+      await Future.delayed(Duration(milliseconds: delayMilliseconds), (){});
       isWaitingForCloudResponse = false;
       showMoreSettingCloud = true;
 
@@ -161,7 +174,7 @@ class CnConfig extends ChangeNotifier {
     return isICloudAvailable?? false;
   }
 
-  Future<bool> signInGoogleDrive() async {
+  Future<bool> signInGoogleDrive({int delayMilliseconds = 1000}) async {
     while(isWaitingForCloudResponse){
       await Future.delayed(const Duration(milliseconds: 200));
       if(!isWaitingForCloudResponse){
@@ -171,7 +184,7 @@ class CnConfig extends ChangeNotifier {
     if(account == null && Platform.isAndroid){
       isWaitingForCloudResponse = true;
       account = await getGoogleDriveAccount();
-      await Future.delayed(const Duration(milliseconds: 1000), (){});
+      await Future.delayed(Duration(milliseconds: delayMilliseconds), (){});
       isWaitingForCloudResponse = false;
       showMoreSettingCloud = true;
 

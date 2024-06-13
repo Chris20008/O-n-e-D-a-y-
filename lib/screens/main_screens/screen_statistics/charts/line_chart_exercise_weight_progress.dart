@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,6 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   int? pointerBIdentifier;
   double lastPointerDistance = 0;
   double focalPointPercent = 0;
-  bool isZooming = false;
   final int _leftPadding = 5;
   late final int _totalPadding = _leftPadding * 2;
   List<FlSpot> spotsAvgWeightPerSet = [];
@@ -156,109 +156,123 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           ],
         ),
         const SizedBox(height: 10,),
-        Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (PointerDownEvent details){
-            animationTime = 0;
-            if(pointerAIdentifier == null){
-              pointerAIdentifier = details.pointer;
-              pointerA = details.position;
-              pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
-            }
-            else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
-              pointerBIdentifier = details.pointer;
-              pointerB = details.position;
-              lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
-              final minPos = pointerB!.dx < pointerA!.dx? pointerB!.dx : pointerA!.dx;
-              /// the middle point between the two pointer in percent minus an offset of 0.2
-              focalPointPercent = (lastPointerDistance/2 + minPos - _widthAxisTitles) / width;
-            }
-          },
-          onPointerMove: (PointerMoveEvent details){
-            if(details.pointer == pointerAIdentifier){
-              pointerA = details.position;
-            }
-            else if(details.pointer == pointerBIdentifier){
-              pointerB = details.position;
-            }
-
-            /// ZOOM
-            if(pointerA != null && pointerB != null /*&& !isZooming*/){
-              // isZooming = true;
-              double sensibility = ((currentVisibleDays) / (1500 / sqrt(currentVisibleDays)));
-              final maxDays = maxDate.difference(minDate).inDays;
-              final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
-              final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
-              lastPointerDistance = currentPointerDistance;
-
-              setState(() {
-                double newOffsetMaxX;
-                double newOffsetMinX;
-
-                newOffsetMaxX = (offsetMaxX - difference);
-                newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
-                newOffsetMinX = (offsetMinX - difference * focalPointPercent);
-                newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
-
-                if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= maxVisibleDays){
-                  offsetMinX = newOffsetMinX;
-                  offsetMaxX = newOffsetMaxX;
-                }
-              });
-              // Future.delayed(const Duration(milliseconds: 30), (){
-              //   isZooming = false;
-              // });
-            }
-
-            /// SCROLL
-            else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
-              final totalRange = maxDate.difference(minDate).inDays;
-              final maxValueOffsetMinX = totalRange - currentVisibleDays + _totalPadding;
-              double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
-              sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
-              final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
-
-              double newOffsetMinX;
-
-              newOffsetMinX = offsetMinX + currentPointerDistance;
-              if(newOffsetMinX >= 0 && newOffsetMinX != offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= offsetMinX)){
-                setState(() {
-                  offsetMinX = newOffsetMinX;
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (PointerDownEvent details){
+                animationTime = 0;
+                if(pointerAIdentifier == null){
+                  pointerAIdentifier = details.pointer;
+                  pointerA = details.position;
                   pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
-                });
-              }
-              setState(() {});
-            }
+                }
+                else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
+                  pointerBIdentifier = details.pointer;
+                  pointerB = details.position;
+                  lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+                  final minPos = pointerB!.dx < pointerA!.dx? pointerB!.dx : pointerA!.dx;
+                  /// the middle point between the two pointer in percent
+                  focalPointPercent = (lastPointerDistance/2 + minPos - _widthAxisTitles) / width;
+                }
+              },
+              onPointerMove: (PointerMoveEvent details){
+                if(details.pointer == pointerAIdentifier){
+                  pointerA = details.position;
+                }
+                else if(details.pointer == pointerBIdentifier){
+                  pointerB = details.position;
+                }
 
-          },
-          onPointerUp: (PointerUpEvent details){
-            pointerA = null;
-            pointerAPreviousPos = null;
-            pointerAIdentifier = null;
-            pointerB = null;
-            pointerBIdentifier = null;
-            isZooming = false;
-            Future.delayed(const Duration(milliseconds: 500), (){
-              if(pointerA == null && pointerB == null){
-                animationTime = 500;
-              }
-            });
-          },
-          child: Stack(
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
-                child: Padding(
-                  padding: EdgeInsets.zero,
-                  child: LineChart(
-                      duration: Duration(milliseconds: animationTime),
-                      curve: Curves.easeInOut,
-                      mainData()
+                /// ZOOM
+                if(pointerA != null && pointerB != null){
+                  double sensibility = ((currentVisibleDays) / (1500 / sqrt(currentVisibleDays)));
+                  final maxDays = maxDate.difference(minDate).inDays;
+                  final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+                  final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
+                  lastPointerDistance = currentPointerDistance;
+
+                  setState(() {
+                    double newOffsetMaxX;
+                    double newOffsetMinX;
+
+                    newOffsetMaxX = (offsetMaxX - difference);
+                    newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
+                    newOffsetMinX = (offsetMinX - difference * focalPointPercent);
+                    newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
+
+                    if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= maxVisibleDays){
+                      offsetMinX = newOffsetMinX;
+                      offsetMaxX = newOffsetMaxX;
+                    }
+                  });
+                }
+
+                /// SCROLL
+                else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
+                  final totalRange = maxDate.difference(minDate).inDays;
+                  final maxValueOffsetMinX = totalRange - currentVisibleDays + _totalPadding;
+                  // double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
+                  double sensibility = 1/ (currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
+                  sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
+                  final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
+
+                  double newOffsetMinX;
+
+                  newOffsetMinX = offsetMinX + currentPointerDistance;
+                  if(newOffsetMinX >= 0 && newOffsetMinX != offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= offsetMinX)){
+                    setState(() {
+                      offsetMinX = newOffsetMinX;
+                      pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
+                    });
+                  }
+                  setState(() {});
+                }
+
+              },
+              onPointerUp: (PointerUpEvent details){
+                if(details.pointer == pointerAIdentifier){
+                  pointerA = null;
+                  pointerAPreviousPos = null;
+                  pointerAIdentifier = null;
+                }
+                else if(details.pointer == pointerBIdentifier){
+                  pointerB = null;
+                  pointerBIdentifier = null;
+                }
+                Future.delayed(const Duration(milliseconds: 500), (){
+                  if(pointerA == null && pointerB == null){
+                    animationTime = 500;
+                  }
+                });
+                // pointerA = null;
+                // pointerAPreviousPos = null;
+                // pointerAIdentifier = null;
+                // pointerB = null;
+                // pointerBIdentifier = null;
+                // Future.delayed(const Duration(milliseconds: 500), (){
+                //   if(pointerA == null && pointerB == null){
+                //     animationTime = 500;
+                //   }
+                // });
+              },
+              child: Stack(
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
+                    child: Padding(
+                      padding: EdgeInsets.zero,
+                      child: LineChart(
+                          duration: Duration(milliseconds: animationTime),
+                          curve: Curves.easeInOut,
+                          mainData()
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          }
         ),
       ],
     );
@@ -429,9 +443,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
       maxY: maxY,
       lineBarsData: [
         LineChartBarData(
-          curveSmoothness: 0.1,
+          isCurved: false,
+          // curveSmoothness: 0.1,
           spots: spotsMaxWeight,
-          isCurved: true,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
