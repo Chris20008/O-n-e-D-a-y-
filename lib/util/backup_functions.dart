@@ -41,7 +41,7 @@ Future loadBackupFromFilePicker({CnHomepage? cnHomepage}) async{
   );
 
   if (result != null) {
-    print("result file Path: ${result.files.single.path!}");
+    // print("result file Path: ${result.files.single.path!}");
     File file = File(result.files.single.path!);
     await loadBackupFromFile(file, cnHomepage: cnHomepage);
   } else {
@@ -94,7 +94,7 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   List<ObWorkout> allCurrentWorkouts = await objectbox.workoutBox.getAllAsync();
   // final length = allCurrentWorkouts.length + workouts.length;
   final length = workouts.length;
-  print("LENGTH: $length");
+  // print("LENGTH: $length");
 
   for(ObWorkout wo in workouts){
     // print("");
@@ -106,7 +106,7 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     /// We have to first check if an matching id exists and if the workout correlated to this id has differences the workout with id from cloud
     /// If so we update the existing workout
     if(existingWorkout != null && !Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(existingWorkout))){
-      print("UPDATE WORKOUT");
+      // print("UPDATE WORKOUT");
       allCurrentWorkouts.remove(existingWorkout);
       existingWorkout = wo;
       objectbox.workoutBox.put(wo);
@@ -123,14 +123,14 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
       /// However, if there is no existing workout that equals the new workout, even when ignoring the ID
       /// It means this is a completely new workout
       if(existingWorkout == null){
-        print("NEW WORKOUT");
+        // print("NEW WORKOUT");
         hadDifferences = true;
         wo.id = 0;
         objectbox.workoutBox.putAsync(wo);
         objectbox.exerciseBox.putManyAsync(wo.exercises);
       } else{
         allCurrentWorkouts.remove(existingWorkout);
-        print("FOUND EXISTING WORKOUT");
+        // print("FOUND EXISTING WORKOUT");
       }
     }
 
@@ -155,7 +155,7 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     hadDifferences = true;
   }
 
-  print("Workouts found to remove: ${allCurrentWorkouts.length}");
+  // print("Workouts found to remove: ${allCurrentWorkouts.length}");
   if(cnHomepage != null){
     final p = counter / length;
     // print("PERCENT: $p");
@@ -254,7 +254,7 @@ Future<bool> loadNewestDataiCloud({CnHomepage? cnHomepage})async{
   bool success;
   if(Platform.isIOS) {
     String? result = await ICloudService.readFromICloud(currentDataFileName);
-    print("RESULT: $result");
+    // print("RESULT: $result");
     if(result == null){
       return false;
     }
@@ -302,7 +302,7 @@ Future<ga.File?> saveBackUpGoogleDrive({
 
     /// Create new File - used for creating Backups
     if(!overwrite){
-      print("create new file");
+      // print("create new file");
       uploadFile.name = basename(file.path);
       uploadFile.parents = [folderId];
       response = await drive.files.create(
@@ -377,7 +377,7 @@ Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
 
 Future<String?> getGoogleDriveFolderId(ga.DriveApi drive, CnConfig cnConfig) async {
   if(cnConfig.folderIdGoogleDrive != null){
-    print("------------------ FOLDER ID IS CACHED");
+    // print("------------------ FOLDER ID IS CACHED");
     return cnConfig.folderIdGoogleDrive;
   }
 
@@ -397,9 +397,9 @@ Future<String?> getCurrentDataId({
   required String folderId
 }) async {
 
-  print("TRY GET CACHED DATA ID: ${cnConfig.currentDataIdGoogleDrive}");
+  // print("TRY GET CACHED DATA ID: ${cnConfig.currentDataIdGoogleDrive}");
   if(cnConfig.currentDataIdGoogleDrive != null){
-    print("------------------ CURRENT DATA ID IS CACHED");
+    // print("------------------ CURRENT DATA ID IS CACHED");
     return cnConfig.currentDataIdGoogleDrive;
   }
 

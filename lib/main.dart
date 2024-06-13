@@ -599,7 +599,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
       cnHomepage.isSyncingWithCloud = false;
       cnHomepage.msg = "Sync with iCloud";
       cnHomepage.refresh();
-      loadNewestDataiCloud(cnHomepage: cnHomepage);
+      await loadNewestDataiCloud(cnHomepage: cnHomepage).then((needRefresh) {
+        if(needRefresh){
+          cnWorkouts.refreshAllWorkouts();
+          cnWorkoutHistory.refreshAllWorkouts();
+        }
+      });
       // loadNewestDataGoogleDrive(
       //     cnConfig,
       //     cnHomepage: cnHomepage
