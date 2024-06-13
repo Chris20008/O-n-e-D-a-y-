@@ -97,6 +97,8 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   print("LENGTH: $length");
 
   for(ObWorkout wo in workouts){
+    // print("");
+    // print("Workout");
     // print("CHECKING OBWOKROUT ID: ${wo.id}");
     // final existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
     ObWorkout? existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => workout.id == wo.id);
@@ -105,31 +107,38 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     /// If so we update the existing workout
     if(existingWorkout != null && !Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(existingWorkout))){
       print("UPDATE WORKOUT");
+      allCurrentWorkouts.remove(existingWorkout);
       existingWorkout = wo;
       objectbox.workoutBox.put(wo);
       objectbox.exerciseBox.putMany(wo.exercises);
       hadDifferences = true;
-      break;
-    }
-
-    /// If not it means the id does not exists, but maybe the workout itself exists because objectbox entries
-    /// on different devices can have different id's
-    /// So we check just for equal
-    existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
-
-    /// However, if there is no existing workout that equals the new workout, even when ignoring the ID
-    /// It means this is a completely new workout
-    if(existingWorkout == null){
-      // print("NEW WORKOUT");
-      hadDifferences = true;
-      wo.id = 0;
-      objectbox.workoutBox.putAsync(wo);
-      objectbox.exerciseBox.putManyAsync(wo.exercises);
+      // continue;
     }
     else{
-      allCurrentWorkouts.remove(existingWorkout);
-      // print("FOUND EXISTING WORKOUT");
+      /// If not it means the id does not exists, but maybe the workout itself exists because objectbox entries
+      /// on different devices can have different id's
+      /// So we check just for equal
+      existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
+
+      /// However, if there is no existing workout that equals the new workout, even when ignoring the ID
+      /// It means this is a completely new workout
+      if(existingWorkout == null){
+        print("NEW WORKOUT");
+        hadDifferences = true;
+        wo.id = 0;
+        objectbox.workoutBox.putAsync(wo);
+        objectbox.exerciseBox.putManyAsync(wo.exercises);
+      } else{
+        allCurrentWorkouts.remove(existingWorkout);
+        print("FOUND EXISTING WORKOUT");
+      }
     }
+
+
+    // if(existingWorkout != null){
+    //   allCurrentWorkouts.remove(existingWorkout);
+    //   print("FOUND EXISTING WORKOUT");
+    // }
     counter += 1;
     if(counter % batchSize == 0){
       await Future.delayed(const Duration(milliseconds: 20));
@@ -137,19 +146,22 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
 
     if(cnHomepage != null && counter % (batchSize*2) == 0){
       final p = counter / length;
-      print("PERCENT: $p");
+      // print("PERCENT: $p");
       cnHomepage.updateSyncStatus(p);
     }
   }
+
   if(allCurrentWorkouts.isNotEmpty){
     hadDifferences = true;
   }
+
   print("Workouts found to remove: ${allCurrentWorkouts.length}");
   if(cnHomepage != null){
     final p = counter / length;
-    print("PERCENT: $p");
+    // print("PERCENT: $p");
     cnHomepage.updateSyncStatus(p);
   }
+
   await objectbox.exerciseBox.removeManyAsync(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
   await objectbox.workoutBox.removeManyAsync(allCurrentWorkouts.map((w) => w.id).toList());
   if(cnHomepage != null){

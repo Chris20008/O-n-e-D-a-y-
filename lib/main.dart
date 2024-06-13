@@ -310,12 +310,12 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
 
     if(cnConfig.currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
-      print("START TUT ONE");
+      // print("START TUT ONE");
       tutorialIsRunning = true;
       initTutorialAddWorkout(context);
       showTutorialAddWorkout(context);
     }
-    print("is running $tutorialIsRunning");
+    // print("is running $tutorialIsRunning");
 
     return Scaffold(
       extendBody: true,
