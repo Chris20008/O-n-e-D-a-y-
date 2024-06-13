@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 
@@ -999,11 +1000,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   Future finishWorkout() async{
     int time;
-    // final createBackup = null;
-    // final createAutomaticBackup = cnConfig.automaticBackups;
-    // if(createAutomaticBackup == null){
-    //   return;
-    // }
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
       time = cnStandardPopUp.animationTime;
@@ -1019,14 +1015,30 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
         cnRunningWorkout.workout.saveToDatabase();
         cnWorkouts.refreshAllWorkouts();
       }
-      await stopWorkout(time: 0);
       if(cnStopwatchWidget.isRunning){
         cnStopwatchWidget.cancelTimer();
       }
+
+      bool savedAutomaticBackup = false;
+      bool savedCurrentData = false;
       if(cnConfig.automaticBackups){
-        saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig);
+        savedAutomaticBackup = await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
       }
-      saveCurrentData(cnConfig);
+      savedCurrentData = await saveCurrentData(cnConfig) != null;
+
+      Fluttertoast.showToast(
+          msg: "Created Automatic Backup: $savedAutomaticBackup \nSaved Current Data: $savedCurrentData",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey[800],
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
+
+      await stopWorkout(time: 0);
+
+
     });
   }
 

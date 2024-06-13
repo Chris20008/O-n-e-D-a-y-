@@ -14,6 +14,7 @@ import '../../../widgets/workout_expansion_tile.dart';
 import '../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts/panels/new_workout_panel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 class ScreenWorkoutHistory extends StatefulWidget {
   const ScreenWorkoutHistory({super.key});
@@ -44,7 +45,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
           children: [
             ScrollablePositionedList.separated(
                 shrinkWrap: true,
-                padding: const EdgeInsets.only(top: 70, left: 20, right: 20, bottom: 0),
+                padding: EdgeInsets.only(top: Platform.isAndroid? 80 : 90, left: 20, right: 20, bottom: 0),
                 separatorBuilder: (BuildContext context, int index) {
                   return const SizedBox(height: 10);
                 },
@@ -75,7 +76,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       initiallyExpanded: cnWorkoutHistory.opened[index]
                   );
 
-                  final double heightOfSpacer = dateOfNewerWorkout == null? (index == 0? 10 : 0) : 40;
+                  final double heightOfSpacer = dateOfNewerWorkout == null? 0 : 40;
 
                   /// check if date is not null
                   if (dateOfWorkout != null) {

@@ -170,7 +170,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void setIntroScreen(){
     currentTutorialStep = cnConfig.currentTutorialStep;
-    print("Current tutorial step $currentTutorialStep");
     if(cnConfig.welcomeScreen){
       showWelcomeScreen = true;
       closeWelcomeScreen = false;

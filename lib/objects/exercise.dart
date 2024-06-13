@@ -137,7 +137,7 @@ class Exercise{
         }
       }
     }
-    print("FILL SET TYPE: $fillSetType");
+    // print("FILL SET TYPE: $fillSetType");
     return Exercise(
       name: data["name"],
       sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1], setType: fillSetType?? s[2]))),

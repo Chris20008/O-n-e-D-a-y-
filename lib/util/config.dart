@@ -151,7 +151,6 @@ class CnConfig extends ChangeNotifier {
     if(isICloudAvailable == null && Platform.isIOS){
       isWaitingForCloudResponse = true;
       isICloudAvailable = await ICloudService.isICloudAvailable();
-      print("IS Cloud Available: $isICloudAvailable");
       await Future.delayed(Duration(milliseconds: delayMilliseconds), (){});
       isWaitingForCloudResponse = false;
       showMoreSettingCloud = true;
@@ -261,12 +260,6 @@ class CnConfig extends ChangeNotifier {
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
   int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
-  String? get lastBackupName => config.settings["lastBackupName"];
-
-  Future setLastBackupName(String filename) async{
-    config.settings["lastBackupName"] = filename;
-    await config.save();
-  }
 
   Future setCurrentTutorialStep(int? step) async{
     config.settings["currentTutorialStep"] = step;
@@ -319,9 +312,7 @@ class CnConfig extends ChangeNotifier {
   }
 
   Future setSyncMultipleDevices(bool value) async{
-    print("Set Sync Multiple Devices: $value");
     config.settings["syncMultipleDevices"] = value;
-    print(syncMultipleDevices);
     await config.save();
   }
 

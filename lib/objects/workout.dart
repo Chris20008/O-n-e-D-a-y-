@@ -82,7 +82,6 @@ class Workout{
           /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
           /// Update amounts and weights of the existing exercise in the template
-          print("EXERCISE COMPARE");
           print(newExercise.setTypes);
           print(ex.setTypes);
           ex.amounts = newExercise.amounts;

@@ -96,10 +96,10 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   List<ObWorkout> allCurrentWorkouts = await objectbox.workoutBox.getAllAsync();
   final length = workouts.length;
   // print("LENGTH: $length");
-  print("BATCHSIZE: $batchSize");
+  // print("BATCHSIZE: $batchSize");
 
   for(ObWorkout wo in workouts){
-    print("");
+    // print("");
     // print("Workout");
     // print("CHECKING OBWOKROUT ID: ${wo.id}");
     // final existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
@@ -110,7 +110,7 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     /// The comparisson with the name and date was added later, to make sure that we only update a workout when the name is the same and it happened at the same date,
     /// otherwise we could run into a lot of unnecessary double computating
     if(existingWorkout != null && !Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(existingWorkout))){
-      print("UPDATE WORKOUT with id: ${existingWorkout.id}");
+      // print("UPDATE WORKOUT with id: ${existingWorkout.id}");
       allCurrentWorkouts.remove(existingWorkout);
       List<ObExercise> allUpdateableExercises = existingWorkout.exercises;
 
@@ -200,40 +200,44 @@ Future<File?> saveBackup({
   String? content,
   bool currentDataCloud = false
 }) async{
-  // Directory? appDocDir = await getLocalPath();
-  // final path = appDocDir?.path;
-  final path = await getLocalPath();
+  try {
+    final path = await getLocalPath();
 
-  /// Seems like having ':' in the filename leads to issues, so we replace them
-  final filename = currentDataCloud? currentDataFileName : "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
-  final fullPath = '$path/$filename';
-  final file = File(fullPath);
-  content = content?? getWorkoutsAsStringList().join("; ");
-  await file.writeAsString(content);
+    /// Seems like having ':' in the filename leads to issues, so we replace them
+    final filename = currentDataCloud
+        ? currentDataFileName
+        : "Auto_Backup_${DateTime.now()}.txt".replaceAll(":", "-");
+    final fullPath = '$path/$filename';
+    final file = File(fullPath);
+    content = content ?? getWorkoutsAsStringList().join("; ");
+    await file.writeAsString(content);
 
-  if(Platform.isIOS && withCloud){
-    await saveBackupiCloud(fullPath, filename);
-  }
-  else if(Platform.isAndroid && withCloud){
-    Map<String, String>? headers = await cnConfig.getGoogleDriveAuthHeaders();
-    if(headers != null){
-      await saveBackUpGoogleDrive(
-          authHeader: headers,
-          file: file,
-          cnConfig: cnConfig,
-          overwrite: currentDataCloud
-      );
+    if (Platform.isIOS && withCloud) {
+      await saveBackupiCloud(fullPath, filename);
     }
-  }
+    else if (Platform.isAndroid && withCloud) {
+      Map<String, String>? headers = await cnConfig.getGoogleDriveAuthHeaders();
+      if (headers != null) {
+        await saveBackUpGoogleDrive(
+            authHeader: headers,
+            file: file,
+            cnConfig: cnConfig,
+            overwrite: currentDataCloud
+        );
+      }
+    }
 
-  /// Delete local CurrentData File
-  if(currentDataCloud){
-    await file.delete();
+    /// Delete local CurrentData File
+    if (currentDataCloud) {
+      await file.delete();
+      return File("");
+    }
+
+    return file;
+  }
+  on Exception catch (_) {
     return null;
   }
-
-  cnConfig.setLastBackupName(filename);
-  return file;
 }
 
 Future<File?> saveCurrentData(CnConfig cnConfig) async{

@@ -194,7 +194,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               newEx: cnNewExercise.exercise,
                                               width: 50,
                                               onConfirm: (){
-                                                print("ON CONFIRM");
                                                 cnNewExercise.refresh();
                                               }
                                           ),
