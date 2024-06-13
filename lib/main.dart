@@ -187,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   void initMain() async{
     objectbox = await ObjectBox.create();
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
@@ -505,40 +505,46 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 if(cnHomepage.isSyncingWithCloud)
                   IgnorePointer(
                     child: SafeArea(
-                      child: Padding(
-                        padding: EdgeInsets.only(top: Platform.isAndroid? (cnRunningWorkout.isRunning? 60 : 10) : 0, left: 0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Colors.white.withOpacity(0.5)
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            height: cnRunningWorkout.isRunning && cnBottomMenu.index == 1? 55 : 0,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
                           ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(width: 5),
-                              Text(cnHomepage.msg),
-                              const SizedBox(width: 5),
-                              if(cnHomepage.percent != null)
-                                Text("${(cnHomepage.percent! * 100).round()}%"),
-                              if(cnHomepage.percent != null)
-                              const SizedBox(width: 5),
-                              if(!cnHomepage.syncWithCloudCompleted)
-                                const SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
-                                )
-                              else
-                                const Icon(
-                                  Icons.check_circle,
-                                  size: 15,
-                                  color: Colors.green
-                                ),
-                              const SizedBox(width: 5)
-                            ],
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.white.withOpacity(0.5)
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(width: 5),
+                                Text(cnHomepage.msg),
+                                const SizedBox(width: 5),
+                                if(cnHomepage.percent != null)
+                                  Text("${(cnHomepage.percent! * 100).round()}%"),
+                                if(cnHomepage.percent != null)
+                                const SizedBox(width: 5),
+                                if(!cnHomepage.syncWithCloudCompleted)
+                                  const SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
+                                  )
+                                else
+                                  const Icon(
+                                    Icons.check_circle,
+                                    size: 15,
+                                    color: Colors.green
+                                  ),
+                                const SizedBox(width: 5)
+                              ],
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ),
                   ),

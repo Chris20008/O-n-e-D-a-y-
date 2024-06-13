@@ -50,6 +50,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 controller: cnWorkouts.scrollController,
                 itemCount: cnWorkouts.workouts.length+1,
                 itemBuilder: (BuildContext context, int index) {
+
+                  /// Bottom Spacer
                   if (index == cnWorkouts.workouts.length){
                     return SafeArea(
                         top: false,
@@ -61,23 +63,32 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                         )
                     );
                   }
+
+                  /// First Child with Top Space
                   if(index == 0){
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: cnRunningWorkout.isRunning? 250 : 0),
-                          height: cnRunningWorkout.isRunning? 110 : 60,
-                        ),
-                        WorkoutExpansionTile(
-                          workout: cnWorkouts.workouts[index],
-                          padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
-                          onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
-                          initiallyExpanded: cnWorkouts.opened[index],
-                        )
-                      ],
+                    return SafeArea(
+                      bottom: false,
+                      left: false,
+                      right: false,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: Duration(milliseconds: cnRunningWorkout.isRunning? 250 : 0),
+                            height: cnRunningWorkout.isRunning? 75 : 25,
+                          ),
+                          WorkoutExpansionTile(
+                            workout: cnWorkouts.workouts[index],
+                            padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
+                            onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
+                            initiallyExpanded: cnWorkouts.opened[index],
+                          )
+                        ],
+                      ),
                     );
                   }
+
+                  /// Other 2 - n Templates
                   return WorkoutExpansionTile(
                       workout: cnWorkouts.workouts[index],
                       padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),

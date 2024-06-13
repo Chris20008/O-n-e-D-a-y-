@@ -317,7 +317,6 @@ Widget getSet({
               });
             },
           ),
-          const PullDownMenuDivider.large(),
           PullDownMenuItem.selectable(
             selected: s.setType == 1,
             title: 'Warm-Up Set',
@@ -328,13 +327,14 @@ Widget getSet({
               FocusManager.instance.primaryFocus?.unfocus();
               Future.delayed(const Duration(milliseconds: 200), (){
                 // setState(() {
-                  s.setType = 1;
-                  onConfirm();
-                  // cnRunningWorkout.cache();
+                s.setType = 1;
+                onConfirm();
+                // cnRunningWorkout.cache();
                 // });
               });
             },
           ),
+          const PullDownMenuDivider.large(),
           rpePullDownMenuItem(s, 1),
           rpePullDownMenuItem(s, 2),
           rpePullDownMenuItem(s, 3),
@@ -392,6 +392,9 @@ Widget getSet({
                     child: Text(
                       "${s.setType!-10}",
                       textScaler: const TextScaler.linear(0.7),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700
+                      ),
                     ),
                   )
                 )

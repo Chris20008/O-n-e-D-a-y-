@@ -70,11 +70,12 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   Widget child = WorkoutExpansionTile(
                       // key: UniqueKey(),
                       workout: cnWorkoutHistory.workouts[index],
-                      // padding: EdgeInsets.only(top: index == 0? cnRunningWorkout.isRunning? 20:70 : 10, left: 20, right: 20, bottom: 0),
                       padding: EdgeInsets.zero,
                       onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
                       initiallyExpanded: cnWorkoutHistory.opened[index]
                   );
+
+                  final double heightOfSpacer = dateOfNewerWorkout == null? (index == 0? 10 : 0) : 40;
 
                   /// check if date is not null
                   if (dateOfWorkout != null) {
@@ -85,7 +86,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         return getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyFuture,
-                            heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                            heightSpacer: heightOfSpacer,
                             textScaler: 1.8
                         );
                       }
@@ -111,7 +112,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         return getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyYesterday,
-                            heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                            heightSpacer: heightOfSpacer,
                             textScaler: 1.7,
                             /// with week header
                             dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
@@ -128,7 +129,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         return getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyLast7Days,
-                            heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                            heightSpacer: heightOfSpacer,
                             textScaler: 1.7,
                             /// with week header
                             dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
@@ -145,7 +146,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       return getChildWithTimeHeader(
                           child: child,
                           headerText: DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
-                          heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                          heightSpacer: heightOfSpacer,
                           textScaler: 1.7,
                           /// with week header
                           dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
@@ -231,7 +232,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
   Widget getChildWithTimeHeader({
     required Widget child,
     required String headerText,
-    double heightSpacer = 40,
+    required double heightSpacer,
     double textScaler = 1.7,
     DateTime? dateForWeekDecoration}){
     return Column(

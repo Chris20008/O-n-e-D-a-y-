@@ -273,7 +273,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               child: OverflowSafeText(
                                                   AppLocalizations.of(context)!.set,
                                                   textAlign: TextAlign.center,
-                                                  // fontSize: 14,
+                                                  // fontSize: 12,
+                                                  style: const TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.white70
+                                                  ),
                                                   minFontSize: 12,
                                                   maxLines: 1,
                                               )
@@ -283,7 +287,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               child: OverflowSafeText(
                                                   AppLocalizations.of(context)!.template,
                                                   textAlign: TextAlign.center,
-                                                  // fontSize: 14,
+                                                  // fontSize: 12,
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.white70
+                                                  ),
                                                   minFontSize: 12,
                                                   maxLines: 1
                                               )
@@ -298,7 +306,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                       child: OverflowSafeText(
                                                           AppLocalizations.of(context)!.weight,
                                                           textAlign: TextAlign.center,
-                                                          // fontSize: 14,
+                                                          // fontSize: 12,
+                                                          style: const TextStyle(
+                                                              fontSize: 13,
+                                                              color: Colors.white70
+                                                          ),
                                                           minFontSize: 12,
                                                           maxLines: 1
                                                       )
@@ -309,7 +321,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                       child: OverflowSafeText(
                                                           AppLocalizations.of(context)!.amount,
                                                           textAlign: TextAlign.center,
-                                                          // fontSize: 14,
+                                                          // fontSize: 12,
+                                                          style: const TextStyle(
+                                                              fontSize: 13,
+                                                              color: Colors.white70
+                                                          ),
                                                           minFontSize: 12,
                                                           maxLines: 1
                                                       )
