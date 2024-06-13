@@ -159,10 +159,15 @@ class Workout{
 
   bool equals(Workout w){
     if(w.exercises.length != exercises.length){
+      // print("----------- NOT SAME LENGTH EXERCISE");
+      // print(w.asMap());
+      // print("----------------------");
+      // print(asMap());
       return false;
     }
     for(List<Exercise> e in zip([w.exercises, exercises])){
       if(!e[0].equals(e[1])){
+        // print("----------- UNEQUALS in EXERCISE");
         return false;
       }
     }

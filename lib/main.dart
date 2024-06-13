@@ -508,24 +508,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                       child: Column(
                         children: [
                           AnimatedContainer(
-                            height: cnRunningWorkout.isRunning && cnBottomMenu.index == 1? 55 : 0,
+                            height: cnRunningWorkout.isRunning && cnBottomMenu.index == 1? 55 : (Platform.isAndroid? 10 : 0),
                             duration: const Duration(milliseconds: 200),
                             curve: Curves.easeOut,
                           ),
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              color: Colors.white.withOpacity(0.5)
+                              color: Colors.black.withOpacity(0.4)
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 const SizedBox(width: 5),
-                                Text(cnHomepage.msg),
+                                Text(cnHomepage.msg, style: const TextStyle(color: CupertinoColors.white)),
                                 const SizedBox(width: 5),
                                 if(cnHomepage.percent != null)
-                                  Text("${(cnHomepage.percent! * 100).round()}%"),
+                                  Text("${(cnHomepage.percent! * 100).round()}%", style: const TextStyle(color: CupertinoColors.white)),
                                 if(cnHomepage.percent != null)
                                 const SizedBox(width: 5),
                                 if(!cnHomepage.syncWithCloudCompleted)

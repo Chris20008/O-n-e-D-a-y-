@@ -926,7 +926,31 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         changeSameNameWorkouts();
       }
       cnWorkouts.refreshAllWorkouts();
-      cnWorkoutHistory.refreshAllWorkouts();
+      await cnWorkoutHistory.refreshAllWorkouts();
+      if(cnBottomMenu.index == 0){
+        int? index;
+        String key = "${cnNewWorkout.workout.date?.year}${cnNewWorkout.workout.date?.month}${cnNewWorkout.workout.date?.day}";
+        // print("KEY: $key");
+        // print(cnWorkoutHistory.indexOfWorkout.keys);
+        if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
+          index = cnWorkoutHistory.indexOfWorkout[key];
+          // print("Index: $index");
+          if(index != null){
+            Future.delayed(const Duration(milliseconds: 0), (){
+              cnWorkoutHistory.scrollController.jumpTo(
+                  index: index!,
+                  // duration: const Duration(milliseconds: 0),
+                  alignment: index == 0
+                      ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
+                      ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
+                      ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
+                      ? 0.3 :  0.1,
+                  // curve: Curves.easeInOut
+              );
+            });
+          }
+        }
+      }
       cnNewWorkout.closePanel(doClear: true);
       cnNewExercisePanel.clear();
       _formKey.currentState?.reset();

@@ -30,6 +30,15 @@ class Exercise{
     }
   }
 
+  Exercise.fromObExercise(ObExercise e):this(
+      id: e.id,
+      name: e.name,
+      sets: List.from(zip([e.weights, e.amounts, e.setTypes]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt(), setType: set[2].toInt()))),
+      restInSeconds: e.restInSeconds,
+      seatLevel: e.seatLevel,
+      linkName: e.linkName
+  );
+
   /// Don't clone the original name
   Exercise.copy(Exercise ex): this(
       name: ex.name,
@@ -153,7 +162,6 @@ class Exercise{
       }
     }
     return true;
-    // return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
   }
 
 }
@@ -161,6 +169,9 @@ class Exercise{
 class SingleSet{
   double? weight;
   int? amount;
+  /// set Type 0 = Working set
+  /// 1 = Warm Up Set
+  /// 11-20 = RPE 1-10
   int? setType;
 
   SingleSet({

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/objects/workout.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -88,27 +89,52 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   if(cnHomepage != null && cnHomepage.msg.isEmpty){
     cnHomepage.msg = "Load Backup";
   }
-  int batchSize = 10;
+  int batchSize = (workouts.length~/100).clamp(5, 15);
+  // int batchSize = 10;
   int counter = 0;
   bool hadDifferences = false;
   List<ObWorkout> allCurrentWorkouts = await objectbox.workoutBox.getAllAsync();
-  // final length = allCurrentWorkouts.length + workouts.length;
   final length = workouts.length;
   // print("LENGTH: $length");
+  print("BATCHSIZE: $batchSize");
 
   for(ObWorkout wo in workouts){
-    // print("");
+    print("");
     // print("Workout");
     // print("CHECKING OBWOKROUT ID: ${wo.id}");
     // final existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
-    ObWorkout? existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => workout.id == wo.id);
+    ObWorkout? existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => workout.id == wo.id && workout.name == wo.name && workout.date == wo.date);
 
     /// We have to first check if an matching id exists and if the workout correlated to this id has differences the workout with id from cloud
     /// If so we update the existing workout
+    /// The comparisson with the name and date was added later, to make sure that we only update a workout when the name is the same and it happened at the same date,
+    /// otherwise we could run into a lot of unnecessary double computating
     if(existingWorkout != null && !Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(existingWorkout))){
-      // print("UPDATE WORKOUT");
+      print("UPDATE WORKOUT with id: ${existingWorkout.id}");
       allCurrentWorkouts.remove(existingWorkout);
+      List<ObExercise> allUpdateableExercises = existingWorkout.exercises;
+
+      for(ObExercise ex in wo.exercises){
+        ObExercise? existingExercise = allUpdateableExercises.firstWhereOrNull((element) => element.name == ex.name);
+
+        /// When an exercise with this name exists and is not equal to the current one, we update it
+        if(existingExercise != null && !Exercise.fromObExercise(ex).equals(Exercise.fromObExercise(existingExercise))){
+          allUpdateableExercises.remove(existingExercise);
+          ex.id = existingExercise.id;
+          objectbox.exerciseBox.put(ex);
+        }
+        /// No ex with this name found -> new Exercise
+        else{
+          objectbox.exerciseBox.put(ex);
+        }
+      }
+
+      if(allUpdateableExercises.isNotEmpty){
+        await objectbox.exerciseBox.removeManyAsync(allUpdateableExercises.map((e) => e.id).toList());
+      }
+
       existingWorkout = wo;
+
       objectbox.workoutBox.put(wo);
       objectbox.exerciseBox.putMany(wo.exercises);
       hadDifferences = true;
@@ -134,12 +160,10 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
       }
     }
 
-
-    // if(existingWorkout != null){
-    //   allCurrentWorkouts.remove(existingWorkout);
-    //   print("FOUND EXISTING WORKOUT");
-    // }
     counter += 1;
+    /// Await a small delay after each completed Batch to allow the UI to refresh
+    /// For better performance this whole function should be executed in an Isolate
+    /// Will be implemented later
     if(counter % batchSize == 0){
       await Future.delayed(const Duration(milliseconds: 20));
     }

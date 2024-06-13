@@ -326,11 +326,8 @@ Widget getSet({
               HapticFeedback.selectionClick();
               FocusManager.instance.primaryFocus?.unfocus();
               Future.delayed(const Duration(milliseconds: 200), (){
-                // setState(() {
                 s.setType = 1;
                 onConfirm();
-                // cnRunningWorkout.cache();
-                // });
               });
             },
           ),
