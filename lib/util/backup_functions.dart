@@ -26,7 +26,8 @@ const folderPathiCloud = "Documents/backups/";
 Future<bool> shareBackup({required CnConfig cnConfig, Function? afterReceiveFile}) async{
   File? file = await saveBackup(
       withCloud: false,
-      cnConfig: cnConfig
+      cnConfig: cnConfig,
+      automatic: false
   );
   if(file == null){
     return false;
