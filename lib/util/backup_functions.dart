@@ -419,6 +419,7 @@ Future<List<FileSystemEntity>> getLocalBackupFiles() async{
   final path = await getLocalPath();
 
   List<FileSystemEntity> localFiles = Directory("$path/").listSync();
+  /// Todo: order list, on IOS at least it is not ordered, on Android it seems to be ordered
   localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
   // print(localFiles);
   return localFiles;
