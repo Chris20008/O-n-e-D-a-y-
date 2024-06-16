@@ -126,7 +126,7 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
 
     /// When this workout exists and they are not completely the same (compare HashKeyBig) we can modify the workout without the need to add a new one
     if(existingWorkout != null && !hashMapBig.keys.contains(woHashBig)){
-      print("UPDATE WORKOUT with id: ${existingWorkout.id}");
+      // print("UPDATE WORKOUT with id: ${existingWorkout.id}");
       allCurrentWorkouts.remove(existingWorkout);
       List<ObExercise> allUpdateableExercises = existingWorkout.exercises;
 
@@ -221,8 +221,11 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     cnHomepage.updateSyncStatus(p);
   }
 
-  await objectbox.exerciseBox.removeManyAsync(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
-  await objectbox.workoutBox.removeManyAsync(allCurrentWorkouts.map((w) => w.id).toList());
+  // print("Start removing async");
+  objectbox.exerciseBox.removeMany(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
+  // print("Finished 1 removing async");
+  objectbox.workoutBox.removeMany(allCurrentWorkouts.map((w) => w.id).toList());
+  // print("Finished 2 removing async");
   if(cnHomepage != null){
     cnHomepage.finishSync();
   }
@@ -412,6 +415,15 @@ List getWorkoutsAsStringList(){
   return allWorkouts;
 }
 
+Future<List<FileSystemEntity>> getLocalBackupFiles() async{
+  final path = await getLocalPath();
+
+  List<FileSystemEntity> localFiles = Directory("$path/").listSync();
+  localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
+  // print(localFiles);
+  return localFiles;
+}
+
 /// ################################################################################################
 /// iCloud load Backup
 /// ################################################################################################
@@ -565,15 +577,6 @@ Future<bool> loadNewestDataGoogleDrive(CnConfig cnConfig, {CnHomepage? cnHomepag
     cnHomepage?.finishSync(p:null);
     return false;
   }
-}
-
-Future<List<FileSystemEntity>> getLocalBackupFiles() async{
-  final path = await getLocalPath();
-
-  List<FileSystemEntity> localFiles = Directory("$path/").listSync();
-  localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
-  print(localFiles);
-  return localFiles;
 }
 
 Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
