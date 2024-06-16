@@ -1,8 +1,10 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/local_file_picker.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,10 +33,12 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnConfig cnConfig = Provider.of<CnConfig>(context);
   bool setOrientation = false;
+  bool _isLoadingBackup = false;
 
   @override
   void initState() {
@@ -68,317 +72,375 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
         },
         child: LayoutBuilder(
             builder: (context, constraints){
-              return SlidingUpPanel(
-                controller: cnScreenStatistics.panelControllerSettings,
-                defaultPanelState: PanelState.CLOSED,
-                maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
-                minHeight: 0,
-                isDraggable: true,
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                backdropEnabled: true,
-                backdropColor: Colors.black,
-                color: Colors.transparent,
-                onPanelSlide: onPanelSlide,
-                /// Use panelBuilder in Order to get a ScrollController which enables closing the
-                panelBuilder: (ScrollController sc){
-                  return ClipRRect(
+              return Stack(
+                children: [
+                  SlidingUpPanel(
+                    controller: cnScreenStatistics.panelControllerSettings,
+                    defaultPanelState: PanelState.CLOSED,
+                    maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
+                    minHeight: 0,
+                    isDraggable: true,
                     borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                    child: Container(
-                      color: Theme.of(context).primaryColor,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 10,),
-                          panelTopBar,
-                          const SizedBox(height: 10,),
-                          Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
-                          const SizedBox(height: 10),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              physics: const BouncingScrollPhysics(),
-                              controller: sc,
-                              child: Column(
-                                children: [
-                                  /// General
-                                  CupertinoListSection.insetGrouped(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.1)
-                                    ),
-                                    backgroundColor: Colors.transparent,
-                                    header: Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Text(AppLocalizations.of(context)!.settingsGeneral, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-                                    ),
+                    backdropEnabled: true,
+                    backdropColor: Colors.black,
+                    color: Colors.transparent,
+                    onPanelSlide: onPanelSlide,
+                    /// Use panelBuilder in Order to get a ScrollController which enables closing the
+                    panelBuilder: (ScrollController sc){
+                      return ClipRRect(
+                        borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+                        child: Container(
+                          color: Theme.of(context).primaryColor,
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 10,),
+                              panelTopBar,
+                              const SizedBox(height: 10,),
+                              Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
+                              const SizedBox(height: 10),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  physics: const BouncingScrollPhysics(),
+                                  controller: sc,
+                                  child: Column(
                                     children: [
-                                      /// Language
-                                      CupertinoListTile(
-                                          leading:  const Icon(
-                                              Icons.language
+                                      /// General
+                                      CupertinoListSection.insetGrouped(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.1)
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        header: Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: Text(AppLocalizations.of(context)!.settingsGeneral, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                                        ),
+                                        children: [
+                                          /// Language
+                                          CupertinoListTile(
+                                              leading:  const Icon(
+                                                  Icons.language
+                                              ),
+                                              title: getSelectLanguageButton()
                                           ),
-                                          title: getSelectLanguageButton()
-                                      ),
-                                      /// Tutorial
-                                      CupertinoListTile(
-                                        onTap: (){
-                                          if(currentTutorialStep != 0){
-                                            cnConfig.setCurrentTutorialStep(0);
-                                            currentTutorialStep = 0;
-                                            tutorialIsRunning = false;
-                                            Fluttertoast.showToast(
-                                                msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
-                                                toastLength: Toast.LENGTH_LONG,
-                                                gravity: ToastGravity.SNACKBAR,
-                                                timeInSecForIosWeb: 1,
-                                                backgroundColor: Colors.grey[800],
-                                                textColor: Colors.white,
-                                                fontSize: 16.0
-                                            );
-                                          }
-                                        },
-                                        leading: const Icon(
-                                            Icons.school
-                                        ),
-                                        trailing: trailingArrow,
-                                        // trailing: CupertinoSwitch(
-                                        //     value: cnConfig.tutorial,
-                                        //     activeColor: const Color(0xFFC16A03),
-                                        //     onChanged: (value){
-                                        //       setState(() {
-                                        //         if(Platform.isAndroid){
-                                        //           HapticFeedback.selectionClick();
-                                        //         }
-                                        //         cnConfig.setTutorial(value);
-                                        //       });
-                                        //     }
-                                        // ),
-                                        title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
-                                      ),
-                                      /// Connect to Spotify
-                                      CupertinoListTile(
-                                        leading: const Icon(
-                                          MyIcons.spotify,
-                                          color: Colors.white,
-                                          // color: Color(0xff1ed560)
-                                        ),
-                                        title: Row(
-                                          children: [
-                                            Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
-                                            const SizedBox(width: 5),
-                                            if(cnConfig.useSpotify)
-                                              FutureBuilder(
-                                                  future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
-                                                  builder: (context, connected){
-                                                    if(!connected.hasData){
-                                                      return const Center(
-                                                        child: SizedBox(
-                                                            height: 15,
-                                                            width: 15,
-                                                            child: CircularProgressIndicator(strokeWidth: 2,)
-                                                        ),
-                                                      );
+                                          /// Tutorial
+                                          CupertinoListTile(
+                                            onTap: (){
+                                              if(currentTutorialStep != 0){
+                                                cnConfig.setCurrentTutorialStep(0);
+                                                currentTutorialStep = 0;
+                                                tutorialIsRunning = false;
+                                                Fluttertoast.showToast(
+                                                    msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                                    toastLength: Toast.LENGTH_LONG,
+                                                    gravity: ToastGravity.SNACKBAR,
+                                                    timeInSecForIosWeb: 1,
+                                                    backgroundColor: Colors.grey[800],
+                                                    textColor: Colors.white,
+                                                    fontSize: 16.0
+                                                );
+                                              }
+                                            },
+                                            leading: const Icon(
+                                                Icons.school
+                                            ),
+                                            trailing: trailingArrow,
+                                            title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
+                                          ),
+                                          /// Connect to Spotify
+                                          CupertinoListTile(
+                                            leading: const Icon(
+                                              MyIcons.spotify,
+                                              color: Colors.white,
+                                              // color: Color(0xff1ed560)
+                                            ),
+                                            title: Row(
+                                              children: [
+                                                Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
+                                                const SizedBox(width: 5),
+                                                if(cnConfig.useSpotify)
+                                                  FutureBuilder(
+                                                      future: cnConfig.isSpotifyInstalled(delayMilliseconds: 800, context: context),
+                                                      builder: (context, connected){
+                                                        if(!connected.hasData){
+                                                          return Center(
+                                                            child: SizedBox(
+                                                                height: 15,
+                                                                width: 15,
+                                                                child: CupertinoActivityIndicator(
+                                                                    radius: 8.0,
+                                                                    color: Colors.amber[800]
+                                                                ),
+                                                                // child: CircularProgressIndicator(strokeWidth: 2,)
+                                                            ),
+                                                          );
+                                                        }
+                                                        return Icon(
+                                                          connected.data == true
+                                                              ? Icons.check_circle
+                                                              : Icons.close,
+                                                          size: 15,
+                                                          color: connected.data == true
+                                                              ? Colors.green
+                                                              : Colors.red,
+                                                        );
+                                                      }
+                                                  )
+                                              ],
+                                            ),
+                                            trailing: CupertinoSwitch(
+                                                value: cnConfig.useSpotify,
+                                                activeColor: const Color(0xFFC16A03),
+                                                onChanged: (value) async{
+                                                  setState(() {
+                                                    if(Platform.isAndroid){
+                                                      HapticFeedback.selectionClick();
                                                     }
-                                                    return Icon(
-                                                      connected.data == true
-                                                          ? Icons.check_circle
-                                                          : Icons.close,
-                                                      size: 15,
-                                                      color: connected.data == true
-                                                          ? Colors.green
-                                                          : Colors.red,
-                                                    );
-                                                  }
-                                              )
-                                          ],
-                                        ),
-                                        trailing: CupertinoSwitch(
-                                            value: cnConfig.useSpotify,
-                                            activeColor: const Color(0xFFC16A03),
-                                            onChanged: (value) async{
-                                              setState(() {
-                                                if(Platform.isAndroid){
-                                                  HapticFeedback.selectionClick();
+                                                    cnConfig.setSpotify(value);
+                                                  });
                                                 }
-                                                cnConfig.setSpotify(value);
-                                              });
-                                            }
-                                        ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
 
-                                  /// Backup
-                                  CupertinoListSection.insetGrouped(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.1)
-                                    ),
-                                    backgroundColor: Colors.transparent,
-                                    header: Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Text(AppLocalizations.of(context)!.settingsBackup, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-                                    ),
-                                    /// More Informations footer
-                                    footer: GestureDetector(
-                                      onTap: () async{
-                                        HapticFeedback.selectionClick();
-                                        await showDialog(
-                                            context: context,
-                                            builder: (context){
-                                              return Center(
-                                                  child: getBackupDialogChild()
-                                              );
-                                            }
-                                        );
-                                        HapticFeedback.selectionClick();
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(left: 10),
-                                        child: Row(
-                                          children: [
-                                            const Icon(Icons.info, size:12),
-                                            const SizedBox(width: 5,),
-                                            Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
-                                          ],
+                                      /// Backup
+                                      CupertinoListSection.insetGrouped(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.1)
                                         ),
-                                      ),
-                                    ),
-                                    children: [
-                                      /// Save Backup Manual
-                                      CupertinoListTile(
-                                        leading: const Icon(Icons.upload),
-                                        // leading: const Icon(
-                                        //     MyIcons.database
-                                        // ),
-                                        title:getSelectCreateBackup(),
-                                      ),
-                                      /// Load Backup
-                                      CupertinoListTile(
-                                        onTap: () async{
-                                          await loadBackupFromFilePicker(cnHomepage: cnHomepage);
-                                          saveCurrentData(cnConfig);
-                                          tutorialIsRunning = false;
-                                          currentTutorialStep = 100;
-                                          cnConfig.setCurrentTutorialStep(currentTutorialStep);
-                                          cnScreenStatistics.refreshData();
-                                          cnScreenStatistics.refresh();
-                                          // cnWorkouts.refreshAllWorkouts();
-                                          // cnWorkoutHistory.refreshAllWorkouts();
-                                        },
-                                        leading: const Icon(Icons.download),
-                                        // leading: const Icon(
-                                        //     Icons.cloud_download
-                                        // ),
-                                        title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
-                                        trailing: trailingArrow,
-                                      ),
-                                      /// Save Backup Automatic
-                                      CupertinoListTile(
-                                        leading: const Icon(Icons.sync),
-                                        title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-                                        trailing: CupertinoSwitch(
-                                            value: cnConfig.automaticBackups,
-                                            activeColor: const Color(0xFFC16A03),
-                                            onChanged: (value){
-                                              setState(() {
-                                                if(Platform.isAndroid){
-                                                  HapticFeedback.selectionClick();
+                                        backgroundColor: Colors.transparent,
+                                        header: Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: Text(AppLocalizations.of(context)!.settingsBackup, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                                        ),
+                                        /// More Informations footer
+                                        footer: GestureDetector(
+                                          onTap: () async{
+                                            HapticFeedback.selectionClick();
+                                            await showDialog(
+                                                context: context,
+                                                builder: (context){
+                                                  return Center(
+                                                      child: getBackupDialogChild()
+                                                  );
                                                 }
-                                                cnConfig.setAutomaticBackups(value);
-                                              });
-                                            }
+                                            );
+                                            HapticFeedback.selectionClick();
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.info, size:12),
+                                                const SizedBox(width: 5,),
+                                                Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                                              ],
+                                            ),
+                                          ),
                                         ),
+                                        children: [
+                                          /// Save Backup Manual
+                                          CupertinoListTile(
+                                            leading: const Icon(Icons.upload),
+                                            // leading: const Icon(
+                                            //     MyIcons.database
+                                            // ),
+                                            title:getSelectCreateBackup(),
+                                          ),
+                                          /// Load Backup
+                                          CupertinoListTile(
+                                            leading: const Icon(Icons.download),
+                                            title: getSelectLoadBackupOption(),
+                                          ),
+                                          /// Save Backup Automatic
+                                          CupertinoListTile(
+                                            leading: const Icon(Icons.sync),
+                                            title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+                                            trailing: CupertinoSwitch(
+                                                value: cnConfig.automaticBackups,
+                                                activeColor: const Color(0xFFC16A03),
+                                                onChanged: (value){
+                                                  setState(() {
+                                                    if(Platform.isAndroid){
+                                                      HapticFeedback.selectionClick();
+                                                    }
+                                                    cnConfig.setAutomaticBackups(value);
+                                                  });
+                                                }
+                                            ),
+                                          ),
+
+                                          AnimatedContainer(
+                                            height: cnConfig.showMoreSettingCloud? 5 : 0,
+                                            color: Theme.of(context).primaryColor.withOpacity(0.5),
+                                            duration: const Duration(milliseconds: 300),
+                                          ),
+
+
+                                          /// Sync with Cloud
+                                          getCloudOptionsColumn(
+                                              cnConfig: cnConfig,
+                                              context: context,
+                                              refresh: () => setState(() {})
+                                          )
+                                        ],
                                       ),
 
-                                      AnimatedContainer(
-                                        height: cnConfig.showMoreSettingCloud? 5 : 0,
-                                        color: Theme.of(context).primaryColor.withOpacity(0.5),
-                                        duration: const Duration(milliseconds: 300),
+                                      /// About
+                                      CupertinoListSection.insetGrouped(
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey.withOpacity(0.1)
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        header: Padding(
+                                          padding: const EdgeInsets.only(left: 10),
+                                          child: Text(AppLocalizations.of(context)!.settingsAbout, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                                        ),
+                                        children: [
+                                          /// Contact
+                                          CupertinoListTile(
+                                            leading: const Icon(
+                                                Icons.help_outline
+                                            ),
+                                            title: getSelectContactButton(),
+                                          ),
+                                          /// Github
+                                          CupertinoListTile(
+                                            onTap: () async{
+                                              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
+                                            },
+                                            leading: const Icon(
+                                                MyIcons.github
+                                            ),
+                                            trailing: trailingArrow,
+                                            title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
+                                          ),
+                                          /// Term Of Use
+                                          CupertinoListTile(
+                                            onTap: () async{
+                                              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
+                                            },
+                                            leading: const Icon(
+                                                Icons.my_library_books_rounded
+                                            ),
+                                            trailing: trailingArrow,
+                                            title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
+                                          ),
+                                          /// Privacy Policy
+                                          CupertinoListTile(
+                                            onTap: () async{
+                                              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
+                                            },
+                                            leading: const Icon(
+                                                Icons.lock_outline
+                                            ),
+                                            trailing: trailingArrow,
+                                            title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
+                                          ),
+                                          /// Imprint
+                                          CupertinoListTile(
+                                            onTap: () async{
+                                              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+                                            },
+                                            leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+                                            trailing: trailingArrow,
+                                            title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
+                                          ),
+                                        ],
                                       ),
-
-
-                                      /// Sync with Cloud
-                                      getCloudOptionsColumn(
-                                          cnConfig: cnConfig,
-                                          context: context,
-                                          refresh: () => setState(() {})
-                                      )
+                                      const SizedBox(height: 50,)
                                     ],
                                   ),
-
-                                  /// About
-                                  CupertinoListSection.insetGrouped(
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey.withOpacity(0.1)
-                                    ),
-                                    backgroundColor: Colors.transparent,
-                                    header: Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: Text(AppLocalizations.of(context)!.settingsAbout, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-                                    ),
-                                    children: [
-                                      /// Contact
-                                      CupertinoListTile(
-                                        leading: const Icon(
-                                            Icons.help_outline
-                                        ),
-                                        title: getSelectContactButton(),
-                                      ),
-                                      /// Github
-                                      CupertinoListTile(
-                                        onTap: () async{
-                                          await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
-                                        },
-                                        leading: const Icon(
-                                            MyIcons.github
-                                        ),
-                                        trailing: trailingArrow,
-                                        title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
-                                      ),
-                                      /// Term Of Use
-                                      CupertinoListTile(
-                                        onTap: () async{
-                                          await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
-                                        },
-                                        leading: const Icon(
-                                            Icons.my_library_books_rounded
-                                        ),
-                                        trailing: trailingArrow,
-                                        title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
-                                      ),
-                                      /// Privacy Policy
-                                      CupertinoListTile(
-                                        onTap: () async{
-                                          await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
-                                        },
-                                        leading: const Icon(
-                                            Icons.lock_outline
-                                        ),
-                                        trailing: trailingArrow,
-                                        title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
-                                      ),
-                                      /// Imprint
-                                      CupertinoListTile(
-                                        onTap: () async{
-                                          await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
-                                        },
-                                        leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
-                                        trailing: trailingArrow,
-                                        title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: 50,)
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  if (_isLoadingBackup)
+                    Container(
+                      color: Colors.black.withOpacity(0.5),
+                      child: Center(
+                        child: CupertinoActivityIndicator(
+                            radius: 20.0,
+                            color: Colors.amber[800]
+                        ),
                       ),
                     ),
-                  );
-                },
+                ],
               );
             }
         )
     );
+  }
+
+  Future _loadBackupFromFilePicker() async{
+    setState(() {
+      _isLoadingBackup = true;
+    });
+    File? file = await getBackupFromFilePicker(cnHomepage: cnHomepage);
+    setState(() {
+      _isLoadingBackup = false;
+    });
+    if(file != null){
+      cnStandardPopUp.open(
+          confirmText: AppLocalizations.of(context)!.yes,
+          cancelText: AppLocalizations.of(context)!.no,
+          widthFactor: 0.8,
+          context: context,
+          child: Column(
+            children: [
+              Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),),
+              const SizedBox(height: 5),
+              Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm, textAlign: TextAlign.center, textScaler: const TextScaler.linear(0.9),)
+            ],
+          ),
+          onConfirm: ()async{
+            setState(() {
+              _isLoadingBackup = true;
+            });
+            try{
+              await loadBackupFromFile(file, cnHomepage: cnHomepage);
+              saveCurrentData(cnConfig);
+              tutorialIsRunning = false;
+              currentTutorialStep = 100;
+              cnConfig.setCurrentTutorialStep(currentTutorialStep);
+              cnScreenStatistics.refreshData();
+              cnScreenStatistics.resetGraph();
+              cnScreenStatistics.refresh();
+              Fluttertoast.showToast(
+                  msg: AppLocalizations.of(context)!.backupLoadSuccess,
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.grey[800],
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+              setState(() {
+                _isLoadingBackup = false;
+              });
+            }
+            catch (_){
+              setState(() {
+                _isLoadingBackup = false;
+              });
+              Fluttertoast.showToast(
+                  msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
+                  toastLength: Toast.LENGTH_LONG,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.grey[800],
+                  textColor: Colors.white,
+                  fontSize: 16.0
+              );
+            }
+
+          }
+      );
+    }
   }
 
   void onPanelSlide(value){
@@ -444,6 +506,54 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             trailingArrow
           ],
         ),
+      ),
+    );
+  }
+
+  Widget getSelectLoadBackupOption() {
+    return PullDownButton(
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      routeTheme: routeTheme,
+      itemBuilder: (context) {
+        return [
+          PullDownMenuItem(
+            title: AppLocalizations.of(context)!.settingsBackupLoadExternal,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                _loadBackupFromFilePicker();
+              });
+            },
+          ),
+          PullDownMenuItem(
+            title: AppLocalizations.of(context)!.settingsBackupLoadLocal,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Future.delayed(const Duration(milliseconds: 200), () async{
+                final localFiles = await getLocalBackupFiles();
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => LocalFilePicker(localFiles: localFiles)
+                    ));
+              });
+            },
+          ),
+        ];
+      },
+      buttonBuilder: (context, showMenu) => CupertinoButton(
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            showMenu();
+          },
+          padding: EdgeInsets.zero,
+          child: Row(
+            children: [
+              Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
+              const Spacer(),
+              trailingArrow
+            ],
+          )
       ),
     );
   }
@@ -520,7 +630,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig);
+                saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig, automatic: false);
                 saveCurrentData(cnConfig);
               });
             },

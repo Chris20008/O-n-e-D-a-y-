@@ -418,14 +418,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       const SizedBox(width: 5),
                       if(cnConfig.useSpotify)
                         FutureBuilder(
-                            future: cnConfig.isSpotifyInstalled(delayMilliseconds: 500, context: context),
+                            future: cnConfig.isSpotifyInstalled(delayMilliseconds: 800, context: context),
                             builder: (context, connected){
                               if(!connected.hasData){
-                                return const Center(
+                                return Center(
                                   child: SizedBox(
                                       height: 15,
                                       width: 15,
-                                      child: CircularProgressIndicator(strokeWidth: 2,)
+                                      child: CupertinoActivityIndicator(
+                                          radius: 8.0,
+                                          color: Colors.amber[800]
+                                      ),
+                                      // child: CircularProgressIndicator(strokeWidth: 2,)
                                   ),
                                 );
                               }

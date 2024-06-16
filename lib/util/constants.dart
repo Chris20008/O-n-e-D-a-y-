@@ -83,7 +83,7 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
-Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4}){
+Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color}){
   return Column(
     children: [
       SizedBox(height: heightTop),
@@ -91,7 +91,7 @@ Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minu
         height: 1,
         width: double.maxFinite - minusWidth,
         // color: const Color(0xFFC16A03).withOpacity(opacity),
-          color: Colors.amber[900]!.withOpacity(opacity)
+          color: (color?? Colors.amber[900])!.withOpacity(opacity)
         // color: Colors.amber[900]!.withOpacity(0.6),
       ),
       SizedBox(height: heightBottom),
@@ -281,21 +281,21 @@ Widget getSet({
   required BuildContext context
 }){
 
-  PullDownMenuItem rpePullDownMenuItem(SingleSet set, int value){
-    return PullDownMenuItem.selectable(
-      selected: set.setType == value+10,
-      title: 'RPE $value',
-      onTap: () {
-        HapticFeedback.selectionClick();
-        FocusManager.instance.primaryFocus?.unfocus();
-        Future.delayed(const Duration(milliseconds: 200), (){
-          set.setType = value+10;
-          // print(setType);
-          onConfirm();
-        });
-      },
-    );
-  }
+  // PullDownMenuItem rpePullDownMenuItem(SingleSet set, int value){
+  //   return PullDownMenuItem.selectable(
+  //     selected: set.setType == value+10,
+  //     title: 'RPE $value',
+  //     onTap: () {
+  //       HapticFeedback.selectionClick();
+  //       FocusManager.instance.primaryFocus?.unfocus();
+  //       Future.delayed(const Duration(milliseconds: 200), (){
+  //         set.setType = value+10;
+  //         // print(setType);
+  //         onConfirm();
+  //       });
+  //     },
+  //   );
+  // }
 
   final SingleSet s = newEx.sets[index];
   return SizedBox(
@@ -331,17 +331,17 @@ Widget getSet({
               });
             },
           ),
-          const PullDownMenuDivider.large(),
-          rpePullDownMenuItem(s, 1),
-          rpePullDownMenuItem(s, 2),
-          rpePullDownMenuItem(s, 3),
-          rpePullDownMenuItem(s, 4),
-          rpePullDownMenuItem(s, 5),
-          rpePullDownMenuItem(s, 6),
-          rpePullDownMenuItem(s, 7),
-          rpePullDownMenuItem(s, 8),
-          rpePullDownMenuItem(s, 9),
-          rpePullDownMenuItem(s, 10)
+          // const PullDownMenuDivider.large(),
+          // rpePullDownMenuItem(s, 1),
+          // rpePullDownMenuItem(s, 2),
+          // rpePullDownMenuItem(s, 3),
+          // rpePullDownMenuItem(s, 4),
+          // rpePullDownMenuItem(s, 5),
+          // rpePullDownMenuItem(s, 6),
+          // rpePullDownMenuItem(s, 7),
+          // rpePullDownMenuItem(s, 8),
+          // rpePullDownMenuItem(s, 9),
+          // rpePullDownMenuItem(s, 10)
         ];
       },
       buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -773,9 +773,10 @@ Widget getCloudOptionsColumn({
   required BuildContext context,
   required Function refresh
 }){
-  return /// Connect with Cloud
+  return
     Column(
       children: [
+        /// Connect with Cloud
         CupertinoListTile(
           leading: const Icon(Icons.cloud_done),
           trailing: CupertinoSwitch(
@@ -819,11 +820,15 @@ Widget getCloudOptionsColumn({
                       future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
                       builder: (context, connected){
                         if(!connected.hasData){
-                          return const Center(
+                          return Center(
                             child: SizedBox(
                                 height: 15,
                                 width: 15,
-                                child: CircularProgressIndicator(strokeWidth: 2,)
+                                child: CupertinoActivityIndicator(
+                                    radius: 8.0,
+                                    color: Colors.amber[800]
+                                ),
+                                // child: CircularProgressIndicator(strokeWidth: 2,)
                             ),
                           );
                         }

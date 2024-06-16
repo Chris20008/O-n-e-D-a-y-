@@ -175,7 +175,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         onConfirm: (){
           cnScreenStatistics.refreshData();
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-            // cnScreenStatistics.lineChartKey = UniqueKey();
             cnScreenStatistics.refresh();
             cnScreenStatistics.cache();
           });
@@ -336,6 +335,11 @@ class CnScreenStatistics extends ChangeNotifier {
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
+  bool graphLocked = false;
+  double currentVisibleDays = 0;
+  double maxVisibleDays = 1900;
+  double offsetMinX = 0;
+  double offsetMaxX = 0;
   late CnConfig cnConfig;
 
   /// Settings variables
@@ -423,7 +427,10 @@ class CnScreenStatistics extends ChangeNotifier {
             indexToRemove.add(index);
           }
         });
-        maxWeights[entry.key] = entry.value.weights.whereIndexed((index, element) => !indexToRemove.contains(index)).max;
+        List<double> cleanedEntry = entry.value.weights.whereIndexed((index, element) => !indexToRemove.contains(index)).toList();
+        if(cleanedEntry.isNotEmpty){
+          maxWeights[entry.key] = entry.value.weights.whereIndexed((index, element) => !indexToRemove.contains(index)).max;
+        }
       } else{
         maxWeights[entry.key] = entry.value.weights.max;
       }
@@ -534,6 +541,13 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
     onlyWorkingSets = data["onlyWorkingSets"] ?? false;
+  }
+
+  void resetGraph(){
+    maxVisibleDays = 1900;
+    offsetMinX = 0;
+    offsetMaxX = 0;
+    lineChartKey = UniqueKey();
   }
 
   Future<void> cache() async{

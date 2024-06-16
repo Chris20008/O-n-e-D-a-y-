@@ -52,16 +52,18 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     if(tutorialIsRunning && MediaQuery.of(context).viewInsets.bottom == 0){
       if(currentTutorialStep == 1
           && cnNewWorkout.workout.name.isNotEmpty
-          && cnNewExercisePanel.panelController.isPanelClosed){
+          && cnNewExercisePanel.panelController.isPanelClosed
+          && cnNewWorkout.workout.exercises.isEmpty
+      ){
+        currentTutorialStep = 2;
         initTutorialAddExercise(context);
         showTutorialAddExercise(context);
-        currentTutorialStep = 2;
       }
       if(currentTutorialStep == 3 && cnNewWorkout.workout.exercises.isNotEmpty){
+        currentTutorialStep = 4;
         Future.delayed(const Duration(milliseconds: 500), (){
           initTutorialExplainExerciseDragOptions(context);
           showTutorialExplainExerciseDragOptions(context);
-          currentTutorialStep = 4;
         });
 
       }

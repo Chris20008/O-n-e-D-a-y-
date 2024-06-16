@@ -37,14 +37,14 @@ class ObExercise{
     );
   }
 
-  // ObExercise.fromMap(Map w): this(
-  //     // id: w["id"],
-  //     name: w["name"],
-  //     weights: List<double>.from(List.from(w["weights"]?? [0.0]).map((w) => double.parse(w.toString()))),
-  //     amounts: List<int>.from(List.from(w["amounts"]?? [0.0]).map((a) => int.parse(a.toString()))),
-  //     setType: List<int>.from(List.from(w["setType"]?? [0.0]).map((a) => int.parse(a.toString()))),
-  //     restInSeconds: w["restInSeconds"]?? 0,
-  //     seatLevel: w["seatLevel"],
-  //     linkName: w["linkName"]
-  // );
+  int getHash(){
+    final listHashW = Object.hashAll(weights);
+    final listHashA = Object.hashAll(amounts);
+    final listHashS = Object.hashAll(setTypes);
+    return Object.hash(name, restInSeconds, seatLevel, linkName, listHashW, listHashA, listHashS);
+  }
+
+  bool equals(ObExercise ex){
+    return getHash() == ex.getHash();
+  }
 }

@@ -466,7 +466,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         setState(() {
           Fluttertoast.showToast(
               msg: "Add at least one Set",
-              toastLength: Toast.LENGTH_LONG,
+              toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.SNACKBAR,
               timeInSecForIosWeb: 1,
               backgroundColor: Colors.grey[800],

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -30,8 +31,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   double maxWeight = 0;
   double minTotalWeight = 0;
   double maxTotalWeight = 0;
-  final double maxVisibleDays = 1900;
-  double currentVisibleDays = 0;
+  // final double maxVisibleDays = 1900;
   double minY = 0;
   double maxY = 0;
   double minPercent = 1;
@@ -42,8 +42,6 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   late DateTime maxDate;
   double width = 0;
   List<FlSpot> spotsMaxWeight = [];
-  double offsetMinX = 0;
-  double offsetMaxX = 0;
   Offset? pointerA;
   Offset? pointerAPreviousPos;
   Offset? pointerB;
@@ -56,26 +54,47 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   List<FlSpot> spotsAvgWeightPerSet = [];
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
-
   int animationTime = 500;
+
+  double _currentVisibleDays = 0;
+  double _offsetMinX = 0;
+  double _offsetMaxX = 0;
+
+  bool initOffsets = true;
+
+
+  @override
+  void dispose() {
+    cnScreenStatistics.currentVisibleDays = _currentVisibleDays;
+    cnScreenStatistics.offsetMinX = _offsetMinX;
+    cnScreenStatistics.offsetMaxX = _offsetMaxX;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    if(initOffsets){
+      initOffsets = false;
+      _currentVisibleDays = cnScreenStatistics.currentVisibleDays;
+      _offsetMinX = cnScreenStatistics.offsetMinX;
+      _offsetMaxX = cnScreenStatistics.offsetMaxX;
+    }
 
     width = MediaQuery.of(context).size.width;
     minDate = cnScreenStatistics.minDate;
     maxDate = cnScreenStatistics.maxDate;
 
-    final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - offsetMaxX;
-    if(tempMaxX > maxVisibleDays){
-      final rest = tempMaxX - maxVisibleDays;
-      if(currentVisibleDays <= 0){
-        offsetMinX += rest;
+    final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - _offsetMaxX;
+    if(tempMaxX > cnScreenStatistics.maxVisibleDays){
+      final rest = tempMaxX - cnScreenStatistics.maxVisibleDays;
+      if(_currentVisibleDays <= 0){
+        _offsetMinX += rest;
       }
-      offsetMaxX += rest - _totalPadding;
-      currentVisibleDays = maxVisibleDays;
+      _offsetMaxX += rest - _totalPadding;
+      _currentVisibleDays = cnScreenStatistics.maxVisibleDays;
     } else{
-      currentVisibleDays = tempMaxX;
+      _currentVisibleDays = tempMaxX;
     }
 
     maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
@@ -104,7 +123,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     /// Set Spots Max Weight
     spotsMaxWeight.clear();
     maxWeights?.forEach((date, weight) {
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - offsetMinX + _leftPadding;
+      final xCoordinate = date.difference(minDate).inDays.toDouble() - _offsetMinX + _leftPadding;
       spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
@@ -112,7 +131,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - offsetMinX + _leftPadding;
+      final xCoordinate = date.difference(minDate).inDays.toDouble() - _offsetMinX + _leftPadding;
       if(percent.isNaN){
         percent = totalWeight / maxTotalWeight;
         if(percent.isNaN){
@@ -153,6 +172,16 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
+            const Spacer(),
+            IconButton(
+                onPressed: (){
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    cnScreenStatistics.graphLocked = !cnScreenStatistics.graphLocked;
+                  });
+                },
+                icon: cnScreenStatistics.graphLocked? const Icon(Icons.lock_outlined) : const Icon(Icons.lock_open),
+            )
           ],
         ),
         const SizedBox(height: 10,),
@@ -177,6 +206,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
                 }
               },
               onPointerMove: (PointerMoveEvent details){
+                if(cnScreenStatistics.graphLocked){
+                  return;
+                }
                 if(details.pointer == pointerAIdentifier){
                   pointerA = details.position;
                 }
@@ -186,7 +218,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
                 /// ZOOM
                 if(pointerA != null && pointerB != null){
-                  double sensibility = ((currentVisibleDays) / (1500 / sqrt(currentVisibleDays)));
+                  double sensibility = ((_currentVisibleDays) / (1500 / sqrt(_currentVisibleDays)));
                   final maxDays = maxDate.difference(minDate).inDays;
                   final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
                   final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
@@ -196,14 +228,14 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
                     double newOffsetMaxX;
                     double newOffsetMinX;
 
-                    newOffsetMaxX = (offsetMaxX - difference);
+                    newOffsetMaxX = (_offsetMaxX - difference);
                     newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
-                    newOffsetMinX = (offsetMinX - difference * focalPointPercent);
+                    newOffsetMinX = (_offsetMinX - difference * focalPointPercent);
                     newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
 
-                    if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= maxVisibleDays){
-                      offsetMinX = newOffsetMinX;
-                      offsetMaxX = newOffsetMaxX;
+                    if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= cnScreenStatistics.maxVisibleDays){
+                      _offsetMinX = newOffsetMinX;
+                      _offsetMaxX = newOffsetMaxX;
                     }
                   });
                 }
@@ -211,18 +243,18 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
                 /// SCROLL
                 else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
                   final totalRange = maxDate.difference(minDate).inDays;
-                  final maxValueOffsetMinX = totalRange - currentVisibleDays + _totalPadding;
+                  final maxValueOffsetMinX = totalRange - _currentVisibleDays + _totalPadding;
                   // double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
-                  double sensibility = 1/ (currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
+                  double sensibility = 1/ (_currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
                   sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
                   final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
 
                   double newOffsetMinX;
 
-                  newOffsetMinX = offsetMinX + currentPointerDistance;
-                  if(newOffsetMinX >= 0 && newOffsetMinX != offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= offsetMinX)){
+                  newOffsetMinX = _offsetMinX + currentPointerDistance;
+                  if(newOffsetMinX >= 0 && newOffsetMinX != _offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= _offsetMinX)){
                     setState(() {
-                      offsetMinX = newOffsetMinX;
+                      _offsetMinX = newOffsetMinX;
                       pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
                     });
                   }
@@ -285,9 +317,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     );
     Widget text;
 
-    value += offsetMinX;
+    value += _offsetMinX;
 
-    if(currentVisibleDays < 200 && value % 1.0 > 0.1){
+    if(_currentVisibleDays < 200 && value % 1.0 > 0.1){
       return SideTitleWidget(
         axisSide: meta.axisSide,
         child: const Text('', style: style)
@@ -311,22 +343,22 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   Widget generateXAxisText(DateTime date, TextStyle style){
     bool doLabel;
     String format;
-    if(currentVisibleDays < 20){
+    if(_currentVisibleDays < 20){
       doLabel = date.day % 5 == 0;
       format = 'd. MMM';
-    } else if(currentVisibleDays < 40){
+    } else if(_currentVisibleDays < 40){
       doLabel = date.day % 10 == 0;
       format = 'd. MMM';
-    } else if(currentVisibleDays < 80){
+    } else if(_currentVisibleDays < 80){
       doLabel = date.day % 15 == 0 || (date.day == 28 && date.month == 2);
       format = 'd. MMM';
-    } else if(currentVisibleDays < 200){
+    } else if(_currentVisibleDays < 200){
       doLabel = date.day == 1;
       format = 'MMM yy';
-    } else if(currentVisibleDays < 400){
+    } else if(_currentVisibleDays < 400){
       doLabel = date.day == 1 && date.month % 2 == 0;
       format = 'MMM yy';
-    }else if (currentVisibleDays < 700){
+    }else if (_currentVisibleDays < 700){
       doLabel = date.day == 1 && date.month % 3 == 0;
       format = 'MMM yy';
     } else{
@@ -420,7 +452,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: currentVisibleDays < 200? 0.1 : 1,
+            interval: _currentVisibleDays < 200? 0.1 : 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
@@ -438,7 +470,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         border: Border.all(color: const Color(0xff5e5e5e)),
       ),
       minX: 0,
-      maxX: currentVisibleDays.toDouble(),
+      maxX: _currentVisibleDays.toDouble(),
       minY: minY,
       maxY: maxY,
       lineBarsData: [
@@ -465,9 +497,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         ),
         if(cnScreenStatistics.showAvgWeightPerSetLine)
           LineChartBarData(
+            isCurved: false,
             curveSmoothness: 0.1,
             spots: spotsAvgWeightPerSet,
-            isCurved: true,
             gradient: LinearGradient(
               colors: gradientColors2,
             ),

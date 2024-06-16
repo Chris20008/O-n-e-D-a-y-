@@ -34,7 +34,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
         _delayStartPeriodicRefreshing = _delayStartPeriodicRefreshing + cnStopwatchWidget.animationTimeStopwatch;
       }
     }
-    on Exception catch (_) {}
+    catch (_) {}
     Future.delayed(Duration(milliseconds: _delayStartPeriodicRefreshing), (){
       periodicRefresh();
     });
@@ -54,7 +54,7 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
               periodicRefresh();
             });
           }
-        } on Exception catch (_) {
+        } catch (_) {
           periodicRefresh();
         }
       }

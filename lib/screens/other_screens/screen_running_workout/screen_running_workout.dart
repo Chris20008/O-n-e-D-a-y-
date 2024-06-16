@@ -74,6 +74,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   bool isAlreadyCheckingKeyboardPermanent = false;
   bool showSelectorExerciseToUpdate = false;
   bool showSelectorExercisePerLink = false;
+  bool isSavingData = false;
   final _style = const TextStyle(color: Colors.white, fontSize: 15);
 
   @override
@@ -97,6 +98,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     }
 
     return PopScope(
+      canPop: !isSavingData,
       onPopInvoked: (doPop){
         if(cnRunningWorkout.isVisible){
           cnRunningWorkout.isVisible = false;
@@ -159,9 +161,27 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 itemCount: cnRunningWorkout.groupedExercises.length,
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
+                                  // for(MapEntry k in cnRunningWorkout.groupedExercises.entries){
+                                  //   print("Entry");
+                                  //   print(k);
+                                  // }
                                   dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+                                  print("Is Exercise? : ${newEx is Exercise}");
+                                  print(newEx);
+                                  print(cnRunningWorkout.groupedExercises.entries.toList()[indexExercise]);
+                                  print(cnRunningWorkout.selectedIndexes);
                                   if(newEx is! Exercise){
-                                    newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
+                                    print("Before");
+                                    try{
+                                      newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
+                                    }
+                                    catch (_){
+                                      if(newEx is List && newEx.first is Exercise){
+                                        newEx = newEx.first;
+                                      } else{
+                                        return const SizedBox();
+                                      }
+                                    }
                                   }
                                   Exercise templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == newEx.name).first;
                                   child = Column(
@@ -170,66 +190,71 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
-                                          ? Expanded(
-                                              child: OverflowSafeText(
-                                                newEx.name,
-                                                maxLines: 1,
-                                                style: const TextStyle(color: Colors.white, fontSize: 20),
-                                              ),
-                                          ):
-                                          PullDownButton(
-                                            onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-                                            buttonAnchor: PullDownMenuAnchor.start,
-                                            routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
-                                            itemBuilder: (context) {
-                                              final children = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<PullDownMenuItem>((Exercise value) {
-                                                return PullDownMenuItem.selectable(
-                                                  title: value.name,
-                                                  selected: newEx.name == value.name,
-                                                  onTap: () {
-                                                    FocusManager.instance.primaryFocus?.unfocus();
-                                                    HapticFeedback.selectionClick();
-                                                    Future.delayed(const Duration(milliseconds: 200), (){
-                                                      setState(() {
-                                                        final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                                        final t = lists.map((element) => element.value.indexWhere((ex) {
-                                                          return ex.name == value.name;
-                                                        })).toList().firstWhere((element) => element >=0);
-                                                        cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
-                                                      });
-                                                      cnRunningWorkout.cache();
-                                                    });
-                                                  },
-                                                );
-                                              }).toList();
-                                              return children;
-                                            },
-                                            buttonBuilder: (context, showMenu) => CupertinoButton(
-                                                onPressed: (){
+                                          /// Single Exercise
+                                          ? ConstrainedBox(
+                                            constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context).size.width-80
+                                            ),
+                                            child: OverflowSafeText(
+                                              newEx.name,
+                                              maxLines: 1,
+                                              style: const TextStyle(color: Colors.white, fontSize: 20),
+                                            ),
+                                          )
+                                          /// Exercise Selector
+                                          : PullDownButton(
+                                          onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+                                          buttonAnchor: PullDownMenuAnchor.start,
+                                          routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
+                                          itemBuilder: (context) {
+                                            final children = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value.map<PullDownMenuItem>((Exercise value) {
+                                              return PullDownMenuItem.selectable(
+                                                title: value.name,
+                                                selected: newEx.name == value.name,
+                                                onTap: () {
+                                                  FocusManager.instance.primaryFocus?.unfocus();
                                                   HapticFeedback.selectionClick();
-                                                  showMenu();
+                                                  Future.delayed(const Duration(milliseconds: 200), (){
+                                                    setState(() {
+                                                      final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
+                                                      final t = lists.map((element) => element.value.indexWhere((ex) {
+                                                        return ex.name == value.name;
+                                                      })).toList().firstWhere((element) => element >=0);
+                                                      cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                                    });
+                                                    cnRunningWorkout.cache();
+                                                  });
                                                 },
-                                                padding: EdgeInsets.zero,
-                                                child: Row(
-                                                  children: [
-                                                    ConstrainedBox(
-                                                      constraints: BoxConstraints(
-                                                          maxWidth: MediaQuery.of(context).size.width-80
-                                                      ),
-                                                      child: OverflowSafeText(
-                                                          newEx.name,
-                                                          style: const TextStyle(color: Colors.white, fontSize: 20),
-                                                          maxLines: 1
-                                                      ),
+                                              );
+                                            }).toList();
+                                            return children;
+                                          },
+                                          buttonBuilder: (context, showMenu) => CupertinoButton(
+                                              onPressed: (){
+                                                HapticFeedback.selectionClick();
+                                                showMenu();
+                                              },
+                                              padding: EdgeInsets.zero,
+                                              child: Row(
+                                                children: [
+                                                  ConstrainedBox(
+                                                    constraints: BoxConstraints(
+                                                        maxWidth: MediaQuery.of(context).size.width-80
                                                     ),
-                                                    const SizedBox(width: 10,),
-                                                    const Icon(
-                                                      Icons.arrow_forward_ios,
-                                                      size: 15,
-                                                      color: Colors.white,
-                                                    )
-                                                  ],
-                                                )
+                                                    child: OverflowSafeText(
+                                                        newEx.name,
+                                                        style: const TextStyle(color: Colors.white, fontSize: 20),
+                                                        maxLines: 1
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 10,),
+                                                  const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  )
+                                                ],
+                                              )
                                             ),
                                           ),
                                           const Spacer(),
@@ -729,7 +754,17 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   });
                 },
               ),
-            )
+            ),
+            if (isSavingData)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: CupertinoActivityIndicator(
+                      radius: 20.0,
+                      color: Colors.amber[800]
+                  ),
+                ),
+              )
           ],
         ),
       ),
@@ -1000,6 +1035,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
   Future finishWorkout() async{
     int time;
+
+    setState(() {
+      isSavingData = true;
+    });
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.clear();
       time = cnStandardPopUp.animationTime;
@@ -1021,9 +1060,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
       bool savedAutomaticBackup = false;
       bool savedCurrentData = false;
+
       if(cnConfig.automaticBackups){
         savedAutomaticBackup = await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
       }
+
       savedCurrentData = await saveCurrentData(cnConfig) != null;
 
       Fluttertoast.showToast(
@@ -1037,6 +1078,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       );
 
       await stopWorkout(time: 0);
+      isSavingData = true;
 
 
     });
@@ -1317,6 +1359,12 @@ class CnRunningWorkout extends ChangeNotifier {
       }
       else{
         groupedExercises[ex.linkName] = groupedExercises[ex.linkName] + [ex];
+      }
+    }
+    for(MapEntry entry in groupedExercises.entries){
+      if(entry.value is List){
+        print(entry.value);
+        (entry.value as List).sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       }
     }
   }

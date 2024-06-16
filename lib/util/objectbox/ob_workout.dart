@@ -49,6 +49,16 @@ class ObWorkout{
     objectbox.exerciseBox.putMany(exercises);
   }
 
+  int getHash(){
+    final listHash = Object.hashAll(linkedExercises);
+    final listHashEx = Object.hashAll(exercises.map((element) => element.getHash()));
+    return Object.hash(name, date, isTemplate, listHash, listHashEx);
+  }
+
+  int getHashId(){
+    return Object.hash(id, name, date);
+  }
+
   Map asMap(){
     final exs = List<Map>.from(exercises.map((ex) => {
       "id": ex.id,

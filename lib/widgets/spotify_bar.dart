@@ -656,7 +656,7 @@ class CnSpotifyBar extends ChangeNotifier {
       if(isConnected){
         _subscribeToPlayerState();
       }
-    }on Exception catch (e) {
+    } catch (e) {
       accessToken = "";
       isTryingToConnect = false;
       if(e.toString().contains("NotLoggedInException")){
@@ -692,7 +692,7 @@ class CnSpotifyBar extends ChangeNotifier {
         // })
       });
       // await SpotifySdk.skipPrevious();
-    } on Exception catch (_) {}
+    } catch (_) {}
     isHandlingControlAction = false;
   }
 
@@ -708,7 +708,7 @@ class CnSpotifyBar extends ChangeNotifier {
         // })
       });
       // await SpotifySdk.skipNext();
-    } on Exception catch (_) {}
+    } catch (_) {}
     isHandlingControlAction = false;
   }
 
@@ -727,7 +727,7 @@ class CnSpotifyBar extends ChangeNotifier {
       //   keepConnectedWhenPaused();
       // }
       // await SpotifySdk.pause();
-    } on Exception catch (_) {}
+    } catch (_) {}
     isHandlingControlAction = false;
   }
 
@@ -742,7 +742,7 @@ class CnSpotifyBar extends ChangeNotifier {
         // })
       });
       // await SpotifySdk.resume();
-    } on Exception catch (_) {}
+    } catch (_) {}
     isHandlingControlAction = false;
   }
 
@@ -811,7 +811,7 @@ class CnSpotifyBar extends ChangeNotifier {
         _subscription.cancel();
         _subscriptionConnectionStatus.cancel();
       });
-    } on Exception catch (_) {
+    } catch (_) {
       cnAnimatedColumn.refresh();
       _subscription.cancel();
       _subscriptionConnectionStatus.cancel();

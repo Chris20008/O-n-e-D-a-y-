@@ -296,14 +296,20 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     ),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.bottomCenter,
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 100),
+                    padding: const EdgeInsets.only(bottom: 100),
                     child: SizedBox(
                         height: 100,
                         width: 100,
-                        child: Center(child: CircularProgressIndicator())
+                        child: Center(
+                          child: CupertinoActivityIndicator(
+                              radius: 20.0,
+                              color: Colors.amber[800]
+                          ),
+                        ),
+                        // child: Center(child: CircularProgressIndicator())
                     ),
                   ),
                 )
@@ -315,7 +321,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     }
 
     if(cnConfig.currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
-      // print("START TUT ONE");
       tutorialIsRunning = true;
       initTutorialAddWorkout(context);
       showTutorialAddWorkout(context);
@@ -528,10 +533,16 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                                 if(cnHomepage.percent != null)
                                 const SizedBox(width: 5),
                                 if(!cnHomepage.syncWithCloudCompleted)
-                                  const SizedBox(
+                                  SizedBox(
                                       height: 15,
                                       width: 15,
-                                      child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
+                                      child: Center(
+                                        child: CupertinoActivityIndicator(
+                                            radius: 8.0,
+                                            color: Colors.amber[800]
+                                        ),
+                                      ),
+                                      // child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
                                   )
                                 else
                                   const Icon(
@@ -659,9 +670,9 @@ class CnHomepage extends ChangeNotifier {
     }
   }
 
-  finishSync(){
+  finishSync({double? p = 1}){
     syncWithCloudCompleted = true;
-    percent = 1;
+    percent = p;
     refresh();
     Future.delayed(const Duration(seconds: 3), (){
       isSyncingWithCloud = false;

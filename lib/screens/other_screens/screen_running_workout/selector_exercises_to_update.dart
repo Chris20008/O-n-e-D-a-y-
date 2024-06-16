@@ -4,6 +4,7 @@ import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:quiver/iterables.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
@@ -107,10 +108,18 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                   children: [
                                     Row(
                                       children: [
-                                        OverflowSafeText(
-                                            relevantExercises[index].name,
-                                            minFontSize: 20
+                                        ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context).size.width-100
+                                          ),
+                                          child: OverflowSafeText(
+                                              relevantExercises[index].name,
+                                              fontSize: 20,
+                                              minFontSize: 16,
+                                              maxLines: 1
+                                          ),
                                         ),
+                                        /// Container to be able to click the are to trigger the checkbox tap
                                         Expanded(child: Container(color: Colors.transparent ,height: 50,),),
                                         Transform.scale(
                                           scale: 1.4,
