@@ -787,12 +787,9 @@ Widget getCloudOptionsColumn({
                   HapticFeedback.selectionClick();
                 }
                 if(!value){
-                  cnConfig.revokeConnectCloud();
+                  await cnConfig.revokeConnectCloud();
                 }
                 cnConfig.setConnectWithCloud(value);
-                // if(Platform.isIOS){
-                //   cnConfig.showMoreSettingCloud = value;
-                // }
                 refresh();
               }
           ),

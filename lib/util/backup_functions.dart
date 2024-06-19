@@ -69,11 +69,7 @@ Future<bool> loadBackupFromFile(File file, {CnHomepage? cnHomepage}) async{
 Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepage}) async{
   /// Todo: Improve Performance of split and for loop
   /// They both take long and block the UI when the data is very large
-  int start = DateTime.now().millisecondsSinceEpoch;
   final allWorkoutsAsListString = content.split(";");
-  print("After Split: ${(DateTime.now().millisecondsSinceEpoch-start)} milliseconds");
-
-  start = DateTime.now().millisecondsSinceEpoch;
   final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
   List<ObWorkout> allObWorkouts = [];
   for (Map w in allWorkouts){
@@ -82,7 +78,6 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     workout.addExercises(exs);
     allObWorkouts.add(workout);
   }
-  print("After for loop: ${(DateTime.now().millisecondsSinceEpoch-start)} milliseconds");
 
   final hadDifferences = await loadDifferences(allObWorkouts, cnHomepage: cnHomepage);
   return hadDifferences;
@@ -95,8 +90,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   int batchSize = (workouts.length~/100).clamp(5, 15);
   // int batchSize = 10;
   int counter = 0;
-  print("Start get all");
-  int start = DateTime.now().millisecondsSinceEpoch;
   bool hadDifferences = false;
   List<ObWorkout> allCurrentWorkouts = await objectbox.workoutBox.getAllAsync();
   Map<int, ObWorkout> hashMapBig = {};
@@ -105,7 +98,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     hashMapBig[key] = obWorkout;
     // print(key);
   }
-  print("Time Get All: ${(DateTime.now().millisecondsSinceEpoch-start)} milliseconds");
 
   Map<int, ObWorkout> hashMapSmall = {};
   for (var obWorkout in allCurrentWorkouts) {
@@ -220,11 +212,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   if(allCurrentWorkouts.isNotEmpty){
     hadDifferences = true;
   }
-
-  int finish = DateTime.now().millisecondsSinceEpoch;
-
-  print("TOTAL WORKOUTS: $counter");
-  print("Time: ${(finish-start)} milliseconds");
 
   // print("Workouts found to remove: ${allCurrentWorkouts.length}");
   if(cnHomepage != null){

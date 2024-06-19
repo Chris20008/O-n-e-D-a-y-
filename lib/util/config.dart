@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'custom_cache_manager.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:googleapis/drive/v3.dart' as ga;
 
 class Config{
 
@@ -158,7 +159,7 @@ class CnConfig extends ChangeNotifier {
       /// If the connection failed we immediately set the sync value to false
       /// but give a small delay to show the failed connection to the user
       if(isICloudAvailable == false && !isWaitingForCloudResponse){
-        revokeConnectCloud();
+        await revokeConnectCloud();
         await setConnectWithCloud(false);
         Future.delayed(const Duration(seconds: 1), ()async{
           refresh();
@@ -189,7 +190,6 @@ class CnConfig extends ChangeNotifier {
 
       /// If the connection failed we immediately set the sync value to false
       /// but give a small delay to show the failed connection to the user
-      print("ACCOUNT: ${account?.id}");
       if(account == null && !isWaitingForCloudResponse){
         await setConnectWithCloud(false);
         showMoreSettingCloud = false;
@@ -206,7 +206,15 @@ class CnConfig extends ChangeNotifier {
     return account != null;
   }
 
-  void revokeConnectCloud(){
+  Future revokeConnectCloud()async{
+    if(Platform.isAndroid){
+      GoogleSignIn googleSignIn = GoogleSignIn(scopes: [ga.DriveApi.driveFileScope], signInOption: SignInOption.standard);
+      if(await googleSignIn.isSignedIn()){
+        await googleSignIn.signOut();
+      }
+      folderIdGoogleDrive = null;
+      currentDataIdGoogleDrive = null;
+    }
     account = null;
     isICloudAvailable = null;
     showMoreSettingCloud = false;

@@ -151,6 +151,12 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                   ],
                 ),
               ),
+              if(widget.localFiles.isEmpty)
+                Center(
+                  child: Text(
+                    "No local Backups"
+                  ),
+                ),
               const StandardPopUp(),
               if (_isLoadingBackup)
                 Container(

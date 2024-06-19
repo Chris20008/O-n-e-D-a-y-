@@ -242,9 +242,6 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                           /// Save Backup Manual
                                           CupertinoListTile(
                                             leading: const Icon(Icons.upload),
-                                            // leading: const Icon(
-                                            //     MyIcons.database
-                                            // ),
                                             title:getSelectCreateBackup(),
                                           ),
                                           /// Load Backup
@@ -403,7 +400,6 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             });
             try{
               await loadBackupFromFile(file, cnHomepage: cnHomepage);
-              saveCurrentData(cnConfig);
               tutorialIsRunning = false;
               currentTutorialStep = 100;
               cnConfig.setCurrentTutorialStep(currentTutorialStep);
