@@ -62,21 +62,25 @@ import Flutter
             do {
               fileContent = try String(contentsOf: newURL, encoding: .utf8)
             } catch let readError {
-              result(FlutterError(code: "READ_ERROR", message: readError.localizedDescription, details: nil))
+                result(nil)
+//               result(FlutterError(code: "READ_ERROR", message: readError.localizedDescription, details: nil))
             }
           }
 
           if let content = fileContent {
             result(content)
           } else if let error = error {
-            result(FlutterError(code: "COORDINATION_ERROR", message: error.localizedDescription, details: nil))
+            result(nil)
+//             result(FlutterError(code: "COORDINATION_ERROR", message: error.localizedDescription, details: nil))
           }
 
         } catch let error {
-          result(FlutterError(code: "QUERY_ERROR", message: error.localizedDescription, details: nil))
+          result(nil)
+//           result(FlutterError(code: "QUERY_ERROR", message: error.localizedDescription, details: nil))
         }
       } else {
-        result(FlutterError(code: "NOT_FOUND", message: "File not found", details: nil))
+//         result(FlutterError(code: "NOT_FOUND", message: "File not found", details: nil))
+        result(nil)
       }
     }
 

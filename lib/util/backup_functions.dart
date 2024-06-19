@@ -232,123 +232,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   return hadDifferences;
 }
 
-// Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage}) async{
-//   if(cnHomepage != null && cnHomepage.msg.isEmpty){
-//     cnHomepage.msg = "Load Backup";
-//   }
-//   int batchSize = (workouts.length~/100).clamp(5, 15);
-//   // int batchSize = 10;
-//   int counter = 0;
-//
-//   int start = DateTime.now().millisecondsSinceEpoch;
-//   bool hadDifferences = false;
-//   List<ObWorkout> allCurrentWorkouts = await objectbox.workoutBox.getAllAsync();
-//   final length = workouts.length;
-//   print("Time Get All: ${(DateTime.now().millisecondsSinceEpoch-start)} milliseconds");
-//   // print("LENGTH: $length");
-//   // print("BATCHSIZE: $batchSize");
-//
-//   for(ObWorkout wo in workouts){
-//     // print("");
-//     // print("Workout");
-//     // print("CHECKING OBWOKROUT ID: ${wo.id}");
-//     // final existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
-//     ObWorkout? existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => workout.id == wo.id && workout.name == wo.name && workout.date == wo.date);
-//
-//     /// We have to first check if an matching id exists and if the workout correlated to this id has differences the workout with id from cloud
-//     /// If so we update the existing workout
-//     /// The comparisson with the name and date was added later, to make sure that we only update a workout when the name is the same and it happened at the same date,
-//     /// otherwise we could run into a lot of unnecessary double computating
-//     if(existingWorkout != null && !Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(existingWorkout))){
-//       // print("UPDATE WORKOUT with id: ${existingWorkout.id}");
-//       allCurrentWorkouts.remove(existingWorkout);
-//       List<ObExercise> allUpdateableExercises = existingWorkout.exercises;
-//
-//       for(ObExercise ex in wo.exercises){
-//         ObExercise? existingExercise = allUpdateableExercises.firstWhereOrNull((element) => element.name == ex.name);
-//
-//         /// When an exercise with this name exists and is not equal to the current one, we update it
-//         if(existingExercise != null && !Exercise.fromObExercise(ex).equals(Exercise.fromObExercise(existingExercise))){
-//           allUpdateableExercises.remove(existingExercise);
-//           ex.id = existingExercise.id;
-//           // objectbox.exerciseBox.put(ex);
-//         }
-//         /// No ex with this name found -> new Exercise
-//         else{
-//           // objectbox.exerciseBox.put(ex);
-//         }
-//       }
-//
-//       // if(allUpdateableExercises.isNotEmpty){
-//       //   await objectbox.exerciseBox.removeManyAsync(allUpdateableExercises.map((e) => e.id).toList());
-//       // }
-//
-//       existingWorkout = wo;
-//
-//       // objectbox.workoutBox.put(wo);
-//       // objectbox.exerciseBox.putMany(wo.exercises);
-//       hadDifferences = true;
-//       // continue;
-//     }
-//     else{
-//       /// If not it means the id does not exists, but maybe the workout itself exists because objectbox entries
-//       /// on different devices can have different id's
-//       /// So we check just for equal
-//       existingWorkout = allCurrentWorkouts.firstWhereOrNull((workout) => Workout.fromObWorkout(wo).equals(Workout.fromObWorkout(workout)));
-//
-//       /// However, if there is no existing workout that equals the new workout, even when ignoring the ID
-//       /// It means this is a completely new workout
-//       // if(existingWorkout == null){
-//       //   // print("NEW WORKOUT");
-//       //   hadDifferences = true;
-//       //   wo.id = 0;
-//       //   objectbox.workoutBox.putAsync(wo);
-//       //   objectbox.exerciseBox.putManyAsync(wo.exercises);
-//       // } else{
-//       //   allCurrentWorkouts.remove(existingWorkout);
-//       //   // print("FOUND EXISTING WORKOUT");
-//       // }
-//     }
-//
-//     counter += 1;
-//     /// Await a small delay after each completed Batch to allow the UI to refresh
-//     /// For better performance this whole function should be executed in an Isolate
-//     /// Will be implemented later
-//     // if(counter % batchSize == 0){
-//     //   await Future.delayed(const Duration(milliseconds: 20));
-//     // }
-//
-//     if(cnHomepage != null && counter % (batchSize*2) == 0){
-//       final p = counter / length;
-//       // print("PERCENT: $p");
-//       cnHomepage.updateSyncStatus(p);
-//     }
-//   }
-//
-//   if(allCurrentWorkouts.isNotEmpty){
-//     hadDifferences = true;
-//   }
-//
-//   // print("Workouts found to remove: ${allCurrentWorkouts.length}");
-//   if(cnHomepage != null){
-//     final p = counter / length;
-//     // print("PERCENT: $p");
-//     cnHomepage.updateSyncStatus(p);
-//   }
-//
-//   int finish = DateTime.now().millisecondsSinceEpoch;
-//
-//   print("TOTAL WORKOUTS: $counter");
-//   print("Time: ${(finish-start)} milliseconds");
-//
-//   // await objectbox.exerciseBox.removeManyAsync(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
-//   // await objectbox.workoutBox.removeManyAsync(allCurrentWorkouts.map((w) => w.id).toList());
-//   if(cnHomepage != null){
-//     cnHomepage.finishSync();
-//   }
-//   return hadDifferences;
-// }
-
 Future<File?> saveBackup({
   required bool withCloud,
   required CnConfig cnConfig,
@@ -477,7 +360,7 @@ Future<bool> loadNewestDataiCloud({CnHomepage? cnHomepage})async{
     else{
       cnHomepage?.msg = "No Data to Sync";
       cnHomepage?.finishSync(p:null);
-      success = false;
+      return false;
     }
     return success;
   }
