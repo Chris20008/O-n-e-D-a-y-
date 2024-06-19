@@ -15,6 +15,7 @@ import 'objectbox/ob_workout.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
 import 'package:http/http.dart';
 import 'package:path/path.dart';
+import 'package:share_plus/share_plus.dart';
 
 const folderNameGoogleDrive = "OneDay Backups";
 const currentDataFileName = "Current_Data.txt";
@@ -22,14 +23,25 @@ const currentDataFileName = "Current_Data.txt";
 /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
 const folderPathiCloud = "Documents/backups/";
 
+Future<bool> shareBackup({required CnConfig cnConfig, Function? afterReceiveFile}) async{
+  File? file = await saveBackup(
+      withCloud: false,
+      cnConfig: cnConfig
+  );
+  if(file == null){
+    return false;
+  }
+  else{
+    XFile xfile = XFile(file.path);
+    await Share.shareXFiles([xfile]);
+    Future.delayed(const Duration(seconds: 1), (){
+      file.delete();
+    });
+  }
+  return true;
+}
+
 Future<String> getLocalPath() async{
-  // if(Platform.isAndroid){
-  // return await getExternalStorageDirectory();
-  // return await getApplicationDocumentsDirectory();
-  // }
-  // else{
-  //   return await getApplicationDocumentsDirectory();
-  // }
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
 }
@@ -418,9 +430,25 @@ List getWorkoutsAsStringList(){
 Future<List<FileSystemEntity>> getLocalBackupFiles() async{
   final path = await getLocalPath();
 
-  List<FileSystemEntity> localFiles = Directory("$path/").listSync();
+  List<FileSystemEntity> localFiles = Directory("$path/").listSync().where((element) => element.path.contains("_Backup")).toList();
   /// Todo: order list, on IOS at least it is not ordered, on Android it seems to be ordered
-  localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
+  // localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
+
+  /// Compute [FileStat] results for each file.  Use [Future.wait] to do it
+  /// efficiently without needing to wait for each I/O operation sequentially.
+  var statResults = await Future.wait([
+    for (var file in localFiles) FileStat.stat(file.path),
+  ]);
+
+  /// Map file paths to modification times.
+  var mtimes = <String, DateTime>{
+    for (var i = 0; i < localFiles.length; i += 1)
+      localFiles[i].path: statResults[i].changed,
+  };
+
+  /// Sort [fileList] by modification times, from oldest to newest.
+  localFiles.sort((a, b) => mtimes[b.path]!.compareTo(mtimes[a.path]!));
+
   // print(localFiles);
   return localFiles;
 }
@@ -451,7 +479,7 @@ Future<bool> loadNewestDataiCloud({CnHomepage? cnHomepage})async{
     bool success;
     if(Platform.isIOS) {
       String? result = await ICloudService.readFromICloud(currentDataFileName);
-      if(result == null){
+      if(result == null || result.isEmpty){
         cnHomepage?.msg = "No Data to Sync";
         cnHomepage?.finishSync(p:null);
         return false;
@@ -565,6 +593,12 @@ Future<bool> loadNewestDataGoogleDrive(CnConfig cnConfig, {CnHomepage? cnHomepag
 
     /// Decode this Stream to receive it as a String
     var content = await utf8.decodeStream(response.stream);
+
+    if(content.isEmpty){
+      cnHomepage?.msg = "No Data to Sync";
+      cnHomepage?.finishSync(p:null);
+      return false;
+    }
 
     final loadedNewData = await loadBackupFromString(
         content: content, cnHomepage: cnHomepage);

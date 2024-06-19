@@ -8,14 +8,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../screen_statistics.dart';
 
-class LineChartExerciseWeightProgress extends StatefulWidget {
-  const LineChartExerciseWeightProgress({super.key});
+class ExerciseLineChart extends StatefulWidget {
+  const ExerciseLineChart({super.key});
 
   @override
-  State<LineChartExerciseWeightProgress> createState() => _LineChartExerciseWeightProgressState();
+  State<ExerciseLineChart> createState() => _ExerciseLineChartState();
 }
 
-class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeightProgress> {
+class _ExerciseLineChartState extends State<ExerciseLineChart> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   List<Color> gradientColors = [
     Colors.amber[200]!,
@@ -406,6 +406,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
   LineChartData mainData() {
     return LineChartData(
+      clipData: const FlClipData.all(),
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(

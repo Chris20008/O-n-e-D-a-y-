@@ -10,7 +10,7 @@
   "restInSeconds": "Ruhezeit in Sekunden",
   "restTime": "Ruhezeit",
   "seatLevel": "Sitzhöhe",
-  "set": "Set",
+  "set": "Satz",
   "weight": "Gewicht",
   "amount": "Anzahl",
   "delete": "Löschen",
@@ -33,6 +33,10 @@
   "backupLoadSuccess": "Backup wurde erfolgreich geladen",
   "backupLoadNotSuccess": "Das Backup konnte nicht geladen werden",
   "localBackups": "Lokale Backups",
+  "createdManualBackup": "Manuelles Backup erstellt",
+  "createdAutomaticBackup": "Automatisches Backup erstellt",
+  "createdBackupFailed": "Es konnte kein Backup erstellt werden",
+  "savedDataForSync": "Daten für sync. gesichert",
 
   "settings": "Einstellungen",
   "settingsGeneral": "Generelles",
@@ -79,6 +83,8 @@
   "filterAvgMovWeightHead": "Durchschn. bewegtes Gewicht",
   "filterAvgMovWeightText": "Zeigt eine zusätzliche Linie im Diagramm an, die das durchschnittlich bewegte Gesamtgewicht pro Satz angibt",
   "filterAllWorkouts": "Alle Workouts",
+  "filterOnlyWorkingSets": "Nur Arbeitssätze",
+  "filterOnlyWorkingSetsText": "Alle Sätze gelten per default als Arbeitssatz. Du kannst einen Satz explizit als Aufwärmsatz festlegen, was dazu führt, dass er in dem Diagramm nicht berücksichtigt wird",
 
   "panelWoExercises": "Übungen",
   "panelWoWorkoutTemplate": "Workout Vorlage",
@@ -113,6 +119,7 @@
   "runningWorkoutNoExerciseUpdate": "Keine Übung zum aktualisieren",
   "runningWorkoutAlreadyExists": "Übungsname existiert bereits",
   "runningWorkoutTimerTimeInSeconds": "Zeit in Sekunden",
+  "runningWorkoutConfirmCancelWorkout": "Möchtest du das Workout wirklich abbrechen? Dadurch gehen alle in diesem Workout gesammelten Daten verloren.",
 
   "welcomeNext": "Weiter",
   "welcomeBack": "Zurück",

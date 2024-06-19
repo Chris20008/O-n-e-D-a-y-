@@ -396,7 +396,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             crossFadeState: cnBottomMenu.index == 0?
                             CrossFadeState.showFirst:
                             CrossFadeState.showSecond,
-                            duration: const Duration(milliseconds: 200)
+                            duration: const Duration(milliseconds: 100)
                         ),
                       ),
 

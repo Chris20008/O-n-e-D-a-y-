@@ -173,19 +173,20 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   ],
                 ),
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LimitedBox(
-                          maxHeight: 1000,
-                          child: MultipleExerciseRow(
-                            exercises: widget.workout.exercises,
-                            // textScaler: TextScaler.linear()1.3,
-                            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                          )
-                      )
-                    ],
-                  ),
+                  // Column(
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   children: [
+                  //     LimitedBox(
+                  //         maxHeight: 1000,
+                  //         child:
+                  MultipleExerciseRow(
+                    exercises: widget.workout.exercises,
+                    // textScaler: TextScaler.linear()1.3,
+                    padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                  )
+                      // )
+                    // ],
+                  // ),
                 ]
             ),
           ),

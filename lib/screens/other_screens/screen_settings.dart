@@ -38,7 +38,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnConfig cnConfig = Provider.of<CnConfig>(context);
   bool setOrientation = false;
-  bool _isLoadingBackup = false;
+  bool _showLoadingIndicator = false;
 
   @override
   void initState() {
@@ -359,7 +359,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                       );
                     },
                   ),
-                  if (_isLoadingBackup)
+                  if (_showLoadingIndicator)
                     Container(
                       color: Colors.black.withOpacity(0.5),
                       child: Center(
@@ -378,11 +378,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
 
   Future _loadBackupFromFilePicker() async{
     setState(() {
-      _isLoadingBackup = true;
+      _showLoadingIndicator = true;
     });
     File? file = await getBackupFromFilePicker(cnHomepage: cnHomepage);
     setState(() {
-      _isLoadingBackup = false;
+      _showLoadingIndicator = false;
     });
     if(file != null){
       cnStandardPopUp.open(
@@ -399,7 +399,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
           ),
           onConfirm: ()async{
             setState(() {
-              _isLoadingBackup = true;
+              _showLoadingIndicator = true;
             });
             try{
               await loadBackupFromFile(file, cnHomepage: cnHomepage);
@@ -420,12 +420,12 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                   fontSize: 16.0
               );
               setState(() {
-                _isLoadingBackup = false;
+                _showLoadingIndicator = false;
               });
             }
             catch (_){
               setState(() {
-                _isLoadingBackup = false;
+                _showLoadingIndicator = false;
               });
               Fluttertoast.showToast(
                   msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
@@ -629,16 +629,44 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             title: AppLocalizations.of(context)!.settingsBackupSaveManualMethodSave,
             onTap: () {
               HapticFeedback.selectionClick();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig, automatic: false);
-                saveCurrentData(cnConfig);
+              setState(() {
+                _showLoadingIndicator = true;
+              });
+              Future.delayed(const Duration(milliseconds: 300), () async{
+                File? result = await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig, automatic: false);
+                await saveCurrentData(cnConfig);
+                setState(() {
+                  _showLoadingIndicator = false;
+                });
+                if(result != null){
+                  Fluttertoast.showToast(
+                      msg: "${AppLocalizations.of(context)!.createdManualBackup} ✅️",
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.grey[800],
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
+                else{
+                  Fluttertoast.showToast(
+                      msg: "${AppLocalizations.of(context)!.createdBackupFailed} ❌",
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.TOP,
+                      timeInSecForIosWeb: 2,
+                      backgroundColor: Colors.grey[800],
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
               });
             },
           ),
           PullDownMenuItem(
           title: AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare,
-            onTap: () {
-              /// ToDo: implement share functionality
+            onTap: () async{
+              await shareBackup(cnConfig: cnConfig);
             },
           ),
         ];

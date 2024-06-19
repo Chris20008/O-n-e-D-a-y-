@@ -238,7 +238,6 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                         widget.onCancel();
                                         Future.delayed(const Duration(milliseconds: 200), (){
                                           widget.onConfirm();
-                                          vibrateSuccess();
                                           if(doUpdate){
                                             workout.exercises = relevantExercises;
                                             workout.updateTemplate();

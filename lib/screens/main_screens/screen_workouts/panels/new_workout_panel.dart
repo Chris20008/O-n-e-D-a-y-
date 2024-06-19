@@ -47,6 +47,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   final _formKey = GlobalKey<FormState>();
   final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
   final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
+  // late final _color = Theme.of(context).primaryColor;
+  // final _color = const Color(0xff120a01);
+  // final _color = const Color(0xff221b14);
+  // final _color = const Color(0xff231b13);
+  // Color _color = const Color(0xff663a0b);
+  final _color = const Color(0xff1c1001);
 
   void checkTutorialState(){
     if(tutorialIsRunning && MediaQuery.of(context).viewInsets.bottom == 0){
@@ -94,7 +100,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
             borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
             // backdropEnabled: true,
             // backdropColor: Colors.black,
-            color: const Color(0xff120a01),
+            color: _color,
             onPanelSlide: onPanelSlide,
             panel: ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
@@ -202,8 +208,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                                         colors: [
                                           // Colors.transparent,
                                           // Colors.black,
-                                          const Color(0xff120a01).withOpacity(0.0),
-                                          const Color(0xff120a01)
+                                          _color.withOpacity(0.0),
+                                          _color
                                         ]
                                     )
                                 ),
@@ -213,7 +219,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             Container(
                               height: _heightBottomColoredBox,
                               // color: Colors.black,
-                              color: const Color(0xff120a01),
+                              color: _color,
                             ),
                             /// bottom row with icons
                             Padding(
@@ -404,7 +410,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
             padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
             // color: const Color(0xff0a0604),
             // color: Theme.of(context).primaryColor,
-            color: const Color(0xff120a01),
+            color: _color,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -626,8 +632,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                     colors: [
                       // Colors.transparent,
                       // Color(0xff0a0604),
-                      const Color(0xff120a01).withOpacity(0.0),
-                      const Color(0xff120a01)
+                      _color.withOpacity(0.0),
+                      _color
                     ]
                 )
             ),

@@ -161,17 +161,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 itemCount: cnRunningWorkout.groupedExercises.length,
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
-                                  // for(MapEntry k in cnRunningWorkout.groupedExercises.entries){
-                                  //   print("Entry");
-                                  //   print(k);
-                                  // }
                                   dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-                                  print("Is Exercise? : ${newEx is Exercise}");
-                                  print(newEx);
-                                  print(cnRunningWorkout.groupedExercises.entries.toList()[indexExercise]);
-                                  print(cnRunningWorkout.selectedIndexes);
                                   if(newEx is! Exercise){
-                                    print("Before");
                                     try{
                                       newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                                     }
@@ -991,7 +982,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             height: 40,
             width: double.maxFinite,
             child: ElevatedButton(
-              onPressed: () => stopWorkout(),
+              onPressed: () => openPopUpConfirmCancelWorkout(),
               style: ButtonStyle(
                   shadowColor: MaterialStateProperty.all(Colors.transparent),
                   surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
@@ -1004,6 +995,66 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  void openPopUpConfirmCancelWorkout() async{
+    if(cnStandardPopUp.isVisible){
+      cnStandardPopUp.clear();
+      await Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime));
+    }
+    cnStandardPopUp.open(
+      context: context,
+      widthFactor: 0.75,
+      confirmText: AppLocalizations.of(context)!.yes,
+      onConfirm: stopWorkout,
+      cancelText: AppLocalizations.of(context)!.no,
+      // confirmTextStyle: TextStyle(color: Colors.red.withOpacity(0.6)),
+      // onConfirm: ,
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(
+        children: [
+          Text(
+            AppLocalizations.of(context)!.runningWorkoutStopWorkout,
+            textAlign: TextAlign.center,
+            textScaler: const TextScaler.linear(1.2),
+            style: const TextStyle(color: Colors.white),
+          ),
+          const SizedBox(height: 10,),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Text(
+              AppLocalizations.of(context)!.runningWorkoutConfirmCancelWorkout,
+              textAlign: TextAlign.center,
+              textScaler: const TextScaler.linear(0.9),
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          const SizedBox(height: 20,),
+          // Container(
+          //   height: 0.5,
+          //   width: double.maxFinite,
+          //   color: Colors.grey[700]!.withOpacity(0.5),
+          // ),
+          // SizedBox(
+          //   height: 40,
+          //   width: double.maxFinite,
+          //   child: ElevatedButton(
+          //     onPressed: stopWorkout,
+          //     style: ButtonStyle(
+          //         shadowColor: MaterialStateProperty.all(Colors.transparent),
+          //         surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+          //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
+          //         shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+          //     ),
+          //     child: Text(
+          //       AppLocalizations.of(context)!.yes,
+          //       // style: TextStyle(color: Colors.red.withOpacity(0.6)),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -1068,7 +1119,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       savedCurrentData = await saveCurrentData(cnConfig) != null;
 
       Fluttertoast.showToast(
-          msg: "Created Automatic Backup: $savedAutomaticBackup \nSaved Current Data: $savedCurrentData",
+          msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
@@ -1076,11 +1127,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
           textColor: Colors.white,
           fontSize: 16.0
       );
-
+      vibrateSuccess();
       await stopWorkout(time: 0);
-      isSavingData = true;
-
-
+      isSavingData = false;
     });
   }
 
@@ -1305,6 +1354,7 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void reopenRunningWorkout(BuildContext context){
+    HapticFeedback.selectionClick();
     Navigator.push(
         context,
         CupertinoPageRoute(

@@ -63,6 +63,7 @@ dependencies:
   path: ^1.9.0
   fluttertoast: ^8.2.5
   flutter_launcher_icons: ^0.13.1
+  share_plus: ^9.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

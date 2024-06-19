@@ -17,7 +17,7 @@ import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings.dart';
-import 'charts/line_chart_exercise_weight_progress.dart';
+import 'charts/exercise_line_chart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -115,7 +115,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     children: [
                       getHeader(),
                       // const SizedBox(height: 20,),
-                      LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
+                      ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
                       const SafeArea(top:false, child: SizedBox(height: 30,)),
                     ],
                   ),
@@ -283,13 +283,13 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OverflowSafeText("Only Working Sets", maxLines: 1),
+                    OverflowSafeText(AppLocalizations.of(context)!.filterOnlyWorkingSets, maxLines: 1),
                     Padding(
                       padding: const EdgeInsets.only(left: 15),
                       child: OverflowSafeText(
-                        "All Sets are Working Sets per default. You can explicitly set a Set as Warm-Up, which leads to excluding this Set in the diagram",
+                        AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
                         minFontSize: 9,
-                        maxLines: 3,
+                        maxLines: 4,
                         style: const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     ),
