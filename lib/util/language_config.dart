@@ -55,8 +55,8 @@ Map<String, String> languagesAsString = {
   "Français": "fr",
   "Italiano": "it",
   "Nederlands": "nl",
-  "Português": "pt",
   "Polski": "pl",
+  "Português": "pt",
 };
 
 Map languages = {
