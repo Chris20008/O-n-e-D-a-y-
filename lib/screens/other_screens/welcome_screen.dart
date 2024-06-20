@@ -1,5 +1,6 @@
 import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/util/language_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -125,28 +126,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       routeTheme: routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
-        return [
-          PullDownMenuItem.selectable(
-            selected: currentLanguage == 'Deutsch',
-            title: 'Deutsch',
+        final List<String> lanAsStrings = languagesAsString.keys.toList();
+        List<PullDownMenuItem> buttons = List.generate(lanAsStrings.length, (index) {
+          return PullDownMenuItem.selectable(
+            selected: currentLanguage == lanAsStrings[index],
+            title: lanAsStrings[index],
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                MyApp.of(context)?.setLocale(language: LANGUAGES.de, config: cnConfig);
+                MyApp.of(context)?.setLocale(languageCode: languagesAsString[lanAsStrings[index]], config: cnConfig);
               });
             },
-          ),
-          PullDownMenuItem.selectable(
-            selected: currentLanguage == 'English',
-            title: 'English',
-            onTap: () {
-              HapticFeedback.selectionClick();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
-              });
-            },
-          ),
-        ];
+          );
+        });
+        return buttons;
       },
       buttonBuilder: (context, showMenu) => CupertinoButton(
         onPressed: (){
@@ -160,13 +153,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             Text(
               getLanguageAsString(context),
-              style: TextStyle(color: Colors.amber[800], fontSize: 16),
+              style: TextStyle(
+                  color: const Color(0xFFC16A03),
+                  fontSize: 16
+              ),
             ),
             const SizedBox(width: 6,),
             Icon(
               Icons.arrow_forward_ios,
               size: 14,
-              color: Colors.amber[800],
+              // color: Colors.amber[800],
+              color: const Color(0xFFC16A03)
             )
           ],
         ),
@@ -297,7 +294,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 /// Save Backup Automatic
                 CupertinoListTile(
                   leading: const Icon(Icons.sync),
-                  title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+                  title: OverflowSafeText(
+                      maxLines: 1,
+                      AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+                      style: const TextStyle(color: Colors.white)
+                  ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.automaticBackups,
                       activeColor: const Color(0xFFC16A03),
@@ -524,16 +525,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
 
                 /// Explore myself
-                CupertinoButton(
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: CupertinoButton(
 
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    widget.onFinish(false);
-                    SystemChrome.setPreferredOrientations([]);
-                  },
-                  child: Text(
-                    AppLocalizations.of(context)!.welcomeButtonExploreMyself,
-                    textScaler: const TextScaler.linear(1.2),
+                    padding: EdgeInsets.zero,
+                    onPressed: () {
+                      widget.onFinish(false);
+                      SystemChrome.setPreferredOrientations([]);
+                    },
+                    child: OverflowSafeText(
+                      AppLocalizations.of(context)!.welcomeButtonExploreMyself,
+                      maxLines: 1,
+                      style: const TextStyle(
+                        color: Color(0xFFC16A03),
+                        fontSize: 20,
+                      )
+                    ),
                   ),
                 ),
 
@@ -545,7 +553,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   onPressed: () => widget.onFinish(true),
                   child: Text(
                     AppLocalizations.of(context)!.welcomeButtonStartTutorial,
-                    textScaler: const TextScaler.linear(1.2),
+                    style: const TextStyle(
+                      color: Color(0xFFC16A03),
+                      fontSize: 20,
+                    )
                   ),
                 ),
                 const SizedBox(height: 80),

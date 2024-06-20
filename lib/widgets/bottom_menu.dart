@@ -131,6 +131,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
   }
 
   void changeIndex(int index){
+    final lastIndex = cnBottomMenu.index;
     cnBottomMenu._changeIndex(index);
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.cancel();
@@ -141,12 +142,13 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     }
     else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();
-
-      // only for testing changing language
-      // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
       cnScreenStatistics.refreshData();
+      if(lastIndex == 2){
+        cnScreenStatistics.resetGraph(withKeyReset: false);
+        cnScreenStatistics.refresh();
+      }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

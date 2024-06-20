@@ -166,10 +166,10 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
 
   double getYPositionAddExercise(){
     if(cnStopwatchWidget.isOpened){
-      if(cnSpotifyBar.isConnected){
-        return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-3;
+      if(showSpotify){
+        return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - cnSpotifyBar.height-6;
       }
-      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - cnSpotifyBar.height-6;
+      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
     }
     return getYPositionStopwatch() - cnSpotifyBar.height;
   }
@@ -187,7 +187,6 @@ class CnAnimatedColumn extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = false;
   int animationTimeStopwatch = 300;
-  // double heightOfTimer = 250;
 
   void refresh()async{
     notifyListeners();

@@ -543,7 +543,7 @@ class CnScreenStatistics extends ChangeNotifier {
     onlyWorkingSets = data["onlyWorkingSets"] ?? false;
   }
 
-  void resetGraph(){
+  void resetGraph({bool withKeyReset = true}){
     maxVisibleDays = 1900;
     offsetMinX = 0;
     offsetMaxX = 0;

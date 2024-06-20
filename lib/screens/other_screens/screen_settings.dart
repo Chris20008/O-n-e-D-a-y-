@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_w
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/local_file_picker.dart';
 import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
@@ -252,7 +253,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                           /// Save Backup Automatic
                                           CupertinoListTile(
                                             leading: const Icon(Icons.sync),
-                                            title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+                                            title: OverflowSafeText(
+                                                maxLines: 1,
+                                                AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+                                                style: const TextStyle(color: Colors.white)
+                                            ),
                                             trailing: CupertinoSwitch(
                                                 value: cnConfig.automaticBackups,
                                                 activeColor: const Color(0xFFC16A03),
@@ -458,28 +463,21 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
       routeTheme: routeTheme,
       itemBuilder: (context) {
         final currentLanguage = getLanguageAsString(context);
-        return [
-          PullDownMenuItem.selectable(
-            selected: currentLanguage == 'Deutsch',
-            title: 'Deutsch',
+        final List<String> lanAsStrings = languagesAsString.keys.toList();
+        List<PullDownMenuItem> buttons = List.generate(lanAsStrings.length, (index) {
+          return PullDownMenuItem.selectable(
+            selected: currentLanguage == lanAsStrings[index],
+            title: lanAsStrings[index],
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), (){
-                MyApp.of(context)?.setLocale(language: LANGUAGES.de, config: cnConfig);
+                MyApp.of(context)?.setLocale(languageCode: languagesAsString[lanAsStrings[index]], config: cnConfig);
               });
             },
-          ),
-          PullDownMenuItem.selectable(
-            selected: currentLanguage == 'English',
-            title: 'English',
-            onTap: () {
-              HapticFeedback.selectionClick();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
-              });
-            },
-          ),
-        ];
+          );
+        });
+
+        return buttons;
       },
       buttonBuilder: (context, showMenu) => CupertinoButton(
         onPressed: (){

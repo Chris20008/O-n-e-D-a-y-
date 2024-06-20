@@ -11,6 +11,7 @@ import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
@@ -96,11 +97,7 @@ class MyAppState extends State<MyApp> {
       child: MaterialApp(
         // showPerformanceOverlay: true,
         locale: _locale,
-        // locale: const Locale("de"),
-        supportedLocales: const [
-          Locale('en'), /// English
-          Locale('de'), /// German
-        ],
+        supportedLocales: supportedLocales,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

@@ -8,7 +8,6 @@ import 'package:fitness_app/util/extensions.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:intl/intl_standalone.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -115,15 +114,6 @@ Future<void> sendMail({required String subject}) async {
     mode: LaunchMode.externalApplication,
   )) {
     throw Exception('Could not send Mail');
-  }
-}
-
-String getLanguageAsString(BuildContext context){
-  final lan =  Localizations.localeOf(context).toString();
-  if(lan == "en"){
-    return "English";
-  } else{
-    return "Deutsch";
   }
 }
 
@@ -427,40 +417,7 @@ String checkOnlyOneDecimalPoint(String text){
   return text;
 }
 
-Future setIntlLanguage({String? countryCode})async{
-  final res = await findSystemLocale();
-  Intl.systemLocale = countryCode?? res;
-  // print("SET LAGNUAGE TO: $res");
-  // print(context.mounted);
-  // MyApp.of(context)?.setLocale(languageCode: countryCode?? res);
-}
 
-class Language{
-  final String languageCode;
-  final String countryCode;
-
-  Language({required this.languageCode, required this.countryCode});
-}
-
-Map languages = {
-  "de": Language(languageCode: "de", countryCode: "de_DE"),
-  "de_DE": Language(languageCode: "de", countryCode: "de_DE"),
-  "en": Language(languageCode: "en", countryCode: "en_US"),
-  "en_US": Language(languageCode: "en", countryCode: "en_US")
-};
-
-Future<Language> initFromSystemLanguage()async{
-  final res = await findSystemLocale();
-  return languages[res]?? languages["en"];
-}
-
-enum LANGUAGES{
-  de ("de"),
-  en ("en");
-
-  const LANGUAGES(this.value);
-  final String value;
-}
 
 Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   Widget iconButton = IconButton(
@@ -928,16 +885,19 @@ Widget getCloudOptionsColumn({
 
 
 
-Widget getBackupDialogWelcomeScreen({
-  required BuildContext context
-}){
+Widget getBackupDialogWelcomeScreen({required BuildContext context}){
   return Column(
     children: [
 
       /// Save Backup Automatic
       CupertinoListTile(
         leading: const Icon(Icons.sync),
-        title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+        // title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+        title: OverflowSafeText(
+            maxLines: 1,
+            AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+            style: const TextStyle(color: Colors.white)
+        ),
       ),
       Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation)),
       const SizedBox(height: 15),
