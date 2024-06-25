@@ -157,21 +157,28 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   }
 
   double getYPositionStopwatch(){
-    final heightSpotifyBar = showSpotify? cnSpotifyBar.height + 3 : 0.0;
+    final heightSpotifyBar = showSpotify? cnSpotifyBar.height + 1 : 0.0;
     if(cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected){
       return 0;
+    }
+    else if(cnStopwatchWidget.isOpened){
+      return - heightSpotifyBar - 1;
     }
     return - heightSpotifyBar;
   }
 
   double getYPositionAddExercise(){
-    if(cnStopwatchWidget.isOpened){
-      if(showSpotify){
-        return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - cnSpotifyBar.height-6;
-      }
-      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
+    if(!cnStopwatchWidget.isOpened){
+      return getYPositionStopwatch() - cnSpotifyBar.height;
     }
-    return getYPositionStopwatch() - cnSpotifyBar.height;
+
+    if(cnSpotifyBar.isConnected){
+      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - 6;
+    }
+    else if(showSpotify){
+      return getYPositionSpotifyBar() - cnSpotifyBar.height - 3;
+    }
+    return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
   }
 
   double getYPositionSpotifyBar(){
