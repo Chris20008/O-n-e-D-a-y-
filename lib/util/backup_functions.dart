@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:icloud_storage/icloud_storage.dart';
 import 'package:path_provider/path_provider.dart';
@@ -16,6 +17,7 @@ import 'package:googleapis/drive/v3.dart' as ga;
 import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:flutter/material.dart';
 
 const folderNameGoogleDrive = "OneDay Backups";
 const currentDataFileName = "Current_Data.txt";
@@ -492,7 +494,15 @@ Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   try {
     account = await googleSignIn.signIn();
   } catch (error) {
-    //
+    // Fluttertoast.showToast(
+    //     msg: error.toString(),
+    //     toastLength: Toast.LENGTH_LONG,
+    //     gravity: ToastGravity.CENTER,
+    //     timeInSecForIosWeb: 1,
+    //     backgroundColor: Colors.grey[800],
+    //     textColor: Colors.white,
+    //     fontSize: 16.0
+    // );
   }
   return account;
 }
