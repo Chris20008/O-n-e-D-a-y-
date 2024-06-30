@@ -494,15 +494,15 @@ Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   try {
     account = await googleSignIn.signIn();
   } catch (error) {
-    // Fluttertoast.showToast(
-    //     msg: error.toString(),
-    //     toastLength: Toast.LENGTH_LONG,
-    //     gravity: ToastGravity.CENTER,
-    //     timeInSecForIosWeb: 1,
-    //     backgroundColor: Colors.grey[800],
-    //     textColor: Colors.white,
-    //     fontSize: 16.0
-    // );
+    Fluttertoast.showToast(
+        msg: error.toString(),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.grey[800],
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
   return account;
 }
