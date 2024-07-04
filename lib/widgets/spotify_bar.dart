@@ -148,8 +148,8 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                           /// Just opens Spotify
                                           String uri = "spotify:";
                                           // if(uri != null){
-                                          openUrl(uri);
                                           HapticFeedback.selectionClick();
+                                          openUrl(uri);
                                           // }
                                         },
                                         child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
@@ -232,8 +232,8 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         /// Just opens Spotify
                                                         String uri = "spotify:";
                                                         // if(uri != null){
+																												HapticFeedback.selectionClick();
                                                         openUrl(uri);
-                                                        HapticFeedback.selectionClick();
                                                         setState(() {
                                                           colorSpotifyButton = Colors.white.withOpacity(0.12);
                                                         });
