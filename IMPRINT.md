@@ -3,7 +3,7 @@
 Responsible for the content of O-n-e-D-a-y- ("the App") according to § 5 TMG:
 
 Christian Range  
-Paulusstraße 19
+Paulusstraße 19                   
 53227 Bonn  
 
 ### Disclaimer:
