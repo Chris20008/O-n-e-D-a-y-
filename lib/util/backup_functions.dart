@@ -87,12 +87,12 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     allObWorkouts.add(workout);
   }
 
+  objectbox.sickDaysBox.removeAll();
   if (result.length > 1){
     final allSickDaysAsListString = result[1].split(";");
     allSickDaysAsListString.removeWhere((element) => element.trim() == "");
     final allSickDays = allSickDaysAsListString.map((e) => jsonDecode(e));
     final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
-    objectbox.sickDaysBox.removeAll();
     objectbox.sickDaysBox.putManyAsync(allObSickDays);
   }
 

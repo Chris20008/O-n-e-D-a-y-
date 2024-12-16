@@ -278,18 +278,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 },
                                               ),
                                             ),
-                                          SizedBox(
-                                            width: 40,
-                                            child: Center(
-                                              child: myIconButton(
-                                                  icon: const Icon(
-                                                    Icons.history,
-                                                    color: Color(0xFFC16A03),
-                                                  ),
-                                                  onPressed: (){}
-                                              ),
-                                            ),
-                                          ),
+                                          // SizedBox(
+                                          //   width: 40,
+                                          //   child: Center(
+                                          //     child: myIconButton(
+                                          //         icon: const Icon(
+                                          //           Icons.history,
+                                          //           color: Color(0xFFC16A03),
+                                          //         ),
+                                          //         onPressed: (){}
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                       const SizedBox(height: 5),
