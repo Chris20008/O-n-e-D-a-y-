@@ -178,18 +178,19 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                   child = Column(
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
                                           cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
                                           /// Single Exercise
-                                          ? ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                                maxWidth: MediaQuery.of(context).size.width-80
-                                            ),
-                                            child: OverflowSafeText(
-                                              newEx.name,
-                                              maxLines: 1,
-                                              style: const TextStyle(color: Colors.white, fontSize: 20),
+                                          ? Expanded(
+                                            child: ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                  maxWidth: MediaQuery.of(context).size.width-80
+                                              ),
+                                              child: OverflowSafeText(
+                                                newEx.name,
+                                                maxLines: 1,
+                                                style: const TextStyle(color: Colors.white, fontSize: 20),
+                                              ),
                                             ),
                                           )
                                           /// Exercise Selector
@@ -230,7 +231,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 children: [
                                                   ConstrainedBox(
                                                     constraints: BoxConstraints(
-                                                        maxWidth: MediaQuery.of(context).size.width-80
+                                                        maxWidth: MediaQuery.of(context).size.width-120
                                                     ),
                                                     child: OverflowSafeText(
                                                         newEx.name,
@@ -248,28 +249,47 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               )
                                             ),
                                           ),
-                                          const Spacer(),
+
+                                          cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
+                                              ? const SizedBox()
+                                              : const Spacer(),
+
                                           if(cnRunningWorkout.newExNames.contains(newEx.name))
-                                            myIconButton(
-                                              icon:const Icon(Icons.delete_forever),
-                                              onPressed: (){
-                                                cnStandardPopUp.open(
-                                                    context: context,
-                                                    confirmText: AppLocalizations.of(context)!.yes,
-                                                    child: Text(
-                                                      AppLocalizations.of(context)!.runningWorkoutDeleteExercise,
-                                                      textAlign: TextAlign.center,
-                                                      textScaler: const TextScaler.linear(1.2),
-                                                      style: const TextStyle(color: Colors.white),
-                                                    ),
-                                                    onConfirm: (){
-                                                      cnRunningWorkout.deleteExercise(newEx);
-                                                    },
-                                                    onCancel: (){},
-                                                    color: const Color(0xff2d2d2d)
-                                                );
-                                              },
+                                            SizedBox(
+                                              width:40,
+                                              child: myIconButton(
+                                                icon:const Icon(Icons.delete_forever),
+                                                onPressed: (){
+                                                  cnStandardPopUp.open(
+                                                      context: context,
+                                                      confirmText: AppLocalizations.of(context)!.yes,
+                                                      child: Text(
+                                                        AppLocalizations.of(context)!.runningWorkoutDeleteExercise,
+                                                        textAlign: TextAlign.center,
+                                                        textScaler: const TextScaler.linear(1.2),
+                                                        style: const TextStyle(color: Colors.white),
+                                                      ),
+                                                      onConfirm: (){
+                                                        cnRunningWorkout.deleteExercise(newEx);
+                                                      },
+                                                      onCancel: (){},
+                                                      color: const Color(0xff2d2d2d)
+                                                  );
+                                                },
+                                              ),
                                             ),
+                                          SizedBox(
+                                            width: 40,
+                                            child: Center(
+                                              child: myIconButton(
+                                                  icon: const Icon(
+                                                    Icons.history,
+                                                    color: Color(0xFFC16A03),
+                                                  ),
+                                                  onPressed: (){}
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 5),

@@ -650,8 +650,8 @@ class CnSpotifyBar extends ChangeNotifier {
         isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "fitness-app://spotify-callback");
       }
       else{
-        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")) : accessToken;
-        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw new TimeoutException("Timeout, do disconnect"));
+        accessToken = accessToken.isEmpty? await SpotifySdk.getAccessToken(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback").timeout(const Duration(seconds: 5), onTimeout: () => throw TimeoutException("Timeout, do disconnect")) : accessToken;
+        isConnected = await SpotifySdk.connectToSpotifyRemote(clientId: dotenv.env["SPOTIFY_CLIENT_ID"]!, redirectUrl: "spotify-ios-quick-start://spotify-login-callback", accessToken: accessToken).timeout(const Duration(seconds: 5), onTimeout: () => throw TimeoutException("Timeout, do disconnect"));
       }
       if(isConnected){
         _subscribeToPlayerState();
