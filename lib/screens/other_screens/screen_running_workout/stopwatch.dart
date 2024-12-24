@@ -146,7 +146,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     Align(
                       alignment: Alignment.topCenter,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 20),
+                        padding: const EdgeInsets.only(top: 5),
                         child: Text(
                           cnStopwatchWidget.isRunning || cnStopwatchWidget.countdownTime != null
                               ? getTimeString()
@@ -185,13 +185,14 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     Align(
                       alignment: Alignment.topLeft,
                       child: getSelectRestInSeconds(
+                        context: context,
                         onConfirm: (value){
                           if (value is int){
                             cnStopwatchWidget.countdownTime = value;
                             cnStopwatchWidget.cancelTimer();
                             cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
                           }
-                          else if(value == "Clear"){
+                          else if(value == AppLocalizations.of(context)!.clear){
                             cnStopwatchWidget.countdownTime = null;
                             cnStopwatchWidget.cancelTimer();
                             cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
@@ -222,8 +223,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                 maxLength: 4,
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  labelText: "Time in Seconds",
-                                  // counterText: "",
+                                  labelText: AppLocalizations.of(context)!.runningWorkoutTimerTimeInSeconds,
                                   contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                 ),
                                 style: const TextStyle(
@@ -328,7 +328,7 @@ class CnStopwatchWidget extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = true;
   int animationTimeStopwatch = 300;
-  double heightOfTimer = 240;
+  double heightOfTimer = 200;
   late CnAnimatedColumn cnAnimatedColumn;
   final Stopwatch stopwatch = Stopwatch();
   int? countdownTime;

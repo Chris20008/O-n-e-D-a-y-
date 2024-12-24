@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -31,8 +32,6 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnBottomMenu cnBottomMenu;
   late Orientation orientation = MediaQuery.of(context).orientation;
-  double _height = 40;
-  double? _iconSize;
 
   @override
   void initState() {
@@ -53,17 +52,14 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     /// To receive the latest values after orientation change we need to use
     /// WidgetsBindings.instance.addPostFrameCallback() inside it
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setBottomMenuHeight();
+      setState(() {
+        cnBottomMenu.setBottomMenuHeight(context);
+        /// Refresh running workout if its visible since the bottom bar depends on bottom menu height
+        if(cnRunningWorkout.isVisible){
+          cnRunningWorkout.refresh();
+        }
+      });
     });
-  }
-
-  void setBottomMenuHeight({bool withRefresh = true}){
-    orientation = MediaQuery.of(context).orientation;
-    _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 40 : 35);
-    final double paddingBottom = MediaQuery.of(context).padding.bottom;
-    cnBottomMenu.height = paddingBottom + _height;
-    _iconSize = orientation == Orientation.portrait? null : 15;
-    cnBottomMenu.refresh();
   }
 
   @override
@@ -71,9 +67,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     if(cnBottomMenu.height <= 0){
-      setBottomMenuHeight(withRefresh: false);
-      // final double paddingBottom = MediaQuery.of(context).padding.bottom;
-      // cnBottomMenu.height = paddingBottom + _height;
+      cnBottomMenu.setBottomMenuHeight(context);
     }
 
     if(!cnBottomMenu.isVisible){
@@ -81,13 +75,14 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     }
 
     return AnimatedContainer(
+      key: cnBottomMenu.bottomMenuKey,
       duration: const Duration(milliseconds: 0),
       transform: Matrix4.translationValues(0, cnBottomMenu.positionYAxis, 0),
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
         // color: Colors.black.withOpacity(0.4),
-        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? const Color(0xff120a01) /*Color(0xff0a0604)*/ : Colors.black.withOpacity(0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? const Color(0xff1c1001) : Colors.black.withOpacity(0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(
@@ -113,15 +108,15 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
               showUnselectedLabels: false,
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.history, size: _iconSize),
+                  icon: Icon(Icons.history, size: cnBottomMenu.iconSize),
                   label: 'History',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.sports_martial_arts, size: _iconSize),
+                  icon: Icon(Icons.sports_martial_arts, size: cnBottomMenu.iconSize),
                   label: 'Templates',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.scatter_plot, size: _iconSize),
+                  icon: Icon(Icons.scatter_plot, size: cnBottomMenu.iconSize),
                   label: 'Statistics',
                 ),
               ],
@@ -136,6 +131,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
   }
 
   void changeIndex(int index){
+    final lastIndex = cnBottomMenu.index;
     cnBottomMenu._changeIndex(index);
     if(cnStandardPopUp.isVisible){
       cnStandardPopUp.cancel();
@@ -146,13 +142,13 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     }
     else if(index == 1) {
       cnWorkouts.refreshAllWorkouts();
-
-      // only for testing changing language
-      // MyApp.of(context)?.setLocale(language: LANGUAGES.en, config: cnConfig);
     }
     else if(index == 2) {
-      // cnScreenStatistics.calcMinMaxDates();
       cnScreenStatistics.refreshData();
+      if(lastIndex == 2){
+        cnScreenStatistics.resetGraph(withKeyReset: false);
+        cnScreenStatistics.refresh();
+      }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){
       SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -167,15 +163,50 @@ class CnBottomMenu extends ChangeNotifier {
   int _selectedIndex = 1;
   bool isVisible = true;
   double positionYAxis = 0;
-  // final double height = Platform.isAndroid? 60 : 92;
   double height = 0;
-  // final t =
+  final GlobalKey _bottomMenuKey = GlobalKey();
+  double? iconSize;
+  late Orientation orientation;
+
+  GlobalKey get bottomMenuKey => _bottomMenuKey;
+
+  // CnBottomMenu(BuildContext context){
+  //   setBottomMenuHeight(context);
+  // }
 
   void _changeIndex(int index) {
     _selectedIndex = index;
     refresh();
   }
 
+  void setBottomMenuHeight(BuildContext context){
+    orientation = MediaQuery.of(context).orientation;
+    final height = orientation == Orientation.portrait
+        ? (Platform.isAndroid? 60 : 50)   /// When Portrait higher
+        : (Platform.isAndroid? 40 : 35);  /// Reduced height when landscape*
+    final double paddingBottom = MediaQuery.of(context).padding.bottom;
+    this.height = paddingBottom + height;
+    iconSize = orientation == Orientation.portrait? null : 15;
+  }
+
+  void showBottomMenuAnimated(){
+    positionYAxis = positionYAxis * 0.92;
+    if(positionYAxis < 1){
+      positionYAxis = 0;
+    }
+    refresh();
+    Future.delayed(const Duration(milliseconds: 10), (){
+      if(positionYAxis > 0){
+        showBottomMenuAnimated();
+      }
+    });
+  }
+
+  /// value between 0-1
+  ///
+  /// 0 = scrolled Down
+  ///
+  /// 1 = completely Visible
   void adjustHeight(double value){
     positionYAxis = height * value;
     refresh();

@@ -53,6 +53,10 @@
 			<string>O̶n̶e̶D̶a̶y̶</string>
 			<key>NSUbiquitousContainerSupportedFolderLevels</key>
 			<string>Any</string>
+			<key>NSUbiquitousContainerSupportedServices</key>
+			<array>
+            <string>CloudDocuments</string>
+            </array>
 		</dict>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -78,5 +82,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+         <string>spotify</string>
+    </array>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>This app doe not require access to the photo library.</string>
+
 </dict>
 </plist>

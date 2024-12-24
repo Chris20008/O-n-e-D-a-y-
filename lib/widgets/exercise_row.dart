@@ -77,10 +77,16 @@ class ExerciseRow extends StatelessWidget {
                                           minFontSize: 9
                                       ),
                                       Container(
-                                        color: Colors.grey[900],
+                                        // color: Colors.grey[900],
+                                        color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
                                         height: 1,
                                         width: 15,
                                       ),
+                                      // Container(
+                                      //   color: Colors.grey[900],
+                                      //   height: 1,
+                                      //   width: 15,
+                                      // ),
                                       Text("${set.amount}")
                                     ],
                                   ),

@@ -25,12 +25,12 @@ class ObWorkout{
     }
   }
 
-  ObWorkout.fromMap(Map w): this(
-      // id: w["id"],
-      name: w["name"],
-      date: DateTime.parse(w["date"]),
-      isTemplate: w["isTemplate"],
-      linkedExercises: List.from(w["linkedExercises"])
+  ObWorkout.fromMap({required Map workoutMap, bool withId = false}): this(
+      id: withId? workoutMap["id"]?? 0 : 0,
+      name: workoutMap["name"],
+      date: DateTime.parse(workoutMap["date"]),
+      isTemplate: workoutMap["isTemplate"],
+      linkedExercises: List.from(workoutMap["linkedExercises"])
   );
 
   final exercises = ToMany<ObExercise>();
@@ -49,12 +49,23 @@ class ObWorkout{
     objectbox.exerciseBox.putMany(exercises);
   }
 
+  int getHash(){
+    final listHash = Object.hashAll(linkedExercises);
+    final listHashEx = Object.hashAll(exercises.map((element) => element.getHash()));
+    return Object.hash(name, date, isTemplate, listHash, listHashEx);
+  }
+
+  int getHashId(){
+    return Object.hash(id, name, date);
+  }
+
   Map asMap(){
     final exs = List<Map>.from(exercises.map((ex) => {
       "id": ex.id,
       "name": ex.name,
       "weights": ex.weights,
       "amounts": ex.amounts,
+      "setTypes": ex.setTypes,
       "restInSeconds": ex.restInSeconds,
       "seatLevel": ex.seatLevel,
       "linkName": ex.linkName

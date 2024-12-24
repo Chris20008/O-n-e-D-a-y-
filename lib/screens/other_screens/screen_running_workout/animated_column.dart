@@ -1,5 +1,6 @@
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/material.dart';
@@ -26,42 +27,43 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnConfig cnConfig = Provider.of<CnConfig>(context);
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
   bool canConfirm = true;
+  late bool showSpotify = cnConfig.useSpotify;
 
   @override
   Widget build(BuildContext context) {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context);
+    showSpotify = cnConfig.useSpotify;
 
     return SafeArea(
       child: Stack(
         alignment: Alignment.bottomRight,
         children: [
+
+          /// Stopwatch/Timer
           AnimatedContainer(
               duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
               transform: Matrix4.translationValues(
                   ///x
                   0,
                   ///y
-                  cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected?
-                  0 :
-                  cnStopwatchWidget.isOpened && cnSpotifyBar.isConnected?
-                  -cnSpotifyBar.height - 5:
-                  -cnSpotifyBar.height -5,
+                  getYPositionStopwatch(),
                   ///z
                   0),
               child: const StopwatchWidget()
           ),
+
+          /// Add Exercise
           AnimatedContainer(
             duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
             transform: Matrix4.translationValues(
-                ///x
+              ///x
                 0,
                 ///y
-                cnStopwatchWidget.isOpened
-                    ? -cnStopwatchWidget.heightOfTimer -5 - cnSpotifyBar.height
-                    : - cnSpotifyBar.height*2 -7,
+                getYPositionAddExercise(),
                 ///z
                 0),
             child: Padding(
@@ -112,7 +114,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                           canConfirm: canConfirm,
                           onConfirm: (){
                             if(_textController.text.isNotEmpty &&
-                               !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
+                                !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
                             ){
                               cnRunningWorkout.addExercise(Exercise(name: _textController.text));
                             }
@@ -120,7 +122,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                               FocusScope.of(context).unfocus();
                               _textController.clear();
                             });
-                        }
+                          }
                       );
                     },
                     icon: Icon(
@@ -131,26 +133,59 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
               ),
             ),
           ),
-          AnimatedContainer(
-            duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
-            transform: Matrix4.translationValues(
-                ///x
-                0,
-                /// y
-                cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected
-                    ? -cnStopwatchWidget.heightOfTimer - 5
-                    : 0,
-                /// z
-                0),
-            child: const Hero(
-                transitionOnUserGestures: true,
-                tag: "SpotifyBar",
-                child: SpotifyBar()
+
+          /// Spotify
+          if(showSpotify)
+            AnimatedContainer(
+              duration: Duration(milliseconds: cnStopwatchWidget.animationTimeStopwatch),
+              transform: Matrix4.translationValues(
+                  ///x
+                  0,
+                  /// y
+                  getYPositionSpotifyBar(),
+                  /// z
+                  0),
+              child: const Hero(
+                  transitionOnUserGestures: true,
+                  tag: "SpotifyBar",
+                  child: SpotifyBar()
+              ),
             ),
-          ),
         ],
       ),
     );
+  }
+
+  double getYPositionStopwatch(){
+    final heightSpotifyBar = showSpotify? cnSpotifyBar.height + 1 : 0.0;
+    if(cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected){
+      return 0;
+    }
+    else if(cnStopwatchWidget.isOpened){
+      return - heightSpotifyBar - 1;
+    }
+    return - heightSpotifyBar;
+  }
+
+  double getYPositionAddExercise(){
+    if(!cnStopwatchWidget.isOpened){
+      return getYPositionStopwatch() - cnSpotifyBar.height;
+    }
+
+    if(cnSpotifyBar.isConnected){
+      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - 6;
+    }
+    else if(showSpotify){
+      return getYPositionSpotifyBar() - cnSpotifyBar.height - 3;
+    }
+    return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
+  }
+
+  double getYPositionSpotifyBar(){
+    if(cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected){
+      return -cnStopwatchWidget.heightOfTimer - 5;
+    }
+    return 0;
   }
 }
 
@@ -159,7 +194,6 @@ class CnAnimatedColumn extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = false;
   int animationTimeStopwatch = 300;
-  // double heightOfTimer = 250;
 
   void refresh()async{
     notifyListeners();

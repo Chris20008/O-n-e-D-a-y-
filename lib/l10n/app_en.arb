@@ -8,6 +8,7 @@
   "groupName": "Group Name",
   "exercise": "Exercise",
   "restInSeconds": "Rest in Seconds",
+  "restTime": "Rest Time",
   "seatLevel": "Seat Level",
   "set": "Set",
   "weight": "Weight",
@@ -21,26 +22,50 @@
   "cancel": "Cancel",
   "myNew": "New",
   "template": "Template",
+  "clear": "Clear",
+  "custom": "Custom",
   "woAlreadyRunning": "Workout {currentWorkoutName} is already Running",
   "woAlreadyRunningDelete": "Do you want to stop the current workout and start workout {newWorkoutName}?",
+  "spotifyPleaseLogin": "Please Login to Spotify",
+  "spotifyPleaseInstall": "Please install Spotify to use this function",
+  "automatic": "automatic",
+  "manual": "manual",
+  "backupLoadSuccess": "Backup successfully loaded",
+  "backupLoadNotSuccess": "The Backup could not be loaded",
+  "localBackups": "Local Backups",
+  "createdManualBackup": "Created manual Backup",
+  "createdAutomaticBackup": "Created automatic Backup",
+  "createdBackupFailed": "Could not create a Backup",
+  "savedDataForSync": "Saved data for sync.",
 
   "settings": "Settings",
   "settingsGeneral": "General",
   "settingsLanguage": "Language",
-  "settingsTutorial": "Tutorial",
+  "settingsTutorialReset": "Reset Tutorial",
+  "settingsTutorialHasBeenReset": "Tutorial has been reset",
   "settingsBackup": "Backup",
   "settingsBackupSaveManual": "Create manual Backup",
-  "settingsBackupSaveManualExplanation": "You can use this function to create a manual backup. If you have activated cloud synchronization, the backup will also be uploaded to the cloud.\nIf you want to share your current status with someone or just want to save a backup external, you can select the 'Share Backup' function. This does not create a backup in the app or the cloud, but shares it directly to your destination",
-  "settingsBackupLoadExplanation": "Click on 'Load backup' to open a pop-up. Here you can select a backup file to be loaded.\nATTENTION! Loading a backup will overwrite the current state of your App.",
-  "settingsBackupSaveAutomaticExplanation": "When this function is activated, an automatic backup is created after each completed workout. This does not apply to canceled workouts. If you have activated cloud synchronization, the backup will also be uploaded to the cloud",
-  "settingsBackupSynciCloudExplanation": "This synchronizes all backups that are created with iCloud. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple iOS devices and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started",
-  "settingsBackupSyncGoogleDriveExplanation": "This synchronizes all backups that are created with Google Drive. This allows you to restore your status even after deleting the app or changing devices.\nIf you use the app on multiple devices with Google Drive and synchronization is activated on all devices, the data is synchronized to the latest version when the app is started",
+  "settingsConnectGoogleDriveExplanation": "You can connect to your Google Drive account. This enables the options to save Backups in your Google Drive and synchronize data between multiple devices.",
+  "settingsConnectiCloudExplanation": "You can connect to your iCloud account. This enables the options to save Backups in iCloud and synchronize data between multiple devices.",
+  "settingsBackupSaveManualExplanation": "You can use this function to create a manual backup. If you have enabled cloud synchronization, the backup will also be uploaded to the cloud.\nIf you want to share your current data with someone or just want to save a backup external, you can select the 'Share Backup' function. This does not create a backup in the App or the cloud, but shares it directly to your destination.",
+  "settingsBackupLoadExplanation": "You can either load an external Backup or a local one.\nTap on 'Load external Backup' to open a pop-up. Here you can select a Backup file from your devices or cloud storage to be loaded.\nTap on 'Load local Backup' to open an new page where all local Backups are listed, so Backups which are in the Apps own storage.\nATTENTION! Loading a backup will overwrite the current state of your App.",
+  "settingsBackupSaveAutomaticExplanation": "When this function is enabled, an automatic backup is created after each completed workout. This does not apply to canceled workouts. If you have actived the function that Backups should be uploaded to the cloud, the backup will be uploaded to the cloud aswell.",
+  "settingsSaveBackupsiCloudExplanation": "Enabling this function will upload all future backups that are created to iCloud. This allows you to restore your data even after deleting the App or changing devices.",
+  "settingsSaveBackupsGoogleDriveExplanation": "Enabling this function will upload all future backups that are created to Google Drive. This allows you to restore your data even after deleting the App or changing devices.",
+  "settingsSyncMultipleDevicesExplanationGoogleDrive": "If you use the App on multiple devices with Google Drive you can synchronize their data. The data is synchronized to the latest version on each App start.",
+  "settingsSyncMultipleDevicesExplanationiCloud": "If you use the App on multiple iOS devices you can synchronize their data. The data is synchronized to the latest version on each App start.",
   "settingsBackupSaveManualMethodSave": "Create Backup",
   "settingsBackupSaveManualMethodShare": "Share Backup",
   "settingsBackupSaveAutomatic": "Enable automatic Backups",
   "settingsBackupLoad": "Load Backup",
-  "settingsSyncGoogleDrive": "Sync with Google Drive",
-  "settingsSynciCloud": "Sync with iCloud",
+  "settingsBackupLoadExternal": "Load external Backup",
+  "settingsBackupLoadLocal": "Load local Backup",
+  "settingsBackupLoadTextToConfirm": "This process will delete all data from the App and replace it be the data from the selected Backup. Are you sure you want to proceed with this action?",
+  "settingsConnectGoogleDrive": "Connect with Google Drive",
+  "settingsConnectiCloud": "Connect with iCloud",
+  "settingsSaveBackupsGoogleDrive": "Save Backups in Google Drive",
+  "settingsSaveBackupsiCloud": "Save Backups in iCloud",
+  "settingsSyncMultipleDevices": "Sync. multiple Devices",
   "settingsBackupMoreInfo": "More Informations about Backups",
   "settingsAbout": "About",
   "settingsContact": "Contact",
@@ -53,10 +78,13 @@
   "settingsOther": "Other",
   "settingsFurtherInformationBackup": "Further Information Backup",
   "settingsImprint": "Imprint",
+  "settingsConnectSpotify": "Connect to Spotify",
 
   "filterAvgMovWeightHead": "Average Total Moved Weight",
   "filterAvgMovWeightText": "Shows an additional line in the graph indicating the average total moved weight per set",
   "filterAllWorkouts": "All Workouts",
+  "filterOnlyWorkingSets": "Only Working Sets",
+  "filterOnlyWorkingSetsText": "All Sets are Working Sets per default. You can explicitly set a Set as Warm-Up, which leads to excluding this Set in the diagram.",
 
   "panelWoExercises": "Exercises",
   "panelWoWorkoutTemplate": "Workout Template",
@@ -89,5 +117,78 @@
   "runningWorkoutSelectGroup": "Select Group Exercises To Track",
   "runningWorkoutSelectExerciseUpdate": "Select Exercises To Update",
   "runningWorkoutNoExerciseUpdate": "No Exercise To Update",
-  "runningWorkoutAlreadyExists": "Exercise Name already exists"
+  "runningWorkoutAlreadyExists": "Exercise Name already exists",
+  "runningWorkoutTimerTimeInSeconds": "Time in Seconds",
+  "runningWorkoutConfirmCancelWorkout": "Do you really want to cancel this workout? All data from this running workout will be lost.",
+
+  "welcomeNext": "Next",
+  "welcomeBack": "Back",
+  "welcome" : "Welcome to ",
+  "welcomeSelectLanguage": "Please select your language",
+  "welcomeSyncGoogleDrive" : "Sync. with Google Drive",
+  "welcomeSynciCloud" : "Sync with iCloud",
+  "welcomeNoAccount" : "You don't have to create an account",
+  "welcomeNoAccount2" : "to use O̶n̶e̶D̶a̶y̶ ",
+  "welcomeAwesome" : "\uD83D\uDE4C Awesome isn't it?",
+  "welcomeLocalBackups" : "Local Backups will be created in the App's own storage",
+  "welcomeSyncGoogleDrive2" : "You can sync. them with Google Drive",
+  "welcomeSynciCloud2" : "You can sync. them with iCloud",
+  "welcomeControlMusic" : "Control your music\uD83C\uDFB5",
+  "welcomeMusicQuestion" : "Are you always changing Apps during your workout to control your music?",
+  "welcomeMusicSolution" : "We have to solution for you!",
+  "welcomeMusicExplanation" : "You can control your music from within O̶n̶e̶D̶a̶y̶ if you are using Spotify",
+  "welcomeSpotify" : "Connect to Spotify",
+  "welcomeSpotifyError" : "Spotify needs to be installed ",
+  "welcomeSetupCompleted" : "Setup Completed✅",
+  "welcomeSetupCompletedMsg" : "Great, you have finished your Setup!",
+  "welcomeSetupCompletedHopIntoTutorial" : "Let's hop right into the tutorial to show you the functions inside the App",
+  "welcomeButtonExploreMyself" : "I wanna explore the App myself",
+  "welcomeButtonStartTutorial" : "Start Tutorial",
+
+  "t1CreateTemplate" : "Let's create your first workout Template",
+  "t1EnterWoName" : "Enter a name for your first workout Template",
+  "t2AddExercise" : "Let's add your first Exercise",
+  "t2SetExerciseOptions" : "Here you can set the name, rest time and seat level for each Exercise",
+  "t2EnterExName" : "Enter a name for your first Exercise",
+  "t3ExOptions" : "Exercise Options",
+  "t3SwipeLeft1" : "Swipe Left",
+  "t3SwipeLeft2" : "to copy or edit an Exercise",
+  "t3SwipeRight1" : "Swipe Right",
+  "t3SwipeRight2" : "to delete an Exercise",
+  "t3LongPress" : "Long press an Exercise to grab and reorder it",
+  "t3Group" : "Exercise Groups",
+  "t3GroupExplanation" : "You can Group exercises. This can be helpful when you have alternating exercises in a workout or just want to have an alternative when your primary exercise is not available\n\nGroups can be dragged and deleted the same way as Exercises\n\nExercises below a Group will automatically be added to this Group. Therefore, Exercises which should not be added to any Group must be placed above the first Group"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,7 +17,7 @@ import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings.dart';
-import 'charts/line_chart_exercise_weight_progress.dart';
+import 'charts/exercise_line_chart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -81,12 +81,27 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         AnimatedBuilder(
           animation: cnScreenStatistics.animationControllerSettingPanel,
           builder: (context, child) {
-            double scale = 1.0 - (cnScreenStatistics.animationControllerSettingPanel.value * 0.1);
+            double scale = 1.0 - ((cnScreenStatistics.animationControllerSettingPanel.value/2) * (Platform.isAndroid? 0.15 : 0.2));
             return Transform.scale(
               scale: scale,
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                  child: child
+                  child: Container(
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              begin: Alignment.topRight,
+                              end: Alignment.bottomLeft,
+                              colors: [
+                                Color(0xffc26a0e),
+                                Color(0xbb110a02)
+                              ]
+                          )
+                      ),
+                      child: Container(
+                          color: Colors.black.withOpacity((cnScreenStatistics.animationControllerSettingPanel.value * 0.5).clamp(0, 1)),
+                          child: child
+                      )
+                  )
               ),
             );
           },
@@ -99,8 +114,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     padding: const EdgeInsets.symmetric(horizontal: 5),
                     children: [
                       getHeader(),
-                      const SizedBox(height: 20,),
-                      LineChartExerciseWeightProgress(key: cnScreenStatistics.lineChartKey),
+                      // const SizedBox(height: 20,),
+                      ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
                       const SafeArea(top:false, child: SizedBox(height: 30,)),
                     ],
                   ),
@@ -116,50 +131,35 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   Widget getHeader() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IconButton(
-          // color: Colors.amber[200]!,
-            color: Colors.white,
-            onPressed: (){
-              cnScreenStatistics.openSettingsPanel();
-              // Navigator.push(
-              //     context,
-              //     CupertinoPageRoute(
-              //         builder: (context) => const SettingsPanel()
-              //     ));
-            },
-            icon: const Icon(
-              Icons.settings,
-            )
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              // color: Colors.amber[200]!,
+                color: Colors.white,
+                onPressed: (){
+                  cnScreenStatistics.saveCurrentFilterState();
+                  openFilterPopUp(context);
+                },
+                icon: const Icon(
+                  Icons.filter_list,
+                )
+            ),
+            IconButton(
+              // color: Colors.amber[200]!,
+                color: Colors.white,
+                onPressed: (){
+                  cnScreenStatistics.openSettingsPanel();
+                },
+                icon: const Icon(
+                  Icons.settings,
+                )
+            ),
+          ],
         ),
-        const SizedBox(height: 10,),
-        SizedBox(
-          height: 40,
-          child: Stack(
-            children: [
-              const Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 15),
-                  child: ExerciseSelector(),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: IconButton(
-                  // color: Colors.amber[200]!,
-                    color: Colors.white,
-                    onPressed: (){
-                      cnScreenStatistics.saveCurrentFilterState();
-                      openFilterPopUp(context);
-                    },
-                    icon: const Icon(
-                      Icons.filter_list,
-                    )
-                ),
-              ),
-            ],
-          ),
+        const Center(
+          child: ExerciseSelector(),
         ),
       ],
     );
@@ -171,11 +171,10 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         maxWidth: 350,
         padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
         context: context,
-        child: getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine, context),
+        child: getPopUpChild(cnScreenStatistics, context),
         onConfirm: (){
           cnScreenStatistics.refreshData();
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-            // cnScreenStatistics.lineChartKey = UniqueKey();
             cnScreenStatistics.refresh();
             cnScreenStatistics.cache();
           });
@@ -187,7 +186,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     );
   }
 
-  Widget getPopUpChild(bool isOn, BuildContext context){
+  Widget getPopUpChild(CnScreenStatistics provider, BuildContext context){
     List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
     /// Replace the "ALL Workouts" name in correct language
     workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
@@ -262,14 +261,51 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: isOn,
+                  value: provider.showAvgWeightPerSetLine,
                   activeColor: const Color(0xFFC16A03),
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showAvgWeightPerSetLine = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics.showAvgWeightPerSetLine, context);
+                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.refresh();
+                  }
+              )
+            ]
+        ),
+        const SizedBox(height: 15,),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OverflowSafeText(AppLocalizations.of(context)!.filterOnlyWorkingSets, maxLines: 1),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15),
+                      child: OverflowSafeText(
+                        AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
+                        minFontSize: 9,
+                        maxLines: 4,
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 30,),
+              CupertinoSwitch(
+                  value: provider.onlyWorkingSets,
+                  activeColor: const Color(0xFFC16A03),
+                  onChanged: (value){
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                    cnScreenStatistics.onlyWorkingSets = value;
+                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -298,6 +334,12 @@ class CnScreenStatistics extends ChangeNotifier {
   String? selectedWorkoutNameLast;
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
+  bool onlyWorkingSets = false;
+  bool graphLocked = false;
+  double currentVisibleDays = 0;
+  double maxVisibleDays = 1900;
+  double offsetMinX = 0;
+  double offsetMaxX = 0;
   late CnConfig cnConfig;
 
   /// Settings variables
@@ -378,7 +420,20 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     Map<DateTime, double> maxWeights = {};
     for(MapEntry<DateTime, ObExercise> entry in obExercises.entries){
-      maxWeights[entry.key] = entry.value.weights.max;
+      List<int> indexToRemove = [];
+      if(onlyWorkingSets){
+        entry.value.setTypes.forEachIndexed((index, element) {
+          if(element == 1){
+            indexToRemove.add(index);
+          }
+        });
+        List<double> cleanedEntry = entry.value.weights.whereIndexed((index, element) => !indexToRemove.contains(index)).toList();
+        if(cleanedEntry.isNotEmpty){
+          maxWeights[entry.key] = entry.value.weights.whereIndexed((index, element) => !indexToRemove.contains(index)).max;
+        }
+      } else{
+        maxWeights[entry.key] = entry.value.weights.max;
+      }
     }
     return maxWeights;
   }
@@ -391,10 +446,18 @@ class CnScreenStatistics extends ChangeNotifier {
       Map<DateTime, double> summedWeights = {};
       for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
         double totalWeight = 0;
-        for(List res in zip([entry.value.weights, entry.value.amounts])){
+        int countingSets = 0;
+        for(List res in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
+          if(onlyWorkingSets && res[2] == 1){
+            continue;
+          }
           totalWeight = totalWeight + res[0] * res[1];
+          countingSets += 1;
         }
-        final avgMovedWeightPerSet = totalWeight/entry.value.amounts.length;
+        if(countingSets == 0){
+          continue;
+        }
+        final avgMovedWeightPerSet = totalWeight/countingSets;
         summedWeights[entry.key] = (summedWeights[entry.key]?? 0) + (avgMovedWeightPerSet);
       }
       return summedWeights;
@@ -477,12 +540,21 @@ class CnScreenStatistics extends ChangeNotifier {
       }
     }
     showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
+    onlyWorkingSets = data["onlyWorkingSets"] ?? false;
+  }
+
+  void resetGraph({bool withKeyReset = true}){
+    maxVisibleDays = 1900;
+    offsetMinX = 0;
+    offsetMaxX = 0;
+    lineChartKey = UniqueKey();
   }
 
   Future<void> cache() async{
     Map data = {
       "selectedExerciseName": selectedExerciseName,
       "showAvgWeightPerSetLine": showAvgWeightPerSetLine,
+      "onlyWorkingSets": onlyWorkingSets
     };
     cnConfig.config.cnScreenStatistics = data;
     await cnConfig.config.save();

@@ -5,27 +5,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class BackgroundImage extends StatefulWidget {
-  const BackgroundImage({super.key});
+class BackgroundColor extends StatefulWidget {
+  const BackgroundColor({super.key});
 
   @override
-  State<BackgroundImage> createState() => _BackgroundImageState();
+  State<BackgroundColor> createState() => _BackgroundColorState();
 }
 
-class _BackgroundImageState extends State<BackgroundImage> {
+class _BackgroundColorState extends State<BackgroundColor> {
 
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  late CnBackgroundImage cnBackgroundImage;
+  late CnBackgroundColor cnBackgroundColor;
 
   @override
   Widget build(BuildContext context) {
 
     // print("--------- REBUILD ---------");
-    // print(cnBackgroundImage.colorFirstChild);
-    // print(cnBackgroundImage.colorSecondChild);
-    // print(cnBackgroundImage.firstChild);
+    // print(cnBackgroundColor.colorFirstChild);
+    // print(cnBackgroundColor.colorSecondChild);
+    // print(cnBackgroundColor.firstChild);
 
-    cnBackgroundImage = Provider.of<CnBackgroundImage>(context);
+    cnBackgroundColor = Provider.of<CnBackgroundColor>(context);
 
     return Container(
       height: double.maxFinite,
@@ -39,14 +39,14 @@ class _BackgroundImageState extends State<BackgroundImage> {
               //   Colors.black38,
               // ]
               colors: [
-                // (cnBackgroundImage.songColors[cnBackgroundImage.currentTrackName]?? cnBackgroundImage.defaultColors)[1],
-                // (cnBackgroundImage.songColors[cnBackgroundImage.currentTrackName]?? cnBackgroundImage.defaultColors)[0],
-                cnBackgroundImage.colorSecondChild?? Colors.black38,
-                cnBackgroundImage.colorFirstChild?? Colors.black54,
+                // (cnBackgroundColor.songColors[cnBackgroundColor.currentTrackName]?? cnBackgroundColor.defaultColors)[1],
+                // (cnBackgroundColor.songColors[cnBackgroundColor.currentTrackName]?? cnBackgroundColor.defaultColors)[0],
+                cnBackgroundColor.colorSecondChild?? Colors.black38,
+                cnBackgroundColor.colorFirstChild?? Colors.black54,
               ]
           )
       ),
-      // color: cnBackgroundImage.colorFirstChild,
+      // color: cnBackgroundColor.colorFirstChild,
       child: Container(
         decoration: const BoxDecoration(
             gradient:  LinearGradient(
@@ -57,8 +57,8 @@ class _BackgroundImageState extends State<BackgroundImage> {
                   Colors.black54,
                 ]
                 // colors: [
-                //   cnBackgroundImage.colorFirstChild?? Colors.black54,
-                //   cnBackgroundImage.colorSecondChild?? Colors.black38,
+                //   cnBackgroundColor.colorFirstChild?? Colors.black54,
+                //   cnBackgroundColor.colorSecondChild?? Colors.black38,
                 // ]
             )
         ),
@@ -68,14 +68,14 @@ class _BackgroundImageState extends State<BackgroundImage> {
     //   children: [
     //     AnimatedCrossFade(
     //       firstChild: Container(
-    //         color: cnBackgroundImage.colorFirstChild,
+    //         color: cnBackgroundColor.colorFirstChild,
     //         // color: Colors.green,
     //       ),
     //       secondChild:Container(
-    //         color: cnBackgroundImage.colorSecondChild,
+    //         color: cnBackgroundColor.colorSecondChild,
     //         // color: Colors.red,
     //       ),
-    //       crossFadeState: cnBackgroundImage.firstChild?
+    //       crossFadeState: cnBackgroundColor.firstChild?
     //       CrossFadeState.showFirst :
     //       CrossFadeState.showSecond,
     //       duration: const Duration(milliseconds: 200),
@@ -193,7 +193,7 @@ class _BackgroundImageState extends State<BackgroundImage> {
 
 }
 
-class CnBackgroundImage extends ChangeNotifier {
+class CnBackgroundColor extends ChangeNotifier {
   Color? colorFirstChild;
   Color? colorSecondChild;
   bool isRefreshing = false;

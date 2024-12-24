@@ -1,19 +1,21 @@
 import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../screen_statistics.dart';
 
-class LineChartExerciseWeightProgress extends StatefulWidget {
-  const LineChartExerciseWeightProgress({super.key});
+class ExerciseLineChart extends StatefulWidget {
+  const ExerciseLineChart({super.key});
 
   @override
-  State<LineChartExerciseWeightProgress> createState() => _LineChartExerciseWeightProgressState();
+  State<ExerciseLineChart> createState() => _ExerciseLineChartState();
 }
 
-class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeightProgress> {
+class _ExerciseLineChartState extends State<ExerciseLineChart> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   List<Color> gradientColors = [
     Colors.amber[200]!,
@@ -29,8 +31,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   double maxWeight = 0;
   double minTotalWeight = 0;
   double maxTotalWeight = 0;
-  final double maxVisibleDays = 1900;
-  double currentVisibleDays = 0;
+  // final double maxVisibleDays = 1900;
   double minY = 0;
   double maxY = 0;
   double minPercent = 1;
@@ -41,8 +42,6 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   late DateTime maxDate;
   double width = 0;
   List<FlSpot> spotsMaxWeight = [];
-  double offsetMinX = 0;
-  double offsetMaxX = 0;
   Offset? pointerA;
   Offset? pointerAPreviousPos;
   Offset? pointerB;
@@ -50,13 +49,11 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   int? pointerBIdentifier;
   double lastPointerDistance = 0;
   double focalPointPercent = 0;
-  bool isZooming = false;
   final int _leftPadding = 5;
   late final int _totalPadding = _leftPadding * 2;
   List<FlSpot> spotsAvgWeightPerSet = [];
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
-
   int animationTime = 500;
 
   @override
@@ -66,16 +63,16 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     minDate = cnScreenStatistics.minDate;
     maxDate = cnScreenStatistics.maxDate;
 
-    final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - offsetMaxX;
-    if(tempMaxX > maxVisibleDays){
-      final rest = tempMaxX - maxVisibleDays;
-      if(currentVisibleDays <= 0){
-        offsetMinX += rest;
+    final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - cnScreenStatistics.offsetMaxX;
+    if(tempMaxX > cnScreenStatistics.maxVisibleDays){
+      final rest = tempMaxX - cnScreenStatistics.maxVisibleDays;
+      if(cnScreenStatistics.currentVisibleDays <= 0){
+        cnScreenStatistics.offsetMinX += rest;
       }
-      offsetMaxX += rest - _totalPadding;
-      currentVisibleDays = maxVisibleDays;
+      cnScreenStatistics.offsetMaxX += rest - _totalPadding;
+      cnScreenStatistics.currentVisibleDays = cnScreenStatistics.maxVisibleDays;
     } else{
-      currentVisibleDays = tempMaxX;
+      cnScreenStatistics.currentVisibleDays = tempMaxX;
     }
 
     maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
@@ -104,7 +101,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     /// Set Spots Max Weight
     spotsMaxWeight.clear();
     maxWeights?.forEach((date, weight) {
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - offsetMinX + _leftPadding;
+      final xCoordinate = date.difference(minDate).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
@@ -112,7 +109,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - offsetMinX + _leftPadding;
+      final xCoordinate = date.difference(minDate).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       if(percent.isNaN){
         percent = totalWeight / maxTotalWeight;
         if(percent.isNaN){
@@ -153,112 +150,139 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
+            const Spacer(),
+            IconButton(
+                onPressed: (){
+                  HapticFeedback.selectionClick();
+                  setState(() {
+                    cnScreenStatistics.graphLocked = !cnScreenStatistics.graphLocked;
+                  });
+                },
+                icon: cnScreenStatistics.graphLocked? const Icon(Icons.lock_outlined) : const Icon(Icons.lock_open),
+            )
           ],
         ),
         const SizedBox(height: 10,),
-        Listener(
-          behavior: HitTestBehavior.translucent,
-          onPointerDown: (PointerDownEvent details){
-            animationTime = 0;
-            if(pointerAIdentifier == null){
-              pointerAIdentifier = details.pointer;
-              pointerA = details.position;
-              pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
-            }
-            else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
-              pointerBIdentifier = details.pointer;
-              pointerB = details.position;
-              lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
-              final minPos = pointerB!.dx < pointerA!.dx? pointerB!.dx : pointerA!.dx;
-              /// the middle point between the two pointer in percent minus an offset of 0.2
-              focalPointPercent = (lastPointerDistance/2 + minPos - _widthAxisTitles) / width;
-            }
-          },
-          onPointerMove: (PointerMoveEvent details){
-            if(details.pointer == pointerAIdentifier){
-              pointerA = details.position;
-            }
-            else if(details.pointer == pointerBIdentifier){
-              pointerB = details.position;
-            }
-
-            /// ZOOM
-            if(pointerA != null && pointerB != null /*&& !isZooming*/){
-              // isZooming = true;
-              double sensibility = ((currentVisibleDays) / (1500 / sqrt(currentVisibleDays)));
-              final maxDays = maxDate.difference(minDate).inDays;
-              final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
-              final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
-              lastPointerDistance = currentPointerDistance;
-
-              setState(() {
-                double newOffsetMaxX;
-                double newOffsetMinX;
-
-                newOffsetMaxX = (offsetMaxX - difference);
-                newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
-                newOffsetMinX = (offsetMinX - difference * focalPointPercent);
-                newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
-
-                if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= maxVisibleDays){
-                  offsetMinX = newOffsetMinX;
-                  offsetMaxX = newOffsetMaxX;
-                }
-              });
-              // Future.delayed(const Duration(milliseconds: 30), (){
-              //   isZooming = false;
-              // });
-            }
-
-            /// SCROLL
-            else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
-              final totalRange = maxDate.difference(minDate).inDays;
-              final maxValueOffsetMinX = totalRange - currentVisibleDays + _totalPadding;
-              double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
-              sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
-              final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
-
-              double newOffsetMinX;
-
-              newOffsetMinX = offsetMinX + currentPointerDistance;
-              if(newOffsetMinX >= 0 && newOffsetMinX != offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= offsetMinX)){
-                setState(() {
-                  offsetMinX = newOffsetMinX;
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Listener(
+              behavior: HitTestBehavior.translucent,
+              onPointerDown: (PointerDownEvent details){
+                animationTime = 0;
+                if(pointerAIdentifier == null){
+                  pointerAIdentifier = details.pointer;
+                  pointerA = details.position;
                   pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
-                });
-              }
-              setState(() {});
-            }
+                }
+                else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
+                  pointerBIdentifier = details.pointer;
+                  pointerB = details.position;
+                  lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+                  final minPos = pointerB!.dx < pointerA!.dx? pointerB!.dx : pointerA!.dx;
+                  /// the middle point between the two pointer in percent
+                  focalPointPercent = (lastPointerDistance/2 + minPos - _widthAxisTitles) / width;
+                }
+              },
+              onPointerMove: (PointerMoveEvent details){
+                if(cnScreenStatistics.graphLocked){
+                  return;
+                }
+                if(details.pointer == pointerAIdentifier){
+                  pointerA = details.position;
+                }
+                else if(details.pointer == pointerBIdentifier){
+                  pointerB = details.position;
+                }
 
-          },
-          onPointerUp: (PointerUpEvent details){
-            pointerA = null;
-            pointerAPreviousPos = null;
-            pointerAIdentifier = null;
-            pointerB = null;
-            pointerBIdentifier = null;
-            isZooming = false;
-            Future.delayed(const Duration(milliseconds: 500), (){
-              if(pointerA == null && pointerB == null){
-                animationTime = 500;
-              }
-            });
-          },
-          child: Stack(
-            children: <Widget>[
-              AspectRatio(
-                aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
-                child: Padding(
-                  padding: EdgeInsets.zero,
-                  child: LineChart(
-                      duration: Duration(milliseconds: animationTime),
-                      curve: Curves.easeInOut,
-                      mainData()
+                /// ZOOM
+                if(pointerA != null && pointerB != null){
+                  double sensibility = ((cnScreenStatistics.currentVisibleDays) / (1500 / sqrt(cnScreenStatistics.currentVisibleDays)));
+                  final maxDays = maxDate.difference(minDate).inDays;
+                  final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
+                  final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
+                  lastPointerDistance = currentPointerDistance;
+
+                  setState(() {
+                    double newOffsetMaxX;
+                    double newOffsetMinX;
+
+                    newOffsetMaxX = (cnScreenStatistics.offsetMaxX - difference);
+                    newOffsetMaxX = newOffsetMaxX >= 0? newOffsetMaxX : 0;
+                    newOffsetMinX = (cnScreenStatistics.offsetMinX - difference * focalPointPercent);
+                    newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
+
+                    if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= cnScreenStatistics.maxVisibleDays){
+                      cnScreenStatistics.offsetMinX = newOffsetMinX;
+                      cnScreenStatistics.offsetMaxX = newOffsetMaxX;
+                    }
+                  });
+                }
+
+                /// SCROLL
+                else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
+                  final totalRange = maxDate.difference(minDate).inDays;
+                  final maxValueOffsetMinX = totalRange - cnScreenStatistics.currentVisibleDays + _totalPadding;
+                  // double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
+                  double sensibility = 1/ (cnScreenStatistics.currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
+                  sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
+                  final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
+
+                  double newOffsetMinX;
+
+                  newOffsetMinX = cnScreenStatistics.offsetMinX + currentPointerDistance;
+                  if(newOffsetMinX >= 0 && newOffsetMinX != cnScreenStatistics.offsetMinX && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= cnScreenStatistics.offsetMinX)){
+                    setState(() {
+                      cnScreenStatistics.offsetMinX = newOffsetMinX;
+                      pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
+                    });
+                  }
+                  setState(() {});
+                }
+
+              },
+              onPointerUp: (PointerUpEvent details){
+                // if(details.pointer == pointerAIdentifier){
+                  pointerA = null;
+                  pointerAPreviousPos = null;
+                  pointerAIdentifier = null;
+                // }
+                // else if(details.pointer == pointerBIdentifier){
+                  pointerB = null;
+                  pointerBIdentifier = null;
+                // }
+                Future.delayed(const Duration(milliseconds: 500), (){
+                  if(pointerA == null && pointerB == null){
+                    animationTime = 500;
+                  }
+                });
+                // pointerA = null;
+                // pointerAPreviousPos = null;
+                // pointerAIdentifier = null;
+                // pointerB = null;
+                // pointerBIdentifier = null;
+                // Future.delayed(const Duration(milliseconds: 500), (){
+                //   if(pointerA == null && pointerB == null){
+                //     animationTime = 500;
+                //   }
+                // });
+              },
+              child: Stack(
+                children: <Widget>[
+                  AspectRatio(
+                    aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
+                    child: Padding(
+                      padding: EdgeInsets.zero,
+                      child: LineChart(
+                          duration: Duration(milliseconds: animationTime),
+                          curve: Curves.easeInOut,
+                          mainData()
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            );
+          }
         ),
       ],
     );
@@ -271,9 +295,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
     );
     Widget text;
 
-    value += offsetMinX;
+    value += cnScreenStatistics.offsetMinX;
 
-    if(currentVisibleDays < 200 && value % 1.0 > 0.1){
+    if(cnScreenStatistics.currentVisibleDays < 200 && value % 1.0 > 0.1){
       return SideTitleWidget(
         axisSide: meta.axisSide,
         child: const Text('', style: style)
@@ -297,22 +321,22 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
   Widget generateXAxisText(DateTime date, TextStyle style){
     bool doLabel;
     String format;
-    if(currentVisibleDays < 20){
+    if(cnScreenStatistics.currentVisibleDays < 20){
       doLabel = date.day % 5 == 0;
       format = 'd. MMM';
-    } else if(currentVisibleDays < 40){
+    } else if(cnScreenStatistics.currentVisibleDays < 40){
       doLabel = date.day % 10 == 0;
       format = 'd. MMM';
-    } else if(currentVisibleDays < 80){
+    } else if(cnScreenStatistics.currentVisibleDays < 80){
       doLabel = date.day % 15 == 0 || (date.day == 28 && date.month == 2);
       format = 'd. MMM';
-    } else if(currentVisibleDays < 200){
+    } else if(cnScreenStatistics.currentVisibleDays < 200){
       doLabel = date.day == 1;
       format = 'MMM yy';
-    } else if(currentVisibleDays < 400){
+    } else if(cnScreenStatistics.currentVisibleDays < 400){
       doLabel = date.day == 1 && date.month % 2 == 0;
       format = 'MMM yy';
-    }else if (currentVisibleDays < 700){
+    }else if (cnScreenStatistics.currentVisibleDays < 700){
       doLabel = date.day == 1 && date.month % 3 == 0;
       format = 'MMM yy';
     } else{
@@ -360,6 +384,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
 
   LineChartData mainData() {
     return LineChartData(
+      clipData: const FlClipData.all(),
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
@@ -406,7 +431,7 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: currentVisibleDays < 200? 0.1 : 1,
+            interval: cnScreenStatistics.currentVisibleDays < 200? 0.1 : 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
@@ -424,14 +449,14 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         border: Border.all(color: const Color(0xff5e5e5e)),
       ),
       minX: 0,
-      maxX: currentVisibleDays.toDouble(),
+      maxX: cnScreenStatistics.currentVisibleDays.toDouble(),
       minY: minY,
       maxY: maxY,
       lineBarsData: [
         LineChartBarData(
-          curveSmoothness: 0.1,
+          isCurved: false,
+          // curveSmoothness: 0.1,
           spots: spotsMaxWeight,
-          isCurved: true,
           gradient: LinearGradient(
             colors: gradientColors,
           ),
@@ -451,9 +476,9 @@ class _LineChartExerciseWeightProgressState extends State<LineChartExerciseWeigh
         ),
         if(cnScreenStatistics.showAvgWeightPerSetLine)
           LineChartBarData(
+            isCurved: false,
             curveSmoothness: 0.1,
             spots: spotsAvgWeightPerSet,
-            isCurved: true,
             gradient: LinearGradient(
               colors: gradientColors2,
             ),

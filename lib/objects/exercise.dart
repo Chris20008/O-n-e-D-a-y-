@@ -30,10 +30,19 @@ class Exercise{
     }
   }
 
+  Exercise.fromObExercise(ObExercise e):this(
+      id: e.id,
+      name: e.name,
+      sets: List.from(zip([e.weights, e.amounts, e.setTypes]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt(), setType: set[2].toInt()))),
+      restInSeconds: e.restInSeconds,
+      seatLevel: e.seatLevel,
+      linkName: e.linkName
+  );
+
   /// Don't clone the original name
   Exercise.copy(Exercise ex): this(
       name: ex.name,
-      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
+      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
       linkName: ex.linkName
@@ -42,7 +51,7 @@ class Exercise{
   Exercise.clone(Exercise ex): this(
       id: ex.id,
       name: ex.name,
-      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount))),
+      sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
       linkName: ex.linkName
@@ -51,15 +60,18 @@ class Exercise{
   ObExercise toObExercise(){
     List<double> weights = [];
     List<int> amounts = [];
+    List<int> setTypes = [];
     sets = sets.where((set) => set.weight != null && set.amount != null).toList();
     for (SingleSet set in sets){
       weights.add(set.weight!);
       amounts.add(set.amount!);
+      setTypes.add(set.setType?? 0);
     }
     return ObExercise(
         name: name,
         weights: weights,
         amounts: amounts,
+        setTypes: setTypes,
         restInSeconds: restInSeconds,
         seatLevel: seatLevel,
         linkName: linkName
@@ -70,12 +82,17 @@ class Exercise{
     return sets.map((e) => UniqueKey()).toList();
   }
 
-  void addSet({double? weight, int? amount}){
-    sets.add(SingleSet(weight: weight, amount: amount));
+  void addSet({double? weight, int? amount, int? setType}){
+    sets.add(SingleSet(weight: weight, amount: amount, setType: setType));
   }
 
-  void resetSets(){
-    sets = sets.map((e) => SingleSet(weight:null, amount:null)).toList();
+  void resetSets({required bool keepSetType}){
+    if(keepSetType){
+      sets = sets.map((e) => SingleSet(weight:null, amount:null, setType:e.setType)).toList();
+    }
+    else{
+      sets = sets.map((e) => SingleSet(weight:null, amount:null, setType:null)).toList();
+    }
   }
 
   void removeEmptySets(){
@@ -85,7 +102,7 @@ class Exercise{
   Map asMap(){
     return {
     "name": name,
-    "sets": sets.map((e) => [e.weight, e.amount]).toList(),
+    "sets": sets.map((e) => [e.weight, e.amount, e.setType]).toList(),
     "restInSeconds": restInSeconds,
     "seatLevel": seatLevel,
     "originalName": originalName, 
@@ -103,9 +120,27 @@ class Exercise{
         !data.containsKey("linkName")){
       return null;
     }
+    /// setType was added afterwards
+    /// So in order to be able to load a backup which doesn't contain this field
+    /// we check if alls lists inside sets have a length > 2
+    /// When all do so, it means that for all values a setType exists
+    /// if not we fill setType with 0 which is the default value
+    int? fillSetType;
+    for (dynamic val in data["sets"]){
+      if (val is List){
+        if (val.length > 2){
+          continue;
+        }
+        else{
+          fillSetType = 0;
+          break;
+        }
+      }
+    }
+    // print("FILL SET TYPE: $fillSetType");
     return Exercise(
       name: data["name"],
-      sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1]))),
+      sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1], setType: fillSetType?? s[2]))),
       restInSeconds: data["restInSeconds"],
       seatLevel: data["seatLevel"],
       originalName: data["originalName"],
@@ -114,7 +149,11 @@ class Exercise{
   }
 
   bool equals(Exercise ex){
-    if(ex.sets.length != sets.length){
+    if(ex.name != name ||
+        seatLevel != ex.seatLevel ||
+        restInSeconds != ex.restInSeconds ||
+        ex.sets.length != sets.length
+    ){
       return false;
     }
     for(List<SingleSet> s in zip([ex.sets, sets])){
@@ -122,7 +161,7 @@ class Exercise{
         return false;
       }
     }
-    return seatLevel == ex.seatLevel && restInSeconds == ex.restInSeconds;
+    return true;
   }
 
 }
@@ -130,14 +169,19 @@ class Exercise{
 class SingleSet{
   double? weight;
   int? amount;
+  /// set Type 0 = Working set
+  /// 1 = Warm Up Set
+  /// 11-20 = RPE 1-10
+  int? setType;
 
   SingleSet({
     this.weight,
-    this.amount
+    this.amount,
+    this.setType
   });
 
   bool equals(SingleSet s){
-    return weight == s.weight && amount == s.amount;
+    return weight == s.weight && amount == s.amount && setType == s.setType;
   }
 }
 

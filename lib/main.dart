@@ -7,24 +7,32 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
+import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_add_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
 late ObjectBox objectbox;
+bool tutorialIsRunning = false;
+int currentTutorialStep = 0;
+String pictureAssetPath = "lib/assets/pictures/";
 
 void main() {
 
@@ -70,14 +78,15 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers:[
-        ChangeNotifierProvider(create: (context) => CnBottomMenu()),
-        ChangeNotifierProvider(create: (context) => CnConfig()),
+        // ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
-        ChangeNotifierProvider(create: (context) => CnBackgroundImage()),
+        ChangeNotifierProvider(create: (context) => CnBackgroundColor()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
+        ChangeNotifierProvider(create: (context) => CnBottomMenu()),
+        ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
@@ -88,11 +97,7 @@ class MyAppState extends State<MyApp> {
       child: MaterialApp(
         // showPerformanceOverlay: true,
         locale: _locale,
-        // locale: const Locale("de"),
-        supportedLocales: const [
-          Locale('en'), /// English
-          Locale('de'), /// German
-        ],
+        supportedLocales: supportedLocales,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
@@ -108,16 +113,14 @@ class MyAppState extends State<MyApp> {
               brightness: Brightness.dark
             )
         ),
-        home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        home: const MyHomePage(),
       ),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
+  const MyHomePage({super.key});
 
   @override
 
@@ -133,8 +136,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context, listen: false);
+  late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context, listen: false);
+  late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: true);
   late CnHomepage cnHomepage;
   late final AnimationController _animationControllerWorkoutPanel = AnimationController(
     vsync: this,
@@ -144,6 +148,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     vsync: this,
     duration: const Duration(milliseconds: 300),
   );
+  bool showWelcomeScreen = false;
+  bool closeWelcomeScreen = true;
+  bool mainIsInitialized = false;
 
   @override
   void initState() {
@@ -158,54 +165,169 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     super.dispose();
   }
 
+  void setIntroScreen(){
+    currentTutorialStep = cnConfig.currentTutorialStep;
+    if(cnConfig.welcomeScreen){
+      showWelcomeScreen = true;
+      closeWelcomeScreen = false;
+      cnBottomMenu.adjustHeight(1);
+    }
+    else{
+      showWelcomeScreen = false;
+      closeWelcomeScreen = true;
+    }
+    if(currentTutorialStep < 10 && currentTutorialStep != 0){
+      tutorialIsRunning = true;
+    }
+  }
+
   void initMain() async{
     objectbox = await ObjectBox.create();
+    await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
       if(context.mounted){
         final res = await findSystemLocale();
         MyApp.of(context)?.setLocale(languageCode: res);
-        // cnConfig.setLanguage(Localizations.localeOf(context).languageCode);
       }
-    } else{
-      if(context.mounted && cnConfig.config.settings["languageCode"] != null){
+    }
+    else if(context.mounted && cnConfig.config.settings["languageCode"] != null){
         MyApp.of(context)?.setLocale(languageCode: cnConfig.config.settings["languageCode"]);
-      }
     }
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
-    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible){
+    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
+    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
+    cnBottomMenu.setBottomMenuHeight(context);
+    cnBottomMenu.refresh();
+
+    /// setIntroScreen needs to be after cnBottomMenu.setBottomMenuHeight
+    setIntroScreen();
+    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
+
+    /// open screenRunningWorkout when it's saved in config.json and the welcome screen is not shown
+    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible && !showWelcomeScreen){
       Future.delayed(const Duration(milliseconds: 300), (){
         Navigator.push(
             context,
             CupertinoPageRoute(
                 builder: (context) => const ScreenRunningWorkout()
             ));
-        });
-    }
-    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
-    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
-    cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
-    if(Platform.isAndroid && cnConfig.syncWithCloud){
-      Future.delayed(const Duration(milliseconds: 300), (){
-        cnConfig.signInGoogleDrive();
       });
     }
+
+
+    /// sign in and sync with cloud
+    await cnConfig.signInCloud();
+    if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+      trySyncWithCloud();
+    }
+
+    // await Future.delayed(const Duration(milliseconds: 200), () async {
+    //   if(cnConfig.connectWithCloud){
+    //     if(Platform.isAndroid){
+    //       await cnConfig.signInGoogleDrive(delayMilliseconds: 0);
+    //     }
+    //     if(Platform.isIOS){
+    //       await cnConfig.checkIfICloudAvailable(delayMilliseconds: 0);
+    //     }
+    //     print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
+    //     if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+    //       trySyncWithCloud();
+    //     }
+    //   }
+    // });
+    setState(() {
+      mainIsInitialized = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
 
     cnHomepage = Provider.of<CnHomepage>(context);
-    if(cnConfig.isInitialized){
+
+    /// Screen to bee shown until 'await cnConfig.initData();' is finished
+    /// So the config data is been initialized
+    /// And also main needs to be initialised
+    /// !cnConfig.isInitialized seems unimportant since, mainIsInitialized can only be true when
+    /// cnConfig.isInitialized is also true, however deleting it leads some to a crash
+    if(!cnConfig.isInitialized || !mainIsInitialized){
+      return Scaffold(
+        body: Container(
+          // color: Theme.of(context).primaryColor,
+          height: double.maxFinite,
+          width: double.maxFinite,
+          decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  colors: [
+                    Color(0xffc26a0e),
+                    Color(0xbb110a02)
+                  ]
+              )
+          ),
+          child: Center(
+            child: Stack(
+              children: [
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 250, maxHeight: 250),
+                    child: Image.asset(
+                        // scale: 0.01,
+                        "${pictureAssetPath}Logo removed HD only dumbell.png"
+                    ),
+                  ),
+                ),
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 125),
+                    child: Text(
+                        "OneDay",
+                        textScaler: TextScaler.linear(4),
+                        style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white)
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    child: SizedBox(
+                        height: 100,
+                        width: 100,
+                        child: Center(
+                          child: CupertinoActivityIndicator(
+                              radius: 20.0,
+                              color: Colors.amber[800]
+                          ),
+                        ),
+                        // child: Center(child: CircularProgressIndicator())
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
     }
+
+    if(cnConfig.currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
+      tutorialIsRunning = true;
+      initTutorialAddWorkout(context);
+      showTutorialAddWorkout(context);
+    }
+    // print("is running $tutorialIsRunning");
 
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
+      bottomNavigationBar: const BottomMenu(),
       body: PopScope(
         canPop: false,
         child: Container(
@@ -216,15 +338,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                     colors: [
                       Color(0xffc26a0e),
                       Color(0xbb110a02)
-
-                      // const Color(0xffb2620e)
-                      // const Color(0xbb1c1003),
-
-                      // const Color(0xff84490b),
-                      // Colors.black.withOpacity(0.9),
                     ]
                 )
             ),
+          // decoration: const BoxDecoration(
+          //     gradient: LinearGradient(
+          //         begin: Alignment.topRight,
+          //         end: Alignment.bottomLeft,
+          //         colors: [
+          //           Color(0x95c26a0e),
+          //           Color(0x7f110a02)
+          //         ]
+          //     )
+          // ),
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
@@ -242,7 +368,22 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             scale: scale,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(borderRadius),
-                                child: child
+                                child: Container(
+                                  decoration: const BoxDecoration(
+                                        gradient: LinearGradient(
+                                            begin: Alignment.topRight,
+                                            end: Alignment.bottomLeft,
+                                            colors: [
+                                              Color(0xffc26a0e),
+                                              Color(0xbb110a02)
+                                            ]
+                                        )
+                                    ),
+                                  child: Container(
+                                      color: Colors.black.withOpacity((_animationControllerWorkoutPanel.value * 1.1).clamp(0, 1)),
+                                      child: child
+                                  ),
+                                )
                             ),
                           );
                         },
@@ -252,23 +393,24 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             crossFadeState: cnBottomMenu.index == 0?
                             CrossFadeState.showFirst:
                             CrossFadeState.showSecond,
-                            duration: const Duration(milliseconds: 200)
+                            duration: const Duration(milliseconds: 100)
                         ),
                       ),
 
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                        curve: Curves.easeInOut,
-                        child: const SafeArea(
-                          top: false,
-                          child: Hero(
-                              transitionOnUserGestures: true,
-                              tag: "SpotifyBar",
-                              child: SpotifyBar()
+                      if(cnConfig.useSpotify)
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                          curve: Curves.easeInOut,
+                          child: const SafeArea(
+                            top: false,
+                            child: Hero(
+                                transitionOnUserGestures: true,
+                                tag: "SpotifyBar",
+                                child: SpotifyBar()
+                            ),
                           ),
                         ),
-                      ),
 
                       /// Overlay with opacity, when workout panel is opened
                       /// We use this instead of the panel own backdropEnabled feature, because
@@ -288,6 +430,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             /// need this anymore when exercise panel is opened because it would become to dark
                             /// with backdrop AND this AnimatedBuilder together
                             opacity = opacity > 0.5 ? 1 - opacity : opacity;
+                            opacity = opacity * 0.5;
                             return Container(
                               color: Colors.black.withOpacity(opacity),
                             );
@@ -309,7 +452,9 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                                 scale: scale,
                                 child: ClipRRect(
                                     borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                                    child: child
+                                    child: Container(
+                                        child: child
+                                    )
                                 ),
                               ),
                             );
@@ -325,28 +470,215 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 //     alignment: Alignment.bottomCenter,
                 //     child: BottomMenu()
                 // ),
-                const StandardPopUp()
+                const StandardPopUp(),
+                if(showWelcomeScreen)
+                  AnimatedCrossFade(
+                    duration: const Duration(milliseconds: 500),
+                    firstChild: WelcomeScreen(
+                      onFinish: onFinishWelcomeScreen
+                    ),
+                    /// Use transparent Container instead of SizedBox to prevent user inputs
+                    /// until tutorial is loaded
+                    secondChild: Container(
+                      color: Colors.transparent,
+                    ),
+                    crossFadeState: closeWelcomeScreen?
+                    CrossFadeState.showSecond :
+                    CrossFadeState.showFirst,
+                    layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          Positioned(
+                            key: bottomChildKey,
+                            // top: 0.0,
+                            child: bottomChild,
+                          ),
+                          Positioned(
+                            key: topChildKey,
+                            child: topChild,
+                          ),
+                        ],
+                      );
+                    },
+                  ),
+                if(cnHomepage.isSyncingWithCloud)
+                  IgnorePointer(
+                    child: SafeArea(
+                      child: Column(
+                        children: [
+                          AnimatedContainer(
+                            height: cnRunningWorkout.isRunning && cnBottomMenu.index == 1? 55 : (Platform.isAndroid? 10 : 0),
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeOut,
+                          ),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Colors.black.withOpacity(0.4)
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(width: 5),
+                                Text(cnHomepage.msg, style: const TextStyle(color: CupertinoColors.white)),
+                                const SizedBox(width: 5),
+                                if(cnHomepage.percent != null)
+                                  Text("${(cnHomepage.percent! * 100).round()}%", style: const TextStyle(color: CupertinoColors.white)),
+                                if(cnHomepage.percent != null)
+                                const SizedBox(width: 5),
+                                if(!cnHomepage.syncWithCloudCompleted)
+                                  SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: Center(
+                                        child: CupertinoActivityIndicator(
+                                            radius: 8.0,
+                                            color: Colors.amber[800]
+                                        ),
+                                      ),
+                                      // child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
+                                  )
+                                else
+                                  const Icon(
+                                    Icons.check_circle,
+                                    size: 15,
+                                    color: Colors.green
+                                  ),
+                                const SizedBox(width: 5)
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                // Center(
+                //   child: ElevatedButton(
+                //     child: Text("Test"),
+                //     onPressed: ()async{
+                //       print("Presses Center button");
+                //       final res = await ICloudService.isICloudAvailable();
+                //       print("RESULT res: $res");
+                //     },
+                //   ),
+                // )
               ],
             ),
-
-          // child: AnimatedCrossFade(
-          //     firstChild: ScreenWorkoutHistory(key: UniqueKey()),
-          //     // firstChild: Container(height: 50, width: 50,),
-          //     secondChild: ScreenWorkout(key: UniqueKey()),
-          //     crossFadeState: cnBottomMenu.index == 0?
-          //     CrossFadeState.showFirst:
-          //     CrossFadeState.showSecond,
-          //     duration: const Duration(milliseconds: 200)
-          // ),
         ),
       ),
-      bottomNavigationBar: const BottomMenu(),
     );
+  }
+
+  Future<void> trySyncWithCloud() async{
+    cnHomepage.isSyncingWithCloud = true;
+    cnHomepage.msg = "Sync with Google Drive";
+    if(Platform.isAndroid){
+      if(await hasInternet()){
+        cnHomepage.refresh();
+        await loadNewestDataGoogleDrive(
+            cnConfig,
+            cnHomepage: cnHomepage
+        ).then((needRefresh) {
+          if(needRefresh){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+          }
+        });
+      }
+      else{
+        cnHomepage.isSyncingWithCloud = false;
+        cnHomepage.msg = "";
+        Fluttertoast.showToast(
+            msg: "No Internet - Sync with Cloud not possible",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.grey[800],
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    }
+    else{
+      cnHomepage.isSyncingWithCloud = true;
+      cnHomepage.msg = "Sync with iCloud";
+      cnHomepage.refresh();
+      await loadNewestDataiCloud(cnHomepage: cnHomepage).then((needRefresh) {
+        if(needRefresh){
+          cnWorkouts.refreshAllWorkouts();
+          cnWorkoutHistory.refreshAllWorkouts();
+        }
+      });
+      // loadNewestDataGoogleDrive(
+      //     cnConfig,
+      //     cnHomepage: cnHomepage
+      // ).then((needRefresh) {
+      //   if(needRefresh){
+      //     cnWorkouts.refreshAllWorkouts();
+      //     cnWorkoutHistory.refreshAllWorkouts();
+      //   }
+      // });
+    }
+  }
+
+  void onFinishWelcomeScreen(bool doShowTutorial) {
+    cnConfig.setWelcomeScreen(false);
+    setState(() {
+      closeWelcomeScreen = true;
+    });
+    Future.delayed(const Duration(milliseconds: 500), ()async{
+      setState(() {
+        cnBottomMenu.showBottomMenuAnimated();
+        if(doShowTutorial && currentTutorialStep == 0) {
+          initTutorialAddWorkout(context);
+          showTutorialAddWorkout(context);
+        } else if(!doShowTutorial){
+          currentTutorialStep = 100;
+          cnConfig.setCurrentTutorialStep(currentTutorialStep);
+          tutorialIsRunning = false;
+        }
+        showWelcomeScreen = false;
+      });
+      if(cnConfig.syncMultipleDevices /*&& !doShowTutorial*/){
+        trySyncWithCloud();
+      }
+    });
   }
 }
 
 class CnHomepage extends ChangeNotifier {
   late CnSpotifyBar cnSpotifyBar;
+  bool isSyncingWithCloud = false;
+  bool syncWithCloudCompleted = false;
+  double? percent;
+  String msg = "";
+
+  updateSyncStatus(double percent){
+    this.percent = percent;
+    if(percent > 0 && percent < 1){
+      isSyncingWithCloud = true;
+      syncWithCloudCompleted = false;
+      refresh();
+    } else{
+      finishSync();
+    }
+  }
+
+  finishSync({double? p = 1}){
+    syncWithCloudCompleted = true;
+    percent = p;
+    refresh();
+    Future.delayed(const Duration(seconds: 3), (){
+      isSyncingWithCloud = false;
+      syncWithCloudCompleted = false;
+      percent = null;
+      refresh();
+      msg = "";
+    });
+  }
 
   CnHomepage(BuildContext context){
     cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);

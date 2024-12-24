@@ -1,5 +1,6 @@
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -146,18 +147,18 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
+                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withOpacity(0.7), fontWeight: FontWeight.w400)
                                       )
-                                      // Text(ex.name, style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                     else
                                       OverflowSafeText(
                                           "${ex.name}, ",
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
+                                          // style: TextStyle(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w400)
                                       )
-                                      // Text("${ex.name}, ", style: TextStyle(color: Colors.white.withOpacity(0.5), fontWeight: FontWeight.w300))
                                 ],
                               ),
                             ),
@@ -172,19 +173,20 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   ],
                 ),
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LimitedBox(
-                          maxHeight: 1000,
-                          child: MultipleExerciseRow(
-                            exercises: widget.workout.exercises,
-                            // textScaler: TextScaler.linear()1.3,
-                            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
-                          )
-                      )
-                    ],
-                  ),
+                  // Column(
+                  //   crossAxisAlignment: CrossAxisAlignment.start,
+                  //   children: [
+                  //     LimitedBox(
+                  //         maxHeight: 1000,
+                  //         child:
+                  MultipleExerciseRow(
+                    exercises: widget.workout.exercises,
+                    // textScaler: TextScaler.linear()1.3,
+                    padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                  )
+                      // )
+                    // ],
+                  // ),
                 ]
             ),
           ),
