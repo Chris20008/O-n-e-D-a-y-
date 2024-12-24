@@ -143,55 +143,18 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                     padding: const EdgeInsets.all(6),
                                     child: GestureDetector(
                                         onTap: (){
-                                          /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
-                                          // String? uri = cnSpotifyBar.data?.track?.uri;
                                           /// Just opens Spotify
                                           String uri = "spotify:";
-                                          // if(uri != null){
-                                          openUrl(uri);
                                           HapticFeedback.selectionClick();
-                                          // }
+                                          /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
+                                          /// when the delay is not there
+                                          Future.delayed(const Duration(milliseconds: 50), (){
+                                            openUrl(uri);
+                                          });
                                         },
                                         child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
                                     )
                                 ),
-                                // Padding(
-                                //   padding: const EdgeInsets.only(left: 5, bottom: 4),
-                                //   child: Column(
-                                //     mainAxisAlignment: MainAxisAlignment.center,
-                                //     crossAxisAlignment: CrossAxisAlignment.start,
-                                //     children: [
-                                //       SizedBox(
-                                //         height: cnSpotifyBar.preservedSpaceOpenSpotify,
-                                //         child: Row(
-                                //           children: [
-                                //             Text("Open Spotify", textScaler: TextScaler.linear(0.6)),
-                                //             const Icon(
-                                //                 MyIcons.spotify,
-                                //                 size: 10,
-                                //                 color: Color(0xff1ed560)
-                                //             ),
-                                //           ],
-                                //         ),
-                                //       ),
-                                //       SizedBox(
-                                //         height: 2,
-                                //       ),
-                                //       GestureDetector(
-                                //           onTap: (){
-                                //             /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
-                                //             // String? uri = cnSpotifyBar.data?.track?.uri;
-                                //             /// Just opens Spotify
-                                //             String uri = "spotify:";
-                                //             // if(uri != null){
-                                //             openUrl(uri);
-                                //             // }
-                                //           },
-                                //           child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
-                                //       )
-                                //     ],
-                                //   ),
-                                // ),
                                 Expanded(
                                   child: SizedBox(
                                     height: cnSpotifyBar.height,
@@ -227,17 +190,17 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         });
                                                       },
                                                       onTap: (){
-                                                        /// Opens Spotify directly to the song/album but also starts it from the beginning at first time
-                                                        // String? uri = cnSpotifyBar.data?.track?.uri;
                                                         /// Just opens Spotify
                                                         String uri = "spotify:";
-                                                        // if(uri != null){
-                                                        openUrl(uri);
-                                                        HapticFeedback.selectionClick();
+																												HapticFeedback.selectionClick();
+                                                        /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
+                                                        /// when the delay is not there
+                                                        Future.delayed(const Duration(milliseconds: 50), (){
+                                                          openUrl(uri);
+                                                        });
                                                         setState(() {
                                                           colorSpotifyButton = Colors.white.withOpacity(0.12);
                                                         });
-                                                        // }
                                                       },
                                                       child: Container(
                                                         height: 20,
