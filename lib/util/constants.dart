@@ -422,7 +422,7 @@ String checkOnlyOneDecimalPoint(String text){
 Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
   Widget iconButton = IconButton(
     key: key,
-    iconSize: 25,
+    // iconSize: 25,
     onPressed: onPressed,
     icon: icon,
   );
