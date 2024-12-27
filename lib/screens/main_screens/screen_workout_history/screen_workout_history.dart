@@ -371,12 +371,13 @@ class CnWorkoutHistory extends ChangeNotifier {
       }
       index += 1;
     }
-    opened = tempWorkouts.map((e) => false).toList();
 
     workouts = tempWorkouts;
     indexOfWorkout = tempindexOfWorkout;
     sickDays = tempSickDays;
     workoutsAndSickDays = tempWorkoutsAndSickDays;
+
+    opened = workoutsAndSickDays.map((e) => false).toList();
 
     // double pos = scrollController.position.pixels;
     refresh();
