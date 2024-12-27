@@ -122,7 +122,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                           ),
                         IconButton(
                             onPressed: () {
-                              cnNewWorkout.editWorkout(widget.workout);
+                              cnNewWorkout.editWorkout(workout: widget.workout);
                             },
                             icon: Icon(Icons.edit,
                               color: Colors.grey.withOpacity(0.4),

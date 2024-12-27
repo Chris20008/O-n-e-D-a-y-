@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -24,6 +25,7 @@ const currentDataFileName = "Current_Data.txt";
 /// !!! Having 'Documents' as the beginning of the path is MANDATORY in order
 /// to see the Folder in ICloud File Explorer. Do NOT remove !!!
 const folderPathiCloud = "Documents/backups/";
+const String workoutSickDaySeparator = "b8c512d6eddb893c5a79349173756c030e6df92d30d2e4d0cc7abef593b910a7";
 
 Future<bool> shareBackup({required CnConfig cnConfig, Function? afterReceiveFile}) async{
   File? file = await saveBackup(
@@ -72,7 +74,10 @@ Future<bool> loadBackupFromFile(File file, {CnHomepage? cnHomepage}) async{
 Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepage}) async{
   /// Todo: Improve Performance of split and for loop
   /// They both take long and block the UI when the data is very large
-  final allWorkoutsAsListString = content.split(";");
+  final result = content.split(workoutSickDaySeparator);
+  result.removeWhere((element) => element.trim() == "");
+  final allWorkoutsAsListString = result.first.split(";");
+  allWorkoutsAsListString.removeWhere((element) => element.trim() == "");
   final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
   List<ObWorkout> allObWorkouts = [];
   for (Map w in allWorkouts){
@@ -82,11 +87,20 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     allObWorkouts.add(workout);
   }
 
-  final hadDifferences = await loadDifferences(allObWorkouts, cnHomepage: cnHomepage);
+  if (result.length > 1){
+    final allSickDaysAsListString = result[1].split(";");
+    allSickDaysAsListString.removeWhere((element) => element.trim() == "");
+    final allSickDays = allSickDaysAsListString.map((e) => jsonDecode(e));
+    final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
+    objectbox.sickDaysBox.removeAll();
+    objectbox.sickDaysBox.putManyAsync(allObSickDays);
+  }
+
+  final hadDifferences = await loadDifferencesWorkouts(allObWorkouts, cnHomepage: cnHomepage);
   return hadDifferences;
 }
 
-Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage}) async{
+Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHomepage}) async{
   if(cnHomepage != null && cnHomepage.msg.isEmpty){
     cnHomepage.msg = "Load Backup";
   }
@@ -99,7 +113,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
   for (var obWorkout in allCurrentWorkouts) {
     final key = obWorkout.getHash();
     hashMapBig[key] = obWorkout;
-    // print(key);
   }
 
   Map<int, ObWorkout> hashMapSmall = {};
@@ -108,19 +121,11 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     hashMapSmall[key] = obWorkout;
   }
   final length = workouts.length;
-  // print("LENGTH: $length");
-  // print("BATCHSIZE: $batchSize");
 
   for(ObWorkout wo in workouts){
-    // print("");
-    // print("CHECKING OBWOKROUT ID: ${wo.id}");
 
     final woHashSmall = wo.getHashId();
     final woHashBig = wo.getHash();
-    // if(wo.isTemplate){
-    // print("KEY SMALL: $woHashSmall");
-    // print("KEY BIG: $woHashBig");
-    // }
 
     /// ################################################################################################################
     /// ################################################################################################################
@@ -133,7 +138,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
 
     /// When this workout exists and they are not completely the same (compare HashKeyBig) we can modify the workout without the need to add a new one
     if(existingWorkout != null && !hashMapBig.keys.contains(woHashBig)){
-      // print("UPDATE WORKOUT with id: ${existingWorkout.id}");
       allCurrentWorkouts.remove(existingWorkout);
       List<ObExercise> allUpdateableExercises = existingWorkout.exercises;
 
@@ -182,7 +186,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
       /// However, if there is no existing workout that equals the new workout, even when ignoring the ID
       /// It means this is a completely new workout
       if(existingWorkout == null){
-        // print("NEW WORKOUT");
         hadDifferences = true;
         wo.id = 0;
         objectbox.workoutBox.putAsync(wo);
@@ -193,7 +196,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
       /// This workout exists as it is
       else{
         allCurrentWorkouts.remove(existingWorkout);
-        // print("FOUND EXISTING WORKOUT");
       }
     }
 
@@ -207,7 +209,6 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
 
     if(cnHomepage != null && counter % (batchSize*2) == 0){
       final p = counter / length;
-      // print("PERCENT: $p");
       cnHomepage.updateSyncStatus(p);
     }
   }
@@ -216,18 +217,13 @@ Future<bool> loadDifferences(List<ObWorkout> workouts, {CnHomepage? cnHomepage})
     hadDifferences = true;
   }
 
-  // print("Workouts found to remove: ${allCurrentWorkouts.length}");
   if(cnHomepage != null){
     final p = counter / length;
-    // print("PERCENT: $p");
     cnHomepage.updateSyncStatus(p);
   }
 
-  // print("Start removing async");
   objectbox.exerciseBox.removeMany(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
-  // print("Finished 1 removing async");
   objectbox.workoutBox.removeMany(allCurrentWorkouts.map((w) => w.id).toList());
-  // print("Finished 2 removing async");
   if(cnHomepage != null){
     cnHomepage.finishSync();
   }
@@ -296,8 +292,11 @@ Future<File?> saveCurrentData(CnConfig cnConfig) async{
 
 List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
-  final allWorkouts = List<String>.from(allObWorkouts.map((e) => jsonEncode(e.asMap())));
-  return allWorkouts;
+  final allObSickDays = objectbox.sickDaysBox.getAll();
+  final allWorkouts = List<String>.from(allObWorkouts.map((workout) => jsonEncode(workout.asMap())));
+  final allSickDays = List<String>.from(allObSickDays.map((sickDay) => jsonEncode(sickDay.asMap())));
+
+  return allWorkouts + [workoutSickDaySeparator] + allSickDays;
 }
 
 Future<List<FileSystemEntity>> getLocalBackupFiles() async{
@@ -321,8 +320,6 @@ Future<List<FileSystemEntity>> getLocalBackupFiles() async{
 
   /// Sort [fileList] by modification times, from oldest to newest.
   localFiles.sort((a, b) => mtimes[b.path]!.compareTo(mtimes[a.path]!));
-
-  // print(localFiles);
   return localFiles;
 }
 
@@ -410,7 +407,6 @@ Future<ga.File?> saveBackUpGoogleDrive({
 
     /// Create new File - used for creating Backups
     if(!overwrite){
-      // print("create new file");
       uploadFile.name = basename(file.path);
       uploadFile.parents = [folderId];
       response = await drive.files.create(
@@ -509,7 +505,6 @@ Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
 
 Future<String?> getGoogleDriveFolderId(ga.DriveApi drive, CnConfig cnConfig) async {
   if(cnConfig.folderIdGoogleDrive != null){
-    // print("------------------ FOLDER ID IS CACHED");
     return cnConfig.folderIdGoogleDrive;
   }
 
@@ -528,10 +523,7 @@ Future<String?> getCurrentDataId({
   required CnConfig cnConfig,
   required String folderId
 }) async {
-
-  // print("TRY GET CACHED DATA ID: ${cnConfig.currentDataIdGoogleDrive}");
   if(cnConfig.currentDataIdGoogleDrive != null){
-    // print("------------------ CURRENT DATA ID IS CACHED");
     return cnConfig.currentDataIdGoogleDrive;
   }
 

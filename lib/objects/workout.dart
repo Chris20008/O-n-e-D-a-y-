@@ -82,14 +82,11 @@ class Workout{
           /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
           /// Update amounts and weights of the existing exercise in the template
-          print(newExercise.setTypes);
-          print(ex.setTypes);
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
           ex.setTypes = newExercise.setTypes;
           ex.restInSeconds = newExercise.restInSeconds;
           ex.seatLevel = newExercise.seatLevel;
-          print(ex.setTypes);
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
@@ -171,6 +168,11 @@ class Workout{
       }
     }
     return w.name == name && w.date == date && w.isTemplate == isTemplate && listEquals(w.linkedExercises, linkedExercises);
+  }
+
+  bool isEmpty(){
+    return name == '' && exercises.isEmpty && linkedExercises.isEmpty;
+
   }
 
   void saveToDatabase(){

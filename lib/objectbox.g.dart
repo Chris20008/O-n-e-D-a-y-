@@ -16,6 +16,7 @@ import 'package:objectbox/objectbox.dart' as obx;
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import 'util/objectbox/ob_exercise.dart';
+import 'util/objectbox/ob_sick_days.dart';
 import 'util/objectbox/ob_workout.dart';
 
 export 'package:objectbox/objectbox.dart'; // so that callers only have to import this file
@@ -108,6 +109,30 @@ final _entities = <obx_int.ModelEntity>[
             name: 'exercises',
             targetId: const obx_int.IdUid(2, 2510276494793380538))
       ],
+      backlinks: <obx_int.ModelBacklink>[]),
+  obx_int.ModelEntity(
+      id: const obx_int.IdUid(4, 3149227828482375570),
+      name: 'ObSickDays',
+      lastPropertyId: const obx_int.IdUid(3, 2028011289927285168),
+      flags: 0,
+      properties: <obx_int.ModelProperty>[
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(1, 423700910599777290),
+            name: 'id',
+            type: 6,
+            flags: 1),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(2, 7878206278239994477),
+            name: 'startDate',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(3, 2028011289927285168),
+            name: 'endDate',
+            type: 10,
+            flags: 0)
+      ],
+      relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
 ];
 
@@ -146,9 +171,9 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(3, 6190945827968541021),
+      lastEntityId: const obx_int.IdUid(4, 3149227828482375570),
       lastIndexId: const obx_int.IdUid(0, 0),
-      lastRelationId: const obx_int.IdUid(3, 979565396682663220),
+      lastRelationId: const obx_int.IdUid(4, 6635772398473233360),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [4145133195816181644],
       retiredIndexUids: const [],
@@ -159,7 +184,11 @@ obx_int.ModelDefinition getObjectBoxModel() {
         425489130545911071,
         2715976310809358031
       ],
-      retiredRelationUids: const [1856206922338472012, 8918878201698632752],
+      retiredRelationUids: const [
+        1856206922338472012,
+        8918878201698632752,
+        6635772398473233360
+      ],
       modelVersion: 5,
       modelVersionParserMinimum: 5,
       version: 1);
@@ -274,6 +303,36 @@ obx_int.ModelDefinition getObjectBoxModel() {
           obx_int.InternalToManyAccess.setRelInfo<ObWorkout>(object.exercises,
               store, obx_int.RelInfo<ObWorkout>.toMany(3, object.id));
           return object;
+        }),
+    ObSickDays: obx_int.EntityDefinition<ObSickDays>(
+        model: _entities[2],
+        toOneRelations: (ObSickDays object) => [],
+        toManyRelations: (ObSickDays object) => {},
+        getId: (ObSickDays object) => object.id,
+        setId: (ObSickDays object, int id) {
+          object.id = id;
+        },
+        objectToFB: (ObSickDays object, fb.Builder fbb) {
+          fbb.startTable(4);
+          fbb.addInt64(0, object.id);
+          fbb.addInt64(1, object.startDate.millisecondsSinceEpoch);
+          fbb.addInt64(2, object.endDate.millisecondsSinceEpoch);
+          fbb.finish(fbb.endTable());
+          return object.id;
+        },
+        objectFromFB: (obx.Store store, ByteData fbData) {
+          final buffer = fb.BufferContext(fbData);
+          final rootOffset = buffer.derefObject(0);
+          final idParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final startDateParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0));
+          final endDateParam = DateTime.fromMillisecondsSinceEpoch(
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
+          final object = ObSickDays(
+              id: idParam, startDate: startDateParam, endDate: endDateParam);
+
+          return object;
         })
   };
 
@@ -340,4 +399,19 @@ class ObWorkout_ {
   /// see [ObWorkout.exercises]
   static final exercises =
       obx.QueryRelationToMany<ObWorkout, ObExercise>(_entities[1].relations[0]);
+}
+
+/// [ObSickDays] entity fields to define ObjectBox queries.
+class ObSickDays_ {
+  /// see [ObSickDays.id]
+  static final id =
+      obx.QueryIntegerProperty<ObSickDays>(_entities[2].properties[0]);
+
+  /// see [ObSickDays.startDate]
+  static final startDate =
+      obx.QueryDateProperty<ObSickDays>(_entities[2].properties[1]);
+
+  /// see [ObSickDays.endDate]
+  static final endDate =
+      obx.QueryDateProperty<ObSickDays>(_entities[2].properties[2]);
 }

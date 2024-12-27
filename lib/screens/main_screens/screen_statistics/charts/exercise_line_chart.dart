@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +29,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     const Color(0xff3e3e3e),
   ];
 
+  List<Color> gradientColors3 = [
+    const Color(0xff147e88),
+    const Color(0xff147e88),
+  ];
+
   double minWeight = 0;
   double maxWeight = 0;
   double minTotalWeight = 0;
@@ -42,6 +49,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   late DateTime maxDate;
   double width = 0;
   List<FlSpot> spotsMaxWeight = [];
+  List<FlSpot> spotsAvgWeightPerSet = [];
+  List<FlSpot> sickDaysSpots = [];
   Offset? pointerA;
   Offset? pointerAPreviousPos;
   Offset? pointerB;
@@ -51,7 +60,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   double focalPointPercent = 0;
   final int _leftPadding = 5;
   late final int _totalPadding = _leftPadding * 2;
-  List<FlSpot> spotsAvgWeightPerSet = [];
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
   int animationTime = 500;
@@ -60,8 +68,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   Widget build(BuildContext context) {
 
     width = MediaQuery.of(context).size.width;
-    minDate = cnScreenStatistics.minDate;
-    maxDate = cnScreenStatistics.maxDate;
+    minDate = cnScreenStatistics.minDate.toDate();
+    maxDate = cnScreenStatistics.maxDate.toDate();
 
     final tempMaxX = maxDate.difference(minDate).inDays + _totalPadding - cnScreenStatistics.offsetMaxX;
     if(tempMaxX > cnScreenStatistics.maxVisibleDays){
@@ -95,13 +103,13 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       maxTotalWeight = maxTotalWeight < value? value : maxTotalWeight;
     });
 
-    minDate = cnScreenStatistics.minDate;
-    maxDate = cnScreenStatistics.maxDate;
+    minDate = cnScreenStatistics.minDate.toDate();
+    maxDate = cnScreenStatistics.maxDate.toDate();
 
     /// Set Spots Max Weight
     spotsMaxWeight.clear();
     maxWeights?.forEach((date, weight) {
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
+      final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
@@ -109,7 +117,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
-      final xCoordinate = date.difference(minDate).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
+      final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       if(percent.isNaN){
         percent = totalWeight / maxTotalWeight;
         if(percent.isNaN){
@@ -142,6 +150,17 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       verticalStepSize = 10;
     } else {
       verticalStepSize = 20;
+    }
+
+    sickDaysSpots.clear();
+    for (ObSickDays sickDay in cnScreenStatistics.allSickDays){
+      double xCoordinate = sickDay.startDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
+      double percent = 5;
+      sickDaysSpots.add(FlSpot(xCoordinate, -5));
+      sickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      xCoordinate = sickDay.endDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
+      sickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      sickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
 
     return Column(
@@ -197,7 +216,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                 /// ZOOM
                 if(pointerA != null && pointerB != null){
                   double sensibility = ((cnScreenStatistics.currentVisibleDays) / (1500 / sqrt(cnScreenStatistics.currentVisibleDays)));
-                  final maxDays = maxDate.difference(minDate).inDays;
+                  final maxDays = maxDate.toDate().difference(minDate.toDate()).inDays;
                   final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
                   final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
                   lastPointerDistance = currentPointerDistance;
@@ -211,7 +230,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                     newOffsetMinX = (cnScreenStatistics.offsetMinX - difference * focalPointPercent);
                     newOffsetMinX = newOffsetMinX >= 0? newOffsetMinX : 0;
 
-                    if(newOffsetMaxX + 5 < maxDays && maxDate.difference(minDate).inDays + _totalPadding - newOffsetMaxX <= cnScreenStatistics.maxVisibleDays){
+                    if(newOffsetMaxX + 5 < maxDays && maxDate.toDate().difference(minDate.toDate()).inDays + _totalPadding - newOffsetMaxX <= cnScreenStatistics.maxVisibleDays){
                       cnScreenStatistics.offsetMinX = newOffsetMinX;
                       cnScreenStatistics.offsetMaxX = newOffsetMaxX;
                     }
@@ -220,7 +239,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
                 /// SCROLL
                 else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
-                  final totalRange = maxDate.difference(minDate).inDays;
+                  final totalRange = maxDate.toDate().difference(minDate.toDate()).inDays;
                   final maxValueOffsetMinX = totalRange - cnScreenStatistics.currentVisibleDays + _totalPadding;
                   // double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
                   double sensibility = 1/ (cnScreenStatistics.currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
@@ -388,16 +407,26 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
+          // showOnTopOfTheChartBoxArea: true,
+          fitInsideVertically: true,
+          fitInsideHorizontally: true,
           getTooltipItems: (List<LineBarSpot> spots){
-            final List<LineTooltipItem> result = spots.map((spot) => LineTooltipItem(
-                textAlign: TextAlign.left,
-                "${getSpotData(spot)} kg",
-                TextStyle(
-                  fontSize: 14,
-                  color: spot.barIndex == 0? gradientColors[0] : gradientColors2[0]
-                ))
-            ).toList();
-            return result;
+            return spots.asMap().entries.map((e) {
+              int index = e.value.barIndex;
+              if (index == 2 || (!cnScreenStatistics.showAvgWeightPerSetLine && index == 1)) {
+                return null;
+              }
+              // print(e.value.barIndex);
+              LineBarSpot spot = e.value;
+              return LineTooltipItem(
+                  textAlign: TextAlign.left,
+                  getSpotData(spot),
+                  TextStyle(
+                      fontSize: 14,
+                      color: spot.barIndex == 0? gradientColors[0] : gradientColors2[0]
+                  )
+              );
+            }).toList();
           }
         )
       ),
@@ -488,6 +517,28 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               show: true,
             ),
           ),
+        if(cnScreenStatistics.showSickDays)
+          LineChartBarData(
+            isCurved: false,
+            curveSmoothness: 0.1,
+            spots: sickDaysSpots,
+            gradient: LinearGradient(
+              colors: gradientColors3,
+            ),
+            barWidth: 1,
+            isStrokeCapRound: true,
+            // dotData: const FlDotData(
+            //   show: true,
+            // ),
+            belowBarData: BarAreaData(
+              show: true,
+              gradient: LinearGradient(
+                colors: gradientColors3
+                    .map((color) => color.withOpacity(0.3))
+                    .toList(),
+              ),
+            ),
+          )
       ],
     );
   }
@@ -496,9 +547,12 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     Map<DateTime, double> data;
     if(spot.barIndex == 0){
       data = maxWeights!;
-    } else{
+    } else if(spot.barIndex == 1){
       data = avgWeights!;
     }
-    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex].toInt()}";
+    else{
+      return "Krank";
+    }
+    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex].toInt()} kg";
   }
 }

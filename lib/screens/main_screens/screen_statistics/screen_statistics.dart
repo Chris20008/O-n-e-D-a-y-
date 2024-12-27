@@ -5,6 +5,7 @@ import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -311,6 +312,43 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               )
             ]
         ),
+        const SizedBox(height: 15,),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OverflowSafeText("Krankheitstage anzeigen", maxLines: 1),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 15),
+                    //   child: OverflowSafeText(
+                    //     AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
+                    //     minFontSize: 9,
+                    //     maxLines: 4,
+                    //     style: const TextStyle(color: Colors.grey, fontSize: 12),
+                    //   ),
+                    // ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 30,),
+              CupertinoSwitch(
+                  value: provider.showSickDays,
+                  activeColor: const Color(0xFFC16A03),
+                  onChanged: (value){
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                    cnScreenStatistics.showSickDays = value;
+                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.refresh();
+                  }
+              )
+            ]
+        ),
         const SizedBox(height: 10,)
       ],
     );
@@ -327,6 +365,7 @@ class CnScreenStatistics extends ChangeNotifier {
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   late List<String> allWorkoutNames = getAllWorkoutNames();
   late List<String> allExerciseNames = getAllExerciseNames();
+  List<ObSickDays> allSickDays = [];
   String? selectedExerciseName;
   String? selectedWorkoutName;
   int selectedWorkoutIndex = 0;
@@ -335,6 +374,7 @@ class CnScreenStatistics extends ChangeNotifier {
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
+  bool showSickDays = false;
   bool graphLocked = false;
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
@@ -531,6 +571,7 @@ class CnScreenStatistics extends ChangeNotifier {
     allWorkoutNames = getAllWorkoutNames();
     allExerciseNames = getAllExerciseNames();
     calcMinMaxDates();
+    allSickDays = objectbox.sickDaysBox.getAll();
   }
 
   void initCachedData(Map data){
@@ -541,6 +582,7 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
     onlyWorkingSets = data["onlyWorkingSets"] ?? false;
+    showSickDays = data["showSickDays"] ?? true;
   }
 
   void resetGraph({bool withKeyReset = true}){
@@ -554,7 +596,8 @@ class CnScreenStatistics extends ChangeNotifier {
     Map data = {
       "selectedExerciseName": selectedExerciseName,
       "showAvgWeightPerSetLine": showAvgWeightPerSetLine,
-      "onlyWorkingSets": onlyWorkingSets
+      "onlyWorkingSets": onlyWorkingSets,
+      "showSickDays": showSickDays,
     };
     cnConfig.config.cnScreenStatistics = data;
     await cnConfig.config.save();
