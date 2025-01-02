@@ -200,9 +200,17 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       onConfirm: (List<DateTime?> values){
                         if(values.isNotEmpty){
                           int? index;
-                          String key = "${values.first?.year}${values.first?.month}${values.first?.day}";
-                          if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
-                            index = cnWorkoutHistory.indexOfWorkout[key];
+                          DateTime selectedDate = values.first!;
+                          while (true){
+                            String key = DateFormat('yyyyMMdd').format(selectedDate);
+                            if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
+                              index = cnWorkoutHistory.indexOfWorkout[key];
+                            }
+                            else if(cnWorkoutHistory.indexOfWorkout.keys.isNotEmpty &&
+                                double.parse(key) > double.parse(cnWorkoutHistory.indexOfWorkout.keys.firstOrNull?? "0")
+                            ){
+                              index = 0;
+                            }
                             if(index != null){
                               cnWorkoutHistory.scrollController.scrollTo(
                                   index: index,
@@ -218,6 +226,10 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                 //   cnWorkoutHistory.opened[index] = true;
                                 // });
                               });
+                              break;
+                            }
+                            else {
+                              selectedDate = selectedDate.add(const Duration(days: 1, hours: 1)).toDate();
                             }
                           }
                         }
@@ -289,7 +301,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
               children: [
                 Text(
                   DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(sickDay.endDate),
-                  textScaler: const TextScaler.linear(0.8),
+                  textScaler: const TextScaler.linear(0.9),
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w200
@@ -297,7 +309,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 ),
                 Text(
                   DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(sickDay.startDate),
-                  textScaler: const TextScaler.linear(0.8),
+                  textScaler: const TextScaler.linear(0.9),
                   style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w200
@@ -365,7 +377,7 @@ class CnWorkoutHistory extends ChangeNotifier {
       }
       tempWorkoutsAndSickDays.add(wo);
 
-      final key = "${w.date.year}${w.date.month}${w.date.day}";
+      final key = DateFormat('yyyyMMdd').format(w.date);
       if(!tempindexOfWorkout.containsKey(key)){
         tempindexOfWorkout[key] = index;
       }

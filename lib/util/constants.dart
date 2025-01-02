@@ -540,7 +540,10 @@ Widget buildCalendarDialogButton({
       size: arrowSize,
       color: colorAmber,
     ),
-    disableMonthPicker: true,
+    firstDate: DateTime(2023, 1, 1),
+    lastDate: DateTime(DateTime.now().year + 2, 12, 31),
+    calendarViewMode: CalendarDatePicker2Mode.scroll,
+    disableMonthPicker: false,
     gapBetweenCalendarAndButtons: 0,
     daySplashColor: Colors.transparent,
     // buttonPadding: justShow? const EdgeInsets.only(right: 100) : null,
@@ -598,12 +601,6 @@ Widget buildCalendarDialogButton({
               ?"Krank + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
               :"${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts"
             : cnNewWorkout.allWorkoutDates[relevantDate];
-        // print(relevantDate);
-        // print(cnNewWorkout.allWorkoutDates[relevantDate]);
-        // print(dayText);
-        // print("Contains Krank");
-        // print(dayText.contains("rank"));
-        // print("");
         dayWidget = Container(
           decoration: decoration,
           child: Center(
@@ -658,10 +655,11 @@ Widget buildCalendarDialogButton({
       final values = await showCalendarDatePicker2Dialog(
         context: context,
         config: config,
-        dialogSize: const Size(325, 400),
+        // dialogSize: const Size(325, 400),
+        dialogSize: const Size(325, 700),
         borderRadius: BorderRadius.circular(15),
         value: [dateToShow ?? cnNewWorkout.workout.date!],
-        dialogBackgroundColor: Theme.of(context).primaryColor,
+        dialogBackgroundColor: Theme.of(context).primaryColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
