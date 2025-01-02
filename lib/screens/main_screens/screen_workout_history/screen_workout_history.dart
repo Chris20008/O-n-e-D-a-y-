@@ -1,7 +1,10 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -53,9 +56,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 physics: const BouncingScrollPhysics(),
                 key: cnWorkoutHistory.key,
                 itemScrollController: cnWorkoutHistory.scrollController,
-                itemCount: cnWorkoutHistory.workouts.length+1,
+                itemCount: cnWorkoutHistory.workoutsAndSickDays.length+1,
                 itemBuilder: (BuildContext context, int index) {
-                  if (index == cnWorkoutHistory.workouts.length){
+                  if (index == cnWorkoutHistory.workoutsAndSickDays.length){
                     return SafeArea(
                         top: false,
                         left: false,
@@ -66,15 +69,29 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         )
                     );
                   }
-                  final dateOfWorkout = cnWorkoutHistory.workouts[index].date;
-                  final DateTime? dateOfNewerWorkout = index > 0 ? cnWorkoutHistory.workouts[index-1].date : null;
-                  Widget child = WorkoutExpansionTile(
+
+                  Widget child = Container();
+                  DateTime? dateOfWorkout;
+                  final DateTime? dateOfNewerWorkout = index > 0
+                      ? cnWorkoutHistory.workoutsAndSickDays[index-1] is Workout
+                        ? cnWorkoutHistory.workoutsAndSickDays[index-1].date
+                        : cnWorkoutHistory.workoutsAndSickDays[index-1].startDate
+                      : null;
+
+                  if(cnWorkoutHistory.workoutsAndSickDays[index] is Workout){
+                    dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].date;
+                    child = WorkoutExpansionTile(
                       // key: UniqueKey(),
-                      workout: cnWorkoutHistory.workouts[index],
-                      padding: EdgeInsets.zero,
-                      onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
-                      initiallyExpanded: cnWorkoutHistory.opened[index]
-                  );
+                        workout: cnWorkoutHistory.workoutsAndSickDays[index],
+                        padding: EdgeInsets.zero,
+                        onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
+                        initiallyExpanded: cnWorkoutHistory.opened[index]
+                    );
+                  }
+                  else if(cnWorkoutHistory.workoutsAndSickDays[index] is ObSickDays){
+                    dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].startDate;
+                    child = sickDayWidget(cnWorkoutHistory.workoutsAndSickDays[index]);
+                  }
 
                   final double heightOfSpacer = dateOfNewerWorkout == null? 0 : 40;
 
@@ -170,6 +187,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 },
             ),
 
+            /// Calendar upper right corner
             SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
@@ -182,9 +200,17 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       onConfirm: (List<DateTime?> values){
                         if(values.isNotEmpty){
                           int? index;
-                          String key = "${values.first?.year}${values.first?.month}${values.first?.day}";
-                          if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
-                            index = cnWorkoutHistory.indexOfWorkout[key];
+                          DateTime selectedDate = values.first!;
+                          while (true){
+                            String key = DateFormat('yyyyMMdd').format(selectedDate);
+                            if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
+                              index = cnWorkoutHistory.indexOfWorkout[key];
+                            }
+                            else if(cnWorkoutHistory.indexOfWorkout.keys.isNotEmpty &&
+                                double.parse(key) > double.parse(cnWorkoutHistory.indexOfWorkout.keys.firstOrNull?? "0")
+                            ){
+                              index = 0;
+                            }
                             if(index != null){
                               cnWorkoutHistory.scrollController.scrollTo(
                                   index: index,
@@ -200,6 +226,10 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                 //   cnWorkoutHistory.opened[index] = true;
                                 // });
                               });
+                              break;
+                            }
+                            else {
+                              selectedDate = selectedDate.add(const Duration(days: 1, hours: 1)).toDate();
                             }
                           }
                         }
@@ -235,7 +265,8 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
     required String headerText,
     required double heightSpacer,
     double textScaler = 1.7,
-    DateTime? dateForWeekDecoration}){
+    DateTime? dateForWeekDecoration
+  }){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -253,30 +284,112 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       ],
     );
   }
+
+  Widget sickDayWidget(ObSickDays sickDay){
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        width: double.maxFinite,
+        color: Colors.black.withOpacity(0.5),
+        padding: EdgeInsets.all(10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(sickDay.endDate),
+                  textScaler: const TextScaler.linear(0.9),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w200
+                  ),
+                ),
+                Text(
+                  DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(sickDay.startDate),
+                  textScaler: const TextScaler.linear(0.9),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w200
+                  ),
+                ),
+                const Text(
+                  "Krank",
+                  style: TextStyle(fontSize: 26),
+                )
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 50),
+              child: IconButton(
+                  onPressed: () {
+                    cnNewWorkout.editWorkout(sickDays: sickDay);
+                  },
+                  icon: Icon(Icons.edit,
+                    color: Colors.grey.withOpacity(0.4),
+                  )
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class CnWorkoutHistory extends ChangeNotifier {
   List<Workout> workouts = [];
+  List<ObSickDays> sickDays = [];
   Key key = UniqueKey();
   List<bool> opened = [];
   ItemScrollController scrollController = ItemScrollController();
   Map<String, int> indexOfWorkout = {};
+  List workoutsAndSickDays = [];
 
   Future refreshAllWorkouts() async{
-    workouts.clear();
-    indexOfWorkout.clear();
+    List<Workout> tempWorkouts = [];
+    Map<String, int> tempindexOfWorkout = {};
+    List<ObSickDays> tempSickDays = [];
+    List tempWorkoutsAndSickDays = [];
+    // workouts.clear();
+    // indexOfWorkout.clear();
+    // sickDays.clear();
+    // workoutsAndSickDays.clear();
+
     final builder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build();
     List<ObWorkout> obWorkouts = await builder.findAsync();
+
+    final builder2 = objectbox.sickDaysBox.query().order(ObSickDays_.startDate, flags: Order.descending).build();
+    tempSickDays = await builder2.findAsync();
+    List<ObSickDays> temp2SickDays = List.from(tempSickDays);
+
     int index = 0;
     for (ObWorkout w in obWorkouts) {
-      workouts.add(Workout.fromObWorkout(w));
-      final key = "${w.date.year}${w.date.month}${w.date.day}";
-      if(!indexOfWorkout.containsKey(key)){
-        indexOfWorkout[key] = index;
+      Workout wo = Workout.fromObWorkout(w);
+      tempWorkouts.add(wo);
+
+      if (temp2SickDays.isNotEmpty && wo.date!.isBefore(temp2SickDays[0].startDate)){
+        tempWorkoutsAndSickDays.add(temp2SickDays[0]);
+        temp2SickDays.removeAt(0);
+        index += 1;
+      }
+      tempWorkoutsAndSickDays.add(wo);
+
+      final key = DateFormat('yyyyMMdd').format(w.date);
+      if(!tempindexOfWorkout.containsKey(key)){
+        tempindexOfWorkout[key] = index;
       }
       index += 1;
     }
-    opened = workouts.map((e) => false).toList();
+
+    workouts = tempWorkouts;
+    indexOfWorkout = tempindexOfWorkout;
+    sickDays = tempSickDays;
+    workoutsAndSickDays = tempWorkoutsAndSickDays;
+
+    opened = workoutsAndSickDays.map((e) => false).toList();
 
     // double pos = scrollController.position.pixels;
     refresh();

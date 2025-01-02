@@ -517,11 +517,13 @@ bool exerciseNameExistsInWorkout({required Workout workout, required String exer
 Widget buildCalendarDialogButton({
   required BuildContext context,
   required CnNewWorkOutPanel cnNewWorkout,
+  DateTime? dateToShow,
   bool justShow = false,
   Function? onConfirm,
   bool buttonIsCalender = false
 }) {
   const colorAmber = Color(0xFFC16A03);
+  const colorAmberDark = Color(0xFF583305);
   const arrowSize = 15.0;
   const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
   final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
@@ -538,7 +540,10 @@ Widget buildCalendarDialogButton({
       size: arrowSize,
       color: colorAmber,
     ),
-    disableMonthPicker: true,
+    firstDate: DateTime(2023, 1, 1),
+    lastDate: DateTime(DateTime.now().year + 2, 12, 31),
+    calendarViewMode: CalendarDatePicker2Mode.scroll,
+    disableMonthPicker: false,
     gapBetweenCalendarAndButtons: 0,
     daySplashColor: Colors.transparent,
     // buttonPadding: justShow? const EdgeInsets.only(right: 100) : null,
@@ -591,6 +596,11 @@ Widget buildCalendarDialogButton({
         }
       }
       if (exists) {
+        String dayText = cnNewWorkout.allWorkoutDates[relevantDate] is List
+            ? cnNewWorkout.allWorkoutDates[relevantDate].contains("Krank")
+              ?"Krank + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
+              :"${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts"
+            : cnNewWorkout.allWorkoutDates[relevantDate];
         dayWidget = Container(
           decoration: decoration,
           child: Center(
@@ -605,17 +615,17 @@ Widget buildCalendarDialogButton({
                 Padding(
                     padding: const EdgeInsets.only(top: 26.5, left: 2, right: 2),
                     child: OverflowSafeText(
-                        cnNewWorkout.allWorkoutDates[relevantDate] is List? "${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts" : cnNewWorkout.allWorkoutDates[relevantDate],
+                        dayText,
                         maxLines: 1,
-                        fontSize: 5,
+                        // fontSize: 5,
                         textAlign: TextAlign.center,
-                        // minFontSize: 4,
+                        minFontSize: cnNewWorkout.allWorkoutDates[relevantDate] is List? 8 : null,
                         style: TextStyle(
                             color: (isSelected?? false)
                                 ? Colors.white
                                 : date.isSameDate(cnNewWorkout.originalWorkout.date) && !justShow
                                 ? const Color(0xFFFFD995)
-                                : colorAmber)
+                                : dayText.contains("Krank") ? colorAmberDark : colorAmber)
                     )
                 ),
                 // only dot indicator
@@ -645,10 +655,11 @@ Widget buildCalendarDialogButton({
       final values = await showCalendarDatePicker2Dialog(
         context: context,
         config: config,
-        dialogSize: const Size(325, 400),
+        // dialogSize: const Size(325, 400),
+        dialogSize: const Size(325, 700),
         borderRadius: BorderRadius.circular(15),
-        value: [cnNewWorkout.workout.date],
-        dialogBackgroundColor: Theme.of(context).primaryColor,
+        value: [dateToShow ?? cnNewWorkout.workout.date!],
+        dialogBackgroundColor: Theme.of(context).primaryColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
@@ -661,7 +672,7 @@ Widget buildCalendarDialogButton({
           color: Colors.white
         )
         : Text(
-          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(cnNewWorkout.workout.date!),
+          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(dateToShow ?? cnNewWorkout.workout.date!),
           style: const TextStyle(
             fontSize: 18,
           ),

@@ -50,7 +50,7 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   jiffy: ^6.2.0
   flutter_dotenv: ^5.1.0
-  calendar_date_picker2: ^1.0.2
+  calendar_date_picker2: ^1.1.8
   scrollable_positioned_list: ^0.3.8
   collection: ^1.18.0
   pull_down_button: ^0.9.4

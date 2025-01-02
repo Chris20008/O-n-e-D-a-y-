@@ -162,7 +162,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
                                   dynamic newEx = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-                                  if(newEx is! Exercise){
+                                  if(newEx is !Exercise){
                                     try{
                                       newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
                                     }
@@ -177,6 +177,21 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                   Exercise templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == newEx.name).first;
                                   child = Column(
                                     children: [
+                                      if (cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is !Exercise)
+                                        Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: OverflowSafeText(
+                                            cnRunningWorkout.groupedExercises.keys.toList()[indexExercise],
+                                            textAlign: TextAlign.center,
+                                            // fontSize: 12,
+                                            style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Colors.white70
+                                            ),
+                                            minFontSize: 12,
+                                            maxLines: 1,
+                                          ),
+                                        ),
                                       Row(
                                         children: [
                                           cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
@@ -278,18 +293,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                 },
                                               ),
                                             ),
-                                          SizedBox(
-                                            width: 40,
-                                            child: Center(
-                                              child: myIconButton(
-                                                  icon: const Icon(
-                                                    Icons.history,
-                                                    color: Color(0xFFC16A03),
-                                                  ),
-                                                  onPressed: (){}
-                                              ),
-                                            ),
-                                          ),
+                                          // SizedBox(
+                                          //   width: 40,
+                                          //   child: Center(
+                                          //     child: myIconButton(
+                                          //         icon: const Icon(
+                                          //           Icons.history,
+                                          //           color: Color(0xFFC16A03),
+                                          //         ),
+                                          //         onPressed: (){}
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                       const SizedBox(height: 5),
@@ -383,6 +398,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               physics: const BouncingScrollPhysics(),
                                               padding: const EdgeInsets.all(0),
                                               shrinkWrap: true,
+                                              cacheExtent: 20000,
                                               proxyDecorator: (
                                                   Widget child, int index, Animation<double> animation) {
                                                 return AnimatedBuilder(
@@ -1389,9 +1405,6 @@ class CnRunningWorkout extends ChangeNotifier {
   }
 
   void setWorkoutTemplate(Workout w){
-    for(Exercise e in w.exercises){
-      print(e.sets.map((s) => s.setType).toList());
-    }
     workoutTemplateModifiable = w;
     workout = Workout.copy(w);
     workoutTemplateNotModifiable = Workout.copy(w);
@@ -1433,7 +1446,6 @@ class CnRunningWorkout extends ChangeNotifier {
     }
     for(MapEntry entry in groupedExercises.entries){
       if(entry.value is List){
-        print(entry.value);
         (entry.value as List).sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
       }
     }

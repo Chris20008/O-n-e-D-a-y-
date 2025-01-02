@@ -91,11 +91,35 @@
           "targetId": "2:2510276494793380538"
         }
       ]
+    },
+    {
+      "id": "4:3149227828482375570",
+      "lastPropertyId": "3:2028011289927285168",
+      "name": "ObSickDays",
+      "properties": [
+        {
+          "id": "1:423700910599777290",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:7878206278239994477",
+          "name": "startDate",
+          "type": 10
+        },
+        {
+          "id": "3:2028011289927285168",
+          "name": "endDate",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "3:6190945827968541021",
+  "lastEntityId": "4:3149227828482375570",
   "lastIndexId": "0:0",
-  "lastRelationId": "3:979565396682663220",
+  "lastRelationId": "4:6635772398473233360",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
@@ -112,7 +136,8 @@
   ],
   "retiredRelationUids": [
     1856206922338472012,
-    8918878201698632752
+    8918878201698632752,
+    6635772398473233360
   ],
   "version": 1
 }

@@ -703,6 +703,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void clear(){
+
     exercise = Exercise();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();

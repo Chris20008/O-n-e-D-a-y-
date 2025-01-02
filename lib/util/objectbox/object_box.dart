@@ -1,3 +1,4 @@
+import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import '../../objectbox.g.dart';
@@ -9,10 +10,12 @@ class ObjectBox{
 
   late final Box<ObWorkout> workoutBox;
   late final Box<ObExercise> exerciseBox;
+  late final Box<ObSickDays> sickDaysBox;
 
   ObjectBox._create(this.store){
     workoutBox = Box<ObWorkout>(store);
     exerciseBox = Box<ObExercise>(store);
+    sickDaysBox = Box<ObSickDays>(store);
   }
 
   void closeStore(){
