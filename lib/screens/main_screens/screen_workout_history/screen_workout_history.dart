@@ -1,5 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/screens/main_screens/screen_workout_history/month_summary_chart.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:flutter/cupertino.dart';
@@ -70,9 +72,14 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     );
                   }
 
+                  // if(index == 0){
+                  //   return MonthSummaryChart();
+                  // }
+
                   Widget child = Container();
+                  Widget childWithHeader = Container();
                   DateTime? dateOfWorkout;
-                  final DateTime? dateOfNewerWorkout = index > 0
+                  final DateTime? previousDate = index > 0
                       ? cnWorkoutHistory.workoutsAndSickDays[index-1] is Workout
                         ? cnWorkoutHistory.workoutsAndSickDays[index-1].date
                         : cnWorkoutHistory.workoutsAndSickDays[index-1].startDate
@@ -93,15 +100,15 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     child = sickDayWidget(cnWorkoutHistory.workoutsAndSickDays[index]);
                   }
 
-                  final double heightOfSpacer = dateOfNewerWorkout == null? 0 : 40;
+                  final double heightOfSpacer = previousDate == null? 0 : 40;
 
                   /// check if date is not null
                   if (dateOfWorkout != null) {
 
                     /// Future
                     if(dateOfWorkout.isInFuture()){
-                      if(dateOfNewerWorkout == null){
-                        return getChildWithTimeHeader(
+                      if(previousDate == null){
+                        childWithHeader = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyFuture,
                             heightSpacer: heightOfSpacer,
@@ -112,67 +119,68 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
                     /// Today
                     else if(dateOfWorkout.isToday()){
-                      if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isToday()){
-                        return getChildWithTimeHeader(
+                      if(previousDate == null || !previousDate.isToday()){
+                        childWithHeader = getChildWithTimeHeader(
                           child: child,
                           headerText: AppLocalizations.of(context)!.historyToday,
-                          heightSpacer: dateOfNewerWorkout == null? 0 : 40,
+                          heightSpacer: previousDate == null? 0 : 40,
                           textScaler: 1.8,
                           /// with week header
-                          dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
+                          dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
                     }
 
                     /// Yesterday
                     else if(dateOfWorkout.isYesterday()){
-                      if(dateOfNewerWorkout == null || !dateOfNewerWorkout.isYesterday()){
-                        return getChildWithTimeHeader(
+                      if(previousDate == null || !previousDate.isYesterday()){
+                        childWithHeader = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyYesterday,
                             heightSpacer: heightOfSpacer,
                             textScaler: 1.7,
                             /// with week header
-                            dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
+                            dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
                     }
 
                     /// Last 7 days
                     else if(dateOfWorkout.isInLastSevenDays()){
-                      if(dateOfNewerWorkout == null
-                          || dateOfNewerWorkout.isToday()
-                          || dateOfNewerWorkout.isYesterday()
-                          || dateOfNewerWorkout.isInFuture() ){
-                        return getChildWithTimeHeader(
+                      if(previousDate == null
+                          || previousDate.isToday()
+                          || previousDate.isYesterday()
+                          || previousDate.isInFuture() ){
+                        childWithHeader = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyLast7Days,
                             heightSpacer: heightOfSpacer,
                             textScaler: 1.7,
                             /// with week header
-                            dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
+                            dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
                     }
 
                     /// Month Header
-                    else if(dateOfNewerWorkout == null
-                        || dateOfNewerWorkout.isInLastSevenDays()
-                        || dateOfNewerWorkout.isInFuture()
-                        || !dateOfNewerWorkout.isSameMonth(dateOfWorkout)
+                    else if(previousDate == null
+                        || previousDate.isInLastSevenDays()
+                        || previousDate.isInFuture()
+                        || !previousDate.isSameMonth(dateOfWorkout)
                     ){
-                      return getChildWithTimeHeader(
+                      childWithHeader = getChildWithTimeHeader(
                           child: child,
                           headerText: DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
                           heightSpacer: heightOfSpacer,
                           textScaler: 1.7,
                           /// with week header
-                          dateForWeekDecoration: dateOfNewerWorkout == null || !dateOfWorkout.isSameWeek(dateOfNewerWorkout)? dateOfWorkout : null
+                          dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null,
+                          summary: cnWorkoutHistory.monthSummaries.firstWhereOrNull((summ) => summ.date.isSameMonth(dateOfWorkout))
                       );
                     }
                     /// Week Header
-                    else if(!dateOfWorkout.isSameWeek(dateOfNewerWorkout)){
-                      return Column(
+                    else if(!dateOfWorkout.isSameWeek(previousDate)){
+                      childWithHeader = Column(
                         children: [
                           const SizedBox(height: 15,),
                           getWeekDecoration(Jiffy.parseFromDateTime(dateOfWorkout).weekOfYear.toString()),
@@ -181,9 +189,12 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         ],
                       );
                     }
+                    else{
+                      childWithHeader = child;
+                    }
                   }
 
-                  return child;
+                  return childWithHeader;
                 },
             ),
 
@@ -265,8 +276,10 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
     required String headerText,
     required double heightSpacer,
     double textScaler = 1.7,
-    DateTime? dateForWeekDecoration
+    DateTime? dateForWeekDecoration,
+    MonthSummary? summary
   }){
+    print(summary);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -277,6 +290,15 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
             textScaler: TextScaler.linear(textScaler),
           ),
         ),
+        if(summary != null)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 10),
+              MonthSummaryChart(summary: summary),
+            ],
+          ),
         if(dateForWeekDecoration != null)
           getWeekDecoration(Jiffy.parseFromDateTime(dateForWeekDecoration).weekOfYear.toString()),
         const SizedBox(height: 5),
@@ -347,16 +369,23 @@ class CnWorkoutHistory extends ChangeNotifier {
   ItemScrollController scrollController = ItemScrollController();
   Map<String, int> indexOfWorkout = {};
   List workoutsAndSickDays = [];
+  List<MonthSummary> monthSummaries = [];
 
   Future refreshAllWorkouts() async{
     List<Workout> tempWorkouts = [];
     Map<String, int> tempindexOfWorkout = {};
     List<ObSickDays> tempSickDays = [];
     List tempWorkoutsAndSickDays = [];
-    // workouts.clear();
-    // indexOfWorkout.clear();
-    // sickDays.clear();
-    // workoutsAndSickDays.clear();
+    List<MonthSummary> tempMonthSummaries = [];
+
+    MonthSummary initSummary(DateTime date, int value) {
+      MonthSummary summ = MonthSummary(DateTime(date.year, date.month+1, 0));
+      if (value != 0) {
+        summ.uniqueWorkouts.add("Krank");
+        summ.workoutCounts["Krank"] = value;
+      }
+      return summ;
+    }
 
     final builder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false)).order(ObWorkout_.date, flags: Order.descending).build();
     List<ObWorkout> obWorkouts = await builder.findAsync();
@@ -389,6 +418,61 @@ class CnWorkoutHistory extends ChangeNotifier {
     sickDays = tempSickDays;
     workoutsAndSickDays = tempWorkoutsAndSickDays;
 
+    MonthSummary? summary = null;
+    int cachedSickDays = 0;
+    for(var item in workoutsAndSickDays){
+      if(item is Workout){
+        if(summary == null || !(summary.date.isSameMonth(item.date!))){
+          if(summary != null) {
+            tempMonthSummaries.add(summary);
+          }
+          summary = initSummary(item.date!, cachedSickDays);
+          cachedSickDays = 0;
+        }
+        // else{
+        summary.uniqueWorkouts.add(item.name);
+        summary.workoutCounts[item.name] = (summary.workoutCounts[item.name]?? 0) + 1;
+        // }
+      }
+      else if(item is ObSickDays){
+        if(summary == null || !(summary.date.isSameMonth(item.endDate))){
+          if(summary != null) {
+            tempMonthSummaries.add(summary);
+          }
+          summary = initSummary(item.endDate, cachedSickDays);
+          cachedSickDays = 0;
+          summary.uniqueWorkouts.add("Krank");
+          if(!item.startDate.isSameMonth(item.endDate)){
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
+            cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
+          }
+          else{
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays;
+          }
+        }
+        else{
+          summary.uniqueWorkouts.add("Krank");
+          if(!item.startDate.isSameMonth(item.endDate)){
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
+            cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
+          }
+          else{
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays;
+          }
+        }
+      }
+    }
+    if(summary != null){
+      tempMonthSummaries.add(summary);
+    }
+    monthSummaries = tempMonthSummaries;
+    // print("FINISHED");
+    for(MonthSummary summ in monthSummaries){
+      print(summ.date);
+      print(summ.workoutCounts);
+      print("");
+    }
+
     opened = workoutsAndSickDays.map((e) => false).toList();
 
     // double pos = scrollController.position.pixels;
@@ -399,4 +483,13 @@ class CnWorkoutHistory extends ChangeNotifier {
   void refresh(){
     notifyListeners();
   }
+}
+
+class MonthSummary{
+  // int year;
+  // int month;
+  DateTime date;
+  MonthSummary(this.date);
+  Set<String> uniqueWorkouts = {};
+  Map<String, int> workoutCounts = {};
 }

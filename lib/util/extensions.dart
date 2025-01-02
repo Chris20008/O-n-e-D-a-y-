@@ -51,4 +51,16 @@ extension DateOnlyCompare on DateTime {
   DateTime toDate() {
     return DateTime(year, month, day);
   }
+
+  int numOfDaysTillLastDayOfMonth(){
+    return DateTime(year, month+1, 0).difference(this).inDays + 1;
+  }
+
+  int numOfDaysTillFirstDayOfMonth(){
+    return difference(DateTime(year, month, 1)).inDays + 1;
+  }
+
+  int numOfDaysOfMonth(){
+    return DateTime(year, month+1, 0).difference(DateTime(year, month, 1)).inDays;
+  }
 }
