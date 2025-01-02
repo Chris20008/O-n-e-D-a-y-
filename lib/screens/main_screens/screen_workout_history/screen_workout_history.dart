@@ -77,7 +77,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   // }
 
                   Widget child = Container();
-                  Widget childWithHeader = Container();
+                  // Widget childWithHeader = Container();
                   DateTime? dateOfWorkout;
                   final DateTime? previousDate = index > 0
                       ? cnWorkoutHistory.workoutsAndSickDays[index-1] is Workout
@@ -96,6 +96,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     );
                   }
                   else if(cnWorkoutHistory.workoutsAndSickDays[index] is ObSickDays){
+                    print(cnWorkoutHistory.workoutsAndSickDays[index].startDate);
+                    print(cnWorkoutHistory.workoutsAndSickDays[index].endDate);
+                    print("");
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].startDate;
                     child = sickDayWidget(cnWorkoutHistory.workoutsAndSickDays[index]);
                   }
@@ -108,19 +111,22 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     /// Future
                     if(dateOfWorkout.isInFuture()){
                       if(previousDate == null){
-                        childWithHeader = getChildWithTimeHeader(
+                        child = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyFuture,
                             heightSpacer: heightOfSpacer,
                             textScaler: 1.8
                         );
                       }
+                      // else{
+                      //   childWithHeader = child;
+                      // }
                     }
 
                     /// Today
                     else if(dateOfWorkout.isToday()){
                       if(previousDate == null || !previousDate.isToday()){
-                        childWithHeader = getChildWithTimeHeader(
+                        child = getChildWithTimeHeader(
                           child: child,
                           headerText: AppLocalizations.of(context)!.historyToday,
                           heightSpacer: previousDate == null? 0 : 40,
@@ -129,12 +135,15 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                           dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
+                      // else{
+                      //   childWithHeader = child;
+                      // }
                     }
 
                     /// Yesterday
                     else if(dateOfWorkout.isYesterday()){
                       if(previousDate == null || !previousDate.isYesterday()){
-                        childWithHeader = getChildWithTimeHeader(
+                        child = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyYesterday,
                             heightSpacer: heightOfSpacer,
@@ -143,6 +152,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                             dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
+                      // else{
+                      //   childWithHeader = child;
+                      // }
                     }
 
                     /// Last 7 days
@@ -151,7 +163,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                           || previousDate.isToday()
                           || previousDate.isYesterday()
                           || previousDate.isInFuture() ){
-                        childWithHeader = getChildWithTimeHeader(
+                        child = getChildWithTimeHeader(
                             child: child,
                             headerText: AppLocalizations.of(context)!.historyLast7Days,
                             heightSpacer: heightOfSpacer,
@@ -160,6 +172,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                             dateForWeekDecoration: previousDate == null || !dateOfWorkout.isSameWeek(previousDate)? dateOfWorkout : null
                         );
                       }
+                      // else{
+                      //   childWithHeader = child;
+                      // }
                     }
 
                     /// Month Header
@@ -168,7 +183,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         || previousDate.isInFuture()
                         || !previousDate.isSameMonth(dateOfWorkout)
                     ){
-                      childWithHeader = getChildWithTimeHeader(
+                      child = getChildWithTimeHeader(
                           child: child,
                           headerText: DateFormat('MMMM y', Localizations.localeOf(context).languageCode).format(dateOfWorkout),
                           heightSpacer: heightOfSpacer,
@@ -180,7 +195,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     }
                     /// Week Header
                     else if(!dateOfWorkout.isSameWeek(previousDate)){
-                      childWithHeader = Column(
+                      child = Column(
                         children: [
                           const SizedBox(height: 15,),
                           getWeekDecoration(Jiffy.parseFromDateTime(dateOfWorkout).weekOfYear.toString()),
@@ -189,12 +204,12 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         ],
                       );
                     }
-                    else{
-                      childWithHeader = child;
-                    }
+                    // else{
+                    //   childWithHeader = child;
+                    // }
                   }
 
-                  return childWithHeader;
+                  return child;
                 },
             ),
 
@@ -279,7 +294,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
     DateTime? dateForWeekDecoration,
     MonthSummary? summary
   }){
-    print(summary);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -295,7 +309,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               MonthSummaryChart(summary: summary),
             ],
           ),
@@ -418,6 +432,18 @@ class CnWorkoutHistory extends ChangeNotifier {
     sickDays = tempSickDays;
     workoutsAndSickDays = tempWorkoutsAndSickDays;
 
+    // for(ObSickDays d in sickDays){
+    //   print(d.startDate);
+    //   print(d.endDate);
+    // }
+    // print("second");
+    // for(var d in workoutsAndSickDays){
+    //   if(d is ObSickDays){
+    //    print(d.startDate);
+    //    print(d.endDate);
+    //   }
+    // }
+
     MonthSummary? summary = null;
     int cachedSickDays = 0;
     for(var item in workoutsAndSickDays){
@@ -447,7 +473,7 @@ class CnWorkoutHistory extends ChangeNotifier {
             cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
           }
           else{
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays;
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
           }
         }
         else{
@@ -457,7 +483,7 @@ class CnWorkoutHistory extends ChangeNotifier {
             cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
           }
           else{
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays;
+            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
           }
         }
       }
@@ -467,11 +493,11 @@ class CnWorkoutHistory extends ChangeNotifier {
     }
     monthSummaries = tempMonthSummaries;
     // print("FINISHED");
-    for(MonthSummary summ in monthSummaries){
-      print(summ.date);
-      print(summ.workoutCounts);
-      print("");
-    }
+    // for(MonthSummary summ in monthSummaries){
+    //   print(summ.date);
+    //   print(summ.workoutCounts);
+    //   print("");
+    // }
 
     opened = workoutsAndSickDays.map((e) => false).toList();
 
