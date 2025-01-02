@@ -143,7 +143,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
         cnWorkoutHistory.scrollController.scrollTo(
             index: 0,
             alignment: 0.05,
-            duration: const Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut
         );
       }
