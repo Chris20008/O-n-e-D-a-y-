@@ -19,7 +19,8 @@ class MonthSummaryChart extends StatefulWidget {
 
 class _MonthSummaryChartState extends State<MonthSummaryChart> {
   int touchedIndex = -1;
-  late final names = widget.summary.uniqueWorkouts.toList();
+  late List<String> names = widget.summary.uniqueWorkouts.toList();
+  late int restDays;
 
   List<Color> colorsShades = [
     Colors.black45,
@@ -31,6 +32,20 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
 
   @override
   Widget build(BuildContext context) {
+
+    widget.summary.workoutCounts["Restdays"] = 0;
+    int amountOfWorkouts = widget.summary.workoutCounts.values.sum - (widget.summary.workoutCounts["Krank"]?? 0);
+    int amountOfDifferentWorkoutDays = widget.summary.differentDaysWithWorkoutOrSick["Workouts"]?.length?? 0;
+    int amountOfSickDays = widget.summary.workoutCounts["Krank"]?? 0;
+    Set workoutDatesSickDaysCombined = Set.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
+    List workoutAndSickSameDate = List.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
+    int amountWorkoutAndSickSameDate = workoutAndSickSameDate.getDuplicates().length;
+    restDays = widget.summary.date.numOfDaysOfMonth() - workoutDatesSickDaysCombined.length;
+    if(restDays > 0){
+      widget.summary.workoutCounts["Restdays"] = restDays;
+      names = widget.summary.uniqueWorkouts.toList();
+      names.add("Restdays");
+    }
     return AspectRatio(
       aspectRatio: 1.5,
       child: Stack(
@@ -44,10 +59,22 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("${(widget.summary.workoutCounts.values.sum - (widget.summary.workoutCounts["Krank"]?? 0)).toString()} Workouts"),
-                  if(widget.summary.workoutCounts.keys.contains("Krank"))
-                    Text("${widget.summary.workoutCounts["Krank"]!.toString()} Krank"),
-                  Text("${widget.summary.date.numOfDaysOfMonth() - widget.summary.workoutCounts.values.sum} Restdays")
+                  Text("${amountOfWorkouts.toString()} Workouts"),
+                  if(amountOfDifferentWorkoutDays != amountOfWorkouts)
+                    Text(
+                      "An ${amountOfDifferentWorkoutDays.toString()} Tagen",
+                      textScaler: const TextScaler.linear(0.7),
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                  if(amountWorkoutAndSickSameDate > 0)
+                    Text(
+                      "${amountWorkoutAndSickSameDate.toString()} als Krank",
+                      textScaler: const TextScaler.linear(0.7),
+                      style: TextStyle(color: Colors.white54),
+                    ),
+                  if(amountOfSickDays > 0)
+                    Text("${amountOfSickDays.toString()} Krank"),
+                  Text("${restDays} Restdays")
                 ],
               ),
             ),
@@ -119,7 +146,7 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       return PieChartSectionData(
         color: colorsShades[i < colorsShades.length ?  i % colorsShades.length : (i+1) % colorsShades.length],
-        value: (widget.summary.workoutCounts[names[i]]! / totalCount) * 360,
+        value: (widget.summary.workoutCounts[names[i]]??0 / totalCount) * 360,
         title: names[i],
         radius: radius,
         titleStyle: TextStyle(

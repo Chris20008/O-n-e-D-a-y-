@@ -158,6 +158,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                 separatorBuilder: (BuildContext context, int index) {
                                   return mySeparator();
                                 },
+                                cacheExtent: 40000,
                                 itemCount: cnRunningWorkout.groupedExercises.length,
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
@@ -1154,15 +1155,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
       savedCurrentData = await saveCurrentData(cnConfig) != null;
 
-      Fluttertoast.showToast(
-          msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800],
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
+      // Fluttertoast.showToast(
+      //     msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
+      //     toastLength: Toast.LENGTH_LONG,
+      //     gravity: ToastGravity.TOP,
+      //     timeInSecForIosWeb: 1,
+      //     backgroundColor: Colors.grey[800],
+      //     textColor: Colors.white,
+      //     fontSize: 16.0
+      // );
       vibrateSuccess();
       await stopWorkout(time: 0);
       isSavingData = false;

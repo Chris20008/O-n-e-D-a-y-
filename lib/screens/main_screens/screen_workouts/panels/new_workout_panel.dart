@@ -1056,6 +1056,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       if(cnBottomMenu.index == 0){
         Future.delayed(const Duration(milliseconds: 100), (){
           cnWorkoutHistory.refreshAllWorkouts();
+          cnWorkoutHistory.refresh();
         });
       }
     }

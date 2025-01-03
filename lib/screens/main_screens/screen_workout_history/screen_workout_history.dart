@@ -72,7 +72,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   }
 
                   Widget child = Container();
-                  // Widget childWithHeader = Container();
                   DateTime? dateOfWorkout;
                   final DateTime? previousDate = index > 0
                       ? cnWorkoutHistory.workoutsAndSickDays[index-1] is Workout
@@ -111,9 +110,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                             isSameWeek: previousDate?.isSameWeek(dateOfWorkout)?? false
                         );
                       }
-                      // else{
-                      //   childWithHeader = child;
-                      // }
                     }
 
                     /// Today
@@ -129,9 +125,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                           isSameWeek: previousDate?.isSameWeek(dateOfWorkout)?? false
                         );
                       }
-                      // else{
-                      //   childWithHeader = child;
-                      // }
                     }
 
                     /// Yesterday
@@ -147,9 +140,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                             isSameWeek: previousDate?.isSameWeek(dateOfWorkout)?? false
                         );
                       }
-                      // else{
-                      //   childWithHeader = child;
-                      // }
                     }
 
                     /// Last 7 days
@@ -168,9 +158,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                             isSameWeek: previousDate?.isSameWeek(dateOfWorkout)?? false
                         );
                       }
-                      // else{
-                      //   childWithHeader = child;
-                      // }
                     }
 
                     /// Month Header
@@ -201,9 +188,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         ],
                       );
                     }
-                    // else{
-                    //   childWithHeader = child;
-                    // }
                   }
                   return child;
                 },
@@ -391,12 +375,13 @@ class CnWorkoutHistory extends ChangeNotifier {
     List tempWorkoutsAndSickDays = [];
     List<MonthSummary> tempMonthSummaries = [];
 
-    MonthSummary initSummary(DateTime date, int value) {
+    MonthSummary initSummary(DateTime date, int value, List<DateTime> cachedSickDates) {
       MonthSummary summ = MonthSummary(DateTime(date.year, date.month+1, 0));
       if (value != 0) {
         summ.uniqueWorkouts.add("Krank");
         summ.workoutCounts["Krank"] = value;
       }
+      summ.differentDaysWithWorkoutOrSick["Krank"]?.addAll(cachedSickDates);
       return summ;
     }
 
@@ -432,32 +417,36 @@ class CnWorkoutHistory extends ChangeNotifier {
     workoutsAndSickDays = tempWorkoutsAndSickDays;
 
     MonthSummary? summary = null;
-    int cachedSickDays = 0;
+    int cachedSickDaysCount = 0;
+    List<DateTime> cachedSickDates = [];
     for(var item in workoutsAndSickDays){
       if(item is Workout){
         if(summary == null || !(summary.date.isSameMonth(item.date!))){
           if(summary != null) {
             tempMonthSummaries.add(summary);
+            // print(summary.differentDaysWithWorkoutOrSick);
           }
-          summary = initSummary(item.date!, cachedSickDays);
-          cachedSickDays = 0;
+          summary = initSummary(item.date!, cachedSickDaysCount, cachedSickDates);
+          cachedSickDaysCount = 0;
+          cachedSickDates.clear();
         }
-        // else{
         summary.uniqueWorkouts.add(item.name);
         summary.workoutCounts[item.name] = (summary.workoutCounts[item.name]?? 0) + 1;
-        // }
+        summary.differentDaysWithWorkoutOrSick["Workouts"]?.add(item.date!.toDate());
       }
       else if(item is ObSickDays){
         if(summary == null || !(summary.date.isSameMonth(item.endDate))){
           if(summary != null) {
             tempMonthSummaries.add(summary);
+            // print(summary.differentDaysWithWorkoutOrSick);
           }
-          summary = initSummary(item.endDate, cachedSickDays);
-          cachedSickDays = 0;
+          summary = initSummary(item.endDate, cachedSickDaysCount, cachedSickDates);
+          cachedSickDaysCount = 0;
+          cachedSickDates.clear();
           summary.uniqueWorkouts.add("Krank");
           if(!item.startDate.isSameMonth(item.endDate)){
             summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
-            cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
+            cachedSickDaysCount = item.startDate.numOfDaysTillLastDayOfMonth();
           }
           else{
             summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
@@ -467,16 +456,32 @@ class CnWorkoutHistory extends ChangeNotifier {
           summary.uniqueWorkouts.add("Krank");
           if(!item.startDate.isSameMonth(item.endDate)){
             summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
-            cachedSickDays = item.startDate.numOfDaysTillLastDayOfMonth();
+            cachedSickDaysCount = item.startDate.numOfDaysTillLastDayOfMonth();
           }
           else{
             summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
           }
         }
+        // print("get dates between");
+        // print(item.startDate);
+        // print(item.endDate);
+        // print("start");
+        if(!item.startDate.isSameMonth(item.endDate)){
+          cachedSickDates = item.startDate.getDatesBetween(item.endDate, onlySameMonth: true);
+        }
+        final dates = item.endDate.getDatesBetween(item.startDate, onlySameMonth: true);
+        // print("\nSTART");
+        // for(DateTime i in dates){
+        //   print(i);
+        // }
+        // print("");
+        summary.differentDaysWithWorkoutOrSick["Krank"]?.addAll(dates);
+        // print(summary.differentDaysWithWorkoutOrSick);
       }
     }
     if(summary != null){
       tempMonthSummaries.add(summary);
+      // print(summary.differentDaysWithWorkoutOrSick);
     }
     monthSummaries = tempMonthSummaries;
 
@@ -493,8 +498,14 @@ class CnWorkoutHistory extends ChangeNotifier {
 }
 
 class MonthSummary{
-  DateTime date;
   MonthSummary(this.date);
+  DateTime date;
   Set<String> uniqueWorkouts = {};
   Map<String, int> workoutCounts = {};
+
+  Map<String, Set<DateTime>> differentDaysWithWorkoutOrSick = {
+    "Krank": {},
+    "Workouts": {}
+  };
+  // Set<DateTime> differentDaysWithWorkoutOrSick = {};
 }
