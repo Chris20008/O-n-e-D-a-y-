@@ -153,12 +153,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                               /// Each EXERCISE
                               child: ListView.separated(
                                 controller: cnRunningWorkout.scrollController,
+                                primary: true,
                                 physics: const BouncingScrollPhysics(),
                                 shrinkWrap: true,
                                 separatorBuilder: (BuildContext context, int index) {
                                   return mySeparator();
                                 },
-                                cacheExtent: 40000,
+                                cacheExtent: 1000000,
                                 itemCount: cnRunningWorkout.groupedExercises.length,
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
@@ -396,7 +397,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         children: [
                                           ReorderableListView.builder(
                                               scrollController: ScrollController(),
-                                              physics: const BouncingScrollPhysics(),
+                                              // physics: const BouncingScrollPhysics(),
+                                              physics: NeverScrollableScrollPhysics(),
                                               padding: const EdgeInsets.all(0),
                                               shrinkWrap: true,
                                               cacheExtent: 20000,

@@ -4,6 +4,7 @@ import 'package:fitness_app/util/extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MonthSummaryChart extends StatefulWidget {
   final MonthSummary summary;
@@ -63,14 +64,14 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
                   if(amountOfDifferentWorkoutDays != amountOfWorkouts)
                     Text(
                       "An ${amountOfDifferentWorkoutDays.toString()} Tagen",
-                      textScaler: const TextScaler.linear(0.7),
-                      style: TextStyle(color: Colors.white54),
+                      textScaler: const TextScaler.linear(0.75),
+                      style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
                     ),
                   if(amountWorkoutAndSickSameDate > 0)
                     Text(
                       "${amountWorkoutAndSickSameDate.toString()} als Krank",
-                      textScaler: const TextScaler.linear(0.7),
-                      style: TextStyle(color: Colors.white54),
+                      textScaler: const TextScaler.linear(0.75),
+                      style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
                     ),
                   if(amountOfSickDays > 0)
                     Text("${amountOfSickDays.toString()} Krank"),
@@ -119,8 +120,11 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
                       // touchedIndex = -1;
                       return;
                     }
-                    touchedIndex = pieTouchResponse
-                        .touchedSection!.touchedSectionIndex;
+                    int newIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
+                    if(touchedIndex != newIndex){
+                      HapticFeedback.selectionClick();
+                    }
+                    touchedIndex = newIndex;
                   });
                 },
               ),
@@ -131,6 +135,8 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
               centerSpaceRadius: 70,
               sections: showingSections(),
             ),
+            swapAnimationDuration: const Duration(milliseconds: 300),
+            swapAnimationCurve: Curves.decelerate,
           ),
         ],
       ),
