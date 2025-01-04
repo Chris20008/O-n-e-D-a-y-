@@ -153,11 +153,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                               /// Each EXERCISE
                               child: ListView.separated(
                                 controller: cnRunningWorkout.scrollController,
+                                primary: true,
                                 physics: const BouncingScrollPhysics(),
                                 shrinkWrap: true,
                                 separatorBuilder: (BuildContext context, int index) {
                                   return mySeparator();
                                 },
+                                cacheExtent: 1000000,
                                 itemCount: cnRunningWorkout.groupedExercises.length,
                                 itemBuilder: (BuildContext context, int indexExercise) {
                                   Widget? child;
@@ -395,7 +397,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                         children: [
                                           ReorderableListView.builder(
                                               scrollController: ScrollController(),
-                                              physics: const BouncingScrollPhysics(),
+                                              // physics: const BouncingScrollPhysics(),
+                                              physics: NeverScrollableScrollPhysics(),
                                               padding: const EdgeInsets.all(0),
                                               shrinkWrap: true,
                                               cacheExtent: 20000,
@@ -1154,15 +1157,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
 
       savedCurrentData = await saveCurrentData(cnConfig) != null;
 
-      Fluttertoast.showToast(
-          msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800],
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
+      // Fluttertoast.showToast(
+      //     msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
+      //     toastLength: Toast.LENGTH_LONG,
+      //     gravity: ToastGravity.TOP,
+      //     timeInSecForIosWeb: 1,
+      //     backgroundColor: Colors.grey[800],
+      //     textColor: Colors.white,
+      //     fontSize: 16.0
+      // );
       vibrateSuccess();
       await stopWorkout(time: 0);
       isSavingData = false;

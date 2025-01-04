@@ -517,11 +517,13 @@ bool exerciseNameExistsInWorkout({required Workout workout, required String exer
 Widget buildCalendarDialogButton({
   required BuildContext context,
   required CnNewWorkOutPanel cnNewWorkout,
-  DateTime? dateToShow,
+  List<DateTime> dateValues = const [],
   bool justShow = false,
   Function? onConfirm,
-  bool buttonIsCalender = false
+  bool buttonIsCalender = false,
+  CalendarDatePicker2Type calendarType = CalendarDatePicker2Type.single
 }) {
+  dateValues = List.from(dateValues.map((e) => e.toDate()));
   const colorAmber = Color(0xFFC16A03);
   const colorAmberDark = Color(0xFF583305);
   const arrowSize = 15.0;
@@ -550,7 +552,8 @@ Widget buildCalendarDialogButton({
     dayTextStyle: dayTextStyle,
     // closeDialogOnOkTapped: !justShow,
     // closeDialogOnCancelTapped: !justShow,
-    calendarType: CalendarDatePicker2Type.single,
+    calendarType: calendarType,
+    // calendarType: CalendarDatePicker2Type.range,
     selectedDayHighlightColor: colorAmber,
     // closeDialogOnCancelTapped: true,
     firstDayOfWeek: 1,
@@ -607,6 +610,15 @@ Widget buildCalendarDialogButton({
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
+                if(dateValues.contains(date.toDate()))
+                  Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: colorAmber.withOpacity(0.2)
+                    ),
+                  ),
                 Text(
                   MaterialLocalizations.of(context).formatDecimal(date.day),
                   style: textStyle,
@@ -621,25 +633,13 @@ Widget buildCalendarDialogButton({
                         textAlign: TextAlign.center,
                         minFontSize: cnNewWorkout.allWorkoutDates[relevantDate] is List? 8 : null,
                         style: TextStyle(
-                            color: (isSelected?? false)
+                            color: ((isSelected?? false) || (dateValues.contains(date.toDate())))
                                 ? Colors.white
-                                : date.isSameDate(cnNewWorkout.originalWorkout.date) && !justShow
-                                ? const Color(0xFFFFD995)
-                                : dayText.contains("Krank") ? colorAmberDark : colorAmber)
+                                : dayText.contains("Krank")
+                                ? colorAmberDark
+                                : colorAmber)
                     )
                 ),
-                // only dot indicator
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 27.5),
-                //   child: Container(
-                //     height: 5,
-                //     width: 5,
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(5),
-                //       color: date.isSameDate(cnNewWorkout.originalWorkout.date)? Colors.blue : colorAmber,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -658,25 +658,65 @@ Widget buildCalendarDialogButton({
         // dialogSize: const Size(325, 400),
         dialogSize: const Size(325, 700),
         borderRadius: BorderRadius.circular(15),
-        value: [dateToShow ?? cnNewWorkout.workout.date!],
+        value: dateValues.isNotEmpty
+          ? dateValues
+          : calendarType == CalendarDatePicker2Type.single
+            ? [DateTime.now()]
+            : [DateTime.now(), DateTime.now()],
         dialogBackgroundColor: Theme.of(context).primaryColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
       }
     },
-    child: buttonIsCalender
-        ? const Icon(
-          Icons.calendar_month,
-          size: 30,
-          color: Colors.white
-        )
-        : Text(
-          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(dateToShow ?? cnNewWorkout.workout.date!),
-          style: const TextStyle(
-            fontSize: 18,
-          ),
+    child: getCalendarChild(
+        context: context,
+        dateValues: dateValues,
+        calendarType: calendarType,
+        buttonIsCalender: buttonIsCalender
     )
+  );
+}
+
+Widget getCalendarChild({
+  required BuildContext context,
+  required List<DateTime> dateValues,
+  required CalendarDatePicker2Type calendarType,
+  required bool buttonIsCalender,
+}){
+  if(buttonIsCalender){
+    return const Icon(
+        Icons.calendar_month,
+        size: 30,
+        color: Colors.white
+    );
+  }
+  if(calendarType == CalendarDatePicker2Type.single){
+    return Text(
+      DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(dateValues.firstOrNull ?? DateTime.now()),
+      style: const TextStyle(
+        fontSize: 18,
+      ),
+    );
+  }
+  return Column(
+    mainAxisSize: MainAxisSize.min,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        "${DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(dateValues.firstOrNull ?? DateTime.now())} -",
+        style: const TextStyle(
+          fontSize: 18,
+        ),
+      ),
+      const SizedBox(height: 5,),
+      Text(
+        DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(dateValues.lastOrNull ?? DateTime.now()),
+        style: const TextStyle(
+          fontSize: 18,
+        ),
+      ),
+    ],
   );
 }
 
