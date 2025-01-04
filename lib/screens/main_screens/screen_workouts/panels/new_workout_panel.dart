@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
@@ -432,7 +433,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             cnNewWorkout.workout.isTemplate
                                 ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
                                 : cnNewWorkout.isSickDays
-                                  ? "Sick Days"
+                                  ? "Krank"
                                   : AppLocalizations.of(context)!.panelWoWorkoutFinished,
                             textScaler: const TextScaler.linear(1.5)),
                         const SizedBox(height: 10,),
@@ -611,34 +612,20 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Start Date", textScaler: TextScaler.linear(1.3),),
+                            const Text("Dauer", textScaler: TextScaler.linear(1.3),),
                             const Spacer(),
                             buildCalendarDialogButton(
                                 context: context,
                                 cnNewWorkout: cnNewWorkout,
-                                dateToShow: cnNewWorkout.sickDays.startDate,
+                                calendarType: CalendarDatePicker2Type.range,
+                                dateValues: [cnNewWorkout.sickDays.startDate, cnNewWorkout.sickDays.endDate],
                                 onConfirm: (List<DateTime?>? values){
-                                  cnNewWorkout.sickDays.startDate = values?[0]?? cnNewWorkout.sickDays.startDate;
-                                  if (cnNewWorkout.sickDays.startDate.isAfter(cnNewWorkout.sickDays.endDate)){
-                                    cnNewWorkout.sickDays.endDate = cnNewWorkout.sickDays.startDate;
-                                  }
-                                }
-                            )
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("End Date", textScaler: TextScaler.linear(1.3),),
-                            const Spacer(),
-                            buildCalendarDialogButton(
-                                context: context,
-                                cnNewWorkout: cnNewWorkout,
-                                dateToShow: cnNewWorkout.sickDays.endDate,
-                                onConfirm: (List<DateTime?>? values){
-                                  cnNewWorkout.sickDays.endDate = values?[0]?? cnNewWorkout.sickDays.endDate;
-                                  if (cnNewWorkout.sickDays.startDate.isAfter(cnNewWorkout.sickDays.endDate)){
-                                    cnNewWorkout.sickDays.startDate = cnNewWorkout.sickDays.endDate;
+                                  if(values != null) {
+                                    cnNewWorkout.sickDays.startDate = values.firstOrNull?? cnNewWorkout.sickDays.startDate;
+                                    cnNewWorkout.sickDays.endDate =  values.lastOrNull?? cnNewWorkout.sickDays.endDate;
+                                    if (cnNewWorkout.sickDays.startDate.isAfter(cnNewWorkout.sickDays.endDate)) {
+                                      cnNewWorkout.sickDays.endDate = cnNewWorkout.sickDays.startDate;
+                                    }
                                   }
                                 }
                             )
@@ -658,6 +645,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                         if(cnNewWorkout.workout.date != null)
                           buildCalendarDialogButton(
                               context: context,
+                              dateValues: [cnNewWorkout.workout.date?? DateTime.now()],
                               cnNewWorkout: cnNewWorkout,
                               onConfirm: (List<DateTime?>? values){
                                 cnNewWorkout.workout.date = values?[0]?? cnNewWorkout.workout.date;
@@ -726,7 +714,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               },
             ),
             PullDownMenuItem(
-              title: "Sick Days",
+              title: "Krank",
               onTap: () {
                 cnNewWorkout.isSickDays = true;
                 cnNewWorkout.minPanelHeight = cnNewWorkout.keepShowingPanelHeightSickDays;
@@ -749,7 +737,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   minFontSize: 22,
                   maxLines: 1,
                   cnNewWorkout.isSickDays
-                      ?"Sick Days"
+                      ?"Krank"
                       :cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished,
                   style: const TextStyle(color: Colors.white)
               ),

@@ -48,6 +48,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
         child: Stack(
           children: [
             ScrollablePositionedList.separated(
+                itemPositionsListener: cnWorkoutHistory.itemPositionsListener,
                 shrinkWrap: true,
                 padding: EdgeInsets.only(top: Platform.isAndroid? 70 : 90, left: 20, right: 20, bottom: 0),
                 separatorBuilder: (BuildContext context, int index) {
@@ -82,7 +83,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   if(cnWorkoutHistory.workoutsAndSickDays[index] is Workout){
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].date;
                     child = WorkoutExpansionTile(
-                      // key: UniqueKey(),
                         workout: cnWorkoutHistory.workoutsAndSickDays[index],
                         padding: EdgeInsets.zero,
                         onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
@@ -91,7 +91,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                   }
                   else if(cnWorkoutHistory.workoutsAndSickDays[index] is ObSickDays){
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].startDate;
-                    child = sickDayWidget(cnWorkoutHistory.workoutsAndSickDays[index]);
+                    child = sickDayWidget(
+                        cnWorkoutHistory.workoutsAndSickDays[index]
+                    );
                   }
 
                   final double heightOfSpacer = previousDate == null? 0 : 40;
@@ -197,49 +199,55 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
             SafeArea(
                 child: Align(
                   alignment: Alignment.topRight,
-                  child: buildCalendarDialogButton(
-                      context: context,
-                      cnNewWorkout:
-                      cnNewWorkout,
-                      justShow: false,
-                      buttonIsCalender: true,
-                      onConfirm: (List<DateTime?> values){
-                        if(values.isNotEmpty){
-                          int? index;
-                          DateTime selectedDate = values.first!;
-                          while (true){
-                            String key = DateFormat('yyyyMMdd').format(selectedDate);
-                            if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
-                              index = cnWorkoutHistory.indexOfWorkout[key];
-                            }
-                            else if(cnWorkoutHistory.indexOfWorkout.keys.isNotEmpty &&
-                                double.parse(key) > double.parse(cnWorkoutHistory.indexOfWorkout.keys.firstOrNull?? "0")
-                            ){
-                              index = 0;
-                            }
-                            if(index != null){
-                              cnWorkoutHistory.scrollController.scrollTo(
-                                  index: index,
-                                  duration: const Duration(seconds: 1),
-                                  alignment: index == 0
-                                      ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
-                                      ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
-                                      ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
-                                      ? 0.3 :  0.1,
-                                  curve: Curves.easeInOut
-                              ).then((value) {
-                                // setState(() {
-                                //   cnWorkoutHistory.opened[index] = true;
-                                // });
-                              });
-                              break;
-                            }
-                            else {
-                              selectedDate = selectedDate.add(const Duration(days: 1, hours: 1)).toDate();
+                  child: Listener(
+                    onPointerDown: (PointerDownEvent event){
+                      cnWorkoutHistory.refresh();
+                    },
+                    child: buildCalendarDialogButton(
+                        context: context,
+                        cnNewWorkout: cnNewWorkout,
+                        justShow: false,
+                        buttonIsCalender: true,
+                        dateValues: getCurrentDate(),
+                        // dateValues: [DateTime(2024, 12, 12)],
+                        onConfirm: (List<DateTime?> values){
+                          if(values.isNotEmpty){
+                            int? index;
+                            DateTime selectedDate = values.first!;
+                            while (true){
+                              String key = DateFormat('yyyyMMdd').format(selectedDate);
+                              if(cnWorkoutHistory.indexOfWorkout.keys.contains(key)){
+                                index = cnWorkoutHistory.indexOfWorkout[key];
+                              }
+                              else if(cnWorkoutHistory.indexOfWorkout.keys.isNotEmpty &&
+                                  double.parse(key) > double.parse(cnWorkoutHistory.indexOfWorkout.keys.firstOrNull?? "0")
+                              ){
+                                index = 0;
+                              }
+                              if(index != null){
+                                cnWorkoutHistory.scrollController.scrollTo(
+                                    index: index,
+                                    duration: const Duration(seconds: 1),
+                                    alignment: index == 0
+                                        ? 0.05 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-1
+                                        ? 0.6 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-2
+                                        ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
+                                        ? 0.3 :  0.1,
+                                    curve: Curves.easeInOut
+                                ).then((value) {
+                                  // setState(() {
+                                  //   cnWorkoutHistory.opened[index] = true;
+                                  // });
+                                });
+                                break;
+                              }
+                              else {
+                                selectedDate = selectedDate.add(const Duration(days: 1, hours: 1)).toDate();
+                              }
                             }
                           }
                         }
-                      }
+                    ),
                   ),
                 )
             )
@@ -356,6 +364,28 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       ),
     );
   }
+
+  List<DateTime> getCurrentDate() {
+    if(cnWorkoutHistory.workoutsAndSickDays.isEmpty){
+      return [DateTime.now()];
+    }
+    print("Index in function");
+    // for(ItemPosition i in List.from(cnWorkoutHistory.itemPositionsListener.itemPositions.value)){
+    //   print(i.index);
+    // }
+    final sortedValues = cnWorkoutHistory.itemPositionsListener.itemPositions.value.sorted((a, b) => a.index.compareTo(b.index));
+    print("");
+    // print(cnWorkoutHistory.itemPositionsListener.itemPositions.value.firstOrNull?.index);
+    int index = (sortedValues.firstWhereOrNull((element) => element.itemLeadingEdge > -0.02)?.index?? 0);
+    index = (index > (cnWorkoutHistory.workoutsAndSickDays.length-1))? index-1 : index;
+    print(index);
+    // print(cnWorkoutHistory.itemPositionsListener.itemPositions.value.firstOrNull?.index);
+    // print(cnWorkoutHistory.itemPositionsListener.itemPositions.value.firstOrNull?.itemLeadingEdge);
+    // print(cnWorkoutHistory.itemPositionsListener.itemPositions.value.firstOrNull?.itemTrailingEdge);
+    // print("");
+    final item = cnWorkoutHistory.workoutsAndSickDays[index >= 0 ? index : 0];
+    return [(item is Workout)? item.date : item.startDate];
+  }
 }
 
 class CnWorkoutHistory extends ChangeNotifier {
@@ -367,8 +397,10 @@ class CnWorkoutHistory extends ChangeNotifier {
   Map<String, int> indexOfWorkout = {};
   List workoutsAndSickDays = [];
   List<MonthSummary> monthSummaries = [];
+  ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
 
   Future refreshAllWorkouts() async{
+    // print("REFRESH");
     List<Workout> tempWorkouts = [];
     Map<String, int> tempindexOfWorkout = {};
     List<ObSickDays> tempSickDays = [];
