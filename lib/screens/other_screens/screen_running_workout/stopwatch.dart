@@ -185,59 +185,60 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     Align(
                       alignment: Alignment.topLeft,
                       child: getSelectRestInSeconds(
-                        context: context,
-                        onConfirm: (value){
-                          if (value is int){
-                            cnStopwatchWidget.countdownTime = value;
-                            cnStopwatchWidget.cancelTimer();
-                            cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                          }
-                          else if(value == AppLocalizations.of(context)!.clear){
-                            cnStopwatchWidget.countdownTime = null;
-                            cnStopwatchWidget.cancelTimer();
-                            cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                          }
-                          else{
-                            cnRunningWorkout.controllerRestInSeconds.clear();
-                            cnStandardPopUp.open(
-                              context: context,
-                              onConfirm: (){
-                                cnStopwatchWidget.countdownTime = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
-                                cnStopwatchWidget.cancelTimer();
-                                cnRunningWorkout.controllerRestInSeconds.clear();
-                                Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                  FocusScope.of(context).unfocus();
-                                  cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                                });
-                              },
-                              onCancel: (){
-                                cnRunningWorkout.controllerRestInSeconds.clear();
-                                Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                  FocusScope.of(context).unfocus();
-                                });
-                              },
-                              child: TextField(
-                                keyboardAppearance: Brightness.dark,
-                                controller: cnRunningWorkout.controllerRestInSeconds,
-                                keyboardType: TextInputType.number,
-                                maxLength: 4,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                  labelText: AppLocalizations.of(context)!.runningWorkoutTimerTimeInSeconds,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                          currentTime: cnStopwatchWidget.countdownTime?? 0,
+                          context: context,
+                          onConfirm: (value){
+                            if (value is int){
+                              cnStopwatchWidget.countdownTime = value;
+                              cnStopwatchWidget.cancelTimer();
+                              cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                            }
+                            else if(value == AppLocalizations.of(context)!.clear){
+                              cnStopwatchWidget.countdownTime = null;
+                              cnStopwatchWidget.cancelTimer();
+                              cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                            }
+                            else{
+                              cnRunningWorkout.controllerRestInSeconds.clear();
+                              cnStandardPopUp.open(
+                                context: context,
+                                onConfirm: (){
+                                  cnStopwatchWidget.countdownTime = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
+                                  cnStopwatchWidget.cancelTimer();
+                                  cnRunningWorkout.controllerRestInSeconds.clear();
+                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                    FocusScope.of(context).unfocus();
+                                    cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                                  });
+                                },
+                                onCancel: (){
+                                  cnRunningWorkout.controllerRestInSeconds.clear();
+                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                    FocusScope.of(context).unfocus();
+                                  });
+                                },
+                                child: TextField(
+                                  keyboardAppearance: Brightness.dark,
+                                  controller: cnRunningWorkout.controllerRestInSeconds,
+                                  keyboardType: TextInputType.number,
+                                  maxLength: 4,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                    labelText: AppLocalizations.of(context)!.runningWorkoutTimerTimeInSeconds,
+                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                  ),
+                                  style: const TextStyle(
+                                      fontSize: 18
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                style: const TextStyle(
-                                    fontSize: 18
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            );
-                          }
-                        },
-                        child: Icon(
-                          Icons.timelapse_rounded,
-                          color: Colors.amber[800],
-                        )
+                              );
+                            }
+                          },
+                          child: Icon(
+                            Icons.timelapse_rounded,
+                            color: Colors.amber[800],
+                          )
                       ),
                     )
                   ],

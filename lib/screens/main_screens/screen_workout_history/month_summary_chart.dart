@@ -37,11 +37,15 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
     widget.summary.workoutCounts["Restdays"] = 0;
     int amountOfWorkouts = widget.summary.workoutCounts.values.sum - (widget.summary.workoutCounts["Krank"]?? 0);
     int amountOfDifferentWorkoutDays = widget.summary.differentDaysWithWorkoutOrSick["Workouts"]?.length?? 0;
-    int amountOfSickDays = widget.summary.workoutCounts["Krank"]?? 0;
+    // int amountOfSickDays = widget.summary.workoutCounts["Krank"]?? 0;
+    int amountOfSickDays = widget.summary.differentDaysWithWorkoutOrSick["Krank"]?.length?? 0;
     Set workoutDatesSickDaysCombined = Set.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
     List workoutAndSickSameDate = List.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
     int amountWorkoutAndSickSameDate = workoutAndSickSameDate.getDuplicates().length;
     restDays = widget.summary.date.numOfDaysOfMonth() - workoutDatesSickDaysCombined.length;
+    if(amountOfSickDays > 0){
+      widget.summary.workoutCounts["Krank"] = amountOfSickDays;
+    }
     if(restDays > 0){
       widget.summary.workoutCounts["Restdays"] = restDays;
       names = widget.summary.uniqueWorkouts.toList();

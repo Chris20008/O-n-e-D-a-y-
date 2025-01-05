@@ -25,7 +25,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 2510276494793380538),
       name: 'ObExercise',
-      lastPropertyId: const obx_int.IdUid(9, 2676033552247713648),
+      lastPropertyId: const obx_int.IdUid(11, 3217034757361258893),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -67,6 +67,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(9, 2676033552247713648),
             name: 'setTypes',
             type: 27,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(11, 3217034757361258893),
+            name: 'category',
+            type: 6,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -182,7 +187,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         7663215118549214280,
         5422671899604002301,
         425489130545911071,
-        2715976310809358031
+        2715976310809358031,
+        2508751927511525074
       ],
       retiredRelationUids: const [
         1856206922338472012,
@@ -210,7 +216,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               ? null
               : fbb.writeString(object.linkName!);
           final setTypesOffset = fbb.writeListInt64(object.setTypes);
-          fbb.startTable(10);
+          fbb.startTable(12);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addOffset(3, amountsOffset);
@@ -219,6 +225,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(6, object.seatLevel);
           fbb.addOffset(7, linkNameOffset);
           fbb.addOffset(8, setTypesOffset);
+          fbb.addInt64(10, object.category);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -244,6 +251,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 16);
           final linkNameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGetNullable(buffer, rootOffset, 18);
+          final categoryParam =
+              const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0);
           final object = ObExercise(
               id: idParam,
               name: nameParam,
@@ -252,7 +261,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               restInSeconds: restInSecondsParam,
               setTypes: setTypesParam,
               seatLevel: seatLevelParam,
-              linkName: linkNameParam);
+              linkName: linkNameParam,
+              category: categoryParam);
 
           return object;
         }),
@@ -372,6 +382,10 @@ class ObExercise_ {
   /// see [ObExercise.setTypes]
   static final setTypes =
       obx.QueryIntegerVectorProperty<ObExercise>(_entities[0].properties[7]);
+
+  /// see [ObExercise.category]
+  static final category =
+      obx.QueryIntegerProperty<ObExercise>(_entities[0].properties[8]);
 }
 
 /// [ObWorkout] entity fields to define ObjectBox queries.

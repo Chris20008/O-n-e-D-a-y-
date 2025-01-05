@@ -1,3 +1,4 @@
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';
@@ -20,7 +21,6 @@ class AnimatedColumn extends StatefulWidget {
 
 class _AnimatedColumnState extends State<AnimatedColumn> {
 
-
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
@@ -32,6 +32,9 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   final TextEditingController _textController = TextEditingController();
   bool canConfirm = true;
   late bool showSpotify = cnConfig.useSpotify;
+  final double _iconSize = 25;
+  final _style = const TextStyle(color: Colors.white, fontSize: 18);
+  UniqueKey newExerciseKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +80,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
+                      cnAnimatedColumn.newEx = Exercise();
                       cnStandardPopUp.open(
                           context: context,
                           onCancel: (){
@@ -85,38 +89,14 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                               _textController.clear();
                             });
                           },
-                          child: TextFormField(
-                            keyboardAppearance: Brightness.dark,
-                            controller: _textController,
-                            maxLength: 40,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: (value) {
-                              value = value?.trim();
-                              if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
-                                canConfirm = false;
-                                return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
-                              }
-                              canConfirm = true;
-                              return null;
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              labelText: AppLocalizations.of(context)!.newExerciseName,
-                              counterText: "",
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                            ),
-                            style: const TextStyle(
-                                fontSize: 18
-                            ),
-                            textAlign: TextAlign.center,
-                            onChanged: (value){},
-                          ),
+                          child: getPopUpChild(),
                           canConfirm: canConfirm,
                           onConfirm: (){
                             if(_textController.text.isNotEmpty &&
                                 !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
                             ){
-                              cnRunningWorkout.addExercise(Exercise(name: _textController.text));
+                              cnAnimatedColumn.newEx.name = _textController.text;
+                              cnRunningWorkout.addExercise(cnAnimatedColumn.newEx);
                             }
                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
                               FocusScope.of(context).unfocus();
@@ -154,6 +134,76 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
         ],
       ),
     );
+  }
+
+  Widget getPopUpChild(){
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        TextFormField(
+          keyboardAppearance: Brightness.dark,
+          controller: _textController,
+          maxLength: 40,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            value = value?.trim();
+            if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
+              canConfirm = false;
+              return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
+            }
+            canConfirm = true;
+            return null;
+          },
+          decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+            labelText: AppLocalizations.of(context)!.newExerciseName,
+            counterText: "",
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+          ),
+          style: const TextStyle(
+              fontSize: 18
+          ),
+          textAlign: TextAlign.center,
+          onChanged: (value){},
+        ),
+        const SizedBox(height: 10,),
+        getSelectCategory(
+            key: newExerciseKey,
+            onConfirm: (int category){
+              cnAnimatedColumn.newEx.category = category;
+              cnStandardPopUp.child = getPopUpChild();
+              // cnStandardPopUp.key = UniqueKey();
+              cnStandardPopUp.refresh();
+            },
+            currentCategory: cnAnimatedColumn.newEx.category,
+            context: context,
+            child: SizedBox(
+              height: 35,
+              child: Row(
+                children: [
+                  Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                  const SizedBox(width: 8,),
+                  Text(cnAnimatedColumn.newEx.getCategoryName(), style: _style),
+                  const Spacer(),
+                  const Spacer(flex: 4,),
+                  // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+                  const SizedBox(width: 10),
+                  trailingArrow
+                ],
+              ),
+            )
+        ),
+      ],
+    );
+  }
+
+  void rebuildAllChildren(BuildContext context) {
+    void rebuild(Element el) {
+      el.markNeedsBuild();
+      el.visitChildren(rebuild);
+    }
+    (context as Element).visitChildren(rebuild);
   }
 
   double getYPositionStopwatch(){
@@ -194,6 +244,12 @@ class CnAnimatedColumn extends ChangeNotifier {
   bool isRunning = false;
   bool isPaused = false;
   int animationTimeStopwatch = 300;
+  Exercise newEx = Exercise();
+  Widget popUpChild = Container();
+
+  void setPopUpChild(Widget child){
+    popUpChild = child;
+  }
 
   void refresh()async{
     notifyListeners();

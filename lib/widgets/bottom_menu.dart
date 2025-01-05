@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 
 import '../screens/main_screens/screen_statistics/screen_statistics.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -108,15 +109,15 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
               showUnselectedLabels: false,
               items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.history, size: cnBottomMenu.iconSize),
+                  icon: Icon(Icons.history, size: cnBottomMenu.iconSize!),
                   label: 'History',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.sports_martial_arts, size: cnBottomMenu.iconSize),
+                  icon: Icon(MyIcons.dumbbell, size: cnBottomMenu.iconSize!-5),
                   label: 'Templates',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.scatter_plot, size: cnBottomMenu.iconSize),
+                  icon: Icon(MyIcons.chart_line, size: cnBottomMenu.iconSize!-5),
                   label: 'Statistics',
                 ),
               ],
@@ -194,7 +195,7 @@ class CnBottomMenu extends ChangeNotifier {
         : (Platform.isAndroid? 40 : 35);  /// Reduced height when landscape*
     final double paddingBottom = MediaQuery.of(context).padding.bottom;
     this.height = paddingBottom + height;
-    iconSize = orientation == Orientation.portrait? null : 15;
+    iconSize = orientation == Orientation.portrait? 25 : 15;
   }
 
   void showBottomMenuAnimated(){

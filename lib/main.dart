@@ -636,7 +636,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
           initTutorialAddWorkout(context);
           showTutorialAddWorkout(context);
         } else if(!doShowTutorial){
-          currentTutorialStep = 100;
+          currentTutorialStep = maxTutorialStep;
           cnConfig.setCurrentTutorialStep(currentTutorialStep);
           tutorialIsRunning = false;
         }

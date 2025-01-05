@@ -1,3 +1,4 @@
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
@@ -14,7 +15,6 @@ import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:io';
-import 'package:fitness_app/assets/custom_icons/my_icons.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../main.dart';
 import '../../util/config.dart';
@@ -312,7 +312,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                               await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
                                             },
                                             leading: const Icon(
-                                                MyIcons.github
+                                                MyIcons.github_circled
                                             ),
                                             trailing: trailingArrow,
                                             title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
@@ -403,10 +403,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             setState(() {
               _showLoadingIndicator = true;
             });
+            bool resultLoadBackup = false;
             try{
-              await loadBackupFromFile(file, cnHomepage: cnHomepage);
+              await loadBackupFromFile(file, cnHomepage: cnHomepage).then((result) => resultLoadBackup = result);
               tutorialIsRunning = false;
-              currentTutorialStep = 100;
+              currentTutorialStep = maxTutorialStep;
               cnConfig.setCurrentTutorialStep(currentTutorialStep);
               cnScreenStatistics.refreshData();
               cnScreenStatistics.resetGraph();
@@ -438,7 +439,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                   fontSize: 16.0
               );
             }
-
+            if(resultLoadBackup){
+              Future.delayed(const Duration(seconds: 5), (){
+                saveCurrentData(cnConfig);
+              });
+            }
           }
       );
     }

@@ -1,5 +1,6 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
@@ -98,7 +99,7 @@ void showTutorialAddWorkout(BuildContext context){
     },
     onClickOverlay: (target){},
     onSkip: (){
-      currentTutorialStep = 1;
+      currentTutorialStep = maxTutorialStep;
       cnConfig.setCurrentTutorialStep(currentTutorialStep);
       return true;
     },

@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:fitness_app/main.dart';
+import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -66,6 +68,25 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
   @override
   Widget build(BuildContext context) {
+
+    final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
+    if(t == null){
+      return SizedBox(
+        height: 200,
+        child: Center(
+          child: Text(
+            "The Category of this Exercise is currently not supported for statistics",
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+    // for (ObExercise ex in t){
+    //   print(ex.name);
+    //   print(ex.category);
+    //   print(ex.id);
+    //   print("");
+    // }
 
     width = MediaQuery.of(context).size.width;
     minDate = cnScreenStatistics.minDate.toDate();

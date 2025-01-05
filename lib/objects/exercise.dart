@@ -1,7 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quiver/iterables.dart';
-
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../util/objectbox/ob_exercise.dart';
+
+Map categoryMapping = {
+  1: "Wiederholungen",
+  2: "Cardio",
+  3: "Static Hold"
+};
 
 class Exercise{
 
@@ -13,6 +19,7 @@ class Exercise{
 
   String? originalName;
   String? linkName;
+  int category;
 
 
   Exercise({
@@ -22,7 +29,8 @@ class Exercise{
     this.seatLevel,
     this.id = -100,
     this.originalName,
-    this.linkName
+    this.linkName,
+    this.category = 1
   }){
     if (sets.isEmpty){
       sets = [];
@@ -36,7 +44,8 @@ class Exercise{
       sets: List.from(zip([e.weights, e.amounts, e.setTypes]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt(), setType: set[2].toInt()))),
       restInSeconds: e.restInSeconds,
       seatLevel: e.seatLevel,
-      linkName: e.linkName
+      linkName: e.linkName,
+      category: e.category
   );
 
   /// Don't clone the original name
@@ -45,7 +54,8 @@ class Exercise{
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
-      linkName: ex.linkName
+      linkName: ex.linkName,
+      category: ex.category
   );
 
   Exercise.clone(Exercise ex): this(
@@ -54,7 +64,8 @@ class Exercise{
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
-      linkName: ex.linkName
+      linkName: ex.linkName,
+      category: ex.category
   );
 
   ObExercise toObExercise(){
@@ -74,7 +85,8 @@ class Exercise{
         setTypes: setTypes,
         restInSeconds: restInSeconds,
         seatLevel: seatLevel,
-        linkName: linkName
+        linkName: linkName,
+        category: category
     );
   }
 
@@ -106,7 +118,8 @@ class Exercise{
     "restInSeconds": restInSeconds,
     "seatLevel": seatLevel,
     "originalName": originalName, 
-    "linkName": linkName
+    "linkName": linkName,
+    "category": category
     };
   }
 
@@ -115,9 +128,7 @@ class Exercise{
       !data.containsKey("name") ||
         !data.containsKey("sets")||
         !data.containsKey("restInSeconds")||
-        !data.containsKey("seatLevel")||
-        !data.containsKey("originalName")||
-        !data.containsKey("linkName")){
+        !data.containsKey("seatLevel")){
       return null;
     }
     /// setType was added afterwards
@@ -145,6 +156,7 @@ class Exercise{
       seatLevel: data["seatLevel"],
       originalName: data["originalName"],
       linkName: data["linkName"],
+      category: data["category"]?? 1
     );
   }
 
@@ -152,7 +164,8 @@ class Exercise{
     if(ex.name != name ||
         seatLevel != ex.seatLevel ||
         restInSeconds != ex.restInSeconds ||
-        ex.sets.length != sets.length
+        ex.sets.length != sets.length ||
+        ex.category != category
     ){
       return false;
     }
@@ -162,6 +175,53 @@ class Exercise{
       }
     }
     return true;
+  }
+
+  bool categoryIsReps(){
+    return category == 1;
+  }
+
+  bool categoryIsCardio(){
+    return category == 2;
+  }
+
+  bool categoryIsStaticHold(){
+    return category == 3;
+  }
+
+  String getCategoryName(){
+    return categoryMapping[category];
+  }
+
+  String getLeftTitle(BuildContext context){
+    if(categoryIsCardio()){
+      return "km";
+    }
+    return AppLocalizations.of(context)!.weight;
+  }
+
+  String getRightTitle(BuildContext context){
+    if(category == 1){
+      return AppLocalizations.of(context)!.amount;
+    }
+    return "Zeit";
+  }
+
+  String getSelectorText(BuildContext context){
+    if (categoryIsReps()){
+      return "Wiederholungen";
+    } else if(categoryIsCardio()){
+      return "Cardio";
+    } else if(categoryIsCardio()){
+      return "Static Hold";
+    }else {
+      category = 1;
+      return "Wiederholungen";
+    }
+  }
+
+  bool isNewExercise(){
+    return id == -100;
   }
 
 }
@@ -182,6 +242,63 @@ class SingleSet{
 
   bool equals(SingleSet s){
     return weight == s.weight && amount == s.amount && setType == s.setType;
+  }
+
+  dynamic get weightAsTrimmedDouble{
+    if(weight == null || (weight?? 1) %1 != 0){
+      return weight;
+    }
+    return weight?.toInt();
+  }
+
+  String? get amountAsTime{
+    if(amount == null){
+      return null;
+    }
+    /// if greater 5 digits remove the last until 5
+    while(amount! > 99999){
+      amount = (amount!/10).floor();
+    }
+    String timeAsString = amount.toString().padLeft(5, "0");
+    if(timeAsString.substring(0, 1) == "0"){
+      timeAsString = "${timeAsString.substring(1, 3)}:${timeAsString.substring(3, 5)}";
+    }
+    else{
+      timeAsString = "${timeAsString.substring(0, 1)}:${timeAsString.substring(1, 3)}:${timeAsString.substring(3, 5)}";
+    }
+    return timeAsString;
+  }
+
+  String get amountAsColumn{
+    // List res = amountAsTime?.split(":")?? [];
+    String res = amountAsTime?.replaceAll(":", "")?? "00000";
+    res = res.padLeft(5, "0");
+    String hours = "${int.parse(res.substring(0, 1))}h".replaceFirst("0", "");
+    String minutes = "${int.parse(res.substring(1, 3))}m".replaceFirst("0", "");
+    String seconds = "${int.parse(res.substring(3, 5))}s".replaceFirst("0", "");
+    List<String> parsedValues = [];
+    if(hours.length > 1){
+      parsedValues.add(hours);
+    }
+    if(minutes.length > 1){
+      parsedValues.add(minutes);
+    }
+    if(seconds.length > 1){
+      parsedValues.add(seconds);
+    }
+    return parsedValues.join("\n");
+    // if(res.substring(0, 1) == "0"){
+    //   return "${res[0]}h\n${res[1]}m\n${res[2]}s";
+    // }
+    // else{
+    //   return "${res[0]}m\n${res[1]}s";
+    // }
+    // if(res.length == 2){
+    //   return "${res[0]}m\n${res[1]}s";
+    // } else if (res.length == 3){
+    //   return "${res[0]}h\n${res[1]}m\n${res[2]}s";
+    // }
+    // return "";
   }
 }
 
