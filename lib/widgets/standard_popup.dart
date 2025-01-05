@@ -39,6 +39,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
     }
 
     return Stack(
+      key: cnStandardPopUp.key,
       alignment: Alignment.center,
       children: [
         AnimatedCrossFade(
@@ -150,6 +151,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
 }
 
 class CnStandardPopUp extends ChangeNotifier {
+  Key key = UniqueKey();
   bool isVisible = false;
   Function? onConfirm;
   Function? onCancel;

@@ -176,7 +176,7 @@ void showTutorialExplainExerciseDragOptions(BuildContext context) {
     onClickTargetWithTapPosition: (target, tapDetails) {},
     onClickOverlay: (target){},
     onSkip: (){
-      currentTutorialStep = 10;
+      currentTutorialStep = maxTutorialStep;
       cnConfig.setCurrentTutorialStep(currentTutorialStep);
       return true;
     },

@@ -921,10 +921,10 @@ packages:
     dependency: "direct main"
     description:
       name: pull_down_button
-      sha256: "48b928203afdeafa4a8be5dc96980523bc8a2ddbd04569f766071a722be22379"
+      sha256: "12cdd8ff187a3150ebdf075e5074299f085579b158d2b4e655ccbafccf95f25b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.9.4"
+    version: "0.10.2"
   quiver:
     dependency: "direct main"
     description:

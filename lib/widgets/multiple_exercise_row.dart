@@ -22,7 +22,7 @@ class MultipleExerciseRow extends StatelessWidget {
   });
 
   final double _height = 60;
-  final double _width = 36;
+  final double _width = 44;
   final double _topBottomPadding = 5;
   final double _iconSize = 13;
   final double _leftRightPadding = 3;
@@ -254,35 +254,11 @@ class MultipleExerciseRow extends StatelessWidget {
                       children: [
 
                         /// Background of single set
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[500]!.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
+                        backgroundSingleSet,
 
                         /// One Column for each set (weight / amount)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 2),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              OverflowSafeText(
-                                  "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight}",
-                                  maxLines: 1,
-                                  fontSize: 14,
-                                  minFontSize: 9
-                              ),
-                              Container(
-                                // color: Colors.grey[900],
-                                color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
-                                height: 1,
-                                width: _width/2,
-                              ),
-                              Text("${set.amount}")
-                            ],
-                          ),
-                        ),
+                        dataSingleSet(set, ex),
+
                         if(weightImproved != null)
                           getArrow(weightImproved, true),
                         if(amountImproved != null)

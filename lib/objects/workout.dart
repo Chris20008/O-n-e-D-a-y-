@@ -59,7 +59,8 @@ class Workout{
           sets: List.from(zip([e.weights, e.amounts, e.setTypes]).map((set) => SingleSet(weight: set[0].toDouble(), amount: set[1].toInt(), setType: set[2].toInt()))),
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel,
-          linkName: e.linkName
+          linkName: e.linkName,
+          category: e.category
       ))),
       date: w.date,
       id: w.id,
@@ -87,6 +88,7 @@ class Workout{
           ex.setTypes = newExercise.setTypes;
           ex.restInSeconds = newExercise.restInSeconds;
           ex.seatLevel = newExercise.seatLevel;
+          ex.category = newExercise.category;
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
@@ -118,7 +120,7 @@ class Workout{
     return keys;
   }
 
-  ObWorkout toObWorkout() {
+  ObWorkout toEmptyObWorkout() {
     return ObWorkout(
       name: name,
       date: date!,
@@ -153,6 +155,16 @@ class Workout{
     }
   }
 
+  bool isNewWorkout(){
+    return id == -100;
+  }
+
+  void removeEmptyLinksFromWorkout(){
+    linkedExercises = linkedExercises.where((linkName) {
+      return exercises.any((exercise) => exercise.linkName == linkName);
+    }).toList();
+  }
+
   bool equals(Workout w){
     if(w.exercises.length != exercises.length){
       // print("----------- NOT SAME LENGTH EXERCISE");
@@ -176,6 +188,7 @@ class Workout{
   }
 
   void saveToDatabase(){
+    removeEmptyLinksFromWorkout();
     /// checks if workout exists
     ObWorkout? existingObWorkout = objectbox.workoutBox.query(ObWorkout_.id.equals(id)).build().findUnique();
 
@@ -192,7 +205,7 @@ class Workout{
     }
 
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
-    ObWorkout newObWorkout = existingObWorkout?? toObWorkout();
+    ObWorkout newObWorkout = existingObWorkout?? toEmptyObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
     // print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);

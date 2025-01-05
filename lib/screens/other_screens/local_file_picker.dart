@@ -82,7 +82,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                                         await loadBackupFromFile(file, cnHomepage: cnHomepage);
                                         saveCurrentData(cnConfig);
                                         tutorialIsRunning = false;
-                                        currentTutorialStep = 100;
+                                        currentTutorialStep = maxTutorialStep;
                                         cnConfig.setCurrentTutorialStep(currentTutorialStep);
                                         cnScreenStatistics.refreshData();
                                         cnScreenStatistics.resetGraph();

@@ -2,6 +2,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -131,7 +132,7 @@ void showTutorialAddExercise(BuildContext context) {
     },
     onClickOverlay: (target){},
     onSkip: (){
-      currentTutorialStep = 3;
+      currentTutorialStep = maxTutorialStep;
       cnConfig.setCurrentTutorialStep(currentTutorialStep);
       return true;
     },

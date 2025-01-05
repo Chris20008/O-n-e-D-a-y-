@@ -12,6 +12,7 @@ class ObExercise{
   int restInSeconds;
   int? seatLevel;
   String? linkName;
+  int category;
 
   ObExercise({
     this.id = 0,
@@ -21,7 +22,8 @@ class ObExercise{
     required this.restInSeconds,
     required this.setTypes,
     this.seatLevel,
-    this.linkName
+    this.linkName,
+    this.category = 1
   });
 
   factory ObExercise.fromMap(Map w){
@@ -33,15 +35,43 @@ class ObExercise{
         setTypes: List<int>.from(List.from(w["setTypes"]?? List.generate(weights.length, (item) => 0)).map((a) => int.parse(a.toString()))),
         restInSeconds: w["restInSeconds"]?? 0,
         seatLevel: w["seatLevel"],
-        linkName: w["linkName"]
+        linkName: w["linkName"],
+        category: w["category"]?? 1
     );
+  }
+
+  Map asMap(){
+    Map m = {
+      "id": id,
+      "name": name,
+      "weights": weights,
+      "amounts": amounts,
+      "setTypes": setTypes,
+      "restInSeconds": restInSeconds,
+      "seatLevel": seatLevel,
+      "linkName": linkName,
+      "category": category
+    };
+    if(m["category"] == 1){
+      m.remove("category");
+    }
+    if(m["seatLevel"] == 0 || m["seatLevel"] == null){
+      m.remove("seatLevel");
+    }
+    if(m["linkName"] == "" || m["linkName"] == null){
+      m.remove("linkName");
+    }
+    if(m["restInSeconds"] == 0){
+      m.remove("restInSeconds");
+    }
+    return m;
   }
 
   int getHash(){
     final listHashW = Object.hashAll(weights);
     final listHashA = Object.hashAll(amounts);
     final listHashS = Object.hashAll(setTypes);
-    return Object.hash(name, restInSeconds, seatLevel, linkName, listHashW, listHashA, listHashS);
+    return Object.hash(name, restInSeconds, seatLevel, linkName, listHashW, listHashA, listHashS, category);
   }
 
   bool equals(ObExercise ex){

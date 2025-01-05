@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -98,8 +99,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                               // mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.weight, maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.amount, maxLines: 1))),
+                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
                               ],
                             ),
                             Expanded(
@@ -183,9 +184,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                   else{
                                                     cnNewExercise.exercise.sets[index].weight = null;
                                                   }
-                                                  setState(() {
-
-                                                  });
+                                                  setState(() {});
                                                 },
                                               ),
                                             ),
@@ -198,10 +197,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                               child: TextField(
                                                 keyboardAppearance: Brightness.dark,
                                                 key: cnNewExercise.ensureVisibleKeys[index][1],
-                                                maxLength: 3,
-                                                style: const TextStyle(
-                                                    fontSize: 18
-                                                ),
+                                                maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
+                                                style: cnNewExercise.exercise.categoryIsReps()
+                                                    ? const TextStyle(fontSize: 18)
+                                                    : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
                                                 onTap: ()async{
                                                   cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
                                                   if(insetsBottom == 0) {
@@ -224,15 +223,25 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 ),
                                                 onChanged: (value){
                                                   value = value.trim();
-                                                  if(value.isNotEmpty){
-                                                    final newValue = int.tryParse(value);
-                                                    cnNewExercise.exercise.sets[index].amount = newValue;
-                                                    if(newValue == null){
-                                                      cnNewExercise.controllers[index][1].clear();
+                                                  /// For Reps
+                                                  if(cnNewExercise.exercise.categoryIsReps()){
+                                                    if(value.isNotEmpty){
+                                                      final newValue = int.tryParse(value);
+                                                      cnNewExercise.exercise.sets[index].amount = newValue;
+                                                      if(newValue == null){
+                                                        cnNewExercise.controllers[index][1].clear();
+                                                      }
+                                                    }
+                                                    else{
+                                                      cnNewExercise.exercise.sets[index].amount = null;
                                                     }
                                                   }
+                                                  /// For Time
                                                   else{
-                                                    cnNewExercise.exercise.sets[index].amount = null;
+                                                    List result = parseTextControllerAmountToTime(value);
+                                                    cnNewExercise.controllers[index][1].text = result[1];
+                                                    cnNewExercise.exercise.sets[index].amount = result[0];
+                                                    setState(() {});
                                                   }
                                                 },
                                               ),
@@ -483,6 +492,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   Widget getRestInSecondsSelector() {
     return getSelectRestInSeconds(
+        currentTime: cnNewExercise.exercise.restInSeconds,
         context: context,
         child: SizedBox(
           height: 35,
@@ -556,6 +566,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
   Widget getSeatLevelSelector() {
     return getSelectSeatLevel(
+      currentSeatLevel: cnNewExercise.exercise.seatLevel,
       context: context,
       onConfirm: (dynamic value){
         if(value is int){
@@ -582,6 +593,33 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           ],
         ),
       )
+    );
+  }
+
+  Widget getExerciseCategorySelector() {
+    return getSelectCategory(
+        context: context,
+        currentCategory: cnNewExercise.exercise.category,
+        onConfirm: (int category){
+          cnNewExercise.exercise.category = category;
+          cnNewExercise.refresh();
+          cnNewExercise.clearTextControllers();
+        },
+        child: SizedBox(
+          height: 35,
+          child: Row(
+            children: [
+              Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+              const SizedBox(width: 8,),
+              Text("Kategorie", style: _style),
+              const Spacer(),
+              const Spacer(flex: 4,),
+              Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+              const SizedBox(width: 10),
+              trailingArrow
+            ],
+          ),
+        )
     );
   }
 
@@ -636,6 +674,28 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
 
         /// Seat Level Row and Selector
         getSeatLevelSelector(),
+
+        const SizedBox(height: 0,),
+
+        /// Exercise Category Selector
+        if(cnNewExercise.exercise.isNewExercise())
+          getExerciseCategorySelector()
+        else
+          SizedBox(
+            height: 35,
+            child: Row(
+              children: [
+                Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                const SizedBox(width: 8,),
+                Text("Kategorie", style: _style),
+                const Spacer(),
+                const Spacer(flex: 4,),
+                Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+                const SizedBox(width: 20),
+                // trailingArrow
+              ],
+            ),
+          )
       ],
     );
   }
@@ -669,11 +729,22 @@ class CnNewExercisePanel extends ChangeNotifier {
   void setExercise(Exercise ex){
     exercise = ex;
     slideableKeys = exercise.generateKeyForEachSet();
-    controllers = exercise.sets.map((e) => ([TextEditingController(text: "${e.weight}"), TextEditingController(text: "${e.amount}")])).toList();
+    controllers = exercise.sets.map((set) => ([TextEditingController(text: "${set.weightAsTrimmedDouble}"), TextEditingController(text: "${exercise.categoryIsReps()? (set.amount) : parseTextControllerAmountToTime(set.amount)[1]}")])).toList();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
     restController = TextEditingController(text: ex.restInSeconds > 0? ex.restInSeconds.toString() : "");
     seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
+  }
+
+  void clearTextControllers(){
+    for (var element in controllers) {
+      element[0].text = "";
+      element[1].text = "";
+    }
+    for (SingleSet set in exercise.sets) {
+      set.weight = null;
+      set.amount = null;
+    }
   }
 
   void openPanel({required Workout workout, Exercise? exercise, Function? onConfirm}){
@@ -703,8 +774,8 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void clear(){
-
     exercise = Exercise();
+    workout = Workout();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
     restController = TextEditingController();

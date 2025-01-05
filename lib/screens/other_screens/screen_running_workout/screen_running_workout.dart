@@ -24,6 +24,7 @@ import '../../../widgets/standard_popup.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
 import 'animated_column.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -153,7 +154,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                               /// Each EXERCISE
                               child: ListView.separated(
                                 controller: cnRunningWorkout.scrollController,
-                                primary: true,
                                 physics: const BouncingScrollPhysics(),
                                 shrinkWrap: true,
                                 separatorBuilder: (BuildContext context, int index) {
@@ -312,7 +312,28 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                       const SizedBox(height: 5),
 
                                       /// Seat Level Row and Selector
-                                      getSeatLevelSelector(newEx),
+                                      // Row(
+                                      //   mainAxisSize: MainAxisSize.min,
+                                      //   mainAxisAlignment: MainAxisAlignment.start,
+                                      //   children: [
+                                      //     getSeatLevelSelector(newEx),
+                                      //     Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                                      //     const SizedBox(width: 8,),
+                                      //     Text(newEx.getCategoryName()),
+                                      //   ],
+                                      // ),
+                                      // getSeatLevelSelector(newEx),
+
+                                      Row(
+                                        // mainAxisSize: MainAxisSize.min,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(width: 100, child: getSeatLevelSelector(newEx),),
+                                          Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                                          const SizedBox(width: 8,),
+                                          Text(newEx.getCategoryName()),
+                                        ],
+                                      ),
 
                                       /// Rest in Seconds Row and Selector
                                       getRestInSecondsSelector(newEx),
@@ -350,6 +371,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   maxLines: 1
                                               )
                                           ),
+                                          /// TextField Headers
                                           Expanded(
                                               flex: 2,
                                               child: Row(
@@ -358,7 +380,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   SizedBox(
                                                       width: _widthOfTextField+10,
                                                       child: OverflowSafeText(
-                                                          AppLocalizations.of(context)!.weight,
+                                                          // AppLocalizations.of(context)!.weight,
+                                                          newEx.getLeftTitle(context),
                                                           textAlign: TextAlign.center,
                                                           // fontSize: 12,
                                                           style: const TextStyle(
@@ -373,7 +396,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                   SizedBox(
                                                       width: _widthOfTextField+10,
                                                       child: OverflowSafeText(
-                                                          AppLocalizations.of(context)!.amount,
+                                                          // AppLocalizations.of(context)!.amount,
+                                                          newEx.getRightTitle(context),
                                                           textAlign: TextAlign.center,
                                                           // fontSize: 12,
                                                           style: const TextStyle(
@@ -453,10 +477,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                       children: [
 
                                                         /// Set
-                                                        // SizedBox(
-                                                        //     width: _widthOfTextField,
-                                                        //     child: Text("${indexSet + 1}", textScaler: const TextScaler.linear(1.2),)
-                                                        // ),
                                                         getSet(
                                                             context: context,
                                                             index: indexSet,
@@ -502,9 +522,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
                                                                         hintFadeDuration: const Duration(milliseconds: 200),
                                                                         hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
-                                                                        hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15))
+                                                                        hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15), sizeSmall: false)
                                                                     ),
-                                                                    style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text),
+                                                                    style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text, sizeSmall: false),
                                                                     onChanged: (value){
                                                                       value = value.trim();
                                                                       if(value.isNotEmpty){
@@ -536,7 +556,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                 child: Center(
                                                                   child: TextField(
                                                                     keyboardAppearance: Brightness.dark,
-                                                                    maxLength: 3,
+                                                                    maxLength: newEx.categoryIsReps()? 3 : 8,
                                                                     textAlign: TextAlign.center,
                                                                     keyboardType: const TextInputType.numberWithOptions(
                                                                         decimal: false,
@@ -551,27 +571,45 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         // isDense: true,
                                                                         counterText: "",
                                                                         contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                                        hintText: "${set.amount?? ""}",
-                                                                        hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
+                                                                        hintText: newEx.categoryIsReps()? "${set.amount?? ""}" : set.amountAsTime,
+                                                                        hintStyle: getTextStyleForTextField(
+                                                                            newEx.categoryIsReps()? "${set.amount?? ""}" : set.amountAsTime?? "",
+                                                                            sizeSmall: false,
+                                                                            color: Colors.white.withOpacity(0.07)
+                                                                        )
+                                                                        // hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
                                                                     ),
-                                                                    style: const TextStyle(
-                                                                      fontSize: 18,
-                                                                    ),
+                                                                    style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text, sizeSmall: false),
                                                                     onChanged: (value){
                                                                       value = value.trim();
-                                                                      if(value.isNotEmpty){
-                                                                        final newValue = int.tryParse(value);
-                                                                        newEx.sets[indexSet].amount = newValue;
-                                                                        if(newValue == null){
-                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
+                                                                      /// For Reps
+                                                                      if(newEx.categoryIsReps()){
+                                                                        if(value.isNotEmpty){
+                                                                          final newValue = int.tryParse(value);
+                                                                          newEx.sets[indexSet].amount = newValue;
+                                                                          if(newValue == null){
+                                                                            cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
+                                                                          }
+                                                                          if(value.length == 1){
+                                                                            setState(() => {});
+                                                                          }
                                                                         }
-                                                                        if(value.length == 1){
+                                                                        else{
+                                                                          newEx.sets[indexSet].amount = null;
                                                                           setState(() => {});
                                                                         }
                                                                       }
+                                                                      /// For Time
                                                                       else{
-                                                                        newEx.sets[indexSet].amount = null;
-                                                                        setState(() => {});
+                                                                        List result = parseTextControllerAmountToTime(value);
+                                                                        if(result[0] <= 0){
+                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = "";
+                                                                          newEx.sets[indexSet].amount = null;
+                                                                        } else{
+                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = result[1];
+                                                                          newEx.sets[indexSet].amount = result[0];
+                                                                        }
+                                                                        setState(() {});
                                                                       }
                                                                       cnRunningWorkout.cache();
                                                                     },
@@ -806,6 +844,20 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     required Exercise newEx,
     required int indexSet
   }){
+
+    String getText(){
+      switch (newEx.category){
+        case 1:
+          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} kg x ${set.amount?? ""}" : "";
+        case 2:
+          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} km in ${set.amountAsTime?? ""}" : "";
+        case 3:
+          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} kg for ${set.amountAsTime?? ""}" : "";
+        default:
+          return "";
+      }
+    }
+
     return Expanded(
         flex: 2,
         child: IgnorePointer(
@@ -823,15 +875,20 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
               ),
               onPressed: (){
-                if(set.weight?.toString() != null &&
-                    set.amount?.toString() != null &&
+                if(set.weight != null &&
+                    set.amount != null &&
                     cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
                     cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
                 ){
                   vibrateConfirm();
-                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weight.toString().endsWith(".0")? set.weight?.toInt().toString() : set.weight.toString())?? "";
+                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weightAsTrimmedDouble?? "").toString();
                   newEx.sets[indexSet].weight = set.weight;
-                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                  if(newEx.categoryIsReps()){
+                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                  }
+                  else{
+                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amountAsTime.toString();
+                  }
                   newEx.sets[indexSet].amount = set.amount;
                   cnRunningWorkout.refresh();
                   cnRunningWorkout.cache();
@@ -844,7 +901,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               child: Center(
                 child: OverflowSafeText(
                   maxLines: 1,
-                  set.weight != null && set.amount != null? "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""} kg x ${set.amount?? ""}" : "",
+                  getText(),
                   style: TextStyle(
                       color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
                           cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
@@ -1175,45 +1232,41 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   Widget getSeatLevelSelector(Exercise newEx) {
     return SizedBox(
       height: 30,
-      child: Row(
-        children: [
-          getSelectSeatLevel(
-              child: SizedBox(
+      child: getSelectSeatLevel(
+          currentSeatLevel: newEx.seatLevel,
+          child: SizedBox(
+            width: 100,
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
                 width: 100,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    width: 100,
-                    height: 30,
-                    color: Colors.transparent,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-                        const SizedBox(width: 2,),
-                        if (newEx.seatLevel == null)
-                          Text("-", style: _style,)
-                        else
-                          Text(newEx.seatLevel.toString(), style: _style,)
-                      ],
-                    ),
-                  ),
+                height: 30,
+                color: Colors.transparent,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                    const SizedBox(width: 2,),
+                    if (newEx.seatLevel == null)
+                      Text("-", style: _style,)
+                    else
+                      Text(newEx.seatLevel.toString(), style: _style,)
+                  ],
                 ),
               ),
-              onConfirm: (dynamic value){
-                if(value is int){
-                  newEx.seatLevel = value;
-                  cnRunningWorkout.refresh();
-                }
-                else if(value == AppLocalizations.of(context)!.clear){
-                  newEx.seatLevel = null;
-                  cnRunningWorkout.refresh();
-                }
-              },
-            context: context
+            ),
           ),
-          const Spacer()
-        ],
+          onConfirm: (dynamic value){
+            if(value is int){
+              newEx.seatLevel = value;
+              cnRunningWorkout.refresh();
+            }
+            else if(value == AppLocalizations.of(context)!.clear){
+              newEx.seatLevel = null;
+              cnRunningWorkout.refresh();
+            }
+          },
+        context: context
       ),
     );
   }
@@ -1224,6 +1277,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       child: Row(
         children: [
           getSelectRestInSeconds(
+              currentTime: newEx.restInSeconds,
               context: context,
               child: SizedBox(
                 width: 100,

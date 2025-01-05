@@ -464,14 +464,17 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                             autovalidateMode: AutovalidateMode.onUserInteraction,
                             validator: (value) {
                               value = value?.trim();
+                              bool first = workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name);
+                              bool second = cnNewWorkout.workout.isTemplate;
+                              bool third = cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase();
                               if (value == null || value.isEmpty) {
                                 return AppLocalizations.of(context)!.panelWoEnterName;
                               }
                               /// Check if the workout name already exists, but only when the current name is different from the
                               /// initializing name. Otherwise editing an existing workout could lead to error
-                              else if(cnNewWorkout.workout.isTemplate  &&                                                           /// only check if template
-                                      cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase() && /// Name is not equal to initial name when opening editing
-                                      workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name)                          /// Name exists in database
+                              else if(first   &&                                                       /// only check if template
+                                      second && /// Name is not equal to initial name when opening editing
+                                      third                          /// Name exists in database
                               ){
                                 return AppLocalizations.of(context)!.panelWoAlreadyExists;
                               }
@@ -1050,11 +1053,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     }
     else if (_formKey.currentState!.validate()){
       vibrateConfirm();
+      _formKey.currentState?.reset();
       cnNewWorkout.updateExercisesOrderInWorkoutObject();
       if(!cnNewWorkout.isUpdating){
         cnNewWorkout.workout.isTemplate = true;
       }
-      cnNewWorkout.removeEmptyLinksFromWorkout();
+      cnNewWorkout.workout.removeEmptyLinksFromWorkout();
       cnNewWorkout.workout.saveToDatabase();
       if(cnNewWorkout.applyNameChanges){
         changeSameNameWorkouts();
@@ -1084,7 +1088,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
       }
       cnNewWorkout.closePanel(doClear: true);
       cnNewExercisePanel.clear();
-      _formKey.currentState?.reset();
       saveCurrentData(cnConfig);
     }
   }
@@ -1139,7 +1142,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   bool applyNameChanges = false;
   bool isSickDays = false;
   double keepShowingPanelHeight = Platform.isAndroid? 180 : 212;
-  double keepShowingPanelHeightSickDays = Platform.isAndroid? 230 : 262;
+  double keepShowingPanelHeightSickDays = Platform.isAndroid? 210 : 242;
   Map<String, String> exerciseNewNameMapping = {};
   late CnHomepage cnHomepage;
   late CnWorkouts cnWorkouts;
@@ -1318,11 +1321,11 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     workout.exercises.addAll(orderedExercises);
   }
 
-  void removeEmptyLinksFromWorkout(){
-    workout.linkedExercises = workout.linkedExercises.where((linkName) {
-      return workout.exercises.any((exercise) => exercise.linkName == linkName);
-    }).toList();
-  }
+  // void removeEmptyLinksFromWorkout(){
+  //   workout.linkedExercises = workout.linkedExercises.where((linkName) {
+  //     return workout.exercises.any((exercise) => exercise.linkName == linkName);
+  //   }).toList();
+  // }
 
   void updateExercisesLinks(){
     /// Gives the exercises their correct linkName, if they need one, otherwise null
@@ -1367,6 +1370,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     Workout? workout,
     ObSickDays? sickDays
   }){
+
     if (workout != null){
       isSickDays = false;
       Workout w = Workout.clone(workout);

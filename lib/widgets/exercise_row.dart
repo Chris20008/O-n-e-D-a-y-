@@ -20,7 +20,7 @@ class ExerciseRow extends StatelessWidget {
     this.flexRight = 7
   });
 
-  final double _widthOfField = 36;
+  final double _widthOfField = 44;
   final double _height = 60;
 
   @override
@@ -54,43 +54,10 @@ class ExerciseRow extends StatelessWidget {
                               children: [
 
                                 /// Background of single set
-                                Container(
-                                  width: _widthOfField,
-                                  decoration: BoxDecoration(
-                                      color: Colors.grey[500]!.withOpacity(0.2),
-                                      borderRadius: BorderRadius.circular(5),
-                                      // border: Border.all(color: Colors.black, width: 1)
-                                    // border: BoxBorder
-                                  ),
-                                ),
+                                backgroundSingleSet,
 
                                 /// One Column for each set (weight / amount)
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      OverflowSafeText(
-                                          "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight}",
-                                          maxLines: 1,
-                                          fontSize: 14,
-                                          minFontSize: 9
-                                      ),
-                                      Container(
-                                        // color: Colors.grey[900],
-                                        color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
-                                        height: 1,
-                                        width: 15,
-                                      ),
-                                      // Container(
-                                      //   color: Colors.grey[900],
-                                      //   height: 1,
-                                      //   width: 15,
-                                      // ),
-                                      Text("${set.amount}")
-                                    ],
-                                  ),
-                                )
+                                dataSingleSet(set, exercise)
                               ],
                             ),
                           ),

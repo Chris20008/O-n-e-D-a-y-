@@ -1,4 +1,4 @@
-import 'package:fitness_app/assets/custom_icons/my_icons.dart';
+import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:flutter/cupertino.dart';

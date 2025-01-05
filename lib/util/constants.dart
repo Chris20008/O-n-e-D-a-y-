@@ -41,6 +41,79 @@ const List<int> predefinedTimes = [
   300
 ];
 
+const int maxTutorialStep = 999999;
+
+Widget backgroundSingleSet = Container(
+  decoration: BoxDecoration(
+    color: Colors.grey[500]!.withOpacity(0.2),
+    borderRadius: BorderRadius.circular(5),
+  ),
+);
+
+Widget dataSingleSet(SingleSet set, Exercise exercise){
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 1),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        // Row(
+        //   mainAxisSize: MainAxisSize.min,
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     Expanded(
+        //       child: OverflowSafeText(
+        //           (set.weightAsTrimmedDouble?? " ").toString(),
+        //           maxLines: 1,
+        //           fontSize: 14,
+        //           minFontSize: 9,
+        //         textAlign: TextAlign.right
+        //       ),
+        //     ),
+        //     Text(exercise.categoryIsCardio()? "km":"kg", textScaler: TextScaler.linear(0.6),)
+        //   ],
+        // ),
+        Expanded(
+          child: Center(
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: getTextStyleForSetView((set.weightAsTrimmedDouble?? " ").toString())),
+                  TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: TextStyle(fontSize: 8))
+                ]
+              )
+            ),
+          ),
+        ),
+        Container(
+          color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
+          height: 1,
+          width: 20,
+        ),
+        // Text(
+        //     exercise.categoryIsReps()
+        //         ? "${set.amount}"
+        //         : (set.amountAsTime?? "").toString(),
+        //     style: (getTextStyleForSetView(exercise.categoryIsReps()
+        //       ? "${set.amount}"
+        //       : (set.amountAsTime?? "").toString()))
+        // ),
+        Expanded(
+          child: Center(
+            child: OverflowSafeText(
+              exercise.categoryIsReps()
+                ? "${set.amount}"
+                  : (set.amountAsTime?? "").toString(),
+              maxLines: 1,
+              fontSize: 15,
+              minFontSize: 9,
+            ),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
 String mapRestInSecondsToString({required int restInSeconds, bool short = true}){
   if (restInSeconds == 0) {
     return ("-");
@@ -171,19 +244,71 @@ Widget standardDialog({
   );
 }
 
-TextStyle getTextStyleForTextField(String text, {Color? color}){
+TextStyle getTextStyleForTextField(String text, {Color? color, bool sizeSmall = true}){
+  if(sizeSmall){
+    return TextStyle(
+      fontSize: text.length < 4
+          ?18
+          : text.length < 5
+          ? 16
+          : text.length < 6
+          ? 13 : 10,
+      color: color,
+    );
+  }
   return TextStyle(
     fontSize: text.length < 4
     ?18
     : text.length < 5
-    ? 16
+    ? 17
     : text.length < 6
-    ? 13 : 10,
+    ? 14 : 12,
     color: color,
   );
 }
 
+TextStyle getTextStyleForSetView(String text){
+  return TextStyle(
+    fontSize: text.length < 4
+        ? 15
+        : text.length < 5
+        ? 13
+        : text.length < 6
+        ? 11 : 9,
+    fontWeight: text.length > 4? FontWeight.w500 : FontWeight.w400
+  );
+}
+
+/// returns a List with '(timeAsInt, timeAsString)'
+List<dynamic> parseTextControllerAmountToTime(dynamic amount){
+  String value = amount.toString().replaceAll(":", "");
+  int timeAsInt = int.tryParse(value)?? 0;
+  /// if greater 5 digits remove the last until 5
+  while(timeAsInt > 99999){
+    timeAsInt = (timeAsInt/10).floor();
+  }
+  String timeAsString = timeAsInt.toString().padLeft(5, "0");
+  String hours = timeAsString.substring(0, 1);
+  String minutes = timeAsString.substring(1, 3);
+  String seconds = timeAsString.substring(3, 5);
+  // if((int.tryParse(minutes)??60) > 59){
+  //   minutes = "59";
+  // }
+  // if((int.tryParse(seconds)??60) > 59){
+  //   seconds = "59";
+  // }
+  if(timeAsString.substring(0, 1) == "0"){
+    timeAsString = "$minutes:$seconds";
+  }
+  else{
+    timeAsString = "$hours:$minutes:$seconds";
+  }
+
+  return [timeAsInt, timeAsString];
+}
+
 Widget getSelectRestInSeconds({
+  required int currentTime,
   required Widget child,
   required Function(dynamic value) onConfirm,
   required BuildContext context
@@ -195,7 +320,8 @@ Widget getSelectRestInSeconds({
       List times = List.from(predefinedTimes);
       times.insert(0, AppLocalizations.of(context)!.clear);
       times.insert(1, AppLocalizations.of(context)!.custom);
-      List<PullDownMenuItem> timeWidgets = List.generate(times.length, (index) => PullDownMenuItem(
+      List<PullDownMenuItem> timeWidgets = List.generate(times.length, (index) => PullDownMenuItem.selectable(
+          selected: (currentTime == times[index]) || (currentTime > 0 && times[index] == AppLocalizations.of(context)!.custom && !times.contains(currentTime)),
           title: times[index] is String? times[index] : mapRestInSecondsToString(restInSeconds: times[index], short: false),
           onTap: () {
             HapticFeedback.selectionClick();
@@ -224,6 +350,7 @@ Widget getSelectRestInSeconds({
 }
 
 Widget getSelectSeatLevel({
+  required int? currentSeatLevel,
   required Widget child,
   required Function(dynamic value) onConfirm,
   required BuildContext context
@@ -234,7 +361,8 @@ Widget getSelectSeatLevel({
     itemBuilder: (context) {
       List seatLevels = List.generate(21, (index) => index);
       seatLevels.insert(0, AppLocalizations.of(context)!.clear);
-      List<PullDownMenuItem> seatLevelWidgets = List.generate(seatLevels.length, (index) => PullDownMenuItem(
+      List<PullDownMenuItem> seatLevelWidgets = List.generate(seatLevels.length, (index) => PullDownMenuItem.selectable(
+          selected: currentSeatLevel == null? false : currentSeatLevel == seatLevels[index],
           title: seatLevels[index] is String? seatLevels[index] : seatLevels[index].toString(),
           onTap: () {
             HapticFeedback.selectionClick();
@@ -249,6 +377,44 @@ Widget getSelectSeatLevel({
         const PullDownMenuDivider.large(),
         ...seatLevelWidgets.sublist(1)
       ];
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    ),
+  );
+}
+
+Widget getSelectCategory({
+  Key? key,
+  required Widget child,
+  required Function(int category) onConfirm,
+  required BuildContext context,
+  required int currentCategory
+}) {
+  return PullDownButton(
+    key: key,
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List categories = categoryMapping.keys.toList();
+      List<PullDownMenuItem> seatLevelWidgets = List.generate(categories.length, (index) => PullDownMenuItem.selectable(
+          selected: currentCategory == categories[index],
+          title: categoryMapping[categories[index]],
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(categories[index]);
+            });
+          })
+      );
+      return seatLevelWidgets;
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -933,8 +1099,6 @@ Widget getCloudOptionsColumn({
       ],
     );
 }
-
-
 
 Widget getBackupDialogWelcomeScreen({required BuildContext context}){
   return Column(
