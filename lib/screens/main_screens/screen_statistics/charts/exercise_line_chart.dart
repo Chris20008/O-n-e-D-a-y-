@@ -65,13 +65,19 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
   int animationTime = 500;
+  bool firstLoad = true;
+  int countSteps = 0;
+  double percent = 0.7;
 
   @override
   Widget build(BuildContext context) {
+    List<FlSpot> tempSpotsMaxWeight = [];
+    List<FlSpot> tempSpotsAvgWeightPerSet = [];
+    List<FlSpot> tempSickDaysSpots = [];
 
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
-    if(t == null){
-      return SizedBox(
+    if(t == null && cnScreenStatistics.selectedExerciseName != null){
+      return const SizedBox(
         height: 200,
         child: Center(
           child: Text(
@@ -81,12 +87,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         ),
       );
     }
-    // for (ObExercise ex in t){
-    //   print(ex.name);
-    //   print(ex.category);
-    //   print(ex.id);
-    //   print("");
-    // }
 
     width = MediaQuery.of(context).size.width;
     minDate = cnScreenStatistics.minDate.toDate();
@@ -128,21 +128,19 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     maxDate = cnScreenStatistics.maxDate.toDate();
 
     /// Set Spots Max Weight
-    spotsMaxWeight.clear();
     maxWeights?.forEach((date, weight) {
       final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
-      spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
+      tempSpotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
     /// Set Spots Total Moved Weight
-    spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
       final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       if(percent.isNaN){
         percent = totalWeight / maxTotalWeight;
         if(percent.isNaN){
-          spotsAvgWeightPerSet.add(FlSpot(xCoordinate, 0));
+          tempSpotsAvgWeightPerSet.add(FlSpot(xCoordinate, 0));
           return;
         }
       }
@@ -152,13 +150,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       if(percent > maxPercent){
         maxPercent = percent;
       }
-      spotsAvgWeightPerSet.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSpotsAvgWeightPerSet.add(FlSpot(xCoordinate, maxWeight * percent));
     });
-    // print("MAXX: $currentVisibleDays");
-
-    if(spotsMaxWeight.isEmpty){
-      return const SizedBox();
-    }
 
     minY = maxWeight * minPercent - 10 < 0? 0 : maxWeight * minPercent - 5;
     maxY = maxWeight*maxPercent + 5;
@@ -173,16 +166,41 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       verticalStepSize = 20;
     }
 
-    sickDaysSpots.clear();
     for (ObSickDays sickDay in cnScreenStatistics.allSickDays){
       double xCoordinate = sickDay.startDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       double percent = 5;
-      sickDaysSpots.add(FlSpot(xCoordinate, -5));
-      sickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
       xCoordinate = sickDay.endDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
-      sickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
-      sickDaysSpots.add(FlSpot(xCoordinate, -5));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
+
+    if(firstLoad){
+      tempSpotsMaxWeight = List.generate(tempSpotsMaxWeight.length, (index) => FlSpot(tempSpotsMaxWeight[index].x, minY));
+      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, minY));
+      Future.delayed(const Duration(milliseconds: 100), (){
+        setState(() {
+          firstLoad = false;
+        });
+      });
+    }
+
+    if(!cnScreenStatistics.showAvgWeightPerSetLine){
+      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, -5));
+    } else{
+      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, tempSpotsAvgWeightPerSet[index].y));
+    }
+
+    if(!cnScreenStatistics.showSickDays){
+      tempSickDaysSpots = List.generate(tempSickDaysSpots.length, (index) => FlSpot(tempSickDaysSpots[index].x, -5));
+    } else{
+      tempSickDaysSpots = List.generate(tempSickDaysSpots.length, (index) => FlSpot(tempSickDaysSpots[index].x, tempSickDaysSpots[index].y));
+    }
+
+    spotsMaxWeight = tempSpotsMaxWeight;
+    spotsAvgWeightPerSet = tempSpotsAvgWeightPerSet;
+    sickDaysSpots = tempSickDaysSpots;
 
     return Column(
       children: [
@@ -437,7 +455,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               if (index == 2 || (!cnScreenStatistics.showAvgWeightPerSetLine && index == 1)) {
                 return null;
               }
-              // print(e.value.barIndex);
               LineBarSpot spot = e.value;
               return LineTooltipItem(
                   textAlign: TextAlign.left,
@@ -524,7 +541,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             ),
           ),
         ),
-        if(cnScreenStatistics.showAvgWeightPerSetLine)
+        // if(cnScreenStatistics.showAvgWeightPerSetLine)
           LineChartBarData(
             isCurved: false,
             curveSmoothness: 0.1,
