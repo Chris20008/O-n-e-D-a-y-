@@ -151,7 +151,7 @@ class CnWorkouts extends ChangeNotifier {
   final GlobalKey keyAddWorkout = GlobalKey();
   List<bool> opened = [];
   ScrollController scrollController = ScrollController();
-  late final AnimationController animationControllerWorkoutPanel;
+  // late final AnimationController animationControllerWorkoutsScreen;
 
   void refreshAllWorkouts() async{
     List<ObWorkout> obWorkouts = await objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).order(ObWorkout_.name).build().findAsync();

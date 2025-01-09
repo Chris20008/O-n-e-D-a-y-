@@ -466,6 +466,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                               },
                                               itemCount: newEx.sets.length,
                                               itemBuilder: (BuildContext context, int indexSet) {
+
+                                                final TextEditingController? weightController = cnRunningWorkout.textControllers[newEx.name]?[indexSet][0];
+                                                final TextEditingController? amountController = cnRunningWorkout.textControllers[newEx.name]?[indexSet][1];
+
                                                 SingleSet set = templateEx.sets[indexSet];
                                                 Widget? child;
                                                 child = Padding(
@@ -489,7 +493,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                         ),
 
                                                         /// Button to copy templates data
-                                                        getButtonInsertTemplatesData(set: set, newEx: newEx, indexSet: indexSet),
+                                                        getButtonInsertTemplatesData(set: set, newEx: newEx, indexSet: indexSet, weightController: weightController, amountController: amountController),
 
                                                         /// Weight and Amount
                                                         Expanded(
@@ -505,15 +509,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                 child: Center(
                                                                   child: TextField(
                                                                     keyboardAppearance: Brightness.dark,
-                                                                    maxLength: (cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text.contains(".")?? true)? 6 : 4,
+                                                                    maxLength: (weightController?.text.contains(".")?? true)? 6 : 4,
                                                                     textAlign: TextAlign.center,
                                                                     keyboardType: const TextInputType.numberWithOptions(
                                                                         decimal: true,
                                                                         signed: false
                                                                     ),
-                                                                    controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][0],
+                                                                    controller: weightController,
                                                                     onTap: (){
-                                                                      cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][0].value.text.length);
+                                                                      weightController?.selection =  TextSelection(baseOffset: 0, extentOffset: weightController.value.text.length);
                                                                     },
                                                                     decoration: InputDecoration(
                                                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -524,7 +528,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         hintText: "${set.weight.toString().endsWith(".0")? set.weight?.toInt() : set.weight?? ""}",
                                                                         hintStyle: getTextStyleForTextField((set.weight?? "").toString(), color: Colors.white.withOpacity(0.15), sizeSmall: false)
                                                                     ),
-                                                                    style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text, sizeSmall: false),
+                                                                    style: getTextStyleForTextField(weightController?.text?? "", sizeSmall: false),
                                                                     onChanged: (value){
                                                                       value = value.trim();
                                                                       if(value.isNotEmpty){
@@ -532,9 +536,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         final newValue = double.tryParse(value);
                                                                         newEx.sets[indexSet].weight = newValue;
                                                                         if(newValue == null){
-                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].clear();
+                                                                          weightController?.clear();
                                                                         } else{
-                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = value;
+                                                                          weightController?.text = value;
                                                                         }
                                                                       }
                                                                       else{
@@ -562,9 +566,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         decimal: false,
                                                                         signed: false
                                                                     ),
-                                                                    controller: cnRunningWorkout.textControllers[newEx.name]?[indexSet][1],
+                                                                    controller: amountController,
                                                                     onTap: (){
-                                                                      cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnRunningWorkout.textControllers[newEx.name]![indexSet][1].value.text.length);
+                                                                      amountController?.selection =  TextSelection(baseOffset: 0, extentOffset: amountController.value.text.length);
                                                                     },
                                                                     decoration: InputDecoration(
                                                                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -579,7 +583,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                         )
                                                                         // hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
                                                                     ),
-                                                                    style: getTextStyleForTextField(cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text, sizeSmall: false),
+                                                                    style: getTextStyleForTextField(amountController?.text?? "", sizeSmall: false),
                                                                     onChanged: (value){
                                                                       value = value.trim();
                                                                       /// For Reps
@@ -588,7 +592,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                           final newValue = int.tryParse(value);
                                                                           newEx.sets[indexSet].amount = newValue;
                                                                           if(newValue == null){
-                                                                            cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].clear();
+                                                                            amountController?.clear();
                                                                           }
                                                                           if(value.length == 1){
                                                                             setState(() => {});
@@ -603,10 +607,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                                       else{
                                                                         List result = parseTextControllerAmountToTime(value);
                                                                         if(result[0] <= 0){
-                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = "";
+                                                                          amountController?.text = "";
                                                                           newEx.sets[indexSet].amount = null;
                                                                         } else{
-                                                                          cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = result[1];
+                                                                          amountController?.text = result[1];
                                                                           newEx.sets[indexSet].amount = result[0];
                                                                         }
                                                                         setState(() {});
@@ -842,7 +846,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   Widget getButtonInsertTemplatesData({
     required SingleSet set,
     required Exercise newEx,
-    required int indexSet
+    required int indexSet,
+    required TextEditingController? weightController,
+    required TextEditingController? amountController
   }){
 
     String getText(){
@@ -858,11 +864,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       }
     }
 
+    final weightTextIsEmpty = weightController?.text.isEmpty?? false;
+    final amountTextIsEmpty = weightController?.text.isEmpty?? false;
+
     return Expanded(
         flex: 2,
         child: IgnorePointer(
-          ignoring: !(cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-              cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty &&
+          ignoring: !(weightTextIsEmpty &&
+              amountTextIsEmpty &&
               set.weight != null &&
               set.amount != null),
           child: SizedBox(
@@ -877,17 +886,17 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
               onPressed: (){
                 if(set.weight != null &&
                     set.amount != null &&
-                    cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                    cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty
+                    weightTextIsEmpty &&
+                    amountTextIsEmpty
                 ){
                   vibrateConfirm();
-                  cnRunningWorkout.textControllers[newEx.name]?[indexSet][0].text = (set.weightAsTrimmedDouble?? "").toString();
+                  weightController?.text = (set.weightAsTrimmedDouble?? "").toString();
                   newEx.sets[indexSet].weight = set.weight;
                   if(newEx.categoryIsReps()){
-                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amount!.toString();
+                    amountController?.text = set.amount!.toString();
                   }
                   else{
-                    cnRunningWorkout.textControllers[newEx.name]?[indexSet][1].text = set.amountAsTime.toString();
+                    amountController?.text = set.amountAsTime.toString();
                   }
                   newEx.sets[indexSet].amount = set.amount;
                   cnRunningWorkout.refresh();
@@ -903,8 +912,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   maxLines: 1,
                   getText(),
                   style: TextStyle(
-                      color: (cnRunningWorkout.textControllers[newEx.name]![indexSet][0].text.isEmpty &&
-                          cnRunningWorkout.textControllers[newEx.name]![indexSet][1].text.isEmpty)
+                      color: (weightTextIsEmpty &&
+                          amountTextIsEmpty)
                           ?Colors.white
                           : Colors.white.withOpacity(0.2)
                   ),

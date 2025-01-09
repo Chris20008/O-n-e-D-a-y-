@@ -1111,79 +1111,82 @@ Widget getDialogCantChangeCategory(BuildContext context){
 }
 
 Widget getBackupDialogWelcomeScreen({required BuildContext context}){
-  return Column(
-    children: [
+  return Padding(
+    padding: EdgeInsets.only(right: 15),
+    child: Column(
+      children: [
 
-      /// Save Backup Automatic
-      CupertinoListTile(
-        leading: const Icon(Icons.sync),
-        // title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
-        title: OverflowSafeText(
-            maxLines: 1,
-            AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
-            style: const TextStyle(color: Colors.white)
+        /// Save Backup Automatic
+        CupertinoListTile(
+          leading: const Icon(Icons.sync),
+          // title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+          title: OverflowSafeText(
+              maxLines: 1,
+              AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+              style: const TextStyle(color: Colors.white)
+          ),
         ),
-      ),
-      Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation)),
-      const SizedBox(height: 15),
+        Padding(padding: const EdgeInsets.only(left: 30) ,child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation)),
+        const SizedBox(height: 15),
 
-      /// Connect with Cloud
-      CupertinoListTile(
-        leading: const Icon(Icons.cloud_done),
-        title: OverflowSafeText(
-            maxLines: 1,
-            Platform.isAndroid
-                ? AppLocalizations.of(context)!.settingsConnectGoogleDrive
-                : AppLocalizations.of(context)!.settingsConnectiCloud,
-            style: const TextStyle(color: Colors.white)
+        /// Connect with Cloud
+        CupertinoListTile(
+          leading: const Icon(Icons.cloud_done),
+          title: OverflowSafeText(
+              maxLines: 1,
+              Platform.isAndroid
+                  ? AppLocalizations.of(context)!.settingsConnectGoogleDrive
+                  : AppLocalizations.of(context)!.settingsConnectiCloud,
+              style: const TextStyle(color: Colors.white)
+          ),
         ),
-      ),
-      Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text(Platform.isAndroid
-              ? AppLocalizations.of(context)!.settingsConnectGoogleDriveExplanation
-              : AppLocalizations.of(context)!.settingsConnectiCloudExplanation
-          )
-      ),
-      const SizedBox(height: 15),
+        Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: Text(Platform.isAndroid
+                ? AppLocalizations.of(context)!.settingsConnectGoogleDriveExplanation
+                : AppLocalizations.of(context)!.settingsConnectiCloudExplanation
+            )
+        ),
+        const SizedBox(height: 15),
 
-      /// Save Backups in Cloud
-      CupertinoListTile(
-        leading: const Icon(Icons.cloud_upload),
-        title: OverflowSafeText(
-            maxLines: 1,
-            Platform.isAndroid
-                ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
-                : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
-            style: const TextStyle(color: Colors.white)
+        /// Save Backups in Cloud
+        CupertinoListTile(
+          leading: const Icon(Icons.cloud_upload),
+          title: OverflowSafeText(
+              maxLines: 1,
+              Platform.isAndroid
+                  ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
+                  : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
+              style: const TextStyle(color: Colors.white)
+          ),
         ),
-      ),
-      Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text(Platform.isAndroid
-              ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDriveExplanation
-              : AppLocalizations.of(context)!.settingsSaveBackupsiCloudExplanation
-          )
-      ),
-      const SizedBox(height: 15),
+        Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: Text(Platform.isAndroid
+                ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDriveExplanation
+                : AppLocalizations.of(context)!.settingsSaveBackupsiCloudExplanation
+            )
+        ),
+        const SizedBox(height: 15),
 
-      /// Sync multiple Devices
-      CupertinoListTile(
-        leading: iconSyncMultipleDevices,
-        title: OverflowSafeText(
-            maxLines: 1,
-            AppLocalizations.of(context)!.settingsSyncMultipleDevices,
-            style: const TextStyle(color: Colors.white)
+        /// Sync multiple Devices
+        CupertinoListTile(
+          leading: iconSyncMultipleDevices,
+          title: OverflowSafeText(
+              maxLines: 1,
+              AppLocalizations.of(context)!.settingsSyncMultipleDevices,
+              style: const TextStyle(color: Colors.white)
+          ),
         ),
-      ),
-      Padding(
-          padding: const EdgeInsets.only(left: 30),
-          child: Text(Platform.isAndroid
-              ? AppLocalizations.of(context)!.settingsSyncMultipleDevicesExplanationGoogleDrive
-              : AppLocalizations.of(context)!.settingsSyncMultipleDevicesExplanationiCloud,
-          )
-      ),
-      const SizedBox(height: 15),
-    ],
+        Padding(
+            padding: const EdgeInsets.only(left: 30),
+            child: Text(Platform.isAndroid
+                ? AppLocalizations.of(context)!.settingsSyncMultipleDevicesExplanationGoogleDrive
+                : AppLocalizations.of(context)!.settingsSyncMultipleDevicesExplanationiCloud,
+            )
+        ),
+        const SizedBox(height: 15),
+      ],
+    ),
   );
 }

@@ -15,12 +15,14 @@ import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_add_workout.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -58,6 +60,7 @@ class MyApp extends StatefulWidget {
 class MyAppState extends State<MyApp> {
   final Language _language = languages[LANGUAGES.en.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
+  final GlobalKey k = GlobalKey();
 
   void setLocale({LANGUAGES? language, String? languageCode, CnConfig? config}) {
     final Language lan = languages[languageCode]?? languages[language?.value]?? languages[LANGUAGES.en.value];
@@ -78,7 +81,6 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers:[
-        // ChangeNotifierProvider(create: (context) => CnConfig()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
@@ -127,7 +129,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
+class _MyHomePageState extends State<MyHomePage>{
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
@@ -140,14 +142,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
   late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
-  late final AnimationController _animationControllerWorkoutPanel = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-  );
-  late final AnimationController _animationControllerSettingPanel = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 300),
-  );
+  // late final AnimationController _animationControllerWorkoutsScreen = AnimationController(
+  //   vsync: this,
+  //   duration: const Duration(milliseconds: 300),
+  // );
+  // late final AnimationController _animationControllerStatisticsScreen = AnimationController(
+  //   vsync: this,
+  //   duration: const Duration(milliseconds: 300),
+  // );
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
   bool mainIsInitialized = false;
@@ -160,8 +162,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
 
   @override
   void dispose() {
-    _animationControllerWorkoutPanel.dispose();
-    _animationControllerSettingPanel.dispose();
+    // _animationControllerWorkoutsScreen.dispose();
+    // _animationControllerStatisticsScreen.dispose();
     super.dispose();
   }
 
@@ -199,8 +201,10 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
-    cnWorkouts.animationControllerWorkoutPanel = _animationControllerWorkoutPanel;
-    cnScreenStatistics.animationControllerSettingPanel = _animationControllerSettingPanel;
+    // cnWorkouts.animationControllerWorkoutsScreen = _animationControllerWorkoutsScreen;
+    // cnHomepage.animationControllers["ScreenWorkouts"] = _animationControllerWorkoutsScreen;
+    // cnScreenStatistics.animationControllerStatisticsScreen = _animationControllerStatisticsScreen;
+    // cnHomepage.animationControllers["ScreenStatistics"] = _animationControllerStatisticsScreen;
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
 
@@ -357,44 +361,55 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                 if(cnBottomMenu.index != 2)
                   Stack(
                     children: [
-                      /// Animiated Builder to Reduce Size of left and middle screen when workout panel is opened
-                      AnimatedBuilder(
-                        animation: _animationControllerWorkoutPanel,
-                        builder: (context, child) {
-                          double scale = 1.0 - (_animationControllerWorkoutPanel.value * (Platform.isAndroid? 0.15 : 0.2));
-                          double borderRadius = 26 - (scale*10-9)*20;
-                          borderRadius = borderRadius > 25 ? 25 : borderRadius;
-                          return Transform.scale(
-                            scale: scale,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(borderRadius),
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                        gradient: LinearGradient(
-                                            begin: Alignment.topRight,
-                                            end: Alignment.bottomLeft,
-                                            colors: [
-                                              Color(0xffc26a0e),
-                                              Color(0xbb110a02)
-                                            ]
-                                        )
-                                    ),
-                                  child: Container(
-                                      color: Colors.black.withOpacity((_animationControllerWorkoutPanel.value * 1.1).clamp(0, 1)),
-                                      child: child
-                                  ),
-                                )
-                            ),
-                          );
-                        },
-                        child: AnimatedCrossFade(
-                            firstChild: const ScreenWorkoutHistory(),
-                            secondChild: const ScreenWorkout(),
-                            crossFadeState: cnBottomMenu.index == 0?
-                            CrossFadeState.showFirst:
-                            CrossFadeState.showSecond,
-                            duration: const Duration(milliseconds: 100)
-                        ),
+                      /// Animated Builder to Reduce Size of left and middle screen when workout panel is opened
+                      // AnimatedBuilder(
+                      //   animation: _animationControllerWorkoutsScreen,
+                      //   builder: (context, child) {
+                      //     double scale = 1.0 - (_animationControllerWorkoutsScreen.value * (Platform.isAndroid? 0.15 : 0.2));
+                      //     double borderRadius = 26 - (scale*10-9)*20;
+                      //     borderRadius = borderRadius > 25 ? 25 : borderRadius;
+                      //     return Transform.scale(
+                      //       scale: scale,
+                      //       child: ClipRRect(
+                      //         borderRadius: BorderRadius.circular(borderRadius),
+                      //           child: Container(
+                      //             decoration: const BoxDecoration(
+                      //                   gradient: LinearGradient(
+                      //                       begin: Alignment.topRight,
+                      //                       end: Alignment.bottomLeft,
+                      //                       colors: [
+                      //                         Color(0xffc26a0e),
+                      //                         Color(0xbb110a02)
+                      //                       ]
+                      //                   )
+                      //               ),
+                      //             child: Container(
+                      //                 color: Colors.black.withOpacity((_animationControllerWorkoutsScreen.value * 1.1).clamp(0, 1)),
+                      //                 child: child
+                      //             ),
+                      //           )
+                      //       ),
+                      //     );
+                      //   },
+                      //   child: AnimatedCrossFade(
+                      //       firstChild: const ScreenWorkoutHistory(),
+                      //       secondChild: const ScreenWorkout(),
+                      //       crossFadeState: cnBottomMenu.index == 0?
+                      //       CrossFadeState.showFirst:
+                      //       CrossFadeState.showSecond,
+                      //       duration: const Duration(milliseconds: 100)
+                      //   ),
+                      // ),
+                      InitialAnimatedScreen(
+                          animationControllerName: "ScreenWorkouts",
+                          child: AnimatedCrossFade(
+                              firstChild: const ScreenWorkoutHistory(),
+                              secondChild: const ScreenWorkout(),
+                              crossFadeState: cnBottomMenu.index == 0?
+                              CrossFadeState.showFirst:
+                              CrossFadeState.showSecond,
+                              duration: const Duration(milliseconds: 100)
+                          ),
                       ),
 
                       if(cnConfig.useSpotify)
@@ -411,56 +426,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin{
                             ),
                           ),
                         ),
-
-                      /// Overlay with opacity, when workout panel is opened
-                      /// We use this instead of the panel own backdropEnabled feature, because
-                      /// we scale down the sizes of the workout panel when the exercise panel is opened
-                      /// However the backdrop of the workout panel would be scaled down as well
-                      /// so we use this AnimatedBuilder which is not scaled down, to provide a
-                      /// backdrop while the workout panel is opened
-                      IgnorePointer(
-                        ignoring: true,
-                        child: AnimatedBuilder(
-                          animation: _animationControllerWorkoutPanel,
-                          builder: (BuildContext context, Widget? child) {
-                            double opacity = _animationControllerWorkoutPanel.value;
-                            /// Scales the opacity from 0 -> 0.5 when animationController is between 0 - 0.5
-                            /// And back from 0.5 - > 0 when animationController is between 0.5 - 1
-                            /// We do that, because on exercise panel the backdropEnabled is True, so we don't
-                            /// need this anymore when exercise panel is opened because it would become to dark
-                            /// with backdrop AND this AnimatedBuilder together
-                            opacity = opacity > 0.5 ? 1 - opacity : opacity;
-                            opacity = opacity * 0.5;
-                            return Container(
-                              color: Colors.black.withOpacity(opacity),
-                            );
-                          },
-                        ),
-                      ),
-                      AnimatedBuilder(
-                          animation: _animationControllerWorkoutPanel,
-                          builder: (context, child) {
-                            double scale = 1.0 - (_animationControllerWorkoutPanel.value * 0.2) + (0.5 * 0.2);
-                            scale = scale > 1 ? 1 : scale;
-                            double topPadding = -(_animationControllerWorkoutPanel.value-0.5)*110;
-                            topPadding = topPadding > 0 ? 0 : topPadding;
-                            // print("TOP PADDING: $topPadding");
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 0),
-                              transform: Matrix4.translationValues(0, topPadding, 0),
-                              child: Transform.scale(
-                                scale: scale,
-                                child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                                    child: Container(
-                                        child: child
-                                    )
-                                ),
-                              ),
-                            );
-                          },
-                          child: const NewWorkOutPanel()
-                      ),
+                      const NewWorkOutPanel(),
                       const NewExercisePanel(),
                     ],
                   )
@@ -655,6 +621,7 @@ class CnHomepage extends ChangeNotifier {
   bool syncWithCloudCompleted = false;
   double? percent;
   String msg = "";
+  Map<String, AnimationController> animationControllers = {};
 
   updateSyncStatus(double percent){
     this.percent = percent;
@@ -693,3 +660,78 @@ class CnHomepage extends ChangeNotifier {
     }
   }
 }
+
+// class CustomCupertinoPageRoute<T> extends CupertinoPageRoute<T>{
+//   CustomCupertinoPageRoute({
+//     required WidgetBuilder builder,
+//     required this.previousWidget,
+//     String? title,
+//     RouteSettings? settings,
+//     bool maintainState = true,
+//     bool fullscreenDialog = false,
+//   }) : super(
+//     builder: builder,
+//     title: title,
+//     settings: settings,
+//     maintainState: maintainState,
+//     fullscreenDialog: fullscreenDialog,
+//   );
+//   final Widget previousWidget;
+//   late DragStartDetails _dragStartDetails;
+//   late DragUpdateDetails _dragUpdateDetails;
+//
+//
+//   @override
+//   Widget buildTransitions(
+//       BuildContext context,
+//       Animation<double> animation,
+//       Animation<double> secondaryAnimation,
+//       Widget child,
+//       ) {
+//
+//     // final heroTransition = super.buildTransitions(
+//     //   context,
+//     //   animation,
+//     //   secondaryAnimation,
+//     //   child,
+//     // );
+//
+//     return GestureDetector(
+//       onVerticalDragStart: (details) {
+//         _dragStartDetails = details;
+//       },
+//       onVerticalDragUpdate: (details) {
+//         _dragUpdateDetails = details;
+//
+//         final primaryDelta = details.primaryDelta;
+//         if (primaryDelta != null) {
+//           final progress = primaryDelta / MediaQuery.of(context).size.height;
+//           controller?.value -= progress;
+//         }
+//       },
+//       onVerticalDragEnd: (details) {
+//         controller?.reverse(from: controller?.value).then((value) => Navigator.of(context).pop());
+//         // Navigator.of(context).pop();
+//       },
+//       child: Stack(
+//         children: [
+//           Container(color: Colors.black),
+//           previousWidget,
+//           SlideTransition(
+//             position: Tween<Offset>(
+//               begin: const Offset(0.0, 1.0),
+//               end: Offset.zero,
+//             ).animate(animation),
+//             child: SlideTransition(
+//               position: Tween<Offset>(
+//                 begin: Offset.zero,
+//                 end: const Offset(0.0, 1.0),
+//               ).animate(secondaryAnimation),
+//               child: child,
+//             ),
+//           ),
+//         ],
+//       )
+//     );
+//   }
+// }

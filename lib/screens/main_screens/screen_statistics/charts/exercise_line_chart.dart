@@ -138,7 +138,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       double percent = (totalWeight*1.1) / maxTotalWeight;
       final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       if(percent.isNaN){
-        percent = totalWeight / maxTotalWeight;
+        percent = totalWeight / (maxTotalWeight.isNaN? 1 : maxTotalWeight);
         if(percent.isNaN){
           tempSpotsAvgWeightPerSet.add(FlSpot(xCoordinate, 0));
           return;
@@ -154,7 +154,14 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     });
 
     minY = maxWeight * minPercent - 10 < 0? 0 : maxWeight * minPercent - 5;
+    minY = minY.isNaN? -4 : minY;
     maxY = maxWeight*maxPercent + 5;
+    print("MINY");
+    print(percent);
+    print(minY);
+    if(minY == maxY){
+      maxY += 50;
+    }
     final weightRange = maxY - minY;
     if(weightRange < 25){
       verticalStepSize = 2;
@@ -169,10 +176,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     for (ObSickDays sickDay in cnScreenStatistics.allSickDays){
       double xCoordinate = sickDay.startDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       double percent = 5;
+      double factor = maxWeight > 0? maxWeight : 4;
       tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
-      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       xCoordinate = sickDay.endDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
-      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
 
@@ -187,7 +195,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     }
 
     if(!cnScreenStatistics.showAvgWeightPerSetLine){
-      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, -5));
+      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, minY-5));
+      // tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, -5));
     } else{
       tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, tempSpotsAvgWeightPerSet[index].y));
     }
@@ -417,7 +426,9 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       color: gradientColors[0]
     );
     String text;
-    if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
+    print("AXIS VALUE");
+    print(value);
+    if(value.toInt() % verticalStepSize == 0 && value == value.toInt()){
       text = '${value.toInt()} KG';
     } else{
       return Container();
