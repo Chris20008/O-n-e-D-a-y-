@@ -37,8 +37,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   final _color = const Color(0xff1c1001);
 
-  PanelController testController = PanelController();
-
   @override
   Widget build(BuildContext context) {
     cnNewExercise = Provider.of<CnNewExercisePanel>(context);
@@ -335,8 +333,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                         shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                                                     ),
                                                     onPressed: () {
-                                                      // addSet();
-                                                      testController.open();
+                                                      addSet();
                                                     },
                                                     icon: const Icon(
                                                       Icons.add,
