@@ -1100,6 +1100,16 @@ Widget getCloudOptionsColumn({
     );
 }
 
+Widget getDialogCantChangeCategory(BuildContext context){
+  return standardDialog(
+    context: context,
+    maxWidth: 400,
+    widthFactor: 0.6,
+    maxHeight: 680,
+    child: Center(child: Text("You can't change the Category of an existing exercise\nPlease create an new exercise with another name", textAlign: TextAlign.center,)),
+  );
+}
+
 Widget getBackupDialogWelcomeScreen({required BuildContext context}){
   return Column(
     children: [
@@ -1177,29 +1187,3 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
     ],
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

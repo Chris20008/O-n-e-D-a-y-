@@ -579,7 +579,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 : - MediaQuery.of(context).size.width,
             0,
             0),
-        curve: Curves.easeInOut,
+        curve: Curves.easeOut,
         child: child
     );
   }

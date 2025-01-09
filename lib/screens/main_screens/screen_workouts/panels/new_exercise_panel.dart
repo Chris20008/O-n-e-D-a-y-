@@ -681,19 +681,33 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
         if(cnNewExercise.exercise.isNewExercise())
           getExerciseCategorySelector()
         else
-          SizedBox(
-            height: 35,
-            child: Row(
-              children: [
-                Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-                const SizedBox(width: 8,),
-                Text("Kategorie", style: _style),
-                const Spacer(),
-                const Spacer(flex: 4,),
-                Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-                const SizedBox(width: 20),
-                // trailingArrow
-              ],
+          Listener(
+            onPointerUp: (PointerUpEvent event)async{
+              HapticFeedback.selectionClick();
+              await showDialog(
+                  context: context,
+                  builder: (context){
+                    return Center(
+                        child: getDialogCantChangeCategory(context)
+                    );
+                  }
+              );
+              HapticFeedback.selectionClick();
+            },
+            child: SizedBox(
+              height: 35,
+              child: Row(
+                children: [
+                  Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                  const SizedBox(width: 8,),
+                  Text("Kategorie", style: _style),
+                  const Spacer(),
+                  const Spacer(flex: 4,),
+                  Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+                  const SizedBox(width: 20),
+                  // trailingArrow
+                ],
+              ),
             ),
           )
       ],

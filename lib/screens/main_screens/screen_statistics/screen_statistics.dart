@@ -589,7 +589,9 @@ class CnScreenStatistics extends ChangeNotifier {
     maxVisibleDays = 1900;
     offsetMinX = 0;
     offsetMaxX = 0;
-    lineChartKey = UniqueKey();
+    if(withKeyReset){
+      lineChartKey = UniqueKey();
+    }
   }
 
   Future<void> cache() async{
