@@ -84,71 +84,19 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
           animationControllerName: "ScreenStatistics",
           child: SafeArea(
             bottom: false,
-            child: Column(
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: false,
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               children: [
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    children: [
-                      getHeader(),
-                      // const SizedBox(height: 20,),
-                      ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
-                      const SafeArea(top:false, child: SizedBox(height: 30,)),
-                    ],
-                  ),
-                ),
+                getHeader(),
+                // const SizedBox(height: 20,),
+                ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
+                const SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
           ),
         ),
-        // AnimatedBuilder(
-        //   animation: cnScreenStatistics.animationControllerStatisticsScreen,
-        //   builder: (context, child) {
-        //     double scale = 1.0 - ((cnScreenStatistics.animationControllerStatisticsScreen.value) * (Platform.isAndroid? 0.15 : 0.2));
-        //     double borderRadius = 26 - (scale*10-9)*20;
-        //     borderRadius = borderRadius > 25 ? 25 : borderRadius;
-        //     return Transform.scale(
-        //       scale: scale,
-        //       child: ClipRRect(
-        //           borderRadius: BorderRadius.circular(borderRadius),
-        //           child: Container(
-        //               decoration: const BoxDecoration(
-        //                   gradient: LinearGradient(
-        //                       begin: Alignment.topRight,
-        //                       end: Alignment.bottomLeft,
-        //                       colors: [
-        //                         Color(0xffc26a0e),
-        //                         Color(0xbb110a02)
-        //                       ]
-        //                   )
-        //               ),
-        //               child: Container(
-        //                   color: Colors.black.withOpacity((cnScreenStatistics.animationControllerStatisticsScreen.value * 1.1).clamp(0, 1)),
-        //                   child: child
-        //               )
-        //           )
-        //       ),
-        //     );
-        //   },
-        //   child: SafeArea(
-        //     bottom: false,
-        //     child: Column(
-        //       children: [
-        //         Expanded(
-        //           child: ListView(
-        //             padding: const EdgeInsets.symmetric(horizontal: 5),
-        //             children: [
-        //               getHeader(),
-        //               // const SizedBox(height: 20,),
-        //               ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
-        //               const SafeArea(top:false, child: SizedBox(height: 30,)),
-        //             ],
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
         const SettingsPanel(),
       ],
     );
@@ -399,7 +347,6 @@ class CnScreenStatistics extends ChangeNotifier {
   bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
   bool showSickDays = false;
-  bool graphLocked = false;
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
   double offsetMinX = 0;

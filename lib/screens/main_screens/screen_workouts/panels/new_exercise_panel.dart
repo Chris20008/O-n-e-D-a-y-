@@ -506,7 +506,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(),
               Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
               const SizedBox(width: 10),
-              trailingArrow
+              trailingChoice
             ],
           ),
         ),
@@ -591,7 +591,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             const Spacer(flex: 4,),
             Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
             const SizedBox(width: 10),
-            trailingArrow
+            trailingChoice
           ],
         ),
       )
@@ -618,7 +618,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(flex: 4,),
               Text(cnNewExercise.exercise.getCategoryName(), style: _style),
               const SizedBox(width: 10),
-              trailingArrow
+              trailingChoice
             ],
           ),
         )
@@ -708,7 +708,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   const Spacer(flex: 4,),
                   Text(cnNewExercise.exercise.getCategoryName(), style: _style),
                   const SizedBox(width: 20),
-                  // trailingArrow
                 ],
               ),
             ),
@@ -743,6 +742,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               Navigator.pop(context);
             },
             child: const Text('Ok'),
+            isDefaultAction: true,
           ),
           // CupertinoActionSheetAction(
           //   /// This parameter indicates the action would perform

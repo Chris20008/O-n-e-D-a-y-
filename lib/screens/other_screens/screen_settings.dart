@@ -538,7 +538,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               style: const TextStyle(color: Colors.grey, fontSize: 15),
             ),
             const SizedBox(width: 6,),
-            trailingArrow
+            trailingChoice
           ],
         ),
       ),
@@ -586,7 +586,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             children: [
               Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
               const Spacer(),
-              trailingArrow
+              trailingChoice
             ],
           )
       ),
@@ -722,7 +722,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               ),
             ),
             const SizedBox(width: 10),
-            trailingArrow
+            trailingChoice
           ],
         ),
       ),

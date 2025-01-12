@@ -23,7 +23,7 @@ class LocalFilePicker extends StatefulWidget {
 }
 
 class _LocalFilePickerState extends State<LocalFilePicker> {
-  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  // late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context);
@@ -61,60 +61,120 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                             DateTime date = getDateFromFileName(filename);
                             return GestureDetector(
                               onTap: (){
-                                cnStandardPopUp.open(
-                                  confirmText: AppLocalizations.of(context)!.yes,
-                                  cancelText: AppLocalizations.of(context)!.no,
-                                  widthFactor: 0.8,
-                                    context: context,
-                                    child: Column(
-                                      children: [
-                                        Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),),
-                                        const SizedBox(height: 5),
-                                        Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm, textAlign: TextAlign.center, textScaler: const TextScaler.linear(0.9),)
-                                      ],
-                                    ),
-                                    onConfirm: ()async{
-                                      setState(() {
-                                        _isLoadingBackup = true;
-                                      });
-                                      try{
-                                        File file = File(widget.localFiles[index].path);
-                                        await loadBackupFromFile(file, cnHomepage: cnHomepage);
-                                        saveCurrentData(cnConfig);
-                                        tutorialIsRunning = false;
-                                        currentTutorialStep = maxTutorialStep;
-                                        cnConfig.setCurrentTutorialStep(currentTutorialStep);
-                                        cnScreenStatistics.refreshData();
-                                        cnScreenStatistics.resetGraph();
-                                        cnScreenStatistics.refresh();
-                                        Navigator.of(context).pop();
-                                        Fluttertoast.showToast(
-                                            msg: AppLocalizations.of(context)!.backupLoadSuccess,
-                                            toastLength: Toast.LENGTH_LONG,
-                                            gravity: ToastGravity.CENTER,
-                                            timeInSecForIosWeb: 1,
-                                            backgroundColor: Colors.grey[800],
-                                            textColor: Colors.white,
-                                            fontSize: 16.0
-                                        );
-                                      }
-                                      catch (_){
-                                        setState(() {
-                                          _isLoadingBackup = false;
-                                        });
-                                        Fluttertoast.showToast(
-                                            msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
-                                            toastLength: Toast.LENGTH_LONG,
-                                            gravity: ToastGravity.CENTER,
-                                            timeInSecForIosWeb: 1,
-                                            backgroundColor: Colors.grey[800],
-                                            textColor: Colors.white,
-                                            fontSize: 16.0
-                                        );
-                                      }
+                                BuildContext currentContext = context;
+                                showCupertinoModalPopup<void>(
+                                  context: context,
+                                  builder: (BuildContext context) => CupertinoActionSheet(
+                                    cancelButton: getActionSheetCancelButton(context),
+                                    title: Text(AppLocalizations.of(context)!.settingsBackupLoad),
+                                    message: Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm),
+                                    actions: <Widget>[
+                                      CupertinoActionSheetAction(
+                                        /// This parameter indicates the action would perform
+                                        /// a destructive action such as delete or exit and turns
+                                        /// the action's text color to red.
+                                        isDestructiveAction: true,
+                                        onPressed: ()async{
 
-                                    }
+                                          Navigator.of(context).pop();
+                                          setState(() {
+                                            _isLoadingBackup = true;
+                                          });
+                                          try{
+                                            File file = File(widget.localFiles[index].path);
+                                            await loadBackupFromFile(file, cnHomepage: cnHomepage);
+                                            saveCurrentData(cnConfig);
+                                            tutorialIsRunning = false;
+                                            currentTutorialStep = maxTutorialStep;
+                                            cnConfig.setCurrentTutorialStep(currentTutorialStep);
+                                            cnScreenStatistics.refreshData();
+                                            cnScreenStatistics.resetGraph();
+                                            cnScreenStatistics.refresh();
+                                            Fluttertoast.showToast(
+                                                msg: AppLocalizations.of(currentContext)!.backupLoadSuccess,
+                                                toastLength: Toast.LENGTH_LONG,
+                                                gravity: ToastGravity.CENTER,
+                                                timeInSecForIosWeb: 1,
+                                                backgroundColor: Colors.grey[800],
+                                                textColor: Colors.white,
+                                                fontSize: 16.0
+                                            );
+                                            Navigator.of(currentContext).pop();
+                                          }
+                                          catch (_){
+                                            setState(() {
+                                              _isLoadingBackup = false;
+                                            });
+                                            Fluttertoast.showToast(
+                                                msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
+                                                toastLength: Toast.LENGTH_LONG,
+                                                gravity: ToastGravity.CENTER,
+                                                timeInSecForIosWeb: 1,
+                                                backgroundColor: Colors.grey[800],
+                                                textColor: Colors.white,
+                                                fontSize: 16.0
+                                            );
+                                          }
+                                        },
+                                        child: Text(AppLocalizations.of(context)!.yes),
+                                      ),
+                                    ],
+                                  ),
                                 );
+                                // cnStandardPopUp.open(
+                                //   confirmText: AppLocalizations.of(context)!.yes,
+                                //   cancelText: AppLocalizations.of(context)!.no,
+                                //   widthFactor: 0.8,
+                                //     context: context,
+                                //     child: Column(
+                                //       children: [
+                                //         Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),),
+                                //         const SizedBox(height: 5),
+                                //         Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm, textAlign: TextAlign.center, textScaler: const TextScaler.linear(0.9),)
+                                //       ],
+                                //     ),
+                                //     onConfirm: ()async{
+                                //       setState(() {
+                                //         _isLoadingBackup = true;
+                                //       });
+                                //       try{
+                                //         File file = File(widget.localFiles[index].path);
+                                //         await loadBackupFromFile(file, cnHomepage: cnHomepage);
+                                //         saveCurrentData(cnConfig);
+                                //         tutorialIsRunning = false;
+                                //         currentTutorialStep = maxTutorialStep;
+                                //         cnConfig.setCurrentTutorialStep(currentTutorialStep);
+                                //         cnScreenStatistics.refreshData();
+                                //         cnScreenStatistics.resetGraph();
+                                //         cnScreenStatistics.refresh();
+                                //         Navigator.of(context).pop();
+                                //         Fluttertoast.showToast(
+                                //             msg: AppLocalizations.of(context)!.backupLoadSuccess,
+                                //             toastLength: Toast.LENGTH_LONG,
+                                //             gravity: ToastGravity.CENTER,
+                                //             timeInSecForIosWeb: 1,
+                                //             backgroundColor: Colors.grey[800],
+                                //             textColor: Colors.white,
+                                //             fontSize: 16.0
+                                //         );
+                                //       }
+                                //       catch (_){
+                                //         setState(() {
+                                //           _isLoadingBackup = false;
+                                //         });
+                                //         Fluttertoast.showToast(
+                                //             msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
+                                //             toastLength: Toast.LENGTH_LONG,
+                                //             gravity: ToastGravity.CENTER,
+                                //             timeInSecForIosWeb: 1,
+                                //             backgroundColor: Colors.grey[800],
+                                //             textColor: Colors.white,
+                                //             fontSize: 16.0
+                                //         );
+                                //       }
+                                //
+                                //     }
+                                // );
                               },
                               child: Container(
                                 margin: const EdgeInsets.symmetric(horizontal: 30),
