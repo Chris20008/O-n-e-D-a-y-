@@ -53,7 +53,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   AnimationController? descendantAnimationController;
   AnimationController? descendantAnimationController2;
-  final maxTopPadding = -45;
+  final maxTopPadding = Platform.isAndroid? -45 : -52;
   late Color color = widget.color?? Theme.of(context).primaryColor;
 
   @override

@@ -42,7 +42,7 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
     return AnimatedBuilder(
       animation: animationController,
       builder: (context, child) {
-        double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.2));
+        double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.245));
         double borderRadius = 26 - (scale*10-9)*20;
         borderRadius = borderRadius > 25 ? 25 : borderRadius;
         double opacity = (animationController.value * 1.1).clamp(0, 1);
