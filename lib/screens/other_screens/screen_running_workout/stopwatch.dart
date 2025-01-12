@@ -1,6 +1,8 @@
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../util/config.dart';
@@ -199,40 +201,13 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                               cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
                             }
                             else{
-                              cnRunningWorkout.controllerRestInSeconds.clear();
-                              cnStandardPopUp.open(
-                                context: context,
-                                onConfirm: (){
-                                  cnStopwatchWidget.countdownTime = int.tryParse(cnRunningWorkout.controllerRestInSeconds.text);
-                                  cnStopwatchWidget.cancelTimer();
-                                  cnRunningWorkout.controllerRestInSeconds.clear();
-                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                    FocusScope.of(context).unfocus();
-                                    cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                                  });
-                                },
-                                onCancel: (){
-                                  cnRunningWorkout.controllerRestInSeconds.clear();
-                                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                    FocusScope.of(context).unfocus();
-                                  });
-                                },
-                                child: TextField(
-                                  keyboardAppearance: Brightness.dark,
-                                  controller: cnRunningWorkout.controllerRestInSeconds,
-                                  keyboardType: TextInputType.number,
-                                  maxLength: 4,
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                    labelText: AppLocalizations.of(context)!.runningWorkoutTimerTimeInSeconds,
-                                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                  ),
-                                  style: const TextStyle(
-                                      fontSize: 18
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              );
+                              showDialogMinuteSecondPicker(
+                                  context: context,
+                                  initialTimeDuration: Duration(minutes: (cnStopwatchWidget.countdownTime??0)~/60, seconds: (cnStopwatchWidget.countdownTime??0)%60),
+                                  onConfirm: (Duration newDuration){
+                                    cnStopwatchWidget.countdownTime = newDuration.inSeconds;
+                                  }
+                              ).then((value) => setState(() {}));
                             }
                           },
                           child: Icon(

@@ -82,6 +82,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                     onPressed: () {
                       cnAnimatedColumn.newEx = Exercise();
                       cnStandardPopUp.open(
+                        padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 5),
                           context: context,
                           onCancel: (){
                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -189,7 +190,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                   const Spacer(flex: 4,),
                   // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
                   const SizedBox(width: 10),
-                  trailingArrow
+                  trailingChoice
                 ],
               ),
             )

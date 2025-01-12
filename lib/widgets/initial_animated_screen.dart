@@ -7,11 +7,13 @@ class InitialAnimatedScreen extends StatefulWidget {
 
   final String animationControllerName;
   final Widget child;
+  final bool backDropEnabled;
 
   const InitialAnimatedScreen({
     super.key,
     required this.animationControllerName,
-    required this.child
+    required this.child,
+    this.backDropEnabled = true
   });
 
   @override
@@ -46,6 +48,9 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
         double borderRadius = 26 - (scale*10-9)*20;
         borderRadius = borderRadius > 25 ? 25 : borderRadius;
         double opacity = (animationController.value * 1.1).clamp(0, 1);
+        if(!widget.backDropEnabled){
+          opacity = 0;
+        }
         return Transform.scale(
           scale: scale,
           child: ClipRRect(

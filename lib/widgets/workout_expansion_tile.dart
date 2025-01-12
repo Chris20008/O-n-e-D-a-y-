@@ -1,5 +1,4 @@
 import 'package:fitness_app/util/constants.dart';
-import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,7 +38,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  // late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -196,39 +195,63 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   }
 
   void openPopUp(String nameNewWorkout){
-    cnStandardPopUp.open(
+    showCupertinoModalPopup<void>(
       context: context,
-      color: const Color(0xff2d2d2d),
-      confirmText: AppLocalizations.of(context)!.yes,
-      cancelText: AppLocalizations.of(context)!.no,
-      onConfirm: () {
-        Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-          cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
-        });
-      },
-      padding: const EdgeInsets.only(top: 20),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Column(
-          children: [
-            OverflowSafeText(
-              AppLocalizations.of(context)!.woAlreadyRunning(cnRunningWorkout.workout.name),
-              textAlign: TextAlign.center
-            ),
-            const SizedBox(height: 10,),
-            OverflowSafeText(
-              AppLocalizations.of(context)!.woAlreadyRunningDelete(nameNewWorkout),
-              maxLines: 6,
-              textAlign: TextAlign.center,
-              fontSize: 14
-              // fontSize:
-            ),
-            const SizedBox(
-              height: 20,
-            )
-          ],
-        ),
+      builder: (BuildContext context) => CupertinoActionSheet(
+        cancelButton: getActionSheetCancelButton(context),
+        title: Text(AppLocalizations.of(context)!.woAlreadyRunning(cnRunningWorkout.workout.name)),
+        message: Text(AppLocalizations.of(context)!.woAlreadyRunningDelete(nameNewWorkout)),
+        actions: <Widget>[
+          CupertinoActionSheetAction(
+            /// This parameter indicates the action would perform
+            /// a destructive action such as delete or exit and turns
+            /// the action's text color to red.
+            isDestructiveAction: true,
+            onPressed: () {
+              Future.delayed(Duration(milliseconds: 200), (){
+                cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+              });
+
+              Navigator.pop(context);
+            },
+            child: Text(AppLocalizations.of(context)!.yes),
+          ),
+        ],
       ),
     );
+    // cnStandardPopUp.open(
+    //   context: context,
+    //   color: const Color(0xff2d2d2d),
+    //   confirmText: AppLocalizations.of(context)!.yes,
+    //   cancelText: AppLocalizations.of(context)!.no,
+    //   onConfirm: () {
+    //     Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+    //       cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+    //     });
+    //   },
+    //   padding: const EdgeInsets.only(top: 20),
+    //   child: Padding(
+    //     padding: const EdgeInsets.symmetric(horizontal: 5),
+    //     child: Column(
+    //       children: [
+    //         OverflowSafeText(
+    //           AppLocalizations.of(context)!.woAlreadyRunning(cnRunningWorkout.workout.name),
+    //           textAlign: TextAlign.center
+    //         ),
+    //         const SizedBox(height: 10,),
+    //         OverflowSafeText(
+    //           AppLocalizations.of(context)!.woAlreadyRunningDelete(nameNewWorkout),
+    //           maxLines: 6,
+    //           textAlign: TextAlign.center,
+    //           fontSize: 14
+    //           // fontSize:
+    //         ),
+    //         const SizedBox(
+    //           height: 20,
+    //         )
+    //       ],
+    //     ),
+    //   ),
+    // );
   }
 }

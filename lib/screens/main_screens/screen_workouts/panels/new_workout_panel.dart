@@ -749,7 +749,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   style: const TextStyle(color: Colors.white)
               ),
               const SizedBox(width: 10),
-              trailingArrow
+              trailingChoice
             ],
           ),
         ),
@@ -1131,23 +1131,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
-        // title: Column(
-        //   children: [
-        //     const Text("Delete Workout"),
-        //     SizedBox(height: 15,)
-        //   ],
-        // ),
+        cancelButton: getActionSheetCancelButton(context),
         message: Text(AppLocalizations.of(context)!.panelWoDeleteWorkout),
-        actions: <CupertinoActionSheetAction>[
-          CupertinoActionSheetAction(
-            /// This parameter indicates the action would be a default
-            /// default behavior, turns the action's text to bold text.
-            isDefaultAction: true,
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.cancel),
-          ),
+        actions: <Widget>[
           CupertinoActionSheetAction(
             /// This parameter indicates the action would perform
             /// a destructive action such as delete or exit and turns
@@ -1157,7 +1143,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               onDelete();
               Navigator.pop(context);
             },
-            child: const Text('Delete'),
+            child: Text(AppLocalizations.of(context)!.delete),
           ),
         ],
       ),

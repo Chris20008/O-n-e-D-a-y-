@@ -97,10 +97,11 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   Widget build(BuildContext context) {
     Widget panel = LayoutBuilder(
         builder: (context, constraints){
+          final maxHeight = constraints.maxHeight - (Platform.isAndroid? 50 : 70);
           return SlidingUpPanel(
               controller: widget.controller,
               defaultPanelState: widget.defaultPanelState,
-              maxHeight: widget.maxHeight?? constraints.maxHeight - (Platform.isAndroid? 50 : 70),
+              maxHeight: (widget.maxHeight?? maxHeight).clamp(0, maxHeight),
               minHeight: widget.minHeight?? 0,
               isDraggable: widget.isDraggable,
               borderRadius: widget.borderRadius,
