@@ -1,5 +1,7 @@
 import 'dart:ui';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
+import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -48,372 +50,372 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           cnNewExercise.closePanel(doClear: false);
         }
       },
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
-        },
-        child: LayoutBuilder(
-          builder: (context, constraints){
-            return SlidingUpPanel(
+      child: Stack(
+        children: [
+          GestureDetector(
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: MySlideUpPanel(
               onPanelSlide: onPanelSlide,
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
-              defaultPanelState: PanelState.CLOSED,
-              maxHeight: constraints.maxHeight - (Platform.isAndroid? 50 : 70),
-              minHeight: 0,
-              backdropEnabled: true,
-              backdropColor: Colors.black,
               backdropOpacity: 0.25,
               color: _color,
-              isDraggable: true,
-              borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-              panel: ClipRRect(
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
-                child: Stack(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-                      child: GestureDetector(
-                        // onTap: () {
-                        //   FocusScope.of(context).unfocus();
-                        // },
-                        child: Column(
-                          children: [
-                            panelTopBar,
-                            const SizedBox(height: 15,),
-                            Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5)),
-                            const SizedBox(height: 10,),
+              animationControllerName: "NewExercisePanel",
+              descendantAnimationControllerName: "NewWorkoutPanel",
+              /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
+              /// when swiping down in  ListView
+              panelBuilder: (sc){
+                cnNewExercise.scrollControllerSets = sc;
+                return ClipRRect(
+                  borderRadius: const BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25)),
+                  child: Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+                        child: GestureDetector(
+                          // onTap: () {
+                          //   FocusScope.of(context).unfocus();
+                          // },
+                          child: Column(
+                            children: [
+                              panelTopBar,
+                              const SizedBox(height: 15,),
+                              Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5)),
+                              const SizedBox(height: 10,),
 
-                            getHeader(),
+                              getHeader(),
 
-                            const SizedBox(height: 25,),
-                            Container(
-                              height: 1,
-                              decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(2)
+                              const SizedBox(height: 25,),
+                              Container(
+                                height: 1,
+                                decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.5),
+                                    borderRadius: BorderRadius.circular(2)
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 15,),
-                            Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
-                              ],
-                            ),
-                            Expanded(
-                              /// ListView of single sets
-                              child: ListView(
-                                controller: cnNewExercise.scrollControllerSets,
-                                shrinkWrap: true,
-                                physics: const BouncingScrollPhysics(),
-                                padding: EdgeInsets.zero,
+                              const SizedBox(height: 15,),
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
                                 children: [
-                                  ReorderableListView.builder(
-                                    physics: const BouncingScrollPhysics(),
-                                    // controller: ScrollController(),
-                                    padding: const EdgeInsets.only(top: 10),
+                                  Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+                                ],
+                              ),
+                              Expanded(
+                                /// ListView of single sets
+                                  child: ListView(
+                                    controller: cnNewExercise.scrollControllerSets,
                                     shrinkWrap: true,
-                                    // key: listViewKey,
-                                    itemCount: cnNewExercise.exercise.sets.length,
-                                    // itemCount: cnNewExercise.exercise.sets.length,
-                                    itemBuilder: (BuildContext context, int index) {
-                                      Widget? child;
-                                      child = Padding(
-                                        padding: const EdgeInsets.only(top: 3, bottom: 3),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                          children: [
-                                            getSet(
-                                                context: context,
-                                                index: index,
-                                                newEx: cnNewExercise.exercise,
-                                                width: 50,
-                                                onConfirm: (){
-                                                  cnNewExercise.refresh();
-                                                }
-                                            ),
-
-                                            /// Weight
-                                            Container(
-                                              width: _widthSetWeightAmount,
-                                              height: 35,
-                                              color: Colors.transparent,
-                                              child: TextField(
-                                                keyboardAppearance: Brightness.dark,
-                                                key: cnNewExercise.ensureVisibleKeys[index][0],
-                                                maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
-                                                style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
-                                                onTap: ()async{
-                                                  cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
-                                                  if(insetsBottom == 0) {
-                                                    await Future.delayed(const Duration(milliseconds: 300));
-                                                  }
-                                                  Scrollable.ensureVisible(
-                                                      cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
-                                                      duration: const Duration(milliseconds: 300),
-                                                      curve: Curves.easeInOut,
-                                                      alignment: 0.2
-                                                  );
-                                                },
-                                                textAlign: TextAlign.center,
-                                                controller: cnNewExercise.controllers[index][0],
-                                                keyboardType: const TextInputType.numberWithOptions(
-                                                    decimal: true,
-                                                    signed: false
-                                                ),
-                                                decoration: InputDecoration(
-                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                  counterText: "",
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                                ),
-                                                onChanged: (value) {
-                                                  value = value.trim();
-                                                  if(value.isNotEmpty){
-                                                    value = validateDoubleTextInput(value);
-                                                    final newValue = double.tryParse(value);
-                                                    cnNewExercise.exercise.sets[index].weight = newValue;
-                                                    if(newValue == null){
-                                                      cnNewExercise.controllers[index][0].clear();
-                                                    } else{
-                                                      cnNewExercise.controllers[index][0].text = value;
+                                    physics: const BouncingScrollPhysics(),
+                                    padding: EdgeInsets.zero,
+                                    children: [
+                                      ReorderableListView.builder(
+                                        physics: const BouncingScrollPhysics(),
+                                        // controller: ScrollController(),
+                                        padding: const EdgeInsets.only(top: 10),
+                                        shrinkWrap: true,
+                                        // key: listViewKey,
+                                        itemCount: cnNewExercise.exercise.sets.length,
+                                        // itemCount: cnNewExercise.exercise.sets.length,
+                                        itemBuilder: (BuildContext context, int index) {
+                                          Widget? child;
+                                          child = Padding(
+                                            padding: const EdgeInsets.only(top: 3, bottom: 3),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              children: [
+                                                getSet(
+                                                    context: context,
+                                                    index: index,
+                                                    newEx: cnNewExercise.exercise,
+                                                    width: 50,
+                                                    onConfirm: (){
+                                                      cnNewExercise.refresh();
                                                     }
-                                                  }
-                                                  else{
-                                                    cnNewExercise.exercise.sets[index].weight = null;
-                                                  }
-                                                  setState(() {});
-                                                },
-                                              ),
-                                            ),
-
-                                            /// Amount
-                                            Container(
-                                              width: _widthSetWeightAmount,
-                                              height: 35,
-                                              color: Colors.transparent,
-                                              child: TextField(
-                                                keyboardAppearance: Brightness.dark,
-                                                key: cnNewExercise.ensureVisibleKeys[index][1],
-                                                maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
-                                                style: cnNewExercise.exercise.categoryIsReps()
-                                                    ? const TextStyle(fontSize: 18)
-                                                    : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
-                                                onTap: ()async{
-                                                  cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
-                                                  if(insetsBottom == 0) {
-                                                    await Future.delayed(const Duration(milliseconds: 300));
-                                                  }
-                                                  Scrollable.ensureVisible(
-                                                      cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
-                                                      duration: const Duration(milliseconds: 300),
-                                                      curve: Curves.easeInOut,
-                                                      alignment: 0.2
-                                                  );
-                                                },
-                                                textAlign: TextAlign.center,
-                                                controller: cnNewExercise.controllers[index][1],
-                                                keyboardType: TextInputType.number,
-                                                decoration: InputDecoration(
-                                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                  counterText: "",
-                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
                                                 ),
-                                                onChanged: (value){
-                                                  value = value.trim();
-                                                  /// For Reps
-                                                  if(cnNewExercise.exercise.categoryIsReps()){
-                                                    if(value.isNotEmpty){
-                                                      final newValue = int.tryParse(value);
-                                                      cnNewExercise.exercise.sets[index].amount = newValue;
-                                                      if(newValue == null){
-                                                        cnNewExercise.controllers[index][1].clear();
+
+                                                /// Weight
+                                                Container(
+                                                  width: _widthSetWeightAmount,
+                                                  height: 35,
+                                                  color: Colors.transparent,
+                                                  child: TextField(
+                                                    keyboardAppearance: Brightness.dark,
+                                                    key: cnNewExercise.ensureVisibleKeys[index][0],
+                                                    maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
+                                                    style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
+                                                    onTap: ()async{
+                                                      cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
+                                                      if(insetsBottom == 0) {
+                                                        await Future.delayed(const Duration(milliseconds: 300));
                                                       }
-                                                    }
-                                                    else{
-                                                      cnNewExercise.exercise.sets[index].amount = null;
-                                                    }
-                                                  }
-                                                  /// For Time
-                                                  else{
-                                                    List result = parseTextControllerAmountToTime(value);
-                                                    cnNewExercise.controllers[index][1].text = result[1];
-                                                    cnNewExercise.exercise.sets[index].amount = result[0];
-                                                    setState(() {});
-                                                  }
-                                                },
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
+                                                      Scrollable.ensureVisible(
+                                                          cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
+                                                          duration: const Duration(milliseconds: 300),
+                                                          curve: Curves.easeInOut,
+                                                          alignment: 0.2
+                                                      );
+                                                    },
+                                                    textAlign: TextAlign.center,
+                                                    controller: cnNewExercise.controllers[index][0],
+                                                    keyboardType: const TextInputType.numberWithOptions(
+                                                        decimal: true,
+                                                        signed: false
+                                                    ),
+                                                    decoration: InputDecoration(
+                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                      counterText: "",
+                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                                    ),
+                                                    onChanged: (value) {
+                                                      value = value.trim();
+                                                      if(value.isNotEmpty){
+                                                        value = validateDoubleTextInput(value);
+                                                        final newValue = double.tryParse(value);
+                                                        cnNewExercise.exercise.sets[index].weight = newValue;
+                                                        if(newValue == null){
+                                                          cnNewExercise.controllers[index][0].clear();
+                                                        } else{
+                                                          cnNewExercise.controllers[index][0].text = value;
+                                                        }
+                                                      }
+                                                      else{
+                                                        cnNewExercise.exercise.sets[index].weight = null;
+                                                      }
+                                                      setState(() {});
+                                                    },
+                                                  ),
+                                                ),
 
-                                      return Slidable(
-                                          key: cnNewExercise.slideableKeys[index],
-                                          // key: UniqueKey(),
-                                          startActionPane: ActionPane(
-                                            motion: const ScrollMotion(),
-                                            dismissible: DismissiblePane(
-                                                onDismissed: () {
-                                                  dismissExercise(index);
-                                                }),
-                                            children: [
-                                              SlidableAction(
-                                                flex:10,
-                                                onPressed: (BuildContext context){
-                                                  dismissExercise(index);
-                                                },
-                                                borderRadius: BorderRadius.circular(15),
-                                                backgroundColor: const Color(0xFFA12D2C),
-                                                foregroundColor: Colors.white,
-                                                icon: Icons.delete,
+                                                /// Amount
+                                                Container(
+                                                  width: _widthSetWeightAmount,
+                                                  height: 35,
+                                                  color: Colors.transparent,
+                                                  child: TextField(
+                                                    keyboardAppearance: Brightness.dark,
+                                                    key: cnNewExercise.ensureVisibleKeys[index][1],
+                                                    maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
+                                                    style: cnNewExercise.exercise.categoryIsReps()
+                                                        ? const TextStyle(fontSize: 18)
+                                                        : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
+                                                    onTap: ()async{
+                                                      cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
+                                                      if(insetsBottom == 0) {
+                                                        await Future.delayed(const Duration(milliseconds: 300));
+                                                      }
+                                                      Scrollable.ensureVisible(
+                                                          cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
+                                                          duration: const Duration(milliseconds: 300),
+                                                          curve: Curves.easeInOut,
+                                                          alignment: 0.2
+                                                      );
+                                                    },
+                                                    textAlign: TextAlign.center,
+                                                    controller: cnNewExercise.controllers[index][1],
+                                                    keyboardType: TextInputType.number,
+                                                    decoration: InputDecoration(
+                                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                                      counterText: "",
+                                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                                    ),
+                                                    onChanged: (value){
+                                                      value = value.trim();
+                                                      /// For Reps
+                                                      if(cnNewExercise.exercise.categoryIsReps()){
+                                                        if(value.isNotEmpty){
+                                                          final newValue = int.tryParse(value);
+                                                          cnNewExercise.exercise.sets[index].amount = newValue;
+                                                          if(newValue == null){
+                                                            cnNewExercise.controllers[index][1].clear();
+                                                          }
+                                                        }
+                                                        else{
+                                                          cnNewExercise.exercise.sets[index].amount = null;
+                                                        }
+                                                      }
+                                                      /// For Time
+                                                      else{
+                                                        List result = parseTextControllerAmountToTime(value);
+                                                        cnNewExercise.controllers[index][1].text = result[1];
+                                                        cnNewExercise.exercise.sets[index].amount = result[0];
+                                                        setState(() {});
+                                                      }
+                                                    },
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+
+                                          return Slidable(
+                                              key: cnNewExercise.slideableKeys[index],
+                                              // key: UniqueKey(),
+                                              startActionPane: ActionPane(
+                                                motion: const ScrollMotion(),
+                                                dismissible: DismissiblePane(
+                                                    onDismissed: () {
+                                                      dismissExercise(index);
+                                                    }),
+                                                children: [
+                                                  SlidableAction(
+                                                    flex:10,
+                                                    onPressed: (BuildContext context){
+                                                      dismissExercise(index);
+                                                    },
+                                                    borderRadius: BorderRadius.circular(15),
+                                                    backgroundColor: const Color(0xFFA12D2C),
+                                                    foregroundColor: Colors.white,
+                                                    icon: Icons.delete,
+                                                  ),
+                                                  SlidableAction(
+                                                    flex: 1,
+                                                    onPressed: (BuildContext context){},
+                                                    backgroundColor: Colors.transparent,
+                                                    foregroundColor: Colors.transparent,
+                                                    label: '',
+                                                  ),
+                                                ],
                                               ),
-                                              SlidableAction(
-                                                flex: 1,
-                                                onPressed: (BuildContext context){},
-                                                backgroundColor: Colors.transparent,
-                                                foregroundColor: Colors.transparent,
-                                                label: '',
+                                              child: child
+                                          );
+                                        },
+                                        proxyDecorator: (
+                                            Widget child, int index, Animation<double> animation) {
+                                          return AnimatedBuilder(
+                                            animation: animation,
+                                            builder: (BuildContext context, Widget? child) {
+                                              final double animValue = Curves.easeInOut.transform(animation.value);
+                                              final double scale = lerpDouble(1, 1.06, animValue)!;
+                                              return Transform.scale(
+                                                scale: scale,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  child: Material(
+                                                      child: Container(
+                                                          padding: const EdgeInsets.only(left: 2),
+                                                          color: Colors.grey.withOpacity(0.1),
+                                                          child: child
+                                                      )
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: child,
+                                          );
+                                        },
+                                        onReorder: (int oldIndex, int newIndex){
+                                          setState(() {
+                                            if (oldIndex < newIndex) {
+                                              newIndex -= 1;
+                                            }
+                                            final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
+                                            cnNewExercise.exercise.sets.insert(newIndex, item);
+                                            final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
+                                            cnNewExercise.controllers.insert(newIndex, weightAndAmount);
+                                          });
+                                        },
+                                      ),
+                                      Column(
+                                        children: [
+                                          const SizedBox(height: 15,),
+
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: IconButton(
+                                                    color: Colors.amber[800],
+                                                    style: ButtonStyle(
+                                                        backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                        shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                                    ),
+                                                    onPressed: () {
+                                                      addSet();
+                                                    },
+                                                    icon: const Icon(
+                                                      Icons.add,
+                                                      size: 20,
+                                                    )
+                                                ),
                                               ),
                                             ],
                                           ),
-                                          child: child
-                                      );
-                                    },
-                                    proxyDecorator: (
-                                        Widget child, int index, Animation<double> animation) {
-                                      return AnimatedBuilder(
-                                        animation: animation,
-                                        builder: (BuildContext context, Widget? child) {
-                                          final double animValue = Curves.easeInOut.transform(animation.value);
-                                          final double scale = lerpDouble(1, 1.06, animValue)!;
-                                          return Transform.scale(
-                                            scale: scale,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(8),
-                                              child: Material(
-                                                  child: Container(
-                                                      padding: const EdgeInsets.only(left: 2),
-                                                      color: Colors.grey.withOpacity(0.1),
-                                                      child: child
-                                                  )
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        child: child,
-                                      );
-                                    },
-                                    onReorder: (int oldIndex, int newIndex){
-                                      setState(() {
-                                        if (oldIndex < newIndex) {
-                                          newIndex -= 1;
-                                        }
-                                        final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
-                                        cnNewExercise.exercise.sets.insert(newIndex, item);
-                                        final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
-                                        cnNewExercise.controllers.insert(newIndex, weightAndAmount);
-                                      });
-                                    },
-                                  ),
-                                  Column(
-                                    children: [
-                                      const SizedBox(height: 15,),
-
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: IconButton(
-                                                color: Colors.amber[800],
-                                                style: ButtonStyle(
-                                                    backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                    shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                                                ),
-                                                onPressed: () {
-                                                  addSet();
-                                                },
-                                                icon: const Icon(
-                                                  Icons.add,
-                                                  size: 20,
-                                                )
-                                            ),
-                                          ),
+                                          SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 60)
                                         ],
-                                      ),
-                                      SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 60)
+                                      )
                                     ],
                                   )
-                                ],
-                              )
-                            ),
-                          ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    /// faded box bottom screen
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: SizedBox(
-                        height: _totalHeightBottomBox,
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            /// faded container
-                            Positioned(
-                              bottom: _heightBottomColoredBox - 0.2,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                height: _totalHeightBottomBox - _heightBottomColoredBox,
-                                decoration: BoxDecoration(
-                                    gradient:  LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          // Colors.transparent,
-                                          // Colors.black,
-                                          _color.withOpacity(0.0),
-                                          _color
-                                        ]
-                                    )
+                      /// faded box bottom screen
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          height: _totalHeightBottomBox,
+                          child: Stack(
+                            alignment: Alignment.bottomCenter,
+                            children: [
+                              /// faded container
+                              Positioned(
+                                bottom: _heightBottomColoredBox - 0.2,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: _totalHeightBottomBox - _heightBottomColoredBox,
+                                  decoration: BoxDecoration(
+                                      gradient:  LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            // Colors.transparent,
+                                            // Colors.black,
+                                            _color.withOpacity(0.0),
+                                            _color
+                                          ]
+                                      )
+                                  ),
                                 ),
                               ),
-                            ),
-                            /// just colored container below faded container
-                            Container(
-                              height: _heightBottomColoredBox,
-                              // color: Colors.black,
-                              color: _color,
-                            ),
-                            /// bottom row with icons
-                            Padding(
-                              padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  myIconButton(
-                                      icon: const Icon(Icons.close),
-                                      onPressed: onCancel
-                                  ),
-                                  myIconButton(
-                                      icon: const Icon(Icons.check),
-                                      onPressed: closePanelAndSaveExercise
-                                  )
-                                ],
+                              /// just colored container below faded container
+                              Container(
+                                height: _heightBottomColoredBox,
+                                // color: Colors.black,
+                                color: _color,
                               ),
-                            )
-                          ],
+                              /// bottom row with icons
+                              Padding(
+                                padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    myIconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: onCancel
+                                    ),
+                                    myIconButton(
+                                        icon: const Icon(Icons.check),
+                                        onPressed: closePanelAndSaveExercise
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+                    ],
+                  ),
+                );
+              },
+            )
+          ),
+        ],
       ),
     );
   }
@@ -425,7 +427,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   }
 
   void onPanelSlide(value){
-    cnWorkouts.animationControllerWorkoutPanel.value = 0.5 + value*0.5;
 
     /// Clear panel when it's completely closed
     if(value == 0){
@@ -434,6 +435,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
       Future.delayed(Duration(milliseconds: cnNewExercise.animationTime), (){
         /// After delay we check again if the value is still null
         if(cnNewExercise.panelController.panelPosition == 0){
+          _formKey.currentState?.reset();
           cnNewExercise.clear();
         }
       });
@@ -504,7 +506,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(),
               Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
               const SizedBox(width: 10),
-              trailingArrow
+              trailingChoice
             ],
           ),
         ),
@@ -589,7 +591,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             const Spacer(flex: 4,),
             Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
             const SizedBox(width: 10),
-            trailingArrow
+            trailingChoice
           ],
         ),
       )
@@ -616,7 +618,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(flex: 4,),
               Text(cnNewExercise.exercise.getCategoryName(), style: _style),
               const SizedBox(width: 10),
-              trailingArrow
+              trailingChoice
             ],
           ),
         )
@@ -684,15 +686,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           Listener(
             onPointerUp: (PointerUpEvent event)async{
               HapticFeedback.selectionClick();
-              await showDialog(
-                  context: context,
-                  builder: (context){
-                    return Center(
-                        child: getDialogCantChangeCategory(context)
-                    );
-                  }
-              );
-              HapticFeedback.selectionClick();
+              _changeCategoryDisabledPopUp(context);
+              // await showDialog(
+              //     context: context,
+              //     builder: (context){
+              //       return Center(
+              //           child: getDialogCantChangeCategory(context)
+              //       );
+              //     }
+              // );
+              // HapticFeedback.selectionClick();
             },
             child: SizedBox(
               height: 35,
@@ -705,7 +708,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                   const Spacer(flex: 4,),
                   Text(cnNewExercise.exercise.getCategoryName(), style: _style),
                   const SizedBox(width: 20),
-                  // trailingArrow
                 ],
               ),
             ),
@@ -713,6 +715,50 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
       ],
     );
   }
+
+  void _changeCategoryDisabledPopUp(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: Column(
+          children: [
+            const Text('Change category', textScaler: TextScaler.linear(1.2)),
+            SizedBox(height: 15,)
+          ],
+        ),
+        message: const Text("You can't change the Category of an existing exercise", textScaler: TextScaler.linear(1.2)),
+        actions: <CupertinoActionSheetAction>[
+          // CupertinoActionSheetAction(
+          //   /// This parameter indicates the action would be a default
+          //   /// default behavior, turns the action's text to bold text.
+          //   isDefaultAction: true,
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: const Text('Default Action'),
+          // ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text('Ok'),
+            isDefaultAction: true,
+          ),
+          // CupertinoActionSheetAction(
+          //   /// This parameter indicates the action would perform
+          //   /// a destructive action such as delete or exit and turns
+          //   /// the action's text color to red.
+          //   isDestructiveAction: true,
+          //   onPressed: () {
+          //     Navigator.pop(context);
+          //   },
+          //   child: const Text('Destructive Action'),
+          // ),
+        ],
+      ),
+    );
+  }
+
 
 }
 
@@ -794,7 +840,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     exerciseNameController = TextEditingController();
     restController = TextEditingController();
     seatLevelController = TextEditingController();
-    key = UniqueKey();
+    // key = UniqueKey();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     refresh();
   }

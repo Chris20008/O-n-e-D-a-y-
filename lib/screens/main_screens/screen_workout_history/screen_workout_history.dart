@@ -34,10 +34,42 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory;
+  /// Overlay to prevent user seeing the jump of the scrollController when initializing the page
+  /// Since ItemScrollController has no initialScrollOffset like the normal ScrollController
+  /// Happens when user switches between ScreenWorkoutHistory and ScreenStatistics
+  bool showOverlay = true;
+
+  void jumpToLastPosition() async{
+    while(!cnWorkoutHistory.scrollController.isAttached){
+      await Future.delayed(const Duration(milliseconds: 1), (){});
+    }
+    cnWorkoutHistory.scrollController.jumpTo(index: cnWorkoutHistory.lastScrollIndex);
+  }
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      /// executes after build
+      cnWorkoutHistory.scrollController.jumpTo(index: cnWorkoutHistory.lastScrollIndex);
+      Future.delayed(const Duration(milliseconds: 10), (){
+        setState(() {
+          showOverlay = false;
+        });
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    cnWorkoutHistory.saveLastScrollIndex();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context);
+
     final size = MediaQuery.of(context).size;
 
     return SafeArea(
@@ -82,11 +114,12 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
                   if(cnWorkoutHistory.workoutsAndSickDays[index] is Workout){
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].date;
+                    // print("");
                     child = WorkoutExpansionTile(
-                        workout: cnWorkoutHistory.workoutsAndSickDays[index],
-                        padding: EdgeInsets.zero,
-                        onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
-                        initiallyExpanded: cnWorkoutHistory.opened[index]
+                      workout: cnWorkoutHistory.workoutsAndSickDays[index],
+                      padding: EdgeInsets.zero,
+                      onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
+                      initiallyExpanded: cnWorkoutHistory.opened[index],
                     );
                   }
                   else if(cnWorkoutHistory.workoutsAndSickDays[index] is ObSickDays){
@@ -195,6 +228,23 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                 },
             ),
 
+            if(showOverlay)
+              /// Overlay to prevent user seeing the jump of the scrollController when initializing the page
+              Container(
+                height: double.maxFinite,
+                width: double.maxFinite,
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          Color(0xffc26a0e),
+                          Color(0xff110a02)
+                        ]
+                    )
+                ),
+              ),
+
             /// Calendar upper right corner
             SafeArea(
                 child: Align(
@@ -225,6 +275,9 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                 index = 0;
                               }
                               if(index != null){
+                                setState(() {
+                                  cnWorkoutHistory.opened[index!] = true;
+                                });
                                 cnWorkoutHistory.scrollController.scrollTo(
                                     index: index,
                                     duration: const Duration(seconds: 1),
@@ -235,8 +288,11 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                         ? 0.3 :  0.1,
                                     curve: Curves.easeInOut
                                 ).then((value) {
-                                  // setState(() {
-                                  //   cnWorkoutHistory.opened[index] = true;
+                                  // Future.delayed(const Duration(seconds: 1), (){
+                                  //   setState(() {
+                                  //     cnWorkoutHistory.opened[index!] = true;
+                                  //     print(cnWorkoutHistory.opened);
+                                  //   });
                                   // });
                                 });
                                 break;
@@ -250,7 +306,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     ),
                   ),
                 )
-            )
+            ),
           ],
         ),
       ),
@@ -387,6 +443,7 @@ class CnWorkoutHistory extends ChangeNotifier {
   List workoutsAndSickDays = [];
   Map<DateTime, MonthSummary> monthSummaries = {};
   ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
+  int lastScrollIndex = 0;
 
   Future refreshAllWorkouts() async{
     List<Workout> tempWorkouts = [];
@@ -503,6 +560,10 @@ class CnWorkoutHistory extends ChangeNotifier {
     // double pos = scrollController.position.pixels;
     refresh();
     // scrollController.jumpTo(pos);
+  }
+
+  void saveLastScrollIndex(){
+    lastScrollIndex = itemPositionsListener.itemPositions.value.sorted((a, b) => a.index.compareTo(b.index)).firstOrNull?.index?? 0;
   }
 
   void refresh(){

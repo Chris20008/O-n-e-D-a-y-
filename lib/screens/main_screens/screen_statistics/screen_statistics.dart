@@ -6,6 +6,7 @@ import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exe
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
+import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -79,53 +80,24 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
     return Stack(
       children: [
-        AnimatedBuilder(
-          animation: cnScreenStatistics.animationControllerSettingPanel,
-          builder: (context, child) {
-            double scale = 1.0 - ((cnScreenStatistics.animationControllerSettingPanel.value/2) * (Platform.isAndroid? 0.15 : 0.2));
-            return Transform.scale(
-              scale: scale,
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                  child: Container(
-                      decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.topRight,
-                              end: Alignment.bottomLeft,
-                              colors: [
-                                Color(0xffc26a0e),
-                                Color(0xbb110a02)
-                              ]
-                          )
-                      ),
-                      child: Container(
-                          color: Colors.black.withOpacity((cnScreenStatistics.animationControllerSettingPanel.value * 0.5).clamp(0, 1)),
-                          child: child
-                      )
-                  )
-              ),
-            );
-          },
+        InitialAnimatedScreen(
+          animationControllerName: "ScreenStatistics",
           child: SafeArea(
             bottom: false,
-            child: Column(
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              shrinkWrap: false,
+              padding: const EdgeInsets.symmetric(horizontal: 5),
               children: [
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    children: [
-                      getHeader(),
-                      // const SizedBox(height: 20,),
-                      ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
-                      const SafeArea(top:false, child: SizedBox(height: 30,)),
-                    ],
-                  ),
-                ),
+                getHeader(),
+                // const SizedBox(height: 20,),
+                ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
+                const SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
           ),
         ),
-        const SettingsPanel()
+        const SettingsPanel(),
       ],
     );
   }
@@ -375,7 +347,6 @@ class CnScreenStatistics extends ChangeNotifier {
   bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
   bool showSickDays = false;
-  bool graphLocked = false;
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
   double offsetMinX = 0;
@@ -383,7 +354,7 @@ class CnScreenStatistics extends ChangeNotifier {
   late CnConfig cnConfig;
 
   /// Settings variables
-  late final AnimationController animationControllerSettingPanel;
+  // late final AnimationController animationControllerStatisticsScreen;
   final PanelController panelControllerSettings = PanelController();
 
   CnScreenStatistics(BuildContext context){

@@ -55,6 +55,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   List<FlSpot> sickDaysSpots = [];
   Offset? pointerA;
   Offset? pointerAPreviousPos;
+  Offset? pointerAStartPositionForGraphLock;
   Offset? pointerB;
   int? pointerAIdentifier;
   int? pointerBIdentifier;
@@ -66,8 +67,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   Map<DateTime, double>? avgWeights;
   int animationTime = 500;
   bool firstLoad = true;
+  bool graphLocked = false;
   int countSteps = 0;
   double percent = 0.7;
+  int? startTimePointerDown;
+  int allowedMovementForGraphLock = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +142,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       double percent = (totalWeight*1.1) / maxTotalWeight;
       final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       if(percent.isNaN){
-        percent = totalWeight / maxTotalWeight;
+        percent = totalWeight / (maxTotalWeight.isNaN? 1 : maxTotalWeight);
         if(percent.isNaN){
           tempSpotsAvgWeightPerSet.add(FlSpot(xCoordinate, 0));
           return;
@@ -154,7 +158,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     });
 
     minY = maxWeight * minPercent - 10 < 0? 0 : maxWeight * minPercent - 5;
+    minY = minY.isNaN? -4 : minY;
     maxY = maxWeight*maxPercent + 5;
+    if(minY == maxY){
+      maxY += 50;
+    }
     final weightRange = maxY - minY;
     if(weightRange < 25){
       verticalStepSize = 2;
@@ -169,10 +177,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     for (ObSickDays sickDay in cnScreenStatistics.allSickDays){
       double xCoordinate = sickDay.startDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
       double percent = 5;
+      double factor = maxWeight > 0? maxWeight : 4;
       tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
-      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       xCoordinate = sickDay.endDate.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
-      tempSickDaysSpots.add(FlSpot(xCoordinate, maxWeight * percent));
+      tempSickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
 
@@ -187,7 +196,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     }
 
     if(!cnScreenStatistics.showAvgWeightPerSetLine){
-      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, -5));
+      tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, minY-5));
     } else{
       tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, tempSpotsAvgWeightPerSet[index].y));
     }
@@ -203,21 +212,13 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     sickDaysSpots = tempSickDaysSpots;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
             const Spacer(),
-            IconButton(
-                onPressed: (){
-                  HapticFeedback.selectionClick();
-                  setState(() {
-                    cnScreenStatistics.graphLocked = !cnScreenStatistics.graphLocked;
-                  });
-                },
-                icon: cnScreenStatistics.graphLocked? const Icon(Icons.lock_outlined) : const Icon(Icons.lock_open),
-            )
           ],
         ),
         const SizedBox(height: 10,),
@@ -228,11 +229,14 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               onPointerDown: (PointerDownEvent details){
                 animationTime = 0;
                 if(pointerAIdentifier == null){
+                  startTimePointerDown = DateTime.now().millisecondsSinceEpoch;
                   pointerAIdentifier = details.pointer;
                   pointerA = details.position;
+                  pointerAStartPositionForGraphLock = details.position;
                   pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
                 }
-                else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier){
+                else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier && !graphLocked){
+                  startTimePointerDown = null;
                   pointerBIdentifier = details.pointer;
                   pointerB = details.position;
                   lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
@@ -242,9 +246,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                 }
               },
               onPointerMove: (PointerMoveEvent details){
-                if(cnScreenStatistics.graphLocked){
+                if(graphLocked){
                   return;
                 }
+
+
                 if(details.pointer == pointerAIdentifier){
                   pointerA = details.position;
                 }
@@ -280,10 +286,21 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                 else if(pointerA != null && pointerB == null && pointerAPreviousPos != null){
                   final totalRange = maxDate.toDate().difference(minDate.toDate()).inDays;
                   final maxValueOffsetMinX = totalRange - cnScreenStatistics.currentVisibleDays + _totalPadding;
-                  // double sensibility = 1/ (currentVisibleDays / 280); /// maybe 300 or calculate with screen width
                   double sensibility = 1/ (cnScreenStatistics.currentVisibleDays / (constraints.maxWidth-_widthAxisTitles));
                   sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
                   final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
+
+                  if(pointerAStartPositionForGraphLock != null && (pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() < allowedMovementForGraphLock){
+                    if(startTimePointerDown != null && (DateTime.now().millisecondsSinceEpoch - startTimePointerDown! > 200)){
+                      graphLocked = true;
+                      HapticFeedback.selectionClick();
+                      return;
+                    }
+                  }
+                  else{
+                    pointerAStartPositionForGraphLock = null;
+                    startTimePointerDown = null;
+                  }
 
                   double newOffsetMinX;
 
@@ -299,6 +316,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
               },
               onPointerUp: (PointerUpEvent details){
+                startTimePointerDown = null;
+                graphLocked = false;
                 // if(details.pointer == pointerAIdentifier){
                   pointerA = null;
                   pointerAPreviousPos = null;
@@ -308,7 +327,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                   pointerB = null;
                   pointerBIdentifier = null;
                 // }
-                Future.delayed(const Duration(milliseconds: 500), (){
+                /// Small delay to allow UI to be drawn at least once and after that reset the animation time back to allow animations
+                Future.delayed(const Duration(milliseconds: 20), (){
                   if(pointerA == null && pointerB == null){
                     animationTime = 500;
                   }
@@ -417,7 +437,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       color: gradientColors[0]
     );
     String text;
-    if(value.toInt() % verticalStepSize == 0 && value.toInt() != 0 && value == value.toInt()){
+    if(value.toInt() % verticalStepSize == 0 && value == value.toInt()){
       text = '${value.toInt()} KG';
     } else{
       return Container();

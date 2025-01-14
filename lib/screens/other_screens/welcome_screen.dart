@@ -1,12 +1,15 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/language_config.dart';
+import 'package:fitness_app/widgets/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../main.dart';
 import '../../util/config.dart';
 import '../../util/constants.dart';
@@ -27,6 +30,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context);
+  PanelController controllerExplainBackups = PanelController();
   final maxIndex = 3;
   int screenIndex = 0;
 
@@ -39,19 +43,55 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).primaryColor,
+      // color: Theme.of(context).primaryColor,
       child: Stack(
         children: [
-          animatedScreen(0, screenOne()),
-          animatedScreen(1, screenTwo()),
-          animatedScreen(2, screenThree()),
-          animatedScreen(3, screenFour()),
-          if(screenIndex < maxIndex)
-            nextButton(),
-          if(screenIndex > 0)
-            backButton(),
-          imprintButton()
-        ]
+          InitialAnimatedScreen(
+            animationControllerName: "ScreenWelcome",
+            child: Container(
+              color: Theme.of(context).primaryColor,
+              child: Stack(
+                children: [
+                  animatedScreen(0, screenOne()),
+                  animatedScreen(1, screenTwo()),
+                  animatedScreen(2, screenThree()),
+                  animatedScreen(3, screenFour()),
+                  if(screenIndex < maxIndex)
+                    nextButton(),
+                  if(screenIndex > 0)
+                    backButton(),
+                  imprintButton(),
+                ]
+              ),
+            ),
+          ),
+          MySlideUpPanel(
+            controller: controllerExplainBackups,
+            animationControllerName: "ExplainBackups",
+            descendantAnimationControllerName: "ScreenWelcome",
+            // backdropEnabled: false,
+            // backdropColor: Colors.blue,
+            // backdropOpacity: 1,
+            panelBuilder: (sc){
+              return Column(
+                children: [
+                  const SizedBox(height: 10,),
+                  panelTopBar,
+                  const SizedBox(height: 10,),
+                  Expanded(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      controller: sc,
+                      children: [
+                        getBackupDialogWelcomeScreen(context: context)
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -226,130 +266,126 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Widget screenTwo(){
-    return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: OverflowSafeText(
-                      maxLines: 1,
-                      Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive : AppLocalizations.of(context)!.welcomeSynciCloud,
-                      fontSize: 25,
-                      textAlign: TextAlign.center,
+    return Stack(
+      children: [
+        SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 2,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: OverflowSafeText(
+                          maxLines: 1,
+                          Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive : AppLocalizations.of(context)!.welcomeSynciCloud,
+                          fontSize: 25,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                OverflowSafeText(
-                  maxLines: 1,
-                  AppLocalizations.of(context)!.welcomeNoAccount,
-                ),
-                OverflowSafeText(
-                  maxLines: 1,
-                  AppLocalizations.of(context)!.welcomeNoAccount2,
-                ),
-                const SizedBox(height: 20),
-                OverflowSafeText(
-                  maxLines: 1,
-                  AppLocalizations.of(context)!.welcomeAwesome,
-                ),
-                const SizedBox(height: 80),
-                OverflowSafeText(
-                  maxLines: 2,
-                  AppLocalizations.of(context)!.welcomeLocalBackups,
-                  textAlign: TextAlign.center
-                ),
-                const SizedBox(height: 20),
-                OverflowSafeText(
-                    maxLines: 2,
-                    Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive2 : AppLocalizations.of(context)!.welcomeSynciCloud2,
-                    textAlign: TextAlign.center
-                ),
-                const SizedBox(height: 40),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                /// Save Backup Automatic
-                CupertinoListTile(
-                  leading: const Icon(Icons.sync),
-                  title: OverflowSafeText(
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    OverflowSafeText(
                       maxLines: 1,
-                      AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
-                      style: const TextStyle(color: Colors.white)
-                  ),
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.automaticBackups,
-                      activeColor: const Color(0xFFC16A03),
-                      onChanged: (value){
-                        setState(() {
-                          if(Platform.isAndroid){
-                            HapticFeedback.selectionClick();
+                      AppLocalizations.of(context)!.welcomeNoAccount,
+                    ),
+                    OverflowSafeText(
+                      maxLines: 1,
+                      AppLocalizations.of(context)!.welcomeNoAccount2,
+                    ),
+                    const SizedBox(height: 20),
+                    OverflowSafeText(
+                      maxLines: 1,
+                      AppLocalizations.of(context)!.welcomeAwesome,
+                    ),
+                    const SizedBox(height: 80),
+                    OverflowSafeText(
+                      maxLines: 2,
+                      AppLocalizations.of(context)!.welcomeLocalBackups,
+                      textAlign: TextAlign.center
+                    ),
+                    const SizedBox(height: 20),
+                    OverflowSafeText(
+                        maxLines: 2,
+                        Platform.isAndroid? AppLocalizations.of(context)!.welcomeSyncGoogleDrive2 : AppLocalizations.of(context)!.welcomeSynciCloud2,
+                        textAlign: TextAlign.center
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    /// Save Backup Automatic
+                    CupertinoListTile(
+                      leading: const Icon(Icons.sync),
+                      title: OverflowSafeText(
+                          maxLines: 1,
+                          AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+                          style: const TextStyle(color: Colors.white)
+                      ),
+                      trailing: CupertinoSwitch(
+                          value: cnConfig.automaticBackups,
+                          activeColor: const Color(0xFFC16A03),
+                          onChanged: (value){
+                            setState(() {
+                              if(Platform.isAndroid){
+                                HapticFeedback.selectionClick();
+                              }
+                              cnConfig.setAutomaticBackups(value);
+                            });
                           }
-                          cnConfig.setAutomaticBackups(value);
-                        });
-                      }
-                  ),
-                ),
-
-                /// Sync with iCloud
-                getCloudOptionsColumn(
-                    cnConfig: cnConfig,
-                    context: context,
-                    refresh: () => setState(() {})
-                ),
-
-                GestureDetector(
-                  onTap: () async{
-                    HapticFeedback.selectionClick();
-                    await showDialog(
-                        context: context,
-                        builder: (context){
-                          return Center(
-                              child: getBackupDialogChild()
-                          );
-                        }
-                    );
-                    HapticFeedback.selectionClick();
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 20),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.info, size:12),
-                        const SizedBox(width: 5,),
-                        Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ],
-            )
+
+                    /// Sync with iCloud
+                    getCloudOptionsColumn(
+                        cnConfig: cnConfig,
+                        context: context,
+                        refresh: () => setState(() {})
+                    ),
+
+                    GestureDetector(
+                      onTap: () async{
+                        HapticFeedback.selectionClick();
+                        controllerExplainBackups.open();
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.info, size:12),
+                            const SizedBox(width: 5,),
+                            Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              ),
+              SizedBox(height: 20,)
+            ],
           ),
-          SizedBox(height: 20,)
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -584,15 +620,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  Widget getBackupDialogChild() {
-    return standardDialog(
-        context: context,
-        maxWidth: 400,
-        widthFactor: 0.9,
-        maxHeight: 680,
-        child: getBackupDialogWelcomeScreen(context: context),
-    );
-  }
+  // Widget getBackupDialogChild() {
+  //   return standardDialog(
+  //       context: context,
+  //       maxWidth: 400,
+  //       widthFactor: 0.9,
+  //       maxHeight: 680,
+  //       child: getBackupDialogWelcomeScreen(context: context),
+  //   );
+  // }
 }
 
 

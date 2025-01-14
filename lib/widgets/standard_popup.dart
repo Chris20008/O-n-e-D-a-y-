@@ -175,7 +175,7 @@ class CnStandardPopUp extends ChangeNotifier {
     required Widget child,
     Function? onConfirm,
     Function? onCancel,
-    EdgeInsets? padding,
+    EdgeInsets padding = const EdgeInsets.all(20),
     String? confirmText,
     String? cancelText,
     Color? color,
@@ -193,7 +193,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.onCancel = onCancel;
     this.onTapOutside = onTapOutside?? onCancel;
     this.child = child;
-    this.padding = padding?? const EdgeInsets.all(20);
+    this.padding = padding;
     this.confirmText = confirmText?? AppLocalizations.of(context)!.ok;
     this.cancelText = cancelText?? AppLocalizations.of(context)!.cancel;
     this.color = color?? Theme.of(context).primaryColor;
