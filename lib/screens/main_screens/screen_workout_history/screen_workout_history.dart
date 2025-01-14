@@ -41,7 +41,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
   void jumpToLastPosition() async{
     while(!cnWorkoutHistory.scrollController.isAttached){
-      print("NOT ATTACHED");
       await Future.delayed(const Duration(milliseconds: 1), (){});
     }
     cnWorkoutHistory.scrollController.jumpTo(index: cnWorkoutHistory.lastScrollIndex);
@@ -278,7 +277,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                               if(index != null){
                                 setState(() {
                                   cnWorkoutHistory.opened[index!] = true;
-                                  print(cnWorkoutHistory.opened);
                                 });
                                 cnWorkoutHistory.scrollController.scrollTo(
                                     index: index,

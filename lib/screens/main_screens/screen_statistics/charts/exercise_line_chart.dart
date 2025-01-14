@@ -291,7 +291,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                   final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
 
                   if(pointerAStartPositionForGraphLock != null && (pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() < allowedMovementForGraphLock){
-                    print((pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs());
                     if(startTimePointerDown != null && (DateTime.now().millisecondsSinceEpoch - startTimePointerDown! > 200)){
                       graphLocked = true;
                       HapticFeedback.selectionClick();

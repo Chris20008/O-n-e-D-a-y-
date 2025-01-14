@@ -1,11 +1,12 @@
 import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../objects/exercise.dart';
@@ -39,6 +40,9 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   late Workout workout;
   List<Exercise> relevantExercises = [];
 
+  /// listen to bottomMenu for height changes
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
+
   @override
   void initState() {
     workout = Workout.clone(widget.workout);
@@ -66,7 +70,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
       descendantAnimationControllerName: "ScreenRunningWorkout",
       backdropEnabled: true,
       controller: widget.controller,
-      maxHeight: ((relevantExercises.length == 1? 192 : relevantExercises.length * 207) + 154),
+      maxHeight: ((relevantExercises.length == 1? 192 : relevantExercises.length * 207) + cnBottomMenu.height + 94),
       panel: Stack(
         children: [
           GestureDetector(
@@ -91,7 +95,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                         color: Theme.of(context).primaryColor,
                         child: ListView.separated(
                             physics: const BouncingScrollPhysics(),
-                            padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : const EdgeInsets.only(bottom: 60, top: 94),
+                            padding: relevantExercises.isEmpty? const EdgeInsets.only(bottom: 50, top: 50) : EdgeInsets.only(bottom: cnBottomMenu.height, top: 94),
                             shrinkWrap: true,
                             separatorBuilder: (context, index){
                               return Padding(
@@ -209,11 +213,11 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                           right: 0,
                           child: Container(
                             color: Theme.of(context).primaryColor,
-                            height: 40,
+                            height: cnBottomMenu.height-10,
                           )
                       ),
                       Positioned(
-                        bottom: 39.5,
+                        bottom: cnBottomMenu.height - 10.5,
                         left: 0,
                         right: 0,
                         child: Container(
@@ -231,62 +235,105 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                         ),
                       ),
                       Positioned(
-                          bottom: -5,
+                          bottom: -10,
                           left: 0,
                           right: 0,
                           child: Row(
                             children: [
                               if(relevantExercises.isNotEmpty)
-                                Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: () {
-                                          bool doUpdate = isCheckedList.any((state) => state);
-                                          if(doUpdate){
-                                            List<int> indexesToRemove = [];
-                                            for (num index in range(isCheckedList.length)){
-                                              if(isCheckedList[index.toInt()] == false){
-                                                indexesToRemove.add(index.toInt());
-                                              }
-                                            }
-                                            for(int index in indexesToRemove.reversed){
-                                              relevantExercises.removeAt(index);
-                                            }
-                                          }
-                                          /// cancel just closes the widget
-                                          widget.onCancel();
-                                          Future.delayed(const Duration(milliseconds: 200), (){
-                                            widget.onConfirm();
-                                            if(doUpdate){
-                                              workout.exercises = relevantExercises;
-                                              workout.updateTemplate();
-                                            }
-                                          });
-                                        },
-                                        style: ButtonStyle(
-                                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        ),
-                                        child: Text(AppLocalizations.of(context)!.confirm)
-                                    )
-                                ),
-                              SizedBox(height: 37, child: verticalGreySpacer),
+                                // Expanded(
+                                //     child: ElevatedButton(
+                                //         onPressed: () {
+                                //           bool doUpdate = isCheckedList.any((state) => state);
+                                //           if(doUpdate){
+                                //             List<int> indexesToRemove = [];
+                                //             for (num index in range(isCheckedList.length)){
+                                //               if(isCheckedList[index.toInt()] == false){
+                                //                 indexesToRemove.add(index.toInt());
+                                //               }
+                                //             }
+                                //             for(int index in indexesToRemove.reversed){
+                                //               relevantExercises.removeAt(index);
+                                //             }
+                                //           }
+                                //           /// cancel just closes the widget
+                                //           widget.onCancel();
+                                //           Future.delayed(const Duration(milliseconds: 200), (){
+                                //             widget.onConfirm();
+                                //             if(doUpdate){
+                                //               workout.exercises = relevantExercises;
+                                //               workout.updateTemplate();
+                                //             }
+                                //           });
+                                //         },
+                                //         style: ButtonStyle(
+                                //             shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                //             surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                //             backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                //             shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                //         ),
+                                //         child: Text(AppLocalizations.of(context)!.confirm)
+                                //     )
+                                // ),
+                              // SizedBox(height: 37, child: verticalGreySpacer),
                               Expanded(
-                                  child: ElevatedButton(
-                                      onPressed: () {
-                                        HapticFeedback.selectionClick();
-                                        widget.onCancel();
-                                      },
-                                      style: ButtonStyle(
-                                          shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                          surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                          shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                      ),
-                                      child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok)
-                                  )
+                                child: CupertinoButton(
+                                  child: SizedBox(
+                                      height: cnBottomMenu.height-10,
+                                      child: Center(child: Text(AppLocalizations.of(context)!.confirm))
+                                  ),
+                                  onPressed: () {
+                                    bool doUpdate = isCheckedList.any((state) => state);
+                                    if(doUpdate){
+                                      List<int> indexesToRemove = [];
+                                      for (num index in range(isCheckedList.length)){
+                                        if(isCheckedList[index.toInt()] == false){
+                                          indexesToRemove.add(index.toInt());
+                                        }
+                                      }
+                                      for(int index in indexesToRemove.reversed){
+                                        relevantExercises.removeAt(index);
+                                      }
+                                    }
+                                    /// cancel just closes the widget
+                                    widget.onCancel();
+                                    Future.delayed(const Duration(milliseconds: 200), (){
+                                      widget.onConfirm();
+                                      if(doUpdate){
+                                        workout.exercises = relevantExercises;
+                                        workout.updateTemplate();
+                                      }
+                                    });
+                                  },
+                                ),
                               ),
+                              Expanded(
+                                child: CupertinoButton(
+                                  child: SizedBox(
+                                      height: cnBottomMenu.height-10,
+                                      child: Center(child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok))
+                                  ),
+                                  onPressed: () {
+                                    HapticFeedback.selectionClick();
+                                    widget.onCancel();
+                                  },
+                                ),
+                              ),
+                              // Expanded(
+                              //     child: ElevatedButton(
+                              //         onPressed: () {
+                              //           HapticFeedback.selectionClick();
+                              //           widget.onCancel();
+                              //         },
+                              //         style: ButtonStyle(
+                              //             shadowColor: MaterialStateProperty.all(Colors.transparent),
+                              //             surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                              //             backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                              //             shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                              //         ),
+                              //         child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok)
+                              //     )
+                              // ),
                             ],
                           )
                       )

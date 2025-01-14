@@ -984,6 +984,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
           controllerSelectorExerciseToUpdate = PanelController();
         });
         Future.delayed(const Duration(milliseconds: (100)), (){
+          FocusManager.instance.primaryFocus?.unfocus();
           controllerSelectorExerciseToUpdate.open();
         });
       });
@@ -1424,7 +1425,6 @@ class CnRunningWorkout extends ChangeNotifier {
   double lastScrollPosition = 0;
 
   CnRunningWorkout(BuildContext context){
-    print("INIT CN RUNNING WORKOUT");
     cnConfig = Provider.of<CnConfig>(context, listen: false);
   }
   
