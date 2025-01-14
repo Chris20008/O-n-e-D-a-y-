@@ -647,7 +647,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             children: [
               Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
               const Spacer(),
-              trailingArrow
+              trailingChoice
             ],
           )
       ),
