@@ -245,7 +245,7 @@ class SingleSet{
   }
 
   dynamic get weightAsTrimmedDouble{
-    if(weight == null || (weight?? 1) %1 != 0){
+    if(weight == null || weight!%1 != 0){
       return weight;
     }
     return weight?.toInt();
