@@ -177,6 +177,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
                                 Expanded(
                                   child: ListView.builder(
+                                    controller: cnRunningWorkout.scrollController,
                                     physics: const BouncingScrollPhysics(),
                                       itemCount: cnRunningWorkout.allItems.length,
                                       itemBuilder: (context, index){
