@@ -193,16 +193,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             Text(
               getLanguageAsString(context),
-              style: TextStyle(
-                  color: const Color(0xFFC16A03),
+              style: const TextStyle(
+                  color: Color(0xFFC16A03),
                   fontSize: 16
               ),
             ),
             const SizedBox(width: 6,),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 14,
-              // color: Colors.amber[800],
+            trailingChoice(
               color: const Color(0xFFC16A03)
             )
           ],

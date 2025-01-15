@@ -37,25 +37,25 @@ class ScreenRunningWorkout extends StatefulWidget {
   State<ScreenRunningWorkout> createState() => _ScreenRunningWorkoutState();
 }
 
-class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with TickerProviderStateMixin {
-  late final AnimationController _controllerSelectorExUpdate = AnimationController(
-    duration: const Duration(milliseconds: 200),
-    vsync: this,
-  );
-  late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
-    parent: _controllerSelectorExUpdate,
-    curve: Curves.decelerate,
-      // curve: Curves.easeOutBack
-  );
-  late final AnimationController _controllerSelectorExPerLink = AnimationController(
-    duration: const Duration(milliseconds: 200),
-    vsync: this,
-  );
-  late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
-    parent: _controllerSelectorExPerLink,
-    curve: Curves.decelerate,
-      // curve: Curves.easeOutBack
-  );
+class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
+  // late final AnimationController _controllerSelectorExUpdate = AnimationController(
+  //   duration: const Duration(milliseconds: 200),
+  //   vsync: this,
+  // );
+  // late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
+  //   parent: _controllerSelectorExUpdate,
+  //   curve: Curves.decelerate,
+  //     // curve: Curves.easeOutBack
+  // );
+  // late final AnimationController _controllerSelectorExPerLink = AnimationController(
+  //   duration: const Duration(milliseconds: 200),
+  //   vsync: this,
+  // );
+  // late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
+  //   parent: _controllerSelectorExPerLink,
+  //   curve: Curves.decelerate,
+  //     // curve: Curves.easeOutBack
+  // );
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
@@ -75,11 +75,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
-  bool showSelectorExerciseToUpdate = false;
-  bool showSelectorExercisePerLink = false;
+  // bool showSelectorExerciseToUpdate = false;
+  // bool showSelectorExercisePerLink = false;
   bool isSavingData = false;
   final _style = const TextStyle(color: Colors.white, fontSize: 15);
+  String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
   PanelController controllerSelectorExerciseToUpdate = PanelController();
+  PanelController controllerSelectorExercisePerLink = PanelController();
 
   @override
   void initState() {
@@ -98,12 +100,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
     //   _controllerSelectorExUpdate.reverse();
     // }
 
-    if(showSelectorExercisePerLink){
-      _controllerSelectorExPerLink.forward();
-    }
-    else{
-      _controllerSelectorExPerLink.reverse();
-    }
+    // if(showSelectorExercisePerLink){
+    //   _controllerSelectorExPerLink.forward();
+    // }
+    // else{
+    //   _controllerSelectorExPerLink.reverse();
+    // }
 
     return PopScope(
       canPop: !isSavingData,
@@ -138,7 +140,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
             alignment: Alignment.center,
             children: [
               InitialAnimatedScreen(
-                backDropEnabled: false,
+                backDropEnabled: true,
                 animationControllerName: "ScreenRunningWorkout",
                 child: Scaffold(
                   extendBody: true,
@@ -281,11 +283,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                                                         ),
                                                       ),
                                                       const SizedBox(width: 10,),
-                                                      const Icon(
-                                                        Icons.arrow_forward_ios,
-                                                        size: 15,
-                                                        color: Colors.white,
-                                                      )
+                                                      trailingChoice(size: 15, color: Colors.white)
+                                                      // const Icon(
+                                                      //   trailingChoice,
+                                                      //   size: 15,
+                                                      //   color: Colors.white,
+                                                      // )
                                                     ],
                                                   )
                                                 ),
@@ -803,73 +806,53 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   ),
                 ),
               const StandardPopUp(),
-              AnimatedCrossFade(
-                firstChild: Container(
-                  color: Colors.black54,
-                ),
-                secondChild: const SizedBox(),
-                crossFadeState: showSelectorExerciseToUpdate || showSelectorExercisePerLink
-                    ? CrossFadeState.showFirst
-                    : CrossFadeState.showSecond,
-                duration: const Duration(milliseconds: 200),
-                layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Positioned(
-                        key: bottomChildKey,
-                        child: bottomChild,
-                      ),
-                      Positioned(
-                        key: topChildKey,
-                        child: topChild,
-                      ),
-                    ],
-                  );
+              // AnimatedCrossFade(
+              //   firstChild: Container(
+              //     color: Colors.black54,
+              //   ),
+              //   secondChild: const SizedBox(),
+              //   crossFadeState: showSelectorExerciseToUpdate || showSelectorExercisePerLink
+              //       ? CrossFadeState.showFirst
+              //       : CrossFadeState.showSecond,
+              //   duration: const Duration(milliseconds: 200),
+              //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+              //     return Stack(
+              //       clipBehavior: Clip.none,
+              //       alignment: Alignment.center,
+              //       children: <Widget>[
+              //         Positioned(
+              //           key: bottomChildKey,
+              //           child: bottomChild,
+              //         ),
+              //         Positioned(
+              //           key: topChildKey,
+              //           child: topChild,
+              //         ),
+              //       ],
+              //     );
+              //   },
+              // ),
+              SelectorExercisesPerLink(
+                controller: controllerSelectorExercisePerLink,
+                key: selectorExercisePerLinkKey,
+                groupedExercises: cnRunningWorkout.groupedExercises,
+                relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
+                onConfirm: confirmSelectorExPerLink,
+                onCancel: (){
+                  controllerSelectorExercisePerLink.close();
                 },
               ),
-              // if(showSelectorExerciseToUpdate)
               SelectorExercisesToUpdate(
                 key: selectorExerciseToUpdateKey,
                 controller: controllerSelectorExerciseToUpdate,
+                descendantAnimationControllerName: descendantNameExerciseToUpdate,
                 workout: Workout.clone(cnRunningWorkout.workout),
                 workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplateNotModifiable),
                 onConfirm: finishWorkout,
                 onCancel: (){
-                  controllerSelectorExerciseToUpdate.close().then((value) => showSelectorExerciseToUpdate = false);
-                  // setState(() {
-                  //   showSelectorExerciseToUpdate = false;
-                  // });
+                  // controllerSelectorExerciseToUpdate.close().then((value) => controllerSelectorExercisePerLink.close());
+                  controllerSelectorExerciseToUpdate.close();
                 },
-              ),
-              // ScaleTransition(
-              //   scale: _animationSelectorExUpdate,
-              //   child: SelectorExercisesToUpdate(
-              //     key: selectorExerciseToUpdateKey,
-              //     workout: Workout.clone(cnRunningWorkout.workout),
-              //     workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplateNotModifiable),
-              //     onConfirm: finishWorkout,
-              //     onCancel: (){
-              //       setState(() {
-              //         showSelectorExerciseToUpdate = false;
-              //       });
-              //     },
-              //   ),
-              // ),
-              ScaleTransition(
-                scale: _animationSelectorExPerLink,
-                child: SelectorExercisesPerLink(
-                  key: selectorExercisePerLinkKey,
-                  groupedExercises: cnRunningWorkout.groupedExercises,
-                  relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
-                  onConfirm: confirmSelectorExPerLink,
-                  onCancel: (){
-                    setState(() {
-                      showSelectorExercisePerLink = false;
-                    });
-                  },
-                ),
               ),
               if (isSavingData)
                 Container(
@@ -971,15 +954,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   }
 
   void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
-    setState(() {
-      showSelectorExercisePerLink = false;
-      cnRunningWorkout.exercisesToRemove = exToRemove?? [];
-    });
+    cnRunningWorkout.exercisesToRemove = exToRemove?? [];
     if(canUpdateTemplate()){
-      // cnStandardPopUp.clear();
       Future.delayed(Duration(milliseconds: delay?? cnStandardPopUp.animationTime), (){
         setState(() {
-          // showSelectorExerciseToUpdate = true;
           selectorExerciseToUpdateKey = UniqueKey();
           controllerSelectorExerciseToUpdate = PanelController();
         });
@@ -1129,9 +1107,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
                   setState(() {
                     cnRunningWorkout.checkMultipleExercisesPerLink();
                     if(cnRunningWorkout.linkWithMultipleExercisesStarted.isNotEmpty){
-                      showSelectorExercisePerLink = true;
+                      descendantNameExerciseToUpdate = "SelectorExercisePerLink";
                       selectorExercisePerLinkKey = UniqueKey();
+                      controllerSelectorExercisePerLink = PanelController();
+                      Future.delayed(const Duration(milliseconds: 100), (){
+                        FocusManager.instance.primaryFocus?.unfocus();
+                        controllerSelectorExercisePerLink.open();
+                      });
                     } else{
+                      descendantNameExerciseToUpdate = "ScreenRunningWorkout";
                       confirmSelectorExPerLink(delay: 0);
                     }
                   });
@@ -1251,19 +1235,25 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
   }
 
   Future finishWorkout() async{
-    int time;
+    int time = 0;
 
     setState(() {
       isSavingData = true;
     });
-    if(cnStandardPopUp.isVisible){
-      cnStandardPopUp.clear();
-      time = cnStandardPopUp.animationTime;
-    } else {
-      time = 0;
+
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    if(controllerSelectorExerciseToUpdate.panelPosition > 0){
+      await controllerSelectorExerciseToUpdate.close();
+      time = 100;
     }
+    if(controllerSelectorExercisePerLink.panelPosition > 0){
+      await Future.delayed(Duration(milliseconds: time));
+      await controllerSelectorExercisePerLink.close();
+    }
+
     /// delay that the popup is closed
-    await Future.delayed(Duration(milliseconds: time), ()async{
+    await Future.delayed(const Duration(milliseconds: 100), ()async{
       cnRunningWorkout.workout.refreshDate();
       cnRunningWorkout.removeNotRelevantExercises();
       cnRunningWorkout.workout.removeEmptyExercises();
@@ -1293,6 +1283,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>  with Ticke
       //     textColor: Colors.white,
       //     fontSize: 16.0
       // );
+      Fluttertoast.showToast(
+          msg: "Workout erfolgreich abgeschlossen 🎉",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+          textColor: Colors.white,
+          fontSize: 16.0
+      );
       vibrateSuccess();
       await stopWorkout(time: 0);
       isSavingData = false;

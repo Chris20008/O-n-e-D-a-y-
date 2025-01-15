@@ -483,7 +483,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.SNACKBAR,
               timeInSecForIosWeb: 1,
-              backgroundColor: Colors.grey[800],
+              backgroundColor: Colors.grey[800]?.withOpacity(0.9),
               textColor: Colors.white,
               fontSize: 16.0
           );
@@ -506,7 +506,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(),
               Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
               const SizedBox(width: 10),
-              trailingChoice
+              trailingChoice()
             ],
           ),
         ),
@@ -591,7 +591,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
             const Spacer(flex: 4,),
             Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
             const SizedBox(width: 10),
-            trailingChoice
+            trailingChoice()
           ],
         ),
       )
@@ -618,7 +618,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
               const Spacer(flex: 4,),
               Text(cnNewExercise.exercise.getCategoryName(), style: _style),
               const SizedBox(width: 10),
-              trailingChoice
+              trailingChoice()
             ],
           ),
         )

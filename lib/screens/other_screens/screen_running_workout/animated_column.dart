@@ -190,7 +190,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                   const Spacer(flex: 4,),
                   // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
                   const SizedBox(width: 10),
-                  trailingChoice
+                  trailingChoice()
                 ],
               ),
             )

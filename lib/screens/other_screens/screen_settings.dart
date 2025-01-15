@@ -127,7 +127,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                           toastLength: Toast.LENGTH_LONG,
                                           gravity: ToastGravity.SNACKBAR,
                                           timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.grey[800],
+                                          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
                                           textColor: Colors.white,
                                           fontSize: 16.0
                                       );
@@ -453,7 +453,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                   toastLength: Toast.LENGTH_LONG,
                   gravity: ToastGravity.CENTER,
                   timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800],
+                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
                   textColor: Colors.white,
                   fontSize: 16.0
               );
@@ -470,7 +470,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                   toastLength: Toast.LENGTH_LONG,
                   gravity: ToastGravity.CENTER,
                   timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800],
+                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
                   textColor: Colors.white,
                   fontSize: 16.0
               );
@@ -538,7 +538,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               style: const TextStyle(color: Colors.grey, fontSize: 15),
             ),
             const SizedBox(width: 6,),
-            trailingChoice
+            trailingChoice()
           ],
         ),
       ),
@@ -586,7 +586,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             children: [
               Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
               const Spacer(),
-              trailingChoice
+              trailingChoice()
             ],
           )
       ),
@@ -647,7 +647,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             children: [
               Text(AppLocalizations.of(context)!.settingsContact, style: const TextStyle(color: Colors.white)),
               const Spacer(),
-              trailingChoice
+              trailingChoice()
             ],
           )
       ),
@@ -679,7 +679,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                       toastLength: Toast.LENGTH_LONG,
                       gravity: ToastGravity.TOP,
                       timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.grey[800],
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
                       textColor: Colors.white,
                       fontSize: 16.0
                   );
@@ -690,7 +690,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                       toastLength: Toast.LENGTH_LONG,
                       gravity: ToastGravity.TOP,
                       timeInSecForIosWeb: 2,
-                      backgroundColor: Colors.grey[800],
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
                       textColor: Colors.white,
                       fontSize: 16.0
                   );
@@ -722,7 +722,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               ),
             ),
             const SizedBox(width: 10),
-            trailingChoice
+            trailingChoice()
           ],
         ),
       ),

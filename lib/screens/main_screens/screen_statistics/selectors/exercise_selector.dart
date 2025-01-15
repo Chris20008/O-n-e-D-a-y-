@@ -92,7 +92,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
             ),
           ),
           const SizedBox(width: 10,),
-          const Icon(Icons.arrow_forward_ios, size: 15, color: Colors.white,)
+          trailingChoice(size: 17, color: Colors.white),
         ],
       ),
     );

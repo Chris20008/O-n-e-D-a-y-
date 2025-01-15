@@ -147,19 +147,21 @@ const trailingArrow = Icon(
   color: Colors.grey,
 );
 
-const trailingChoice = Stack(
-  alignment: Alignment.center,
-  children: [
-    Padding(
-        padding: EdgeInsets.only(bottom: 7),
-        child: Icon(Icons.keyboard_arrow_up, size: 14, color: Colors.grey)
-    ),
-    Padding(
-      padding: EdgeInsets.only(top: 7),
-      child: Icon(Icons.keyboard_arrow_down, size: 14, color: Colors.grey),
-    ),
-  ],
-);
+Widget trailingChoice({double size = 14, Color color = Colors.grey}){
+ return Stack(
+   alignment: Alignment.center,
+   children: [
+     Padding(
+         padding: const EdgeInsets.only(bottom: 7),
+         child: Icon(Icons.keyboard_arrow_up, size: size, color: color)
+     ),
+     Padding(
+       padding: const EdgeInsets.only(top: 7),
+       child: Icon(Icons.keyboard_arrow_down, size: size, color: color),
+     ),
+   ],
+ );
+}
 
 Color? getLinkColor({required String linkName, required Workout workout}){
   int index = workout.linkedExercises.indexOf(linkName);

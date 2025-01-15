@@ -749,7 +749,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   style: const TextStyle(color: Colors.white)
               ),
               const SizedBox(width: 10),
-              trailingChoice
+              trailingChoice()
             ],
           ),
         ),
