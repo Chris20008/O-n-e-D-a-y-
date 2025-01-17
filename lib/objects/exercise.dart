@@ -269,6 +269,19 @@ class SingleSet{
     return timeAsString;
   }
 
+  String? getAmountAsText(int category){
+    switch (category){
+      case 1:
+        return (amount?? "").toString();
+      case 2:
+        return amountAsTime;
+      case 3:
+        return amountAsTime;
+      default:
+        return "";
+    }
+  }
+
   String get amountAsColumn{
     // List res = amountAsTime?.split(":")?? [];
     String res = amountAsTime?.replaceAll(":", "")?? "00000";

@@ -1,5 +1,7 @@
+import 'dart:collection';
 import 'dart:ui';
 import 'package:collection/collection.dart';
+import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
@@ -164,7 +166,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   ): const SizedBox(),
                   body: GestureDetector(
                     onTap: (){
-                      FocusScope.of(context).unfocus();
+                      FocusManager.instance.primaryFocus?.unfocus();
                     },
                     child: Stack(
                       children: [
@@ -612,7 +614,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                     shrinkWrap: true,
                                     separatorBuilder: (BuildContext context, int index) {
                                       if (index == 0){
-                                        return SizedBox();
+                                        return const SizedBox();
                                       }
                                       dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[index+1].value;
                                       if (item is Exercise || item is GroupedExercise){
@@ -623,35 +625,18 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                     cacheExtent: 1000000,
                                     itemCount: cnRunningWorkout.groupedExercises.length,
                                     itemBuilder: (BuildContext context, int indexExercise) {
-                                      print(indexExercise);
                                       Widget? child;
                                       String key = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key;
+                                      dynamic mapValue = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
                                       dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-                                      // if(newEx is !Exercise){
-                                      //   try{
-                                      //     newEx = newEx[cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key]];
-                                      //   }
-                                      //   catch (_){
-                                      //     if(newEx is List && newEx.first is Exercise){
-                                      //       newEx = newEx.first;
-                                      //     } else{
-                                      //       return const SizedBox();
-                                      //     }
-                                      //   }
-                                      // }
-                                      // Exercise templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == newEx.name).first;
-
-                                      // print(item.toString());
-                                      // print(cnRunningWorkout.groupedExercises.length);
                                       if(item is Exercise || item is GroupedExercise){
-                                        print(item is Exercise);
-                                        print(item is GroupedExercise);
-                                        print("");
 
-                                        Exercise newEx = item is Exercise ? item : (item)._exercises.first;
-                                        // if(item is GroupedExercise){
-                                        //   item = item._exercises.first;
-                                        // }
+                                        Exercise? newEx = item is Exercise ? item : (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[key]!);
+
+                                        if(newEx == null){
+                                          return const SizedBox();
+                                        }
+
                                         child = Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -692,21 +677,20 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                   buttonAnchor: PullDownMenuAnchor.start,
                                                   routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
                                                   itemBuilder: (context) {
-                                                    final children = item._exercises.map<PullDownMenuItem>((Exercise value) {
+                                                    final children = item.exercises.map<PullDownMenuItem>((Exercise value) {
                                                       return PullDownMenuItem.selectable(
                                                         title: value.name,
-                                                        // selected: item.name == value.name,
-                                                        selected: false,
+                                                        selected: value.name == (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[key]!)?.name,
+                                                        // selected: false,
                                                         onTap: () {
                                                           FocusManager.instance.primaryFocus?.unfocus();
                                                           HapticFeedback.selectionClick();
                                                           Future.delayed(const Duration(milliseconds: 200), (){
                                                             setState(() {
-                                                              final lists = cnRunningWorkout.groupedExercises.entries.toList().where((element) => element.value is List<Exercise>);
-                                                              final t = lists.map((element) => element.value.indexWhere((ex) {
-                                                                return ex.name == value.name;
-                                                              })).toList().firstWhere((element) => element >=0);
-                                                              cnRunningWorkout.selectedIndexes[cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key] = t;
+                                                              final exercises = mapValue.exercises;
+                                                              final t = exercises.indexWhere((ex) => ex.name == value.name);
+
+                                                              cnRunningWorkout.selectedIndexes[key] = t;
                                                             });
                                                             cnRunningWorkout.cache();
                                                           });
@@ -728,7 +712,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                 maxWidth: MediaQuery.of(context).size.width-120
                                                             ),
                                                             child: OverflowSafeText(
-                                                                newEx.name,
+                                                                (mapValue as GroupedExercise).exercises[cnRunningWorkout.selectedIndexes[key]!].name,
                                                                 style: const TextStyle(color: Colors.white, fontSize: 20),
                                                                 maxLines: 1
                                                             ),
@@ -744,35 +728,35 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                     ? const SizedBox()
                                                     : const Spacer(),
 
-                                                if(cnRunningWorkout.newExNames.contains(key))
-                                                  SizedBox(
-                                                    width:40,
-                                                    child: myIconButton(
-                                                      icon:const Icon(Icons.delete_forever),
-                                                      onPressed: (){
-                                                        showCupertinoModalPopup<void>(
-                                                          context: context,
-                                                          builder: (BuildContext context) => CupertinoActionSheet(
-                                                            cancelButton: getActionSheetCancelButton(context),
-                                                            message: Text(AppLocalizations.of(context)!.runningWorkoutDeleteExercise),
-                                                            actions: <Widget>[
-                                                              CupertinoActionSheetAction(
-                                                                /// This parameter indicates the action would perform
-                                                                /// a destructive action such as delete or exit and turns
-                                                                /// the action's text color to red.
-                                                                isDestructiveAction: true,
-                                                                onPressed: () {
-                                                                  // cnRunningWorkout.deleteExercise(item is Exercise? item : item._exercises[0]);
-                                                                  Navigator.pop(context);
-                                                                },
-                                                                child: Text(AppLocalizations.of(context)!.delete),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
+                                                // if(cnRunningWorkout.newExNames.contains(key))
+                                                //   SizedBox(
+                                                //     width:40,
+                                                //     child: myIconButton(
+                                                //       icon:const Icon(Icons.delete_forever),
+                                                //       onPressed: (){
+                                                //         showCupertinoModalPopup<void>(
+                                                //           context: context,
+                                                //           builder: (BuildContext context) => CupertinoActionSheet(
+                                                //             cancelButton: getActionSheetCancelButton(context),
+                                                //             message: Text(AppLocalizations.of(context)!.runningWorkoutDeleteExercise),
+                                                //             actions: <Widget>[
+                                                //               CupertinoActionSheetAction(
+                                                //                 /// This parameter indicates the action would perform
+                                                //                 /// a destructive action such as delete or exit and turns
+                                                //                 /// the action's text color to red.
+                                                //                 isDestructiveAction: true,
+                                                //                 onPressed: () {
+                                                //                   // cnRunningWorkout.deleteExercise(item is Exercise? item : item._exercises[0]);
+                                                //                   Navigator.pop(context);
+                                                //                 },
+                                                //                 child: Text(AppLocalizations.of(context)!.delete),
+                                                //               ),
+                                                //             ],
+                                                //           ),
+                                                //         );
+                                                //       },
+                                                //     ),
+                                                //   ),
                                               ],
                                             ),
 
@@ -785,7 +769,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                 SizedBox(width: 100, child: getSeatLevelSelector(newEx)),
                                                 Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
                                                 const SizedBox(width: 8,),
-                                                Text(item is Exercise? (item as Exercise).getCategoryName() : item._exercises[0].getCategoryName())
+                                                Text(newEx.getCategoryName())
                                               ]
                                             ),
 
@@ -874,16 +858,36 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                       }
 
                                       if(item is NamedSet || item is GroupedSet){
+                                        // GroupedE
+                                        NamedSet? tempSet;
 
-                                        NamedSet set = item is NamedSet ? item : (item)._sets.first;
+                                        if(item is NamedSet){
+                                          tempSet = item;
+                                        }
+                                        else{
+                                          item = item as GroupedSet;
+                                          String linkName = key.split("_").first;
+                                          Exercise ex = (cnRunningWorkout.groupedExercises[linkName] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkName]!)!;
+                                          tempSet = item.getSet(ex.name);
+                                        }
+                                        if(tempSet == null){
+                                          return const SizedBox();
+                                        }
+
+                                        NamedSet set = tempSet;
 
                                         /// Each Set
-                                        final TextEditingController? weightController = set.weightController;
-                                        final TextEditingController? amountController = set.amountController;
+                                        final TextEditingController weightController = set.weightController;
+                                        final TextEditingController amountController = set.amountController;
 
-                                        Exercise templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == set.ex.name).first;
+                                        Exercise? templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((ex) => ex.name == set.ex.name).firstOrNull;
 
-                                        SingleSet setTemplate = templateEx.sets[set.index];
+                                        if(templateEx == null){
+                                          return const SizedBox();
+                                        }
+
+                                        SingleSet? templateSet = templateEx.sets[set.index];
+
                                         child = Padding(
                                           padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
                                           child: SizedBox(
@@ -905,7 +909,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                 ),
 
                                                 /// Button to copy templates data
-                                                getButtonInsertTemplatesData(set: setTemplate, newEx: templateEx, indexSet: set.index, weightController: weightController, amountController: amountController),
+                                                getButtonInsertTemplatesData(newSet: set.set, templateSet: templateSet, templateEx: templateEx, indexSet: set.index, weightController: weightController, amountController: amountController),
 
                                                 /// Weight and Amount
                                                 Expanded(
@@ -921,7 +925,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                         child: Center(
                                                           child: TextField(
                                                             keyboardAppearance: Brightness.dark,
-                                                            maxLength: (weightController?.text.contains(".")?? true)? 6 : 4,
+                                                            maxLength: (weightController.text.contains("."))? 6 : 4,
                                                             textAlign: TextAlign.center,
                                                             keyboardType: const TextInputType.numberWithOptions(
                                                                 decimal: true,
@@ -929,7 +933,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                             ),
                                                             controller: weightController,
                                                             onTap: (){
-                                                              weightController?.selection =  TextSelection(baseOffset: 0, extentOffset: weightController.value.text.length);
+                                                              weightController.selection =  TextSelection(baseOffset: 0, extentOffset: weightController.value.text.length);
                                                             },
                                                             decoration: InputDecoration(
                                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -937,10 +941,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                 counterText: "",
                                                                 contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
                                                                 hintFadeDuration: const Duration(milliseconds: 200),
-                                                                hintText: "${set.set.weight.toString().endsWith(".0")? set.set.weight?.toInt() : set.set.weight?? ""}",
-                                                                hintStyle: getTextStyleForTextField((set.set.weight?? "").toString(), color: Colors.white.withOpacity(0.15), sizeSmall: false)
+                                                                hintText: (templateSet.weightAsTrimmedDouble?? "").toString(),
+                                                                hintStyle: getTextStyleForTextField(templateSet.weightAsTrimmedDouble.toString(), color: Colors.white.withOpacity(0.15), sizeSmall: false)
                                                             ),
-                                                            style: getTextStyleForTextField(weightController?.text?? "", sizeSmall: false),
+                                                            style: getTextStyleForTextField(weightController.text, sizeSmall: false),
                                                             onChanged: (value){
                                                               value = value.trim();
                                                               if(value.isNotEmpty){
@@ -948,9 +952,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                 final newValue = double.tryParse(value);
                                                                 set.set.weight = newValue;
                                                                 if(newValue == null){
-                                                                  weightController?.clear();
+                                                                  weightController.clear();
                                                                 } else{
-                                                                  weightController?.text = value;
+                                                                  weightController.text = value;
                                                                 }
                                                               }
                                                               else{
@@ -980,22 +984,21 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                             ),
                                                             controller: amountController,
                                                             onTap: (){
-                                                              amountController?.selection =  TextSelection(baseOffset: 0, extentOffset: amountController.value.text.length);
+                                                              amountController.selection =  TextSelection(baseOffset: 0, extentOffset: amountController.value.text.length);
                                                             },
                                                             decoration: InputDecoration(
                                                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                                                                 // isDense: true,
                                                                 counterText: "",
                                                                 contentPadding: const EdgeInsets.symmetric(horizontal: 0 ,vertical: 0.0),
-                                                                hintText: set.ex.categoryIsReps()? "${set.set.amount?? ""}" : set.set.amountAsTime,
+                                                                hintText: templateEx.categoryIsReps()? "${templateSet.amount?? ""}" : templateSet.amountAsTime,
                                                                 hintStyle: getTextStyleForTextField(
-                                                                    set.ex.categoryIsReps()? "${set.set.amount?? ""}" : set.set.amountAsTime?? "",
+                                                                    templateEx.categoryIsReps()? "${templateSet.amount?? ""}" : templateSet.amountAsTime?? "",
                                                                     sizeSmall: false,
                                                                     color: Colors.white.withOpacity(0.07)
                                                                 )
-                                                              // hintStyle: TextStyle(color: Colors.white.withOpacity(0.07))
                                                             ),
-                                                            style: getTextStyleForTextField(amountController?.text?? "", sizeSmall: false),
+                                                            style: getTextStyleForTextField(amountController.text, sizeSmall: false),
                                                             onChanged: (value){
                                                               value = value.trim();
                                                               /// For Reps
@@ -1004,7 +1007,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                                   final newValue = int.tryParse(value);
                                                                   set.set.amount = newValue;
                                                                   if(newValue == null){
-                                                                    amountController?.clear();
+                                                                    amountController.clear();
                                                                   }
                                                                   if(value.length == 1){
                                                                     setState(() => {});
@@ -1019,10 +1022,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                               else{
                                                                 List result = parseTextControllerAmountToTime(value);
                                                                 if(result[0] <= 0){
-                                                                  amountController?.text = "";
+                                                                  amountController.text = "";
                                                                   set.set.amount = null;
                                                                 } else{
-                                                                  amountController?.text = result[1];
+                                                                  amountController.text = result[1];
                                                                   set.set.amount = result[0];
                                                                 }
                                                                 setState(() {});
@@ -1040,38 +1043,48 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                           ),
                                         );
 
-                                        // return Slidable(
-                                        //   key: cnRunningWorkout.slideableKeys[newEx.name]![indexSet],
-                                        //   // key: UniqueKey(),
-                                        //   startActionPane: ActionPane(
-                                        //     motion: const ScrollMotion(),
-                                        //     dismissible: DismissiblePane(
-                                        //         onDismissed: () {
-                                        //           dismiss(newEx, templateEx, indexSet);
-                                        //         }),
-                                        //     children: [
-                                        //       SlidableAction(
-                                        //         flex:10,
-                                        //         onPressed: (BuildContext context){
-                                        //           dismiss(newEx, templateEx, indexSet);
-                                        //         },
-                                        //         borderRadius: BorderRadius.circular(15),
-                                        //         backgroundColor: const Color(0xFFA12D2C),
-                                        //         foregroundColor: Colors.white,
-                                        //         icon: Icons.delete,
+                                        // if(set.ex.sets.length > 1){
+                                        //   child = Slidable(
+                                        //       key: set.key,
+                                        //       startActionPane: ActionPane(
+                                        //         motion: const ScrollMotion(),
+                                        //         dismissible: DismissiblePane(
+                                        //             onDismissed: () {
+                                        //               dismiss(set.ex, templateEx, set);
+                                        //             }),
+                                        //         children: [
+                                        //           SlidableAction(
+                                        //             flex:10,
+                                        //             onPressed: (BuildContext context){
+                                        //               dismiss(set.ex, templateEx, set);
+                                        //             },
+                                        //             borderRadius: BorderRadius.circular(15),
+                                        //             backgroundColor: const Color(0xFFA12D2C),
+                                        //             foregroundColor: Colors.white,
+                                        //             icon: Icons.delete,
+                                        //           ),
+                                        //           SlidableAction(
+                                        //             flex: 1,
+                                        //             onPressed: (BuildContext context){},
+                                        //             backgroundColor: Colors.transparent,
+                                        //             foregroundColor: Colors.transparent,
+                                        //             label: '',
+                                        //           ),
+                                        //         ],
                                         //       ),
-                                        //       SlidableAction(
-                                        //         flex: 1,
-                                        //         onPressed: (BuildContext context){},
-                                        //         backgroundColor: Colors.transparent,
-                                        //         foregroundColor: Colors.transparent,
-                                        //         label: '',
-                                        //       ),
-                                        //     ],
-                                        //   ),
-                                        //   child: child,
-                                        // );
-                                        child;
+                                        //       child: child
+                                        //   );
+                                        // }
+
+                                        if(set.index == (set.ex.sets.length - 1)){
+                                          child = Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              child,
+                                              getAddSetButton(set.ex, templateEx)
+                                            ],
+                                          );
+                                        }
 
                                       }
 
@@ -1080,7 +1093,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                         child = Column(
                                           children: [
                                             const SizedBox(height: 80,),
-                                            child?? SizedBox()
+                                            child?? const SizedBox()
                                           ],
                                         );
                                       }
@@ -1100,8 +1113,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                         );
                                       }
 
-                                      return child?? SizedBox();
-                                      return SizedBox();
+                                      return child?? const SizedBox();
                                     },
                                   ),
                                 ),
@@ -1229,36 +1241,40 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   }
 
   Widget getButtonInsertTemplatesData({
-    required SingleSet set,
-    required Exercise newEx,
+    required SingleSet newSet,
+    required SingleSet? templateSet,
+    required Exercise? templateEx,
     required int indexSet,
     required TextEditingController? weightController,
     required TextEditingController? amountController
   }){
 
     String getText(){
-      switch (newEx.category){
+      if(templateEx == null || templateSet == null){
+        return "";
+      }
+      switch (templateEx.category){
         case 1:
-          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} kg x ${set.amount?? ""}" : "";
+          return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} kg x ${templateSet.amount?? ""}" : "";
         case 2:
-          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} km in ${set.amountAsTime?? ""}" : "";
+          return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} km in ${templateSet.amountAsTime?? ""}" : "";
         case 3:
-          return set.weight != null && set.amount != null? "${set.weightAsTrimmedDouble?? ""} kg for ${set.amountAsTime?? ""}" : "";
+          return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} kg for ${templateSet.amountAsTime?? ""}" : "";
         default:
           return "";
       }
     }
 
     final weightTextIsEmpty = weightController?.text.isEmpty?? false;
-    final amountTextIsEmpty = weightController?.text.isEmpty?? false;
+    final amountTextIsEmpty = amountController?.text.isEmpty?? false;
 
     return Expanded(
         flex: 2,
         child: IgnorePointer(
           ignoring: !(weightTextIsEmpty &&
               amountTextIsEmpty &&
-              set.weight != null &&
-              set.amount != null),
+              templateSet?.weight != null &&
+              templateSet?.amount != null),
           child: SizedBox(
             height: _heightOfSetRow,
             child: ElevatedButton(
@@ -1269,26 +1285,29 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
               ),
               onPressed: (){
-                if(set.weight != null &&
-                    set.amount != null &&
+                if(templateSet == null || templateEx == null){
+                  return;
+                }
+                if(templateSet.weight != null &&
+                    templateSet.amount != null &&
                     weightTextIsEmpty &&
                     amountTextIsEmpty
                 ){
                   vibrateConfirm();
-                  weightController?.text = (set.weightAsTrimmedDouble?? "").toString();
-                  newEx.sets[indexSet].weight = set.weight;
-                  if(newEx.categoryIsReps()){
-                    amountController?.text = set.amount!.toString();
+                  weightController?.text = (templateSet.weightAsTrimmedDouble?? "").toString();
+                  newSet.weight = templateSet.weight;
+                  if(templateEx.categoryIsReps()){
+                    amountController?.text = templateSet.amount!.toString();
                   }
                   else{
-                    amountController?.text = set.amountAsTime.toString();
+                    amountController?.text = templateSet.amountAsTime.toString();
                   }
-                  newEx.sets[indexSet].amount = set.amount;
+                  newSet.amount = templateSet.amount;
                   cnRunningWorkout.refresh();
                   cnRunningWorkout.cache();
                 } else{
                   setState(() {
-                    FocusScope.of(context).unfocus();
+                    FocusManager.instance.primaryFocus?.unfocus();
                   });
                 }
               },
@@ -1331,9 +1350,29 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   void addSet(Exercise ex, Exercise lastEx){
     setState(() {
+      int newIndex = ex.sets.length;
       ex.addSet();
       lastEx.addSet();
-      cnRunningWorkout.textControllers[ex.name]?.add([TextEditingController(), TextEditingController()]);
+      SingleSet newSet = ex.sets[newIndex];
+      NamedSet newNamedSet = NamedSet(
+          set: newSet,
+          name: ex.name,
+          index: newIndex,
+          ex: ex,
+          weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
+          amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+      );
+      if(ex.linkName == null){
+        cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
+      } else{
+        final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
+        if(cnRunningWorkout.groupedExercises.containsKey(newSetKey)){
+          (cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
+        } else{
+          cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
+        }
+      }
+      // cnRunningWorkout.textControllers[ex.name]?.add([TextEditingController(), TextEditingController()]);
       cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
       final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
       if(newControllerPos >= 0 && cnRunningWorkout.scrollController.position.maxScrollExtent >= newControllerPos){
@@ -1342,50 +1381,78 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     });
   }
 
-  void dismiss(Exercise ex, Exercise lastEx, int index){
-    setState(() {
-      final dismissedSet = ex.sets.removeAt(index);
-      final dismissedTemplateSet = lastEx.sets.removeAt(index);
-      final dismissedControllers = cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
-      cnRunningWorkout.slideableKeys[ex.name]?.removeAt(index);
-
-      cnRunningWorkout.dismissedSets.add(
-          DismissedSingleSet(
-              linkName: ex.linkName,
-              exName: ex.name,
-              index: index,
-              dismissedSet: dismissedSet,
-              dismissedTemplateSet: dismissedTemplateSet,
-              dismissedControllers: dismissedControllers
-          )
-      );
-    });
-    cnRunningWorkout.cache();
-  }
+  // void dismiss(Exercise ex, Exercise lastEx, NamedSet set){
+  //   setState(() {
+  //     // final dismissedSet = ex.sets.removeAt(set.index);
+  //     // final dismissedTemplateSet = lastEx.sets.removeAt(set.index);
+  //     // final dismissedControllers = cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
+  //     // cnRunningWorkout.slideableKeys[ex.name]?.removeAt(index);
+  //     print("KEY NAME ${getSetKeyName(ex.name, set.index)}");
+  //     print(cnRunningWorkout.groupedExercises.keys);
+  //     print("Länge vorher");
+  //     print(cnRunningWorkout.groupedExercises.length);
+  //     cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.name, set.index));
+  //     String name = ex.linkName ?? ex.name;
+  //     cnRunningWorkout.groupedExercises.map((key, value) {
+  //       if(key.split("_").first == name){
+  //         if(value is NamedSet && value.index > set.index){
+  //           print("Dismiss in single Exercise");
+  //           value.index -= 1;
+  //         }
+  //         /// ToDo: not working properly
+  //         else if(value is GroupedSet){
+  //           NamedSet s = value._sets.firstWhere((set) => set.name == ex.name);
+  //           if(s.index > set.index){
+  //             print("Dismiss in grouped Exercise");
+  //             s.index -= 1;
+  //           }
+  //         }
+  //       }
+  //       return MapEntry(key, value);
+  //     });
+  //     print("Länge nachher");
+  //     print(cnRunningWorkout.groupedExercises.length);
+  //
+  //     final dismissedSet = ex.sets.removeAt(set.index);
+  //     final dismissedTemplateSet = lastEx.sets.removeAt(set.index);
+  //
+  //     // cnRunningWorkout.dismissedSets.add(
+  //     //     DismissedSingleSet(
+  //     //         linkName: ex.linkName,
+  //     //         exName: ex.name,
+  //     //         index: set.index,
+  //     //         dismissedSet: dismissedSet,
+  //     //         dismissedTemplateSet: dismissedTemplateSet,
+  //     //         dismissedControllers: [set.weightController, set.amountController]
+  //     //     )
+  //     // );
+  //   });
+  //   cnRunningWorkout.cache();
+  // }
 
   void undoDismiss(){
-    if(cnRunningWorkout.dismissedSets.isEmpty){
-      return;
-    }
-    setState(() {
-      final setsToInsert = cnRunningWorkout.dismissedSets.removeLast();
-      final templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == setsToInsert.exName).first;
-      late Exercise newEx;
-      if(setsToInsert.linkName != null){
-        newEx = cnRunningWorkout.groupedExercises[setsToInsert.linkName].where((ex) => ex.name == setsToInsert.exName).first;
-      } else{
-        newEx = cnRunningWorkout.groupedExercises[setsToInsert.exName];
-      }
-      templateEx.sets.insert(setsToInsert.index, setsToInsert.dismissedTemplateSet);
-      newEx.sets.insert(setsToInsert.index, setsToInsert.dismissedSet);
-      if(setsToInsert.dismissedControllers != null){
-        cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, setsToInsert.dismissedControllers!);
-      } else{
-        cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, [TextEditingController(), TextEditingController()]);
-      }
-      cnRunningWorkout.slideableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
-    });
-    cnRunningWorkout.cache();
+    // if(cnRunningWorkout.dismissedSets.isEmpty){
+    //   return;
+    // }
+    // setState(() {
+    //   final setsToInsert = cnRunningWorkout.dismissedSets.removeLast();
+    //   final templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((element) => element.name == setsToInsert.exName).first;
+    //   late Exercise newEx;
+    //   if(setsToInsert.linkName != null){
+    //     newEx = cnRunningWorkout.groupedExercises[setsToInsert.linkName].where((ex) => ex.name == setsToInsert.exName).first;
+    //   } else{
+    //     newEx = cnRunningWorkout.groupedExercises[setsToInsert.exName];
+    //   }
+    //   templateEx.sets.insert(setsToInsert.index, setsToInsert.dismissedTemplateSet);
+    //   newEx.sets.insert(setsToInsert.index, setsToInsert.dismissedSet);
+    //   if(setsToInsert.dismissedControllers != null){
+    //     cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, setsToInsert.dismissedControllers!);
+    //   } else{
+    //     cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, [TextEditingController(), TextEditingController()]);
+    //   }
+    //   cnRunningWorkout.slideableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
+    // });
+    // cnRunningWorkout.cache();
   }
 
   /// Find the first indication of whether or not an Exercise has changed.
@@ -1486,11 +1553,31 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     );
   }
 
+  Widget getAddSetButton(Exercise newEx, Exercise templateEx){
+    return Row(
+      children: [
+        Expanded(
+          child: IconButton(
+              alignment: Alignment.center,
+              color: Colors.amber[800],
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+              ),
+              onPressed: () {
+                addSet(newEx, templateEx);
+              },
+              icon: const Icon(
+                Icons.add,
+                size: 20,
+              )
+          ),
+        ),
+      ],
+    );
+  }
+
   void openPopUpConfirmCancelWorkout() {
-    // if(cnStandardPopUp.isVisible){
-    //   cnStandardPopUp.clear();
-    //   await Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime));
-    // }
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -1512,59 +1599,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         ],
       ),
     );
-    // cnStandardPopUp.open(
-    //   context: context,
-    //   widthFactor: 0.75,
-    //   confirmText: AppLocalizations.of(context)!.yes,
-    //   onConfirm: stopWorkout,
-    //   cancelText: AppLocalizations.of(context)!.no,
-    //   // confirmTextStyle: TextStyle(color: Colors.red.withOpacity(0.6)),
-    //   // onConfirm: ,
-    //   padding: const EdgeInsets.only(top: 20),
-    //   child: Column(
-    //     children: [
-    //       Text(
-    //         AppLocalizations.of(context)!.runningWorkoutStopWorkout,
-    //         textAlign: TextAlign.center,
-    //         textScaler: const TextScaler.linear(1.2),
-    //         style: const TextStyle(color: Colors.white),
-    //       ),
-    //       const SizedBox(height: 10,),
-    //       Padding(
-    //         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-    //         child: Text(
-    //           AppLocalizations.of(context)!.runningWorkoutConfirmCancelWorkout,
-    //           textAlign: TextAlign.center,
-    //           textScaler: const TextScaler.linear(0.9),
-    //           style: const TextStyle(color: Colors.white),
-    //         ),
-    //       ),
-    //       const SizedBox(height: 20,),
-    //       // Container(
-    //       //   height: 0.5,
-    //       //   width: double.maxFinite,
-    //       //   color: Colors.grey[700]!.withOpacity(0.5),
-    //       // ),
-    //       // SizedBox(
-    //       //   height: 40,
-    //       //   width: double.maxFinite,
-    //       //   child: ElevatedButton(
-    //       //     onPressed: stopWorkout,
-    //       //     style: ButtonStyle(
-    //       //         shadowColor: MaterialStateProperty.all(Colors.transparent),
-    //       //         surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-    //       //         backgroundColor: MaterialStateProperty.all(Colors.transparent),
-    //       //         shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-    //       //     ),
-    //       //     child: Text(
-    //       //       AppLocalizations.of(context)!.yes,
-    //       //       // style: TextStyle(color: Colors.red.withOpacity(0.6)),
-    //       //     ),
-    //       //   ),
-    //       // ),
-    //     ],
-    //   ),
-    // );
   }
 
   Future stopWorkout({int? time})async{
@@ -1622,24 +1656,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         cnStopwatchWidget.cancelTimer();
       }
 
-      bool savedAutomaticBackup = false;
-      bool savedCurrentData = false;
-
       if(cnConfig.automaticBackups){
-        savedAutomaticBackup = await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
+        await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
       }
 
-      savedCurrentData = await saveCurrentData(cnConfig) != null;
+      await saveCurrentData(cnConfig) != null;
 
-      // Fluttertoast.showToast(
-      //     msg: "${AppLocalizations.of(context)!.createdAutomaticBackup}: ${savedAutomaticBackup? "✅" : "❌"} \n${AppLocalizations.of(context)!.savedDataForSync}: ${savedCurrentData? "✅" : "❌"}",
-      //     toastLength: Toast.LENGTH_LONG,
-      //     gravity: ToastGravity.TOP,
-      //     timeInSecForIosWeb: 1,
-      //     backgroundColor: Colors.grey[800],
-      //     textColor: Colors.white,
-      //     fontSize: 16.0
-      // );
       Fluttertoast.showToast(
           msg: "Workout erfolgreich abgeschlossen 🎉",
           toastLength: Toast.LENGTH_LONG,
@@ -1749,28 +1771,29 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
 class CnRunningWorkout extends ChangeNotifier {
   Workout workout = Workout();
+  /// Modifiable Workout template
+  /// Exercises can be delete
   Workout workoutTemplateModifiable = Workout();
+  /// NOT Modifiable Workout template - for comparison what have changed
   Workout workoutTemplateNotModifiable = Workout();
   bool isRunning = false;
   bool isVisible = false;
   ScrollController scrollController = ScrollController();
-  // TextEditingController controllerRestInSeconds = TextEditingController();
-  TextEditingController controllerSeatLevel = TextEditingController();
   List<String> newExNames = [];
   late Map<String, List<Key>> slideableKeys = {
     for (var e in workout.exercises)
       e.name :
       e.generateKeyForEachSet()
   };
-  late Map<String, List<List<TextEditingController>>> textControllers = {
-    for (var e in workout.exercises)
-      e.name :
-      e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
-  };
+  // late Map<String, List<List<TextEditingController>>> textControllers = {
+  //   for (var e in workout.exercises)
+  //     e.name :
+  //     e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
+  // };
   /// Contains all Exercises - linked and non linked ones - as a Map
   /// linked exercises are saved as another Map with key = linkName
   /// non linked Exercises are saved as the exercise itself with the ex.name as the key
-  Map groupedExercises = {};
+  SplayTreeMap<String, dynamic> groupedExercises = SplayTreeMap();
   /// Contains for each linked exercise the currently selected index for getting the right one
   /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
@@ -1780,6 +1803,7 @@ class CnRunningWorkout extends ChangeNotifier {
   List<DismissedSingleSet> dismissedSets = [];
   double lastScrollPosition = 0;
   List<dynamic> allItems = [];
+  List<String> exerciseOrder = [];
 
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -1791,7 +1815,18 @@ class CnRunningWorkout extends ChangeNotifier {
     newExNames.add(ex.name);
     slideableKeys[ex.name] = ex.generateKeyForEachSet();
     groupedExercises[ex.name] = ex;
-    textControllers[ex.name] = ex.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
+    SingleSet newSet = ex.sets.first;
+    NamedSet newNamedSet = NamedSet(
+        set: newSet,
+        name: ex.name,
+        index: 0,
+        ex: ex,
+        weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+    );
+    if(ex.linkName == null){
+      groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
+    }
     cache();
     refresh();
   }
@@ -1813,7 +1848,7 @@ class CnRunningWorkout extends ChangeNotifier {
       data.containsKey("workoutTemplateNotModifiable") &&
       data.containsKey("isRunning") &&
       data.containsKey("isVisible") &&
-      data.containsKey("testControllerValues") &&
+      // data.containsKey("testControllerValues") &&
       data.containsKey("selectedIndexes") &&
       data.containsKey("newExNames")
     ){
@@ -1828,8 +1863,8 @@ class CnRunningWorkout extends ChangeNotifier {
       workoutTemplateNotModifiable = Workout().fromMap(data["workoutTemplateNotModifiable"]) ?? Workout();
       initSlideableKeys();
       initGroupedExercises();
-      initTextControllers();
-      setTextControllerValues(data["testControllerValues"]);
+      // initTextControllers();
+      // setTextControllerValues(data["testControllerValues"]);
     }
   }
 
@@ -1877,7 +1912,7 @@ class CnRunningWorkout extends ChangeNotifier {
     initSlideableKeys();
     initSelectedIndexes();
     initGroupedExercises();
-    initTextControllers();
+    // initTextControllers();
   }
 
   void initSlideableKeys(){
@@ -1899,31 +1934,103 @@ class CnRunningWorkout extends ChangeNotifier {
   void initGroupedExercises(){
     groupedExercises.clear();
     allItems.clear();
+    exerciseOrder.clear();
 
     for (Exercise ex in workout.exercises){
+
+      /// single exercise
       if (ex.linkName == null){
         groupedExercises[ex.name] = ex;
         for(var i = 0; i < ex.sets.length; i++){
-          groupedExercises["${ex.name}$i"] = NamedSet(set: ex.sets[i], name: ex.name, index: i, ex: ex, weightController: TextEditingController(), amountController: TextEditingController());
+          groupedExercises[getSetKeyName(ex.name, i)] = NamedSet(
+              set: ex.sets[i],
+              name: ex.name,
+              index: i,
+              ex: ex,
+              weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
+          );
         }
-      } else{
+        if(!exerciseOrder.contains(ex.name)){
+          exerciseOrder.add(ex.name);
+        }
+      }
+
+      /// linked exercise
+      else{
         if(!groupedExercises.containsKey(ex.linkName)){
-          groupedExercises[ex.linkName] = GroupedExercise(ex: ex);
+          groupedExercises[ex.linkName!] = GroupedExercise(ex: ex);
         }
         else{
           (groupedExercises[ex.linkName] as GroupedExercise).add(ex);
         }
         for(var i = 0; i < ex.sets.length; i++){
-          if(groupedExercises.containsKey("${ex.linkName}$i")){
-            (groupedExercises["${ex.linkName}$i"] as GroupedSet).add(NamedSet(set: ex.sets[i], name: ex.name, index: i, ex: ex, weightController: TextEditingController(), amountController: TextEditingController()));
+          NamedSet namedSet = NamedSet(
+              set: ex.sets[i],
+              name: ex.name,
+              index: i,
+              ex: ex,
+              weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
+          );
+          final String keyName = getSetKeyName(ex.linkName??"", i);
+          if(groupedExercises.containsKey(keyName)){
+            (groupedExercises[keyName] as GroupedSet).add(namedSet);
           } else{
-            groupedExercises["${ex.linkName}$i"] = GroupedSet(set: NamedSet(set: ex.sets[i], name: ex.name, index: i, ex: ex, weightController: TextEditingController(), amountController: TextEditingController()));
+            groupedExercises[keyName] = GroupedSet(set: namedSet);
           }
+        }
+        if(!exerciseOrder.contains(ex.linkName)){
+          exerciseOrder.add(ex.linkName!);
         }
       }
       allItems.add(ex);
       allItems.addAll(ex.sets);
     }
+
+    int customComparator(String a, String b) {
+      String aFirst = a.split("_").first;
+      String bFirst = b.split("_").first;
+      String aLast = a.split("_").last;
+      String bLast = b.split("_").last;
+      print("");
+      print("AB");
+      print(a +""+ b);
+      print(aFirst);
+      print(bFirst);
+      final indexA = exerciseOrder.indexOf(aFirst);
+      final indexB = exerciseOrder.indexOf(bFirst);
+      print("INDEX");
+      print(indexA);
+      print(indexB);
+      if(indexA == indexB){
+        print("EQUAL");
+        print(aLast);
+        print(bLast);
+        print(aLast.compareTo(bLast));
+        if(aFirst == aLast && bFirst != bLast){
+          print("SMALLER");
+          return -1;
+        } else if(aFirst != aLast && bFirst == bLast){
+          print("BIGGER");
+          return 1;
+        }
+        return aLast.compareTo(bLast);
+      } else if(indexA > indexB){
+        print("BIGGER");
+        return 1;
+      } else{
+        print("SMALLER");
+        return -1;
+      }
+      return exerciseOrder.indexOf(a).compareTo(exerciseOrder.indexOf(b));
+    }
+    print(groupedExercises.keys);
+    SplayTreeMap<String, dynamic> rightOrderedGroupedExercises = SplayTreeMap<String, dynamic>(customComparator)..addAll(groupedExercises);
+    groupedExercises = rightOrderedGroupedExercises;
+
+    print(rightOrderedGroupedExercises.keys);
+
     // for(MapEntry val in groupedExercises.entries){
     //   final t = val.value;
     //   print(val.key);
@@ -1937,20 +2044,22 @@ class CnRunningWorkout extends ChangeNotifier {
     //   }
     // }
 
+    // groupedExercises.
+
     // for(MapEntry entry in groupedExercises.entries){
-    //   if(entry.value is List){
-    //     (entry.value as List).sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    //   }
+      // if(entry.value is List){
+      //   (entry.value as List).sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+      // }
     // }
   }
 
-  void initTextControllers(){
-    textControllers = {
-      for (var e in workout.exercises)
-        e.name :
-        e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
-    };
-  }
+  // void initTextControllers(){
+  //   textControllers = {
+  //     for (var e in workout.exercises)
+  //       e.name :
+  //       e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
+  //   };
+  // }
 
   Future<void> cache() async{
     Map data = {
@@ -1959,7 +2068,7 @@ class CnRunningWorkout extends ChangeNotifier {
       "workoutTemplateNotModifiable": workoutTemplateNotModifiable.asMap(),
       "isRunning": isRunning,
       "isVisible": isVisible,
-      "testControllerValues": getTextControllerValues(),
+      // "testControllerValues": getTextControllerValues(),
       "selectedIndexes": selectedIndexes,
       "newExNames": newExNames
     };
@@ -1967,20 +2076,20 @@ class CnRunningWorkout extends ChangeNotifier {
     await cnConfig.config.save();
   }
 
-  Map<String, List<dynamic>> getTextControllerValues(){
-    return {
-      for (MapEntry entry in textControllers.entries)
-        entry.key :
-        entry.value.map((controllers) => [controllers[0].text, controllers[1].text]).toList()
-    };
-  }
+  // Map<String, List<dynamic>> getTextControllerValues(){
+  //   return {
+  //     for (MapEntry entry in textControllers.entries)
+  //       entry.key :
+  //       entry.value.map((controllers) => [controllers[0].text, controllers[1].text]).toList()
+  //   };
+  // }
 
-  void setTextControllerValues(Map<String, dynamic> textControllersValues){
-    for (MapEntry entry in textControllersValues.entries){
-      // textControllers[entry.key] = entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[0])]).toList();
-      textControllers[entry.key] = List<List<TextEditingController>>.from(entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[1])]));
-    }
-  }
+  // void setTextControllerValues(Map<String, dynamic> textControllersValues){
+  //   for (MapEntry entry in textControllersValues.entries){
+  //     // textControllers[entry.key] = entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[0])]).toList();
+  //     textControllers[entry.key] = List<List<TextEditingController>>.from(entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[1])]));
+  //   }
+  // }
 
   void checkMultipleExercisesPerLink(){
     Map<String, int> linkCounter = {};
@@ -2003,7 +2112,7 @@ class CnRunningWorkout extends ChangeNotifier {
   void clear(){
     lastScrollPosition = 0;
     workout = Workout();
-    textControllers.clear();
+    // textControllers.clear();
     slideableKeys.clear();
     selectedIndexes.clear();
     groupedExercises.clear();
@@ -2039,15 +2148,18 @@ class GroupedExercise{
    void add(Exercise ex){
      _exercises.add(ex);
    }
+
+   List<Exercise> get exercises => _exercises;
 }
 
 class NamedSet{
   final String name;
   final SingleSet set;
-  final int index;
+  int index;
   final Exercise ex;
   final TextEditingController weightController;
   final TextEditingController amountController;
+  final UniqueKey key = UniqueKey();
 
   NamedSet({
     required this.set,
@@ -2067,19 +2179,8 @@ class GroupedSet{
     _sets.add(set);
   }
 
-  // NamedSet? getSet(int index){
-  //   if(index > _sets.length-1){
-  //     return null;
-  //   }
-  //   return _sets[index];
-  // }
-
   NamedSet? getSet(String exName){
     return _sets.firstWhereOrNull((s) => s.name == exName);
-    // if(index > _sets.length-1){
-    //   return null;
-    // }
-    // return _sets[index];
   }
 
   void add(NamedSet s){

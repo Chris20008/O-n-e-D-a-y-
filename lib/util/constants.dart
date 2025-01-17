@@ -575,6 +575,16 @@ Widget getSet({
   );
 }
 
+String intToLexicographic(int value){
+  String result = List.generate(value~/26, (index) => "Z").join();
+  result = result + String.fromCharCode(65 + value%26);
+  return result;
+}
+
+String getSetKeyName(String exName, int index){
+  return "${exName}_${intToLexicographic(index)}";
+}
+
 String validateDoubleTextInput(String text){
   text = text.replaceAll(",", ".");
   if(text.characters.last == "."){

@@ -1,3 +1,4 @@
+import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,10 +41,13 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
   @override
   void initState() {
     for(MapEntry e in widget.groupedExercises.entries){
-      if(!widget.relevantLinkNames.contains(e.key) || e.value is Exercise){
+      if(!widget.relevantLinkNames.contains(e.key) || e.value is! GroupedExercise){
         continue;
       }
-      groupedExercises[e.key] = e.value.map((ex) => Exercise.copy(ex)).toList();
+      print("GROUPED EXERCISE");
+      print(e.key);
+      print(e.value.exercises);
+      groupedExercises[e.key] = e.value.exercises.map((ex) => Exercise.copy(ex)).toList();
       for(Exercise ex in groupedExercises[e.key]){
         ex.removeEmptySets();
       }
