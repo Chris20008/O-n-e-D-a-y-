@@ -12,11 +12,11 @@ import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'dart:io';
 
 import '../../../main.dart';
 import '../../../objects/exercise.dart';
@@ -522,7 +522,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                       if (indexExercise == 0){
                                         child = Column(
                                           children: [
-                                            const SizedBox(height: 80,),
+                                            SizedBox(height: Platform.isAndroid? 80 : 120),
                                             child?? const SizedBox()
                                           ],
                                         );
@@ -1421,6 +1421,9 @@ class CnRunningWorkout extends ChangeNotifier {
 
       /// single exercise
       if (ex.linkName == null){
+        if(!exerciseOrder.contains(ex.name)){
+          exerciseOrder.add(ex.name);
+        }
         groupedExercises[ex.name] = ex;
         for(var i = 0; i < ex.sets.length; i++){
           groupedExercises[getSetKeyName(ex.name, i)] = NamedSet(
@@ -1432,13 +1435,13 @@ class CnRunningWorkout extends ChangeNotifier {
               amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
           );
         }
-        if(!exerciseOrder.contains(ex.name)){
-          exerciseOrder.add(ex.name);
-        }
       }
 
       /// linked exercise
       else{
+        if(!exerciseOrder.contains(ex.linkName)){
+          exerciseOrder.add(ex.linkName!);
+        }
         if(!groupedExercises.containsKey(ex.linkName)){
           groupedExercises[ex.linkName!] = GroupedExercise(ex: ex);
         }
@@ -1460,9 +1463,6 @@ class CnRunningWorkout extends ChangeNotifier {
           } else{
             groupedExercises[keyName] = GroupedSet(set: namedSet);
           }
-        }
-        if(!exerciseOrder.contains(ex.linkName)){
-          exerciseOrder.add(ex.linkName!);
         }
       }
 
@@ -1510,27 +1510,6 @@ class CnRunningWorkout extends ChangeNotifier {
     }
     SplayTreeMap<String, dynamic> rightOrderedGroupedExercises = SplayTreeMap<String, dynamic>(customComparator)..addAll(groupedExercises);
     groupedExercises = rightOrderedGroupedExercises;
-
-    // for(MapEntry val in groupedExercises.entries){
-    //   final t = val.value;
-    //   print(val.key);
-    //   if(t is GroupedExercise){
-    //     print((t as GroupedExercise)._exercises);
-    //   }
-    //   else if(t is GroupedSet){
-    //     print((t as GroupedSet)._sets.toString());
-    //   } else{
-    //     print(t.toString());
-    //   }
-    // }
-
-    // groupedExercises.
-
-    // for(MapEntry entry in groupedExercises.entries){
-      // if(entry.value is List){
-      //   (entry.value as List).sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-      // }
-    // }
   }
 
   // void initTextControllers(){
