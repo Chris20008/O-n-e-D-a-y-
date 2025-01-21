@@ -175,6 +175,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                     onReorderStart: (index){
                                       currentDraggingKey = cnRunningWorkout.groupedExercises.entries.toList()[index].key.split("_").firstOrNull;
                                     },
+                                    onReorderEnd: (index){
+                                      currentDraggingKey = null;
+                                    },
                                     onReorder: (int oldIndex, int newIndex) {
                                       if (oldIndex < newIndex) {
                                         newIndex -= 1;
@@ -545,12 +548,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                       }
 
                                       return Container(
-                                          // key: (item is NamedSet || item is GroupedSet)
-                                          //     && currentDraggingKey != null
-                                          //     && groupedExerciseKey.contains(currentDraggingKey!)
-                                          //     ? ValueKey(groupedExerciseKey)
-                                          //     : UniqueKey(),
-                                          key: ValueKey(groupedExerciseKey),
+                                          key: currentDraggingKey == null ||
+                                              ((item is NamedSet || item is GroupedSet)
+                                              && groupedExerciseKey.contains(currentDraggingKey!))
+                                              ? ValueKey(groupedExerciseKey)
+                                              : UniqueKey(),
+                                          // key: ValueKey(groupedExerciseKey),
                                           child: child?? const SizedBox());
                                     },
                                   ),
@@ -1310,6 +1313,7 @@ class CnRunningWorkout extends ChangeNotifier {
       groupedExercises[ex.name] = ex;
       groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
     }
+    checkSeparator(ex);
     cache();
     refresh();
   }
@@ -1467,11 +1471,7 @@ class CnRunningWorkout extends ChangeNotifier {
         }
       }
 
-      /// Use | before Separator String, so that it comes after the single sets because | is after the characters in ASCII table
-      if(exerciseOrder.last.split("_").last != "|Separator"){
-        exerciseOrder.add("${ex.linkName?? ex.name}_|Separator");
-        groupedExercises["${ex.linkName?? ex.name}_|Separator"] = "Separator";
-      }
+      checkSeparator(ex);
     }
 
     int customComparator(String a, String b) {
@@ -1512,6 +1512,14 @@ class CnRunningWorkout extends ChangeNotifier {
     }
     SplayTreeMap<String, dynamic> rightOrderedGroupedExercises = SplayTreeMap<String, dynamic>(customComparator)..addAll(groupedExercises);
     groupedExercises = rightOrderedGroupedExercises;
+  }
+
+  void checkSeparator(Exercise ex){
+    /// Use | before Separator String, so that it comes after the single sets because | is after the characters in ASCII table
+    if(exerciseOrder.last.split("_").last != "|Separator"){
+      exerciseOrder.add("${ex.linkName?? ex.name}_|Separator");
+      groupedExercises["${ex.linkName?? ex.name}_|Separator"] = "Separator";
+    }
   }
 
   // void initTextControllers(){
