@@ -143,6 +143,9 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextFormField(
+          onTapOutside: (event){
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
           keyboardAppearance: Brightness.dark,
           controller: _textController,
           maxLength: 40,

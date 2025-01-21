@@ -172,18 +172,21 @@ Color? getLinkColor({required String linkName, required Workout workout}){
 }
 
 Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color}){
-  return Column(
-    children: [
-      SizedBox(height: heightTop),
-      Container(
-        height: 1,
-        width: double.maxFinite - minusWidth,
-        // color: const Color(0xFFC16A03).withOpacity(opacity),
-          color: (color?? Colors.amber[900])!.withOpacity(opacity)
-        // color: Colors.amber[900]!.withOpacity(0.6),
-      ),
-      SizedBox(height: heightBottom),
-    ],
+  return IgnorePointer(
+    ignoring: true,
+    child: Column(
+      children: [
+        SizedBox(height: heightTop),
+        Container(
+          height: 1,
+          width: double.maxFinite - minusWidth,
+          // color: const Color(0xFFC16A03).withOpacity(opacity),
+            color: (color?? Colors.amber[900])!.withOpacity(opacity)
+          // color: Colors.amber[900]!.withOpacity(0.6),
+        ),
+        SizedBox(height: heightBottom),
+      ],
+    ),
   );
 }
 

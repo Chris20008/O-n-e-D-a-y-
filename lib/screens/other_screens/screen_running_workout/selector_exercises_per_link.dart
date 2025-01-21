@@ -44,9 +44,6 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       if(!widget.relevantLinkNames.contains(e.key) || e.value is! GroupedExercise){
         continue;
       }
-      print("GROUPED EXERCISE");
-      print(e.key);
-      print(e.value.exercises);
       groupedExercises[e.key] = e.value.exercises.map((ex) => Exercise.copy(ex)).toList();
       for(Exercise ex in groupedExercises[e.key]){
         ex.removeEmptySets();
