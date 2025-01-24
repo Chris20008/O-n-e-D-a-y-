@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "2:2510276494793380538",
-      "lastPropertyId": "11:3217034757361258893",
+      "lastPropertyId": "12:64718899079331937",
       "name": "ObExercise",
       "properties": [
         {
@@ -53,6 +53,11 @@
           "id": "11:3217034757361258893",
           "name": "category",
           "type": 6
+        },
+        {
+          "id": "12:64718899079331937",
+          "name": "blockLink",
+          "type": 1
         }
       ],
       "relations": []

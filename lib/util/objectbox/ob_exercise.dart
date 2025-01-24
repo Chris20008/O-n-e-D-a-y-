@@ -13,6 +13,7 @@ class ObExercise{
   int? seatLevel;
   String? linkName;
   int category;
+  bool blockLink;
 
   ObExercise({
     this.id = 0,
@@ -23,7 +24,8 @@ class ObExercise{
     required this.setTypes,
     this.seatLevel,
     this.linkName,
-    this.category = 1
+    this.category = 1,
+    this.blockLink = false
   });
 
   factory ObExercise.fromMap(Map w){
@@ -36,7 +38,8 @@ class ObExercise{
         restInSeconds: w["restInSeconds"]?? 0,
         seatLevel: w["seatLevel"],
         linkName: w["linkName"],
-        category: w["category"]?? 1
+        category: w["category"]?? 1,
+        blockLink: w["blockLink"]?? false
     );
   }
 
@@ -50,7 +53,8 @@ class ObExercise{
       "restInSeconds": restInSeconds,
       "seatLevel": seatLevel,
       "linkName": linkName,
-      "category": category
+      "category": category,
+      "blockLink": blockLink
     };
     if(m["category"] == 1){
       m.remove("category");
@@ -64,6 +68,9 @@ class ObExercise{
     if(m["restInSeconds"] == 0){
       m.remove("restInSeconds");
     }
+    if(!blockLink){
+      m.remove("blockLink");
+    }
     return m;
   }
 
@@ -71,7 +78,7 @@ class ObExercise{
     final listHashW = Object.hashAll(weights);
     final listHashA = Object.hashAll(amounts);
     final listHashS = Object.hashAll(setTypes);
-    return Object.hash(name, restInSeconds, seatLevel, linkName, listHashW, listHashA, listHashS, category);
+    return Object.hash(name, restInSeconds, seatLevel, linkName, listHashW, listHashA, listHashS, category, blockLink);
   }
 
   bool equals(ObExercise ex){

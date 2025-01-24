@@ -15,6 +15,7 @@ class Workout{
   DateTime? date;
   int id;
   bool isTemplate;
+  /// holds the names of exercise links/groups
   List<String> linkedExercises;
 
   Workout({
@@ -60,7 +61,8 @@ class Workout{
           restInSeconds: e.restInSeconds,
           seatLevel: e.seatLevel,
           linkName: e.linkName,
-          category: e.category
+          category: e.category,
+          blockLink: e.blockLink
       ))),
       date: w.date,
       id: w.id,
@@ -89,6 +91,7 @@ class Workout{
           ex.restInSeconds = newExercise.restInSeconds;
           ex.seatLevel = newExercise.seatLevel;
           ex.category = newExercise.category;
+          ex.blockLink = newExercise.blockLink;
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
@@ -97,8 +100,17 @@ class Workout{
       for (Exercise ex in newExercises){
         /// Convert Exercise to ObExercise
         ObExercise obExercise = ex.toObExercise();
-        /// Add the new exercise to the template
-        template.exercises.add(obExercise);
+
+        if(obExercise.linkName != null){
+          final insertIndex = template.exercises.lastIndexWhere((element) => element.linkName == obExercise.linkName) + 1;
+          template.exercises.insert(insertIndex, obExercise);
+          Workout.fromObWorkout(template).saveToDatabase();
+          return;
+        }
+        else{
+          /// Add the new exercise to the template
+          template.exercises.add(obExercise);
+        }
         /// Put the new exercise in the database
         objectbox.exerciseBox.put(obExercise);
       }
@@ -167,15 +179,10 @@ class Workout{
 
   bool equals(Workout w){
     if(w.exercises.length != exercises.length){
-      // print("----------- NOT SAME LENGTH EXERCISE");
-      // print(w.asMap());
-      // print("----------------------");
-      // print(asMap());
       return false;
     }
     for(List<Exercise> e in zip([w.exercises, exercises])){
       if(!e[0].equals(e[1])){
-        // print("----------- UNEQUALS in EXERCISE");
         return false;
       }
     }
@@ -195,6 +202,7 @@ class Workout{
     /// workout already exists
     if(existingObWorkout != null){
       /// find and delete all exercises from this workout
+      /// this is necessary to be able to change the order, since objectbox returns the exercises ordered by ID
       List<ObExercise> oldObExercises = existingObWorkout.exercises;
       objectbox.exerciseBox.removeMany(oldObExercises.map((e) => e.id).toList());
       existingObWorkout.name = name;
@@ -207,7 +215,6 @@ class Workout{
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toEmptyObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
-    // print("linked exercises string in saveToDatabase() ${newObWorkout.linkedExercises}");
     objectbox.workoutBox.put(newObWorkout);
     objectbox.exerciseBox.putMany(newObExercises);
   }

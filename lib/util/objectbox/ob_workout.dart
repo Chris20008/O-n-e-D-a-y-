@@ -60,17 +60,6 @@ class ObWorkout{
   }
 
   Map asMap(){
-    // final exs = List<Map>.from(exercises.map((ex) => {
-    //   "id": ex.id,
-    //   "name": ex.name,
-    //   "weights": ex.weights,
-    //   "amounts": ex.amounts,
-    //   "setTypes": ex.setTypes,
-    //   "restInSeconds": ex.restInSeconds,
-    //   "seatLevel": ex.seatLevel,
-    //   "linkName": ex.linkName,
-    //   "category": ex.category
-    // }));
     final exs = List<Map>.from(exercises.map((ex) => ex.asMap()));
     final result = {
       "id": id,

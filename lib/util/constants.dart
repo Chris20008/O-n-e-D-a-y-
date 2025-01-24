@@ -423,7 +423,7 @@ Widget getSelectCategory({
     routeTheme: routeTheme,
     itemBuilder: (context) {
       List categories = categoryMapping.keys.toList();
-      List<PullDownMenuItem> seatLevelWidgets = List.generate(categories.length, (index) => PullDownMenuItem.selectable(
+      List<PullDownMenuItem> categoryWidgets = List.generate(categories.length, (index) => PullDownMenuItem.selectable(
           selected: currentCategory == categories[index],
           title: categoryMapping[categories[index]],
           onTap: () {
@@ -434,7 +434,7 @@ Widget getSelectCategory({
             });
           })
       );
-      return seatLevelWidgets;
+      return categoryWidgets;
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(

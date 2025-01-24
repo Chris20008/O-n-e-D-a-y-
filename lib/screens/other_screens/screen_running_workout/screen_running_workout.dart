@@ -60,8 +60,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
-  // bool showSelectorExerciseToUpdate = false;
-  // bool showSelectorExercisePerLink = false;
   bool isSavingData = false;
   final _style = const TextStyle(color: Colors.white, fontSize: 15);
   String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
@@ -219,17 +217,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                         child: child,
                                       );
                                     },
-                                    // separatorBuilder: (BuildContext context, int index) {
-                                    //   if (index == 0){
-                                    //     return const SizedBox();
-                                    //   }
-                                    //   dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[index+1].value;
-                                    //   if (item is Exercise || item is GroupedExercise){
-                                    //     return mySeparator();
-                                    //   }
-                                    //   return const SizedBox();
-                                    // },
-                                    // cacheExtent: 1000000,
                                     itemCount: cnRunningWorkout.groupedExercises.length,
                                     itemBuilder: (BuildContext context, int indexExercise) {
                                       Widget? child;
@@ -284,7 +271,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                   child: OverflowSafeText(
                                                     groupedExerciseKey,
                                                     textAlign: TextAlign.center,
-                                                    // fontSize: 12,
                                                     style: const TextStyle(
                                                         fontSize: 13,
                                                         color: Colors.white70
@@ -319,7 +305,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                         return PullDownMenuItem.selectable(
                                                           title: value.name,
                                                           selected: value.name == (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!)?.name,
-                                                          // selected: false,
                                                           onTap: () {
                                                             FocusManager.instance.primaryFocus?.unfocus();
                                                             HapticFeedback.selectionClick();
@@ -534,12 +519,31 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                         );
                                       }
 
+                                      // GlobalKey key = currentDraggingKey == null ||
+                                      //     ((item is NamedSet || item is GroupedSet)
+                                      //         && groupedExerciseKey.contains(currentDraggingKey!))
+                                      //     ? GlobalKey(debugLabel: groupedExerciseKey)
+                                      //     : GlobalKey();
+                                      //
+                                      // Future.delayed(const Duration(milliseconds: 300), (){
+                                      //   final keyContext = key.currentContext;
+                                      //   if (keyContext == null || !keyContext.mounted) {
+                                      //     return Container();
+                                      //   }
+                                      //   final box = keyContext.findRenderObject() as RenderBox;
+                                      //   final pos = box.localToGlobal(Offset.zero);
+                                      //   print("Height");
+                                      //   print(key.toString());
+                                      //   print(box.size.height);
+                                      // });
+
                                       return Container(
                                           key: currentDraggingKey == null ||
                                               ((item is NamedSet || item is GroupedSet)
                                               && groupedExerciseKey.contains(currentDraggingKey!))
                                               ? ValueKey(groupedExerciseKey)
                                               : UniqueKey(),
+                                          // key: key,
                                           // key: ValueKey(groupedExerciseKey),
                                           child: child?? const SizedBox());
                                     },
@@ -624,7 +628,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplateNotModifiable),
                 onConfirm: finishWorkout,
                 onCancel: (){
-                  // controllerSelectorExerciseToUpdate.close().then((value) => controllerSelectorExercisePerLink.close());
                   controllerSelectorExerciseToUpdate.close();
                 },
               ),
@@ -688,7 +691,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
       }
     }
-    cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
     final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
     cnRunningWorkout.scrollController.jumpTo(newControllerPos);
     cnRunningWorkout.refresh();
@@ -714,7 +716,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     //   } else{
     //     cnRunningWorkout.textControllers[setsToInsert.exName]?.insert(setsToInsert.index, [TextEditingController(), TextEditingController()]);
     //   }
-    //   cnRunningWorkout.slideableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
+    //   cnRunningWorkout.slidableKeys[setsToInsert.exName]?.insert(setsToInsert.index, UniqueKey());
     // });
     // cnRunningWorkout.cache();
   }
@@ -1044,16 +1046,6 @@ class CnRunningWorkout extends ChangeNotifier {
   bool isVisible = false;
   ScrollController scrollController = ScrollController();
   List<String> newExNames = [];
-  late Map<String, List<Key>> slideableKeys = {
-    for (var e in workout.exercises)
-      e.name :
-      e.generateKeyForEachSet()
-  };
-  // late Map<String, List<List<TextEditingController>>> textControllers = {
-  //   for (var e in workout.exercises)
-  //     e.name :
-  //     e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
-  // };
   /// Contains all Exercises - linked and non linked ones - as a Map
   /// linked exercises are saved as another Map with key = linkName
   /// non linked Exercises are saved as the exercise itself with the ex.name as the key
@@ -1072,11 +1064,11 @@ class CnRunningWorkout extends ChangeNotifier {
     cnConfig = Provider.of<CnConfig>(context, listen: false);
   }
   
-  void addExercise(Exercise ex){
-    workoutTemplateModifiable.exercises.add(Exercise.copy(ex));
-    workout.exercises.add(ex);
-    newExNames.add(ex.name);
-    slideableKeys[ex.name] = ex.generateKeyForEachSet();
+  void addExercise(
+      Exercise ex,
+      BuildContext context,
+      {double? additionalScrollPosition}
+      ){
     SingleSet newSet = ex.sets.first;
     NamedSet newNamedSet = NamedSet(
         set: newSet,
@@ -1086,14 +1078,83 @@ class CnRunningWorkout extends ChangeNotifier {
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
         amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
     );
+    final maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
     if(ex.linkName == null){
+      workoutTemplateModifiable.exercises.add(Exercise.copy(ex));
+      workout.exercises.add(ex);
+      newExNames.add(ex.name);
       exerciseOrder.add(ex.name);
       groupedExercises[ex.name] = ex;
       groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
+
+      /// Add one set row and Exercise size
+      final newMaxScrollExtend = maxScrollExtend + 40 + 133;
+      scrollController.animateTo(newMaxScrollExtend, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    } else{
+      final insertIndex = workout.exercises.lastIndexWhere((e) => e.linkName == ex.linkName) + 1;
+      workoutTemplateModifiable.exercises.insert(insertIndex, Exercise.copy(ex));
+      workout.exercises.insert(insertIndex ,ex);
+      newExNames.add(ex.name);
+      (groupedExercises[ex.linkName!] as GroupedExercise).add(ex);
+      (groupedExercises[getSetKeyName(ex.linkName!, 0)] as GroupedSet).add(newNamedSet);
+
+      final lastIndex = groupedExercises.keys.toList().indexWhere((element) => element == getSetKeyName(ex.linkName!, 0));
+      List<MapEntry<String, dynamic>> tempGroupedExercises = groupedExercises.entries.whereIndexed((index, element) => index <= lastIndex).toList();
+
+      final amountNamedSets = tempGroupedExercises.where((element) => element.value is NamedSet).length;
+      List<dynamic> groupedSets = tempGroupedExercises.where((element) => element.value is GroupedSet).toList();
+      final amountExercises = tempGroupedExercises.where((element) => element.value is Exercise).length;
+      final amountGroupedExercises = tempGroupedExercises.where((element) => element.value is GroupedExercise).length - 1;
+      final amountSeparators = tempGroupedExercises.where((element) => element.key.contains("|Separator")).length;
+      int amountGroupedSets = 0;
+      for(String linkName in selectedIndexes.keys){
+        final exercise = (groupedExercises[linkName] as GroupedExercise).getExercise(selectedIndexes[linkName]!);
+        for (MapEntry<String, dynamic> s in groupedSets){
+          if(s.value.getSet(exercise!.name) != null){
+            amountGroupedSets += 1;
+          }
+        }
+      }
+      final position = amountNamedSets * 40
+          + (amountGroupedSets-1) * 40
+          + amountExercises * 133
+          + amountSeparators * 89
+          + amountGroupedExercises * 167.0;
+      /// subtract one Separator size
+      final newMaxScrollExtend = maxScrollExtend - 89;
+      scrollController.animateTo(position.clamp(0, newMaxScrollExtend), duration: const Duration(milliseconds: 1000), curve: Curves.easeInOut)
+          .then((value) {
+        selectedIndexes[ex.linkName!] = (groupedExercises[ex.linkName] as GroupedExercise).exercises.length-1;
+        refresh();
+      });
     }
     checkSeparator(ex);
     cache();
     refresh();
+  }
+
+  double getMaxScrollExtend(BuildContext context, {double? additionalScrollPosition}){
+    final amountNamedSets = groupedExercises.values.whereType<NamedSet>().length;
+    final groupedSets = groupedExercises.values.whereType<GroupedSet>();
+    final amountExercises = groupedExercises.values.whereType<Exercise>().length;
+    final amountGroupedExercises = groupedExercises.values.whereType<GroupedExercise>().length;
+    final amountSeparators = groupedExercises.keys.where((element) => element.contains("|Separator")).length;
+    int amountGroupedSets = 0;
+    for(String linkName in selectedIndexes.keys){
+      final exercise = (groupedExercises[linkName] as GroupedExercise).getExercise(selectedIndexes[linkName]!);
+      for (GroupedSet s in groupedSets){
+        if(s.getSet(exercise!.name) != null){
+          amountGroupedSets += 1;
+        }
+      }
+    }
+    return amountNamedSets * 40
+        + amountGroupedSets * 40
+        + amountExercises * 133
+        + amountSeparators * 89
+        + amountGroupedExercises * 167
+        + 80.0 + 39 - MediaQuery.of(context).size.height
+        + (additionalScrollPosition?? 0);
   }
 
   void deleteExercise(Exercise ex){
@@ -1101,7 +1162,6 @@ class CnRunningWorkout extends ChangeNotifier {
     dismissedSets.removeWhere((e) => e.exName == ex.name);
     workout.exercises.removeWhere((e) => e.name == ex.name);
     newExNames.removeWhere((e) => e == ex.name);
-    slideableKeys.remove(ex.name);
     groupedExercises.remove(ex.name);
     refresh();
   }
@@ -1113,7 +1173,6 @@ class CnRunningWorkout extends ChangeNotifier {
       data.containsKey("workoutTemplateNotModifiable") &&
       data.containsKey("isRunning") &&
       data.containsKey("isVisible") &&
-      // data.containsKey("testControllerValues") &&
       data.containsKey("selectedIndexes") &&
       data.containsKey("newExNames")
     ){
@@ -1126,10 +1185,7 @@ class CnRunningWorkout extends ChangeNotifier {
       workout = Workout().fromMap(data["workout"]) ?? Workout();
       workoutTemplateModifiable = Workout().fromMap(data["workoutTemplateModifiable"]) ?? Workout();
       workoutTemplateNotModifiable = Workout().fromMap(data["workoutTemplateNotModifiable"]) ?? Workout();
-      initSlideableKeys();
       initGroupedExercises();
-      // initTextControllers();
-      // setTextControllerValues(data["testControllerValues"]);
     }
   }
 
@@ -1152,15 +1208,6 @@ class CnRunningWorkout extends ChangeNotifier {
         CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
-
-    // while(true){
-    //   await Future.delayed(const Duration(milliseconds: 5), (){});
-    //   if(scrollController.hasClients){
-    //     print(scrollController.position.pixels);
-    //     scrollController.jumpTo(lastScrollPosition);
-    //     break;
-    //   }
-    // }
     isVisible = true;
     cache();
   }
@@ -1174,18 +1221,8 @@ class CnRunningWorkout extends ChangeNotifier {
     workout = Workout.copy(w);
     workoutTemplateNotModifiable = Workout.copy(w);
     workout.resetAllExercisesSets(keepSetType: true);
-    initSlideableKeys();
     initSelectedIndexes();
     initGroupedExercises();
-    // initTextControllers();
-  }
-
-  void initSlideableKeys(){
-    slideableKeys = {
-      for (var e in workout.exercises)
-        e.name :
-        e.generateKeyForEachSet()
-    };
   }
 
   void initSelectedIndexes(){
@@ -1257,34 +1294,18 @@ class CnRunningWorkout extends ChangeNotifier {
       String bFirst = b.split("_").first;
       String aLast = a.split("_").last;
       String bLast = b.split("_").last;
-      // print("");
-      // print("AB");
-      // print(a +""+ b);
-      // print(aFirst);
-      // print(bFirst);
       final indexA = exerciseOrder.indexOf(aFirst);
       final indexB = exerciseOrder.indexOf(bFirst);
-      // print("INDEX");
-      // print(indexA);
-      // print(indexB);
       if(indexA == indexB){
-        // print("EQUAL");
-        // print(aLast);
-        // print(bLast);
-        // print(aLast.compareTo(bLast));
         if(aFirst == aLast && bFirst != bLast){
-          // print("SMALLER");
           return -1;
         } else if(aFirst != aLast && bFirst == bLast){
-          // print("BIGGER");
           return 1;
         }
         return aLast.compareTo(bLast);
       } else if(indexA > indexB){
-        // print("BIGGER");
         return 1;
       } else{
-        // print("SMALLER");
         return -1;
       }
     }
@@ -1300,14 +1321,6 @@ class CnRunningWorkout extends ChangeNotifier {
     }
   }
 
-  // void initTextControllers(){
-  //   textControllers = {
-  //     for (var e in workout.exercises)
-  //       e.name :
-  //       e.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList()
-  //   };
-  // }
-
   Future<void> cache() async{
     Map data = {
       "workout": workout.asMap(),
@@ -1315,28 +1328,12 @@ class CnRunningWorkout extends ChangeNotifier {
       "workoutTemplateNotModifiable": workoutTemplateNotModifiable.asMap(),
       "isRunning": isRunning,
       "isVisible": isVisible,
-      // "testControllerValues": getTextControllerValues(),
       "selectedIndexes": selectedIndexes,
       "newExNames": newExNames
     };
     cnConfig.config.cnRunningWorkout = data;
     await cnConfig.config.save();
   }
-
-  // Map<String, List<dynamic>> getTextControllerValues(){
-  //   return {
-  //     for (MapEntry entry in textControllers.entries)
-  //       entry.key :
-  //       entry.value.map((controllers) => [controllers[0].text, controllers[1].text]).toList()
-  //   };
-  // }
-
-  // void setTextControllerValues(Map<String, dynamic> textControllersValues){
-  //   for (MapEntry entry in textControllersValues.entries){
-  //     // textControllers[entry.key] = entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[0])]).toList();
-  //     textControllers[entry.key] = List<List<TextEditingController>>.from(entry.value.map((e) => [TextEditingController(text: e[0]), TextEditingController(text: e[1])]));
-  //   }
-  // }
 
   NamedSet? removeSpecificSetFromExercise(NamedSet set){
     NamedSet? removedSet;
@@ -1439,8 +1436,6 @@ class CnRunningWorkout extends ChangeNotifier {
   void clear(){
     lastScrollPosition = 0;
     workout = Workout();
-    // textControllers.clear();
-    slideableKeys.clear();
     selectedIndexes.clear();
     groupedExercises.clear();
     exercisesToRemove.clear();

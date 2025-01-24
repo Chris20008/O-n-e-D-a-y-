@@ -90,6 +90,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                                             cnScreenStatistics.refreshData();
                                             cnScreenStatistics.resetGraph();
                                             cnScreenStatistics.refresh();
+                                            await cnConfig.config.save();
                                             Fluttertoast.showToast(
                                                 msg: AppLocalizations.of(currentContext)!.backupLoadSuccess,
                                                 toastLength: Toast.LENGTH_LONG,

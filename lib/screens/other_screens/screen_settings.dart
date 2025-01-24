@@ -57,7 +57,6 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state){
-    // cnConfig.isICloudAvailable = null;
     setState(() {});
   }
 
@@ -448,6 +447,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               cnScreenStatistics.refreshData();
               cnScreenStatistics.resetGraph();
               cnScreenStatistics.refresh();
+              await cnConfig.config.save();
               Fluttertoast.showToast(
                   msg: AppLocalizations.of(context)!.backupLoadSuccess,
                   toastLength: Toast.LENGTH_LONG,

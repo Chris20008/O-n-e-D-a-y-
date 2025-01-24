@@ -252,7 +252,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                           );
 
                                           return Slidable(
-                                              key: cnNewExercise.slideableKeys[index],
+                                              key: cnNewExercise.slidableKeys[index],
                                               // key: UniqueKey(),
                                               startActionPane: ActionPane(
                                                 motion: const ScrollMotion(),
@@ -445,7 +445,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   void dismissExercise(int index){
     setState(() {
       cnNewExercise.exercise.sets.removeAt(index);
-      cnNewExercise.slideableKeys.removeAt(index);
+      cnNewExercise.slidableKeys.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
       cnNewExercise.ensureVisibleKeys.removeAt(index);
     });
@@ -454,7 +454,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   void addSet(){
     setState(() {
       cnNewExercise.exercise.addSet();
-      cnNewExercise.slideableKeys.add(UniqueKey());
+      cnNewExercise.slidableKeys.add(UniqueKey());
       cnNewExercise.controllers.add([TextEditingController(),TextEditingController()]);
       cnNewExercise.ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
       cnNewExercise.scrollControllerSets.jumpTo(cnNewExercise.scrollControllerSets.position.pixels+41);
@@ -775,7 +775,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
   ScrollController scrollControllerSets = ScrollController();
-  late List<Key> slideableKeys = exercise.generateKeyForEachSet();
+  late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
   final int animationTime = 300;
 
@@ -788,7 +788,7 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   void setExercise(Exercise ex){
     exercise = ex;
-    slideableKeys = exercise.generateKeyForEachSet();
+    slidableKeys = exercise.generateKeyForEachSet();
     controllers = exercise.sets.map((set) => ([TextEditingController(text: "${set.weightAsTrimmedDouble}"), TextEditingController(text: "${exercise.categoryIsReps()? (set.amount) : parseTextControllerAmountToTime(set.amount)[1]}")])).toList();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
