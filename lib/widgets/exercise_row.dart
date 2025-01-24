@@ -33,7 +33,8 @@ class ExerciseRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.1),
+        color: Colors.grey.withOpacity(0.07),
+        // color: Color(0x921c1001),
         borderRadius: borderRadius?? BorderRadius.circular(8)
       ),
       margin: margin,

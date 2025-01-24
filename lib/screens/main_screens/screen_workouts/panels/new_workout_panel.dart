@@ -788,7 +788,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         child: Container(
           margin: EdgeInsets.only(top: 3),
           decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withOpacity(0.07),
               borderRadius: isLast? BorderRadius.circular(8) : BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
           ),
           child: Row(
