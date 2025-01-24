@@ -54,7 +54,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
-  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 160;
+  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 90;
   Key selectorExerciseToUpdateKey = UniqueKey();
   Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
@@ -1078,7 +1078,7 @@ class CnRunningWorkout extends ChangeNotifier {
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
         amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
     );
-    final maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
+    double maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
     if(ex.linkName == null){
       workoutTemplateModifiable.exercises.add(Exercise.copy(ex));
       workout.exercises.add(ex);
@@ -1088,8 +1088,10 @@ class CnRunningWorkout extends ChangeNotifier {
       groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
 
       /// Add one set row and Exercise size
-      final newMaxScrollExtend = maxScrollExtend + 40 + 133;
-      scrollController.animateTo(newMaxScrollExtend, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+      if(maxScrollExtend > 0){
+        maxScrollExtend = maxScrollExtend + 40 + 133;
+      }
+      scrollController.animateTo(maxScrollExtend, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     } else{
       final insertIndex = workout.exercises.lastIndexWhere((e) => e.linkName == ex.linkName) + 1;
       workoutTemplateModifiable.exercises.insert(insertIndex, Exercise.copy(ex));
@@ -1121,8 +1123,10 @@ class CnRunningWorkout extends ChangeNotifier {
           + amountSeparators * 89
           + amountGroupedExercises * 167.0;
       /// subtract one Separator size
-      final newMaxScrollExtend = maxScrollExtend - 89;
-      scrollController.animateTo(position.clamp(0, newMaxScrollExtend), duration: const Duration(milliseconds: 1000), curve: Curves.easeInOut)
+      if(maxScrollExtend > 89){
+        maxScrollExtend = maxScrollExtend - 89;
+      }
+      scrollController.animateTo(position.clamp(0, maxScrollExtend), duration: const Duration(milliseconds: 1000), curve: Curves.easeInOut)
           .then((value) {
         selectedIndexes[ex.linkName!] = (groupedExercises[ex.linkName] as GroupedExercise).exercises.length-1;
         refresh();
@@ -1148,13 +1152,19 @@ class CnRunningWorkout extends ChangeNotifier {
         }
       }
     }
-    return amountNamedSets * 40
+    double scrollExtend = amountNamedSets * 40
         + amountGroupedSets * 40
         + amountExercises * 133
         + amountSeparators * 89
         + amountGroupedExercises * 167
-        + 80.0 + 39 - MediaQuery.of(context).size.height
+        + (Platform.isAndroid? 80 : 115) /// Top Spacer
+        + 39                             /// Bottom Spacer
+        - MediaQuery.of(context).size.height
         + (additionalScrollPosition?? 0);
+    if(scrollExtend < 0){
+      return 0;
+    }
+    return scrollExtend;
   }
 
   void deleteExercise(Exercise ex){
