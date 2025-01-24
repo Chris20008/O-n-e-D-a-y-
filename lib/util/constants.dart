@@ -171,12 +171,13 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
-Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color}){
+Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color, Key? key, bool ignoring= true}){
   return IgnorePointer(
-    ignoring: true,
+    key: key,
+    ignoring: ignoring,
     child: Column(
       children: [
-        SizedBox(height: heightTop),
+        Container(height: heightTop, color: Colors.transparent,),
         Container(
           height: 1,
           width: double.maxFinite - minusWidth,
@@ -184,7 +185,7 @@ Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minu
             color: (color?? Colors.amber[900])!.withOpacity(opacity)
           // color: Colors.amber[900]!.withOpacity(0.6),
         ),
-        SizedBox(height: heightBottom),
+        Container(height: heightTop, color: Colors.transparent,),
       ],
     ),
   );
@@ -832,7 +833,9 @@ Widget buildCalendarDialogButton({
                                 ? Colors.white
                                 : dayText.contains("Krank")
                                 ? colorAmberDark
-                                : colorAmber)
+                                : colorAmber,
+                          fontWeight: FontWeight.w600
+                        )
                     )
                 ),
               ],

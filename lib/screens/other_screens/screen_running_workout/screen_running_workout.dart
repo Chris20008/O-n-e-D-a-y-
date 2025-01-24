@@ -40,24 +40,6 @@ class ScreenRunningWorkout extends StatefulWidget {
 }
 
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
-  // late final AnimationController _controllerSelectorExUpdate = AnimationController(
-  //   duration: const Duration(milliseconds: 200),
-  //   vsync: this,
-  // );
-  // late final Animation<double> _animationSelectorExUpdate = CurvedAnimation(
-  //   parent: _controllerSelectorExUpdate,
-  //   curve: Curves.decelerate,
-  //     // curve: Curves.easeOutBack
-  // );
-  // late final AnimationController _controllerSelectorExPerLink = AnimationController(
-  //   duration: const Duration(milliseconds: 200),
-  //   vsync: this,
-  // );
-  // late final Animation<double> _animationSelectorExPerLink = CurvedAnimation(
-  //   parent: _controllerSelectorExPerLink,
-  //   curve: Curves.decelerate,
-  //     // curve: Curves.easeOutBack
-  // );
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
@@ -72,6 +54,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
+  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 160;
   Key selectorExerciseToUpdateKey = UniqueKey();
   Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
@@ -539,9 +522,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                             child?? const SizedBox(),
                                             AnimatedContainer(
                                                 duration: const Duration(milliseconds: 250),
-                                                height: cnStopwatchWidget.isOpened
-                                                    ? 160 + cnStopwatchWidget.heightOfTimer
-                                                    : 160
+                                                height: _defaultBottomSpacerHeight
+                                                    + (cnStopwatchWidget.isOpened
+                                                        ? cnStopwatchWidget.heightOfTimer
+                                                        : 0)
+                                                    + (cnSpotifyBar.isConnected
+                                                        ? cnSpotifyBar.height
+                                                        : 0)
                                             ),
                                           ],
                                         );
@@ -615,33 +602,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                     ),
                   ),
                 ),
+
               const StandardPopUp(),
-              // AnimatedCrossFade(
-              //   firstChild: Container(
-              //     color: Colors.black54,
-              //   ),
-              //   secondChild: const SizedBox(),
-              //   crossFadeState: showSelectorExerciseToUpdate || showSelectorExercisePerLink
-              //       ? CrossFadeState.showFirst
-              //       : CrossFadeState.showSecond,
-              //   duration: const Duration(milliseconds: 200),
-              //   layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-              //     return Stack(
-              //       clipBehavior: Clip.none,
-              //       alignment: Alignment.center,
-              //       children: <Widget>[
-              //         Positioned(
-              //           key: bottomChildKey,
-              //           child: bottomChild,
-              //         ),
-              //         Positioned(
-              //           key: topChildKey,
-              //           child: topChild,
-              //         ),
-              //       ],
-              //     );
-              //   },
-              // ),
+
               SelectorExercisesPerLink(
                 controller: controllerSelectorExercisePerLink,
                 key: selectorExercisePerLinkKey,
@@ -652,6 +615,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   controllerSelectorExercisePerLink.close();
                 },
               ),
+
               SelectorExercisesToUpdate(
                 key: selectorExerciseToUpdateKey,
                 controller: controllerSelectorExerciseToUpdate,
@@ -664,6 +628,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   controllerSelectorExerciseToUpdate.close();
                 },
               ),
+
               if (isSavingData)
                 Container(
                   color: Colors.black.withOpacity(0.5),
@@ -680,95 +645,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
       ),
     );
   }
-
-  // Widget getButtonInsertTemplatesData({
-  //   required SingleSet newSet,
-  //   required SingleSet? templateSet,
-  //   required Exercise? templateEx,
-  //   required int indexSet,
-  //   required TextEditingController? weightController,
-  //   required TextEditingController? amountController
-  // }){
-  //
-  //   String getText(){
-  //     if(templateEx == null || templateSet == null){
-  //       return "";
-  //     }
-  //     switch (templateEx.category){
-  //       case 1:
-  //         return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} kg x ${templateSet.amount?? ""}" : "";
-  //       case 2:
-  //         return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} km in ${templateSet.amountAsTime?? ""}" : "";
-  //       case 3:
-  //         return templateSet.weight != null && templateSet.amount != null? "${templateSet.weightAsTrimmedDouble?? ""} kg for ${templateSet.amountAsTime?? ""}" : "";
-  //       default:
-  //         return "";
-  //     }
-  //   }
-  //
-  //   final weightTextIsEmpty = weightController?.text.isEmpty?? false;
-  //   final amountTextIsEmpty = amountController?.text.isEmpty?? false;
-  //
-  //   return Expanded(
-  //       flex: 2,
-  //       child: IgnorePointer(
-  //         ignoring: !(weightTextIsEmpty &&
-  //             amountTextIsEmpty &&
-  //             templateSet?.weight != null &&
-  //             templateSet?.amount != null),
-  //         child: SizedBox(
-  //           height: _heightOfSetRow,
-  //           child: ElevatedButton(
-  //             style: ButtonStyle(
-  //                 shadowColor: MaterialStateProperty.all(Colors.transparent),
-  //                 surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-  //                 backgroundColor: MaterialStateProperty.all(Colors.transparent),
-  //                 shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
-  //             ),
-  //             onPressed: (){
-  //               if(templateSet == null || templateEx == null){
-  //                 return;
-  //               }
-  //               if(templateSet.weight != null &&
-  //                   templateSet.amount != null &&
-  //                   weightTextIsEmpty &&
-  //                   amountTextIsEmpty
-  //               ){
-  //                 vibrateConfirm();
-  //                 weightController?.text = (templateSet.weightAsTrimmedDouble?? "").toString();
-  //                 newSet.weight = templateSet.weight;
-  //                 if(templateEx.categoryIsReps()){
-  //                   amountController?.text = templateSet.amount!.toString();
-  //                 }
-  //                 else{
-  //                   amountController?.text = templateSet.amountAsTime.toString();
-  //                 }
-  //                 newSet.amount = templateSet.amount;
-  //                 cnRunningWorkout.refresh();
-  //                 cnRunningWorkout.cache();
-  //               } else{
-  //                 setState(() {
-  //                   FocusManager.instance.primaryFocus?.unfocus();
-  //                 });
-  //               }
-  //             },
-  //             child: Center(
-  //               child: OverflowSafeText(
-  //                 maxLines: 1,
-  //                 getText(),
-  //                 style: TextStyle(
-  //                     color: (weightTextIsEmpty &&
-  //                         amountTextIsEmpty)
-  //                         ?Colors.white
-  //                         : Colors.white.withOpacity(0.2)
-  //                 ),
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       )
-  //   );
-  // }
 
   void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
     cnRunningWorkout.exercisesToRemove = exToRemove?? [];
@@ -814,107 +690,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     }
     cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
     final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
-    // if(newControllerPos >= 0 && cnRunningWorkout.scrollController.position.maxScrollExtent >= newControllerPos){
     cnRunningWorkout.scrollController.jumpTo(newControllerPos);
-    // }
     cnRunningWorkout.refresh();
-    // setState();
   }
-
-  // void dismiss(Exercise ex, Exercise templateEx, NamedSet set){
-  //   setState(() {
-  //     // final dismissedSet = ex.sets.removeAt(set.index);
-  //     // final dismissedTemplateSet = lastEx.sets.removeAt(set.index);
-  //     // final dismissedControllers = cnRunningWorkout.textControllers[ex.name]?.removeAt(index);
-  //     // cnRunningWorkout.slideableKeys[ex.name]?.removeAt(index);
-  //
-  //     // print("KEY NAME ${getSetKeyName(ex.name, set.index)}");
-  //     // print(cnRunningWorkout.groupedExercises.keys);
-  //     // print("Länge vorher");
-  //     // print(cnRunningWorkout.groupedExercises.length);
-  //
-  //     final oldSetsAmount = ex.sets.length;
-  //     // print("Old Sets Amount = $oldSetsAmount");
-  //     ex.sets.removeAt(set.index);
-  //     templateEx.sets.removeAt(set.index);
-  //     if(ex.linkName == null){
-  //       // print("Is Single Exercise");
-  //       for(int i = set.index; i <= (oldSetsAmount-1); i++){
-  //         if(i == oldSetsAmount-1){
-  //           // print("Delete Set at index $i");
-  //           cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.name, i));
-  //           break;
-  //         }
-  //         // print("replace Set at index $i");
-  //         NamedSet nextNamedSet = cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, i+1)];
-  //         nextNamedSet.index -= 1;
-  //         cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, i)] = nextNamedSet;
-  //       }
-  //       // print("");
-  //     }
-  //     else {
-  //       // print("Is Grouped Exercise");
-  //       for(int i = set.index; i <= (oldSetsAmount-1); i++){
-  //         // cnRunningWorkout.groupedExercises.keys.forEach((element) {print(element);});
-  //         if(i == oldSetsAmount-1){
-  //           // print("Delete Set at index $i");
-  //           // print(getSetKeyName(ex.linkName!, i));
-  //           // print(cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)]);
-  //           cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].remove(ex.name);
-  //           if(cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].isEmpty()){
-  //             // print("Delete whole GroupeedSet");
-  //             cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.linkName!, i));
-  //           }
-  //           break;
-  //         }
-  //         // print("replace Set at index $i");
-  //         NamedSet nextNamedSet = cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i+1)].getSet(ex.name);
-  //         nextNamedSet.index -= 1;
-  //         cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].set(nextNamedSet);
-  //       }
-  //       // print("");
-  //     }
-  //
-  //
-  //
-  //     // cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.name, set.index));
-  //     // String name = ex.linkName ?? ex.name;
-  //     // cnRunningWorkout.groupedExercises.map((key, value) {
-  //     //   if(key.split("_").first == name){
-  //     //     if(value is NamedSet && value.index > set.index){
-  //     //       print("Dismiss in single Exercise");
-  //     //       value.index -= 1;
-  //     //     }
-  //     //     /// ToDo: not working properly
-  //     //     else if(value is GroupedSet){
-  //     //       NamedSet s = value._sets.firstWhere((set) => set.name == ex.name);
-  //     //       if(s.index > set.index){
-  //     //         print("Dismiss in grouped Exercise");
-  //     //         s.index -= 1;
-  //     //       }
-  //     //     }
-  //     //   }
-  //     //   return MapEntry(key, value);
-  //     // });
-  //     // print("Länge nachher");
-  //     // print(cnRunningWorkout.groupedExercises.length);
-  //     //
-  //     // final dismissedSet = ex.sets.removeAt(set.index);
-  //     // final dismissedTemplateSet = lastEx.sets.removeAt(set.index);
-  //
-  //     // cnRunningWorkout.dismissedSets.add(
-  //     //     DismissedSingleSet(
-  //     //         linkName: ex.linkName,
-  //     //         exName: ex.name,
-  //     //         index: set.index,
-  //     //         dismissedSet: dismissedSet,
-  //     //         dismissedTemplateSet: dismissedTemplateSet,
-  //     //         dismissedControllers: [set.weightController, set.amountController]
-  //     //     )
-  //     // );
-  //   });
-  //   cnRunningWorkout.cache();
-  // }
 
   void undoDismiss(){
     // if(cnRunningWorkout.dismissedSets.isEmpty){

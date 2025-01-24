@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,13 +41,19 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
             sizeCurve: Curves.easeInOut,
             firstChild: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Container(
-                color: Colors.black,
-                height: cnStopwatchWidget.heightOfTimer,
-                width: width - paddingLeftRight*2,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                    sigmaX: 10.0,
+                    sigmaY: 10.0,
+                    tileMode: TileMode.mirror
+                ),
+                child: Container(
+                  color: Colors.black.withOpacity(0.5),
+                  height: cnStopwatchWidget.heightOfTimer,
+                  width: width - paddingLeftRight*2,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
 
                     /// Stopwatch controls
                     Align(
@@ -144,79 +152,80 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                         )
                     ),
 
-                    /// Stopwatch text
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Text(
-                          cnStopwatchWidget.isRunning || cnStopwatchWidget.countdownTime != null
-                              ? getTimeString()
-                              // : cnStopwatchWidget.countdownTime != null
-                              // ? cnStopwatchWidget.countdownTime.toString()
-                              : "00:00",
-                          style: TextStyle(
-                            fontSize: 80,
-                            color: Colors.white54,
-                            fontFamily: GoogleFonts.robotoMono().fontFamily
-                          )
+                      /// Stopwatch text
+                      Align(
+                        alignment: Alignment.topCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Text(
+                            cnStopwatchWidget.isRunning || cnStopwatchWidget.countdownTime != null
+                                ? getTimeString()
+                                // : cnStopwatchWidget.countdownTime != null
+                                // ? cnStopwatchWidget.countdownTime.toString()
+                                : "00:00",
+                            style: TextStyle(
+                              fontSize: 80,
+                              color: const Color(0xFFA7A7A7),
+                              fontFamily: GoogleFonts.robotoMono().fontFamily
+                            )
+                          ),
+                        )
+                      ),
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 2.5),
+                          child: IconButton(
+                              iconSize: 30,
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                              ),
+                              onPressed: () {
+                                cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
+                                cnRunningWorkout.refresh();
+                              },
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
+                                color: Colors.amber[800],
+                              )
+                          ),
                         ),
-                      )
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 2.5),
-                        child: IconButton(
-                            iconSize: 30,
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                              // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                            ),
-                            onPressed: () {
-                              cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
-                              cnRunningWorkout.refresh();
+                      ),
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: getSelectRestInSeconds(
+                            currentTime: cnStopwatchWidget.countdownTime?? 0,
+                            context: context,
+                            onConfirm: (value){
+                              if (value is int){
+                                cnStopwatchWidget.countdownTime = value;
+                                cnStopwatchWidget.cancelTimer();
+                                cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                              }
+                              else if(value == AppLocalizations.of(context)!.clear){
+                                cnStopwatchWidget.countdownTime = null;
+                                cnStopwatchWidget.cancelTimer();
+                                cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
+                              }
+                              else{
+                                showDialogMinuteSecondPicker(
+                                    context: context,
+                                    initialTimeDuration: Duration(minutes: (cnStopwatchWidget.countdownTime??0)~/60, seconds: (cnStopwatchWidget.countdownTime??0)%60),
+                                    onConfirm: (Duration newDuration){
+                                      cnStopwatchWidget.countdownTime = newDuration.inSeconds;
+                                    }
+                                ).then((value) => setState(() {}));
+                              }
                             },
-                            icon: Icon(
-                              Icons.keyboard_arrow_down,
+                            child: Icon(
+                              Icons.timelapse_rounded,
                               color: Colors.amber[800],
                             )
                         ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: getSelectRestInSeconds(
-                          currentTime: cnStopwatchWidget.countdownTime?? 0,
-                          context: context,
-                          onConfirm: (value){
-                            if (value is int){
-                              cnStopwatchWidget.countdownTime = value;
-                              cnStopwatchWidget.cancelTimer();
-                              cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                            }
-                            else if(value == AppLocalizations.of(context)!.clear){
-                              cnStopwatchWidget.countdownTime = null;
-                              cnStopwatchWidget.cancelTimer();
-                              cnConfig.setCountdownTime(cnStopwatchWidget.countdownTime);
-                            }
-                            else{
-                              showDialogMinuteSecondPicker(
-                                  context: context,
-                                  initialTimeDuration: Duration(minutes: (cnStopwatchWidget.countdownTime??0)~/60, seconds: (cnStopwatchWidget.countdownTime??0)%60),
-                                  onConfirm: (Duration newDuration){
-                                    cnStopwatchWidget.countdownTime = newDuration.inSeconds;
-                                  }
-                              ).then((value) => setState(() {}));
-                            }
-                          },
-                          child: Icon(
-                            Icons.timelapse_rounded,
-                            color: Colors.amber[800],
-                          )
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
