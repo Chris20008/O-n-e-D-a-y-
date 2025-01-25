@@ -504,7 +504,7 @@ class CnScreenStatistics extends ChangeNotifier {
 
   Map<DateTime, double>? getOneRepMaxPerDate(){
     double bodyWeight = 0;
-    if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft"].contains(selectedExerciseName)){
+    if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft", "Squat Langhantel"].contains(selectedExerciseName)){
       bodyWeight = 82;
     }
     final exercises = getSelectedExerciseHistory();
