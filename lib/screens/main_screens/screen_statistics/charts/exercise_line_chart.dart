@@ -33,7 +33,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
   List<Color> gradientColors3 = [
     const Color(0xffffa3a3),
-    const Color(0xffa34141),
+    const Color(0xffa66161),
   ];
 
   List<Color> gradientColors4 = [

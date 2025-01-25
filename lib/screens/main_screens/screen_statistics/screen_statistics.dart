@@ -365,16 +365,22 @@ class CnScreenStatistics extends ChangeNotifier {
   late List<String> allWorkoutNames = getAllWorkoutNames();
   late List<String> allExerciseNames = getAllExerciseNames();
   List<ObSickDays> allSickDays = [];
+
   String? selectedExerciseName;
   String? selectedWorkoutName;
   int selectedWorkoutIndex = 0;
   bool showAvgWeightPerSetLine = true;
-  String? selectedWorkoutNameLast;
-  int selectedWorkoutIndexLast = 0;
-  bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
   bool showOneRepMax = false;
   bool showSickDays = false;
+
+  String? selectedWorkoutNameLast;
+  int selectedWorkoutIndexLast = 0;
+  bool showAvgWeightPerSetLineLast = true;
+  bool onlyWorkingSetsLast = true;
+  bool showOneRepMaxLast = true;
+  bool showSickDaysLast = false;
+
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
   double offsetMinX = 0;
@@ -584,12 +590,18 @@ class CnScreenStatistics extends ChangeNotifier {
     selectedWorkoutNameLast = selectedWorkoutName;
     selectedWorkoutIndexLast = selectedWorkoutIndex;
     showAvgWeightPerSetLineLast = showAvgWeightPerSetLine;
+    onlyWorkingSetsLast = onlyWorkingSets;
+    showOneRepMaxLast = showOneRepMax;
+    showSickDaysLast = showSickDays;
   }
 
   void restoreLastFilterState(){
     selectedWorkoutName = selectedWorkoutNameLast;
     selectedWorkoutIndex = selectedWorkoutIndexLast;
     showAvgWeightPerSetLine = showAvgWeightPerSetLineLast;
+    onlyWorkingSets = onlyWorkingSetsLast;
+    showOneRepMax = showOneRepMaxLast;
+    showSickDays = showSickDaysLast;
   }
 
   void refreshData(){
