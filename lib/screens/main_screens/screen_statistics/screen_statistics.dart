@@ -4,7 +4,6 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/util/constants.dart';
-import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
@@ -144,7 +143,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         maxWidth: 350,
         padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
         context: context,
-        child: getPopUpChild(cnScreenStatistics, context),
+        child: getPopUpChild(context),
         onConfirm: (){
           cnScreenStatistics.refreshData();
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
@@ -159,7 +158,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     );
   }
 
-  Widget getPopUpChild(CnScreenStatistics provider, BuildContext context){
+  Widget getPopUpChild(BuildContext context){
     List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
     /// Replace the "ALL Workouts" name in correct language
     workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
@@ -234,14 +233,42 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.showAvgWeightPerSetLine,
+                  value: cnScreenStatistics.showAvgWeightPerSetLine,
                   activeColor: const Color(0xFFC16A03),
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showAvgWeightPerSetLine = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
+                    cnStandardPopUp.refresh();
+                  }
+              ),
+            ]
+        ),
+        const SizedBox(height: 15,),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OverflowSafeText("1RM Anzeigen", maxLines: 1),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 30,),
+              CupertinoSwitch(
+                  value: cnScreenStatistics.showOneRepMax,
+                  activeColor: const Color(0xFFC16A03),
+                  onChanged: (value){
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                    cnScreenStatistics.showOneRepMax = value;
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -271,14 +298,14 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.onlyWorkingSets,
+                  value: cnScreenStatistics.onlyWorkingSets,
                   activeColor: const Color(0xFFC16A03),
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.onlyWorkingSets = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -308,14 +335,14 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.showSickDays,
+                  value: cnScreenStatistics.showSickDays,
                   activeColor: const Color(0xFFC16A03),
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showSickDays = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -346,6 +373,7 @@ class CnScreenStatistics extends ChangeNotifier {
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
   bool onlyWorkingSets = false;
+  bool showOneRepMax = false;
   bool showSickDays = false;
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
@@ -414,15 +442,15 @@ class CnScreenStatistics extends ChangeNotifier {
 
   }
 
-   List<double?>? getMinMaxWeights(){
-    final exercises = getSelectedExerciseHistory();
-    if(exercises == null){
-      return null;
-    }
-    double minWeight = exercises.values.map((e) => e.weights.min).min;
-    double maxWeight = exercises.values.map((e) => e.weights.max).max;
-    return [minWeight, maxWeight];
-  }
+  //  List<double?>? getMinMaxWeights(){
+  //   final exercises = getSelectedExerciseHistory();
+  //   if(exercises == null){
+  //     return null;
+  //   }
+  //   double minWeight = exercises.values.map((e) => e.weights.min).min;
+  //   double maxWeight = exercises.values.map((e) => e.weights.max).max;
+  //   return [minWeight, maxWeight];
+  // }
 
   Map<DateTime, double>? getMaxWeightsPerDate(){
     final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
@@ -474,6 +502,32 @@ class CnScreenStatistics extends ChangeNotifier {
       return summedWeights;
     }
 
+  Map<DateTime, double>? getOneRepMaxPerDate(){
+    double bodyWeight = 0;
+    if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft"].contains(selectedExerciseName)){
+      bodyWeight = 82;
+    }
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    Map<DateTime, double> oneRepMaxPerDate = {};
+    for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
+      double oneRepMax = 0;
+      for(List set in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
+        if(onlyWorkingSets && set[2] == 1){
+          continue;
+        }
+        final tempOneRepMax = calcEpley(weight: set[0], reps: set[1], bodyWeight: bodyWeight);
+        if(tempOneRepMax > oneRepMax){
+          oneRepMax = tempOneRepMax;
+        }
+      }
+      oneRepMaxPerDate[entry.key] = oneRepMax;
+    }
+    return oneRepMaxPerDate;
+  }
+
   void calcMinMaxDates()async{
     ObWorkout? firstWorkout;
     final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
@@ -506,16 +560,16 @@ class CnScreenStatistics extends ChangeNotifier {
   //   "Sun": 7,
   // };
 
-  int getMaxDaysOfMonths(DateTime date){
-    switch (date.month){
-      case 4 || 6 || 9 || 11:
-        return 30;
-      case 2:
-        return date.isLeapYear()? 29: 28;
-      default:
-        return 31;
-    }
-  }
+  // int getMaxDaysOfMonths(DateTime date){
+  //   switch (date.month){
+  //     case 4 || 6 || 9 || 11:
+  //       return 30;
+  //     case 2:
+  //       return date.isLeapYear()? 29: 28;
+  //     default:
+  //       return 31;
+  //   }
+  // }
 
   void openSettingsPanel(){
     HapticFeedback.selectionClick();
@@ -554,6 +608,7 @@ class CnScreenStatistics extends ChangeNotifier {
     showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
     onlyWorkingSets = data["onlyWorkingSets"] ?? false;
     showSickDays = data["showSickDays"] ?? true;
+    showOneRepMax = data["showOneRepMax"] ?? true;
   }
 
   void resetGraph({bool withKeyReset = true}){
@@ -571,6 +626,7 @@ class CnScreenStatistics extends ChangeNotifier {
       "showAvgWeightPerSetLine": showAvgWeightPerSetLine,
       "onlyWorkingSets": onlyWorkingSets,
       "showSickDays": showSickDays,
+      "showOneRepMax": showOneRepMax,
     };
     cnConfig.config.cnScreenStatistics = data;
     await cnConfig.config.save();

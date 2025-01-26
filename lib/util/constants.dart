@@ -589,6 +589,14 @@ String getSetKeyName(String exName, int index){
   return "${exName}_${intToLexicographic(index)}";
 }
 
+double calcEpley({
+  required double weight,
+  required int reps,
+  double bodyWeight = 0
+}){
+  return ((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight;
+}
+
 String validateDoubleTextInput(String text){
   text = text.replaceAll(",", ".");
   if(text.characters.last == "."){
