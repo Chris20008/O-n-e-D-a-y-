@@ -41,14 +41,14 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
             sizeCurve: Curves.easeInOut,
             firstChild: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(
-                    sigmaX: 10.0,
-                    sigmaY: 10.0,
-                    tileMode: TileMode.mirror
-                ),
+              // child: BackdropFilter(
+              //   filter: ImageFilter.blur(
+              //       sigmaX: 10.0,
+              //       sigmaY: 10.0,
+              //       tileMode: TileMode.mirror
+              //   ),
                 child: Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black,
                   height: cnStopwatchWidget.heightOfTimer,
                   width: width - paddingLeftRight*2,
                   child: Stack(
@@ -227,7 +227,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                     ],
                   ),
                 ),
-              ),
+              // ),
             ),
             secondChild: SizedBox(
               height: cnSpotifyBar.heightOfButton,
