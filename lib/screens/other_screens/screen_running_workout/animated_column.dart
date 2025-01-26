@@ -4,8 +4,11 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwat
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import '../../../main.dart';
 import '../../../objects/exercise.dart';
 import '../../../util/constants.dart';
@@ -35,6 +38,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   final double _iconSize = 25;
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   UniqueKey newExerciseKey = UniqueKey();
+  UniqueKey linkNameKey = UniqueKey();
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +84,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                       backgroundColor: MaterialStateProperty.all(Colors.transparent),
                     ),
                     onPressed: () {
-                      cnAnimatedColumn.newEx = Exercise();
+                      cnAnimatedColumn.newEx = Exercise(blockLink: true);
                       cnStandardPopUp.open(
                         padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 5),
                           context: context,
@@ -97,7 +101,10 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                 !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
                             ){
                               cnAnimatedColumn.newEx.name = _textController.text;
-                              cnRunningWorkout.addExercise(cnAnimatedColumn.newEx);
+                              double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
+                                  + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
+                                  + cnBottomMenu.height + 20;
+                              cnRunningWorkout.addExercise(cnAnimatedColumn.newEx, context, additionalScrollPosition: additionalScrollPosition);
                             }
                             Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
                               FocusScope.of(context).unfocus();
@@ -143,6 +150,9 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         TextFormField(
+          onTapOutside: (event){
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
           keyboardAppearance: Brightness.dark,
           controller: _textController,
           maxLength: 40,
@@ -174,7 +184,6 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
             onConfirm: (int category){
               cnAnimatedColumn.newEx.category = category;
               cnStandardPopUp.child = getPopUpChild();
-              // cnStandardPopUp.key = UniqueKey();
               cnStandardPopUp.refresh();
             },
             currentCategory: cnAnimatedColumn.newEx.category,
@@ -190,12 +199,80 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                   const Spacer(flex: 4,),
                   // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
                   const SizedBox(width: 10),
-                  trailingChoice
+                  trailingChoice()
                 ],
               ),
             )
         ),
+
+        if(cnRunningWorkout.workout.linkedExercises.isNotEmpty)
+          const SizedBox(height: 10,),
+        if(cnRunningWorkout.workout.linkedExercises.isNotEmpty)
+          getSelectLink(
+              key: linkNameKey,
+              onConfirm: (String linkName){
+                cnAnimatedColumn.newEx.linkName = linkName == "-"? null : linkName;
+                cnAnimatedColumn.newEx.blockLink = linkName == "-";
+                cnStandardPopUp.child = getPopUpChild();
+                cnStandardPopUp.refresh();
+              },
+              currentLinkName: cnAnimatedColumn.newEx.linkName?? "-",
+              context: context,
+              child: SizedBox(
+                height: 35,
+                child: Row(
+                  children: [
+                    Icon(Icons.link, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                    const SizedBox(width: 8,),
+                    Text(cnAnimatedColumn.newEx.linkName?? "-", style: _style),
+                    const Spacer(),
+                    const Spacer(flex: 4,),
+                    // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+                    const SizedBox(width: 10),
+                    trailingChoice()
+                  ],
+                ),
+              )
+          ),
       ],
+    );
+  }
+
+  Widget getSelectLink({
+    Key? key,
+    required Widget child,
+    required Function(String category) onConfirm,
+    required BuildContext context,
+    required String currentLinkName
+  }) {
+    return PullDownButton(
+      key: key,
+      buttonAnchor: PullDownMenuAnchor.start,
+      routeTheme: routeTheme,
+      itemBuilder: (context) {
+        List linkNames = ["-"] + cnRunningWorkout.workout.linkedExercises;
+        List<PullDownMenuItem> linkNameWidgets = List.generate(linkNames.length, (index) => PullDownMenuItem.selectable(
+            selected: currentLinkName == linkNames[index],
+            title: linkNames[index],
+            onTap: () {
+              HapticFeedback.selectionClick();
+              FocusManager.instance.primaryFocus?.unfocus();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                onConfirm(linkNames[index]);
+              });
+            })
+        );
+        return linkNameWidgets;
+      },
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      buttonBuilder: (context, showMenu) => CupertinoButton(
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            showMenu();
+          },
+          padding: EdgeInsets.zero,
+          child: child
+      ),
     );
   }
 

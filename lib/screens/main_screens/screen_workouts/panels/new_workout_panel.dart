@@ -749,7 +749,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   style: const TextStyle(color: Colors.white)
               ),
               const SizedBox(width: 10),
-              trailingChoice
+              trailingChoice()
             ],
           ),
         ),
@@ -863,6 +863,35 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
             padding: const EdgeInsets.all(0),
             flex:10,
             onPressed: (BuildContext context){
+              if(cnNewWorkout.exercisesAndLinks[index].blockLink){
+                cnNewWorkout.exercisesAndLinks[index].linkName = null;
+                cnNewWorkout.exercisesAndLinks[index].blockLink = false;
+                cnNewWorkout.updateExercisesLinks();
+              }
+              else{
+                cnNewWorkout.exercisesAndLinks[index].linkName = null;
+                cnNewWorkout.exercisesAndLinks[index].blockLink = true;
+                cnNewWorkout.orderExercises();
+              }
+              setState(() {});
+            },
+            borderRadius: BorderRadius.circular(15),
+            backgroundColor: const Color(0xFF5F9561),
+            // backgroundColor: Colors.white.withOpacity(0.1),
+            foregroundColor: Colors.white,
+            icon: cnNewWorkout.exercisesAndLinks[index].blockLink? Icons.link : Icons.link_off,
+          ),
+          SlidableAction(
+            flex: 1,
+            onPressed: (BuildContext context){},
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.transparent,
+            label: '',
+          ),
+          SlidableAction(
+            padding: const EdgeInsets.all(0),
+            flex:10,
+            onPressed: (BuildContext context){
               openExercise(cnNewWorkout.exercisesAndLinks[index], copied: true);
             },
             borderRadius: BorderRadius.circular(15),
@@ -919,6 +948,16 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                     ),
                   ),
                 ],
+              ),
+            if(cnNewWorkout.exercisesAndLinks[index].blockLink)
+              Positioned(
+                top: 5,
+                left: 5,
+                child: Icon(
+                  Icons.link_off,
+                  size: 10,
+                  color: const Color(0xFF5F9561),
+                ),
               )
           ],
         ),
@@ -966,9 +1005,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addExercise(){
-    // print(!tutorialIsRunning);
-    // print(cnNewWorkout.panelController.isPanelOpen);
-    // print(cnNewWorkout.panelController.panelPosition);
     if(!tutorialIsRunning && cnNewWorkout.panelController.panelPosition > 0.99){
       cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
     }
@@ -1323,7 +1359,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     exercisesAndLinks = List.from(exercisesAndLinks.toSet());
   }
 
-  void initializeCorrectOrder(){
+  void insertLinksAtPlace(){
     final List<String> links = exercisesAndLinks.whereType<String>().toList();
     for (final link in links){
       exercisesAndLinks.remove(link);
@@ -1343,18 +1379,10 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   }
 
   void updateExercisesOrderInWorkoutObject(){
-    // List tempCopy = List.from(exercisesAndLinks);
     List<Exercise> orderedExercises = exercisesAndLinks.whereType<Exercise>().toList();
-    // List<Exercise> orderedExercises = List<Exercise>.from(tempCopy.where((element) => element is Exercise).toList());
     workout.exercises.clear();
     workout.exercises.addAll(orderedExercises);
   }
-
-  // void removeEmptyLinksFromWorkout(){
-  //   workout.linkedExercises = workout.linkedExercises.where((linkName) {
-  //     return workout.exercises.any((exercise) => exercise.linkName == linkName);
-  //   }).toList();
-  // }
 
   void updateExercisesLinks(){
     /// Gives the exercises their correct linkName, if they need one, otherwise null
@@ -1365,7 +1393,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
           item.linkName = null;
           continue;
         }
-        else{
+        else if(!item.blockLink){
           item.linkName = currentLinkName;
         }
       }
@@ -1373,6 +1401,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         currentLinkName = item;
       }
     }
+    orderExercises();
   }
 
   void closePanel({bool doClear = false}){
@@ -1413,7 +1442,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         isUpdating = true;
         setWorkout(w);
         updateExercisesAndLinksList();
-        initializeCorrectOrder();
+        insertLinksAtPlace();
+        orderExercises();
         openPanelWithRefresh();
       }
     }
@@ -1455,4 +1485,55 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   void refresh(){
     notifyListeners();
   }
+
+  void orderExercises() {
+    exercisesAndLinks.sort(((a, b) {
+
+      /// blocked Link
+      if(a is Exercise && a.blockLink){
+        /// b is LinkName so a is after b
+        if(b is String){
+          return -1;
+        }
+        /// b is blockedLink, don't change order
+        if(b is Exercise && b.blockLink){
+          return 0;
+        }
+        /// b is Exercise with link, a after b
+        return 1;
+      }
+
+
+      if(a is String && b is Exercise){
+        if(a == b.linkName || b.blockLink){
+          return -1;
+        }
+        return 1;
+      }
+
+      if(a is String && b is String){
+        return 0;
+      }
+
+      if(a is Exercise && b is String){
+        if(a.linkName == b){
+          return 1;
+        } else{
+          return -1;
+        }
+      }
+
+      return 0;
+    }));
+  }
+  // void removeLink(int index) {
+  //   Exercise ex = exercisesAndLinks.removeAt(index);
+  //   String? oldLinkName = ex.linkName;
+  //   ex.linkName = null;
+  //   ex.blockLink = true;
+  //   final newIndex = oldLinkName == null? index : exercisesAndLinks.lastIndexWhere((element) => element is Exercise && element.linkName == oldLinkName)+1;
+  //   if(newIndex >= 0){
+  //     exercisesAndLinks.insert(newIndex, ex);
+  //   }
+  // }
 }

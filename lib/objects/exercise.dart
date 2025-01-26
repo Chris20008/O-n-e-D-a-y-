@@ -20,6 +20,7 @@ class Exercise{
   String? originalName;
   String? linkName;
   int category;
+  bool blockLink;
 
 
   Exercise({
@@ -30,7 +31,8 @@ class Exercise{
     this.id = -100,
     this.originalName,
     this.linkName,
-    this.category = 1
+    this.category = 1,
+    this.blockLink = false
   }){
     if (sets.isEmpty){
       sets = [];
@@ -45,7 +47,8 @@ class Exercise{
       restInSeconds: e.restInSeconds,
       seatLevel: e.seatLevel,
       linkName: e.linkName,
-      category: e.category
+      category: e.category,
+      blockLink: e.blockLink
   );
 
   /// Don't clone the original name
@@ -55,7 +58,8 @@ class Exercise{
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
       linkName: ex.linkName,
-      category: ex.category
+      category: ex.category,
+      blockLink: ex.blockLink
   );
 
   Exercise.clone(Exercise ex): this(
@@ -65,7 +69,8 @@ class Exercise{
       restInSeconds: ex.restInSeconds,
       seatLevel: ex.seatLevel,
       linkName: ex.linkName,
-      category: ex.category
+      category: ex.category,
+      blockLink: ex.blockLink
   );
 
   ObExercise toObExercise(){
@@ -86,7 +91,8 @@ class Exercise{
         restInSeconds: restInSeconds,
         seatLevel: seatLevel,
         linkName: linkName,
-        category: category
+        category: category,
+        blockLink: blockLink
     );
   }
 
@@ -113,13 +119,14 @@ class Exercise{
   
   Map asMap(){
     return {
-    "name": name,
-    "sets": sets.map((e) => [e.weight, e.amount, e.setType]).toList(),
-    "restInSeconds": restInSeconds,
-    "seatLevel": seatLevel,
-    "originalName": originalName, 
-    "linkName": linkName,
-    "category": category
+      "name": name,
+      "sets": sets.map((e) => [e.weight, e.amount, e.setType]).toList(),
+      "restInSeconds": restInSeconds,
+      "seatLevel": seatLevel,
+      "originalName": originalName,
+      "linkName": linkName,
+      "category": category,
+      "blockLink": blockLink
     };
   }
 
@@ -148,7 +155,6 @@ class Exercise{
         }
       }
     }
-    // print("FILL SET TYPE: $fillSetType");
     return Exercise(
       name: data["name"],
       sets: List<SingleSet>.from(data["sets"].map((s) => SingleSet(weight: s[0], amount: s[1], setType: fillSetType?? s[2]))),
@@ -156,7 +162,8 @@ class Exercise{
       seatLevel: data["seatLevel"],
       originalName: data["originalName"],
       linkName: data["linkName"],
-      category: data["category"]?? 1
+      category: data["category"]?? 1,
+      blockLink: data['blockLink']?? false
     );
   }
 
@@ -245,7 +252,7 @@ class SingleSet{
   }
 
   dynamic get weightAsTrimmedDouble{
-    if(weight == null || (weight?? 1) %1 != 0){
+    if(weight == null || weight!%1 != 0){
       return weight;
     }
     return weight?.toInt();
@@ -267,6 +274,19 @@ class SingleSet{
       timeAsString = "${timeAsString.substring(0, 1)}:${timeAsString.substring(1, 3)}:${timeAsString.substring(3, 5)}";
     }
     return timeAsString;
+  }
+
+  String? getAmountAsText(int category){
+    switch (category){
+      case 1:
+        return (amount?? "").toString();
+      case 2:
+        return amountAsTime;
+      case 3:
+        return amountAsTime;
+      default:
+        return "";
+    }
   }
 
   String get amountAsColumn{

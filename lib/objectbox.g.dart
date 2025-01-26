@@ -25,7 +25,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 2510276494793380538),
       name: 'ObExercise',
-      lastPropertyId: const obx_int.IdUid(11, 3217034757361258893),
+      lastPropertyId: const obx_int.IdUid(12, 64718899079331937),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -72,6 +72,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(11, 3217034757361258893),
             name: 'category',
             type: 6,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(12, 64718899079331937),
+            name: 'blockLink',
+            type: 1,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -216,7 +221,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               ? null
               : fbb.writeString(object.linkName!);
           final setTypesOffset = fbb.writeListInt64(object.setTypes);
-          fbb.startTable(12);
+          fbb.startTable(13);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addOffset(3, amountsOffset);
@@ -226,6 +231,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addOffset(7, linkNameOffset);
           fbb.addOffset(8, setTypesOffset);
           fbb.addInt64(10, object.category);
+          fbb.addBool(11, object.blockLink);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -253,6 +259,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .vTableGetNullable(buffer, rootOffset, 18);
           final categoryParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0);
+          final blockLinkParam =
+              const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false);
           final object = ObExercise(
               id: idParam,
               name: nameParam,
@@ -262,7 +270,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               setTypes: setTypesParam,
               seatLevel: seatLevelParam,
               linkName: linkNameParam,
-              category: categoryParam);
+              category: categoryParam,
+              blockLink: blockLinkParam);
 
           return object;
         }),
@@ -386,6 +395,10 @@ class ObExercise_ {
   /// see [ObExercise.category]
   static final category =
       obx.QueryIntegerProperty<ObExercise>(_entities[0].properties[8]);
+
+  /// see [ObExercise.blockLink]
+  static final blockLink =
+      obx.QueryBooleanProperty<ObExercise>(_entities[0].properties[9]);
 }
 
 /// [ObWorkout] entity fields to define ObjectBox queries.

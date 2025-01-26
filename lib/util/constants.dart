@@ -147,19 +147,21 @@ const trailingArrow = Icon(
   color: Colors.grey,
 );
 
-const trailingChoice = Stack(
-  alignment: Alignment.center,
-  children: [
-    Padding(
-        padding: EdgeInsets.only(bottom: 7),
-        child: Icon(Icons.keyboard_arrow_up, size: 14, color: Colors.grey)
-    ),
-    Padding(
-      padding: EdgeInsets.only(top: 7),
-      child: Icon(Icons.keyboard_arrow_down, size: 14, color: Colors.grey),
-    ),
-  ],
-);
+Widget trailingChoice({double size = 14, Color color = Colors.grey}){
+ return Stack(
+   alignment: Alignment.center,
+   children: [
+     Padding(
+         padding: const EdgeInsets.only(bottom: 7),
+         child: Icon(Icons.keyboard_arrow_up, size: size, color: color)
+     ),
+     Padding(
+       padding: const EdgeInsets.only(top: 7),
+       child: Icon(Icons.keyboard_arrow_down, size: size, color: color),
+     ),
+   ],
+ );
+}
 
 Color? getLinkColor({required String linkName, required Workout workout}){
   int index = workout.linkedExercises.indexOf(linkName);
@@ -169,19 +171,23 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
-Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color}){
-  return Column(
-    children: [
-      SizedBox(height: heightTop),
-      Container(
-        height: 1,
-        width: double.maxFinite - minusWidth,
-        // color: const Color(0xFFC16A03).withOpacity(opacity),
-          color: (color?? Colors.amber[900])!.withOpacity(opacity)
-        // color: Colors.amber[900]!.withOpacity(0.6),
-      ),
-      SizedBox(height: heightBottom),
-    ],
+Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color, Key? key, bool ignoring= true}){
+  return IgnorePointer(
+    key: key,
+    ignoring: ignoring,
+    child: Column(
+      children: [
+        Container(height: heightTop, color: Colors.transparent,),
+        Container(
+          height: 1,
+          width: double.maxFinite - minusWidth,
+          // color: const Color(0xFFC16A03).withOpacity(opacity),
+            color: (color?? Colors.amber[900])!.withOpacity(opacity)
+          // color: Colors.amber[900]!.withOpacity(0.6),
+        ),
+        Container(height: heightTop, color: Colors.transparent,),
+      ],
+    ),
   );
 }
 
@@ -417,7 +423,7 @@ Widget getSelectCategory({
     routeTheme: routeTheme,
     itemBuilder: (context) {
       List categories = categoryMapping.keys.toList();
-      List<PullDownMenuItem> seatLevelWidgets = List.generate(categories.length, (index) => PullDownMenuItem.selectable(
+      List<PullDownMenuItem> categoryWidgets = List.generate(categories.length, (index) => PullDownMenuItem.selectable(
           selected: currentCategory == categories[index],
           title: categoryMapping[categories[index]],
           onTap: () {
@@ -428,7 +434,7 @@ Widget getSelectCategory({
             });
           })
       );
-      return seatLevelWidgets;
+      return categoryWidgets;
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -571,6 +577,16 @@ Widget getSet({
       ),
     ),
   );
+}
+
+String intToLexicographic(int value){
+  String result = List.generate(value~/26, (index) => "Z").join();
+  result = result + String.fromCharCode(65 + value%26);
+  return result;
+}
+
+String getSetKeyName(String exName, int index){
+  return "${exName}_${intToLexicographic(index)}";
 }
 
 String validateDoubleTextInput(String text){
@@ -817,7 +833,9 @@ Widget buildCalendarDialogButton({
                                 ? Colors.white
                                 : dayText.contains("Krank")
                                 ? colorAmberDark
-                                : colorAmber)
+                                : colorAmber,
+                          fontWeight: FontWeight.w600
+                        )
                     )
                 ),
               ],

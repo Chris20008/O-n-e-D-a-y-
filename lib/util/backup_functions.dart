@@ -93,7 +93,7 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     allSickDaysAsListString.removeWhere((element) => element.trim() == "");
     final allSickDays = allSickDaysAsListString.map((e) => jsonDecode(e));
     final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
-    objectbox.sickDaysBox.putManyAsync(allObSickDays);
+    await objectbox.sickDaysBox.putManyAsync(allObSickDays);
   }
 
   final hadDifferences = await loadDifferencesWorkouts(allObWorkouts, cnHomepage: cnHomepage);
