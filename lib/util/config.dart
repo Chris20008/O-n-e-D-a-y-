@@ -4,7 +4,6 @@ import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:googleapis/shared.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'custom_cache_manager.dart';
@@ -271,12 +270,13 @@ class CnConfig extends ChangeNotifier {
     permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
     if(permission != true){
       print("Do not have permission");
-      print(await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types));
+      result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
+      print(result);
       permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
       print("Second Permission result $permission");
     }
     print("RESULT HEALTH: $permission");
-    if(permission != true){
+    if(permission != true && result != true){
       await setHealth(false);
       cnScreenStatistics.health.revokePermissions();
       Future.delayed(const Duration(milliseconds: 500), (){
@@ -285,7 +285,7 @@ class CnConfig extends ChangeNotifier {
     }
     });
     isWaitingForHealthResponse = false;
-    return permission?? false;
+    return permission?? result?? false;
   }
 
   Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, BuildContext? context}) async{

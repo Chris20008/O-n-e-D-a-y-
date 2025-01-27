@@ -419,7 +419,10 @@ class CnScreenStatistics extends ChangeNotifier {
         startTime: startTime,
         endTime: now,
         types: types
-    ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList().reversed.toList());
+    ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList());
+    if(Platform.isAndroid){
+      healthData = healthData.reversed.toList();
+    }
     for(final l in healthData){
       print(l.dateFrom);
       print(l.weight);
