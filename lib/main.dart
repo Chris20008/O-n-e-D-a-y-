@@ -31,6 +31,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
+import 'package:health/health.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:carp_serializable/carp_serializable.dart';
+
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
 int currentTutorialStep = 0;
@@ -521,16 +525,16 @@ class _MyHomePageState extends State<MyHomePage>{
                       ),
                     ),
                   ),
-                // Center(
-                //   child: ElevatedButton(
-                //     child: Text("Test"),
-                //     onPressed: ()async{
-                //       print("Presses Center button");
-                //       final res = await ICloudService.isICloudAvailable();
-                //       print("RESULT res: $res");
-                //     },
-                //   ),
-                // )
+                Center(
+                  child: ElevatedButton(
+                    child: Text("Test"),
+                    onPressed: ()async{
+                      print("Presses Center button");
+                      tryHealthData();
+                      // print("RESULT res: $res");
+                    },
+                  ),
+                )
               ],
             ),
         ),
@@ -613,6 +617,23 @@ class _MyHomePageState extends State<MyHomePage>{
       }
     });
   }
+}
+
+void tryHealthData()async{
+  // Global Health instance
+  final health = Health();
+
+  // configure the health plugin before use.
+  await health.configure();
+  var types = [
+    HealthDataType.WEIGHT
+  ];
+  bool requested = await health.requestAuthorization(types);
+  var now = DateTime.now();
+  List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+      startTime: now.subtract(Duration(days: 1)), endTime: now, types: types);
+
+  print(healthData);
 }
 
 class CnHomepage extends ChangeNotifier {
