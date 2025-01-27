@@ -518,6 +518,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             return spots.asMap().entries.map((e) {
               int index = e.value.barIndex;
               /// return null when bar index is from sickDays
+              /// or one of the other lines is disabled
               if (index == 3
                   || (!cnScreenStatistics.showAvgWeightPerSetLine && index == 1)
                   || (!cnScreenStatistics.showOneRepMax && index == 2)
