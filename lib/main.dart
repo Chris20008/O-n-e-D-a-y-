@@ -525,16 +525,16 @@ class _MyHomePageState extends State<MyHomePage>{
                       ),
                     ),
                   ),
-                Center(
-                  child: ElevatedButton(
-                    child: Text("Test"),
-                    onPressed: ()async{
-                      print("Presses Center button");
-                      tryHealthData();
-                      // print("RESULT res: $res");
-                    },
-                  ),
-                )
+                // Center(
+                //   child: ElevatedButton(
+                //     child: Text("Test"),
+                //     onPressed: ()async{
+                //       print("Presses Center button");
+                //       tryHealthData();
+                //       // print("RESULT res: $res");
+                //     },
+                //   ),
+                // )
               ],
             ),
         ),
@@ -630,10 +630,17 @@ void tryHealthData()async{
   ];
   bool requested = await health.requestAuthorization(types);
   var now = DateTime.now();
+  DateTime startTime = DateTime(2000, 1, 1);
   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-      startTime: now.subtract(Duration(days: 1)), endTime: now, types: types);
+      startTime: startTime, endTime: now, types: types);
 
-  print(healthData);
+  for(HealthDataPoint h in healthData){
+    print(h.dateFrom);
+    print(h.value);
+    print("");
+  }
+  print(healthData.length);
+  // print(healthData);
 }
 
 class CnHomepage extends ChangeNotifier {
