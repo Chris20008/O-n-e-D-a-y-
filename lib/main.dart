@@ -618,24 +618,27 @@ class _MyHomePageState extends State<MyHomePage>{
 }
 
 void tryHealthData()async{
-
   // Global Health instance
   final health = Health();
 
   // configure the health plugin before use.
   await health.configure();
-  print(await health.getHealthConnectSdkStatus());
-
   var types = [
     HealthDataType.WEIGHT
   ];
   bool requested = await health.requestAuthorization(types);
-  print(requested);
   var now = DateTime.now();
+  DateTime startTime = DateTime(2000, 1, 1);
   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-      startTime: now.subtract(Duration(days: 1000)), endTime: now, types: types);
+      startTime: startTime, endTime: now, types: types);
 
-  print(healthData);
+  for(HealthDataPoint h in healthData){
+    print(h.dateFrom);
+    print(h.value);
+    print("");
+  }
+  print(healthData.length);
+  // print(healthData);
 }
 
 class CnHomepage extends ChangeNotifier {
