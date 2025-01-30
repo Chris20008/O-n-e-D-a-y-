@@ -32,8 +32,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
 import 'package:health/health.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:carp_serializable/carp_serializable.dart';
 
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
@@ -620,18 +618,22 @@ class _MyHomePageState extends State<MyHomePage>{
 }
 
 void tryHealthData()async{
+
   // Global Health instance
   final health = Health();
 
   // configure the health plugin before use.
   await health.configure();
+  print(await health.getHealthConnectSdkStatus());
+
   var types = [
     HealthDataType.WEIGHT
   ];
   bool requested = await health.requestAuthorization(types);
+  print(requested);
   var now = DateTime.now();
   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-      startTime: now.subtract(Duration(days: 1)), endTime: now, types: types);
+      startTime: now.subtract(Duration(days: 1000)), endTime: now, types: types);
 
   print(healthData);
 }
