@@ -93,7 +93,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     List<FlSpot> tempSickDaysSpots = [];
 
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
-    if(t == null && cnScreenStatistics.selectedExerciseName != null){
+    if(t == null && cnScreenStatistics.selectedExerciseName != null && cnScreenStatistics.selectedExerciseName != "Gewicht"){
       return const SizedBox(
         height: 200,
         child: Center(

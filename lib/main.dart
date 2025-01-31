@@ -144,14 +144,6 @@ class _MyHomePageState extends State<MyHomePage>{
   late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
-  // late final AnimationController _animationControllerWorkoutsScreen = AnimationController(
-  //   vsync: this,
-  //   duration: const Duration(milliseconds: 300),
-  // );
-  // late final AnimationController _animationControllerStatisticsScreen = AnimationController(
-  //   vsync: this,
-  //   duration: const Duration(milliseconds: 300),
-  // );
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
   bool mainIsInitialized = false;
@@ -160,13 +152,6 @@ class _MyHomePageState extends State<MyHomePage>{
   void initState() {
     initMain();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    // _animationControllerWorkoutsScreen.dispose();
-    // _animationControllerStatisticsScreen.dispose();
-    super.dispose();
   }
 
   void setIntroScreen(){
@@ -203,10 +188,6 @@ class _MyHomePageState extends State<MyHomePage>{
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
     cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
-    // cnWorkouts.animationControllerWorkoutsScreen = _animationControllerWorkoutsScreen;
-    // cnHomepage.animationControllers["ScreenWorkouts"] = _animationControllerWorkoutsScreen;
-    // cnScreenStatistics.animationControllerStatisticsScreen = _animationControllerStatisticsScreen;
-    // cnHomepage.animationControllers["ScreenStatistics"] = _animationControllerStatisticsScreen;
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
 
@@ -232,20 +213,6 @@ class _MyHomePageState extends State<MyHomePage>{
       trySyncWithCloud();
     }
 
-    // await Future.delayed(const Duration(milliseconds: 200), () async {
-    //   if(cnConfig.connectWithCloud){
-    //     if(Platform.isAndroid){
-    //       await cnConfig.signInGoogleDrive(delayMilliseconds: 0);
-    //     }
-    //     if(Platform.isIOS){
-    //       await cnConfig.checkIfICloudAvailable(delayMilliseconds: 0);
-    //     }
-    //     print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
-    //     if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
-    //       trySyncWithCloud();
-    //     }
-    //   }
-    // });
     setState(() {
       mainIsInitialized = true;
     });
@@ -523,16 +490,16 @@ class _MyHomePageState extends State<MyHomePage>{
                       ),
                     ),
                   ),
-                Center(
-                  child: ElevatedButton(
-                    child: Text("Test"),
-                    onPressed: ()async{
-                      print("Presses Center button");
-                      tryHealthData();
-                      // print("RESULT res: $res");
-                    },
-                  ),
-                )
+                // Center(
+                //   child: ElevatedButton(
+                //     child: Text("Test"),
+                //     onPressed: ()async{
+                //       print("Presses Center button");
+                //       tryHealthData();
+                //       // print("RESULT res: $res");
+                //     },
+                //   ),
+                // )
               ],
             ),
         ),
@@ -617,29 +584,32 @@ class _MyHomePageState extends State<MyHomePage>{
   }
 }
 
-void tryHealthData()async{
-  // Global Health instance
-  final health = Health();
-
-  // configure the health plugin before use.
-  await health.configure();
-  var types = [
-    HealthDataType.WEIGHT
-  ];
-  bool requested = await health.requestAuthorization(types);
-  var now = DateTime.now();
-  DateTime startTime = DateTime(2000, 1, 1);
-  List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-      startTime: startTime, endTime: now, types: types);
-
-  for(HealthDataPoint h in healthData){
-    print(h.dateFrom);
-    print(h.value);
-    print("");
-  }
-  print(healthData.length);
-  // print(healthData);
-}
+// void tryHealthData()async{
+//   // Global Health instance
+//   final health = Health();
+//
+//   // configure the health plugin before use.
+//   await health.configure();
+//   var types = [
+//     HealthDataType.WEIGHT
+//   ];
+//   bool requested = await health.requestAuthorization(types);
+//   var now = DateTime.now();
+//   DateTime startTime = DateTime(2000, 1, 1);
+//   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+//       startTime: startTime, endTime: now, types: types);
+//
+//   print("");
+//   print("ALL_VALUES");
+//   for(HealthDataPoint h in healthData){
+//     final test = HealthDataPointWrapper(hdp: h);
+//     print(test.dateFrom);
+//     print(test.weight);
+//     print("");
+//   }
+//   print(healthData.length);
+//   // print(healthData);
+// }
 
 class CnHomepage extends ChangeNotifier {
   late CnSpotifyBar cnSpotifyBar;

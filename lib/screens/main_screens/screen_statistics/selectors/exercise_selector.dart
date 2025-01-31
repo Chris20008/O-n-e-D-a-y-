@@ -70,7 +70,27 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
               }
             },
             children: cnScreenStatistics.allExerciseNames.map((String exName) {
-              return SizedBox(width: cnScreenStatistics.width-150, child: Center(child: OverflowSafeText(exName, maxLines: 1, minFontSize: 12)));
+              Widget child = SizedBox(
+                  width: cnScreenStatistics.width-150,
+                  child: Center(
+                      child: OverflowSafeText(
+                          exName,
+                          maxLines: 1,
+                          minFontSize: 12
+                      )
+                  )
+              );
+              if (exName == "Gewicht"){
+                child = Column(
+                  children: [
+                    const Spacer(),
+                    child,
+                    const Spacer(),
+                    Container(color: Colors.grey.withOpacity(0.2), height: 1.5, width: cnScreenStatistics.width-150,)
+                  ],
+                );
+              }
+              return child;
             }).toList()
         ),
       ),

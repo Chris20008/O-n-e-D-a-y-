@@ -56,7 +56,12 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
+  void didChangeAppLifecycleState(AppLifecycleState state)async{
+    Future.delayed(const Duration(milliseconds: 500), ()async{
+      await cnScreenStatistics.refreshHealthData();
+      cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.refresh();
+    });
     setState(() {});
   }
 
@@ -188,6 +193,90 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                             HapticFeedback.selectionClick();
                                           }
                                           cnConfig.setSpotify(value);
+                                        });
+                                      }
+                                  ),
+                                ),
+
+                                /// Use Health Data
+                                CupertinoListTile(
+                                  leading: Stack(
+                                    children: [
+                                      Container(
+                                        height: 25,
+                                        width: 25,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(6)
+                                        ) ,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Icon(
+                                              MyIcons.heart,
+                                              color: Colors.black.withOpacity(0.8),
+                                              size: 15,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Text("Apple Health", style: const TextStyle(color: Colors.white)),
+                                      const SizedBox(width: 5),
+                                      if(cnConfig.useHealthData)
+                                        FutureBuilder(
+                                            future: cnConfig.isHealthDataAccessAllowed(cnScreenStatistics),
+                                            builder: (context, connected){
+                                              if(!connected.hasData){
+                                                return Center(
+                                                  child: SizedBox(
+                                                    height: 15,
+                                                    width: 15,
+                                                    child: CupertinoActivityIndicator(
+                                                        radius: 8.0,
+                                                        color: Colors.amber[800]
+                                                    ),
+                                                    // child: CircularProgressIndicator(strokeWidth: 2,)
+                                                  ),
+                                                );
+                                              }
+                                              return Icon(
+                                                connected.data == true
+                                                    ? Icons.check_circle
+                                                    : Icons.close,
+                                                size: 15,
+                                                color: connected.data == true
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                              );
+                                            }
+                                        )
+                                    ],
+                                  ),
+                                  trailing: CupertinoSwitch(
+                                      value: cnConfig.useHealthData,
+                                      activeColor: const Color(0xFFC16A03),
+                                      onChanged: (value) async{
+                                        setState(() {
+                                          if(Platform.isAndroid){
+                                            HapticFeedback.selectionClick();
+                                          }
+                                          // cnConfig.askHealthPermission(cnScreenStatistics, value);
+                                          cnConfig.setHealth(value);
+                                          if(!value){
+                                            Future.delayed(const Duration(milliseconds: 500), (){
+                                              print("REVOK PERMISSIONS");
+                                              cnScreenStatistics.health.revokePermissions();
+                                            });
+                                          }
                                         });
                                       }
                                   ),
@@ -369,7 +458,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                           CupertinoListTile(
                             // onTap: getSelectCreateBackup,
                             leading: const Icon(
-                                Icons.upload
+                                Icons.upload,
                             ),
                             title: OverflowSafeText(
                                 maxLines: 1,

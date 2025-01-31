@@ -64,7 +64,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) async{
    if(state == AppLifecycleState.resumed) {
      cnSpotifyBar.refresh();
-     cnConfig.isSpotifyInstalled(secondsDelayMilliseconds: 100, context: context);
+     cnConfig.isSpotifyInstalled(secondDelayMilliseconds: 100, context: context);
    }
   }
 

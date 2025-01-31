@@ -594,7 +594,7 @@ double calcEpley({
   required int reps,
   double bodyWeight = 0
 }){
-  return ((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight;
+  return (((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight).round() * 1.0;
 }
 
 String validateDoubleTextInput(String text){

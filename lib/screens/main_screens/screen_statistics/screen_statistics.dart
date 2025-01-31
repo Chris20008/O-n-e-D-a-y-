@@ -4,12 +4,14 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -386,6 +388,8 @@ class CnScreenStatistics extends ChangeNotifier {
   double offsetMinX = 0;
   double offsetMaxX = 0;
   late CnConfig cnConfig;
+  final health = Health();
+  List<HealthDataPointWrapper> healthData = [];
 
   /// Settings variables
   // late final AnimationController animationControllerStatisticsScreen;
@@ -394,13 +398,32 @@ class CnScreenStatistics extends ChangeNotifier {
   CnScreenStatistics(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
   }
-
+  final types = [
+    HealthDataType.WEIGHT
+  ];
 
   void init(Map? data) async{
     isInitialized = true;
     calcMinMaxDates();
     if(data != null){
       initCachedData(data);
+    }
+    await health.configure();
+    await refreshHealthData();
+  }
+
+  Future refreshHealthData() async{
+    var now = DateTime.now();
+    DateTime startTime = DateTime(2000, 1, 1);
+    healthData = await health.getHealthDataFromTypes(
+        startTime: startTime,
+        endTime: now,
+        types: types
+    ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList().reversed.toList());
+    for(final l in healthData){
+      print(l.dateFrom);
+      print(l.weight);
+      print("");
     }
   }
 
@@ -423,7 +446,7 @@ class CnScreenStatistics extends ChangeNotifier {
     query.distinct = true;
     final res = query.find();
     res.sort();
-    if(selectedExerciseName == null || !res.contains(selectedExerciseName)){
+    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && selectedExerciseName != "Gewicht"){
       selectedExerciseName = res.firstOrNull;
     }
     return res;
@@ -459,6 +482,9 @@ class CnScreenStatistics extends ChangeNotifier {
   // }
 
   Map<DateTime, double>? getMaxWeightsPerDate(){
+    if(selectedExerciseName == "Gewicht"){
+      return { for (var e in healthData) e.dateFrom : e.weight };
+    }
     final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
     if(obExercises == null){
       return null;
@@ -510,9 +536,9 @@ class CnScreenStatistics extends ChangeNotifier {
 
   Map<DateTime, double>? getOneRepMaxPerDate(){
     double bodyWeight = 0;
-    if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft", "Squat Langhantel"].contains(selectedExerciseName)){
-      bodyWeight = 82;
-    }
+    // if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft", "Squat Langhantel"].contains(selectedExerciseName)){
+    //   bodyWeight = 82;
+    // }
     final exercises = getSelectedExerciseHistory();
     if(exercises == null){
       return null;
@@ -520,10 +546,17 @@ class CnScreenStatistics extends ChangeNotifier {
     Map<DateTime, double> oneRepMaxPerDate = {};
     for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
       double oneRepMax = 0;
+      if(healthData.isNotEmpty){
+        HealthDataPointWrapper datesBodyWeight = healthData.firstWhereOrNull((hdp) => hdp.dateFrom.isBefore(entry.key) | hdp.dateFrom.isSameDate(entry.key))??
+            healthData.reversed.firstWhere((hdp) => hdp.dateFrom.isAfter(entry.key));
+        bodyWeight = datesBodyWeight.weight;
+        print("SELECT Weight Point ${datesBodyWeight.dateFrom} for date ${entry.key}");
+      }
       for(List set in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
         if(onlyWorkingSets && set[2] == 1){
           continue;
         }
+        print(bodyWeight);
         final tempOneRepMax = calcEpley(weight: set[0], reps: set[1], bodyWeight: bodyWeight);
         if(tempOneRepMax > oneRepMax){
           oneRepMax = tempOneRepMax;
@@ -535,6 +568,10 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void calcMinMaxDates()async{
+    if (selectedExerciseName == "Gewicht"){
+      minDate = healthData.last.dateFrom;
+      maxDate = healthData.first.dateFrom;
+    }
     ObWorkout? firstWorkout;
     final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
     if(selectedExerciseName != null) {
@@ -607,6 +644,7 @@ class CnScreenStatistics extends ChangeNotifier {
   void refreshData(){
     allWorkoutNames = getAllWorkoutNames();
     allExerciseNames = getAllExerciseNames();
+    allExerciseNames.insert(0, "Gewicht");
     calcMinMaxDates();
     allSickDays = objectbox.sickDaysBox.getAll();
   }
@@ -647,4 +685,19 @@ class CnScreenStatistics extends ChangeNotifier {
   void refresh(){
     notifyListeners();
   }
+}
+
+class HealthDataPointWrapper{
+  final HealthDataPoint hdp;
+  late final Map<String, dynamic> json;
+
+  HealthDataPointWrapper({
+    required this.hdp
+  }){
+   json = hdp.toJson();
+  }
+
+  DateTime get dateFrom => hdp.dateFrom;
+  DateTime get dateTo => hdp.dateTo;
+  double get weight => json['value']['numericValue'];
 }

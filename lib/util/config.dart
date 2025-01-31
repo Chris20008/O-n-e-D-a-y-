@@ -1,8 +1,10 @@
+import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:googleapis/shared.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'custom_cache_manager.dart';
@@ -63,6 +65,7 @@ class CnConfig extends ChangeNotifier {
   bool isInitialized = false;
   bool isWaitingForCloudResponse = false;
   bool isWaitingForSpotifyResponse = false;
+  bool isWaitingForHealthResponse = false;
   bool failedSpotifyConnection = false;
   bool showMoreSettingCloud = false;
   bool? isICloudAvailable;
@@ -220,7 +223,72 @@ class CnConfig extends ChangeNotifier {
     showMoreSettingCloud = false;
   }
 
-  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500, BuildContext? context}) async{
+  // Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics)async{
+  //   // bool? result;
+  //   bool? permission;
+  //   // bool hadToWait = false;
+  //   // while(isWaitingForHealthResponse){
+  //   //   await Future.delayed(const Duration(milliseconds: 100));
+  //   //   hadToWait = true;
+  //   // }
+  //   // if(hadToWait){
+  //   //   return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
+  //   // }
+  //   // isWaitingForHealthResponse = true;
+  //   // await Future.delayed(const Duration(milliseconds: 500), ()async{
+  //     permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+  //     // if(permission != true){
+  //     //   print("Do not have permission");
+  //     //   print(await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types));
+  //     //   permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+  //     //   print("Second Permission result $permission");
+  //     // }
+  //     // print("RESULT HEALTH: $permission");
+  //     // if(permission != true){
+  //     //   await setHealth(false);
+  //     //   Future.delayed(const Duration(milliseconds: 500), (){
+  //     //     refresh();
+  //     //   });
+  //     // }
+  //   // });
+  //   // isWaitingForHealthResponse = false;
+  //   return permission?? false;
+  // }
+
+  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics)async{
+    bool? result;
+    bool? permission;
+    bool hadToWait = false;
+    while(isWaitingForHealthResponse){
+      await Future.delayed(const Duration(milliseconds: 100));
+      hadToWait = true;
+    }
+    if(hadToWait){
+      return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
+    }
+    isWaitingForHealthResponse = true;
+    await Future.delayed(const Duration(milliseconds: 500), ()async{
+    permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+    if(permission != true){
+      print("Do not have permission");
+      print(await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types));
+      permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+      print("Second Permission result $permission");
+    }
+    print("RESULT HEALTH: $permission");
+    if(permission != true){
+      await setHealth(false);
+      cnScreenStatistics.health.revokePermissions();
+      Future.delayed(const Duration(milliseconds: 500), (){
+        refresh();
+      });
+    }
+    });
+    isWaitingForHealthResponse = false;
+    return permission?? false;
+  }
+
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, BuildContext? context}) async{
     isWaitingForSpotifyResponse = true;
     await Future.delayed(Duration(milliseconds: delayMilliseconds));
     final result = await canLaunchUrl(Uri.parse("spotify:"));
@@ -240,7 +308,7 @@ class CnConfig extends ChangeNotifier {
           fontSize: 16.0
       );
       await setSpotify(false);
-      Future.delayed(Duration(milliseconds: secondsDelayMilliseconds), ()async{
+      Future.delayed(Duration(milliseconds: secondDelayMilliseconds), ()async{
         refresh();
       });
     } else if(failedSpotifyConnection){
@@ -267,6 +335,7 @@ class CnConfig extends ChangeNotifier {
   bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? false) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
+  bool get useHealthData => config.settings["useHealthData"]?? false;
   int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
 
   Future setCurrentTutorialStep(int? step) async{
@@ -281,6 +350,11 @@ class CnConfig extends ChangeNotifier {
 
   Future setSpotify(bool value) async{
     config.settings["useSpotify"] = value;
+    await config.save();
+  }
+
+  Future setHealth(bool value) async{
+    config.settings["useHealthData"] = value;
     await config.save();
   }
 
