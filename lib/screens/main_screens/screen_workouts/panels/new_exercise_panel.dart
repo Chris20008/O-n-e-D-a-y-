@@ -176,7 +176,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
                                                 duration: const Duration(milliseconds: 300),
                                                 curve: Curves.easeInOut,
-                                                alignment: 0.4
+                                                alignment: 0.38
                                             );
                                           },
                                           textAlign: TextAlign.center,
@@ -231,7 +231,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                                 cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
                                                 duration: const Duration(milliseconds: 300),
                                                 curve: Curves.easeInOut,
-                                                alignment: 0.2
+                                                alignment: 0.38
                                             );
                                           },
                                           textAlign: TextAlign.center,
@@ -364,7 +364,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 60)
+                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
                               ],
                             )
                           ],
