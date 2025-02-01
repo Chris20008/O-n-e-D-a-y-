@@ -265,18 +265,24 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       value: cnConfig.useHealthData,
                                       activeColor: const Color(0xFFC16A03),
                                       onChanged: (value) async{
-                                        setState(() {
+                                        setState(() async{
                                           if(Platform.isAndroid){
                                             HapticFeedback.selectionClick();
                                           }
-                                          // cnConfig.askHealthPermission(cnScreenStatistics, value);
                                           cnConfig.setHealth(value);
                                           if(!value){
                                             Future.delayed(const Duration(milliseconds: 500), (){
-                                              print("REVOK PERMISSIONS");
                                               cnScreenStatistics.health.revokePermissions();
                                             });
                                           }
+                                          await cnScreenStatistics.refreshHealthData().then((value){
+                                            if(value){
+                                              cnScreenStatistics.selectedExerciseName = "Gewicht";
+                                            }
+                                          });
+                                          cnScreenStatistics.refreshData();
+                                          cnScreenStatistics.calcMinMaxDates();
+                                          cnScreenStatistics.refresh();
                                         });
                                       }
                                   ),

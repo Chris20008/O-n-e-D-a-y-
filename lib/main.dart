@@ -490,16 +490,16 @@ class _MyHomePageState extends State<MyHomePage>{
                       ),
                     ),
                   ),
-                Center(
-                  child: ElevatedButton(
-                    child: Text("Test"),
-                    onPressed: ()async{
-                      print("Presses Center button");
-                      tryHealthData();
-                      // print("RESULT res: $res");
-                    },
-                  ),
-                )
+                // Center(
+                //   child: ElevatedButton(
+                //     child: Text("Test"),
+                //     onPressed: ()async{
+                //       print("Presses Center button");
+                //       tryHealthData();
+                //       // print("RESULT res: $res");
+                //     },
+                //   ),
+                // )
               ],
             ),
         ),
@@ -582,34 +582,36 @@ class _MyHomePageState extends State<MyHomePage>{
       }
     });
   }
-}
 
-void tryHealthData()async{
-  // Global Health instance
-  final health = Health();
-
-  // configure the health plugin before use.
-  await health.configure();
-  var types = [
-    HealthDataType.WEIGHT
-  ];
-  bool requested = await health.requestAuthorization(types);
-  print("REQUESTED: $requested");
-  var now = DateTime.now();
-  DateTime startTime = DateTime(2000, 1, 1);
-  List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-      startTime: startTime, endTime: now, types: types);
-
-  print("");
-  print("ALL_VALUES");
-  for(HealthDataPoint h in healthData){
-    final test = HealthDataPointWrapper(hdp: h);
-    print(test.dateFrom);
-    print(test.weight);
-    print("");
-  }
-  print(healthData.length);
-  // print(healthData);
+  // void tryHealthData()async{
+  //   // Global Health instance
+  //   final health = Health();
+  //
+  //   // configure the health plugin before use.
+  //   await health.configure();
+  //   var types = [
+  //     HealthDataType.WEIGHT
+  //   ];
+  //   bool requested = await health.requestAuthorization(types);
+  //   print("REQUESTED: $requested");
+  //   final result = await cnScreenStatistics.refreshHealthData();
+  //   print("Result $result");
+  //   var now = DateTime.now();
+  //   DateTime startTime = DateTime(2000, 1, 1);
+  //   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+  //       startTime: startTime, endTime: now, types: types);
+  //
+  //   // print("");
+  //   // print("ALL_VALUES");
+  //   // for(HealthDataPoint h in healthData){
+  //   //   final test = HealthDataPointWrapper(hdp: h);
+  //   //   print(test.dateFrom);
+  //   //   print(test.weight);
+  //   //   print("");
+  //   // }
+  //   // print(healthData.length);
+  //   // print(healthData);
+  // }
 }
 
 class CnHomepage extends ChangeNotifier {

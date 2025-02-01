@@ -404,29 +404,37 @@ class CnScreenStatistics extends ChangeNotifier {
 
   void init(Map? data) async{
     isInitialized = true;
+    await health.configure();
+    await refreshHealthData();
     calcMinMaxDates();
     if(data != null){
       initCachedData(data);
     }
-    await health.configure();
-    await refreshHealthData();
   }
 
-  Future refreshHealthData() async{
+  Future<bool> refreshHealthData() async{
+    if(!cnConfig.useHealthData){
+      healthData.clear();
+      return false;
+    }
     var now = DateTime.now();
     DateTime startTime = DateTime(2000, 1, 1);
-    healthData = await health.getHealthDataFromTypes(
-        startTime: startTime,
-        endTime: now,
-        types: types
-    ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList());
-    if(Platform.isAndroid){
-      healthData = healthData.reversed.toList();
+    try{
+      healthData = await health.getHealthDataFromTypes(
+          startTime: startTime,
+          endTime: now,
+          types: types
+      ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList());
+      if(Platform.isAndroid){
+        healthData = healthData.reversed.toList();
+      }
+      if(healthData.isEmpty){
+        return false;
+      }
+      return true;
     }
-    for(final l in healthData){
-      print(l.dateFrom);
-      print(l.weight);
-      print("");
+    catch (_){
+      return false;
     }
   }
 
@@ -449,7 +457,7 @@ class CnScreenStatistics extends ChangeNotifier {
     query.distinct = true;
     final res = query.find();
     res.sort();
-    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && selectedExerciseName != "Gewicht"){
+    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && (selectedExerciseName != "Gewicht" || !cnConfig.useHealthData)){
       selectedExerciseName = res.firstOrNull;
     }
     return res;
@@ -647,14 +655,16 @@ class CnScreenStatistics extends ChangeNotifier {
   void refreshData(){
     allWorkoutNames = getAllWorkoutNames();
     allExerciseNames = getAllExerciseNames();
-    allExerciseNames.insert(0, "Gewicht");
+    if(cnConfig.useHealthData){
+      allExerciseNames.insert(0, "Gewicht");
+    }
     calcMinMaxDates();
     allSickDays = objectbox.sickDaysBox.getAll();
   }
 
   void initCachedData(Map data){
     if(data.containsKey("selectedExerciseName")){
-      if(allExerciseNames.contains(data["selectedExerciseName"])){
+      if((allExerciseNames.contains(data["selectedExerciseName"])) | (data["selectedExerciseName"] == "Gewicht" && cnConfig.useHealthData)){
         selectedExerciseName = data["selectedExerciseName"];
       }
     }

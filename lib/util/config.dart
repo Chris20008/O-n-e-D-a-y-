@@ -258,34 +258,35 @@ class CnConfig extends ChangeNotifier {
     bool? result;
     bool? permission;
     bool hadToWait = false;
+    bool gotData = false;
     while(isWaitingForHealthResponse){
       await Future.delayed(const Duration(milliseconds: 100));
       hadToWait = true;
     }
     if(hadToWait){
+      if(Platform.isIOS){
+        return cnScreenStatistics.healthData.isNotEmpty;
+      }
       return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
     }
     isWaitingForHealthResponse = true;
     await Future.delayed(const Duration(milliseconds: 500), ()async{
-    permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
-    if(permission != true){
-      print("Do not have permission");
-      result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
-      print(result);
       permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
-      print("Second Permission result $permission");
-    }
-    print("RESULT HEALTH: $permission");
-    if(permission != true && result != true){
-      await setHealth(false);
-      cnScreenStatistics.health.revokePermissions();
-      Future.delayed(const Duration(milliseconds: 500), (){
-        refresh();
-      });
-    }
+      if(permission != true){
+        result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
+        permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+      }
+      gotData = await cnScreenStatistics.refreshHealthData();
+      if(!gotData){
+        await setHealth(false);
+        cnScreenStatistics.health.revokePermissions();
+        Future.delayed(const Duration(milliseconds: 500), (){
+          refresh();
+        });
+      }
     });
     isWaitingForHealthResponse = false;
-    return permission?? result?? false;
+    return gotData;
   }
 
   Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, BuildContext? context}) async{
