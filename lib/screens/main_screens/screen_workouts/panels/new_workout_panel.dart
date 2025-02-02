@@ -111,7 +111,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         //   return
         // },
         panel: ClipRRect(
-          borderRadius: const BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25)),
+          borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
           child: GestureDetector(
             behavior: HitTestBehavior.translucent,
             onTap: () {
@@ -196,90 +196,107 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                   ),
                 ),
 
-                /// faded box bottom screen
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    height: _totalHeightBottomBox,
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
-                      children: [
-                        /// faded container
-                        Positioned(
-                          bottom: _heightBottomColoredBox - 0.2,
-                          left: 0,
-                          right: 0,
-                          child: Container(
-                            height: _totalHeightBottomBox - _heightBottomColoredBox,
-                            decoration: BoxDecoration(
-                                gradient:  LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      // Colors.transparent,
-                                      // Colors.black,
-                                      _color.withOpacity(0.0),
-                                      _color
-                                    ]
-                                )
-                            ),
-                          ),
-                        ),
-                        /// just colored container below faded container
-                        Container(
-                          height: _heightBottomColoredBox,
-                          // color: Colors.black,
-                          color: _color,
-                        ),
-                        /// bottom row with icons
-                        Padding(
-                          padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              myIconButton(
-                                  icon: const Icon(Icons.close),
-                                  onPressed: onCancel
-                              ),
-                              if(cnNewWorkout.isUpdating)
-                                myIconButton(
-                                  icon:const Icon(Icons.delete_forever),
-                                  onPressed: (){
-                                    HapticFeedback.selectionClick();
-                                    askDeleteWorkout();
-                                    // cnStandardPopUp.open(
-                                    //     context: context,
-                                    //     child: Text(
-                                    //       AppLocalizations.of(context)!.panelWoDeleteWorkout,
-                                    //       textAlign: TextAlign.center,
-                                    //       textScaler: const TextScaler.linear(1.2),
-                                    //       style: const TextStyle(color: Colors.white),
-                                    //     ),
-                                    //     onConfirm: onDelete,
-                                    //     onCancel: (){},
-                                    //     color: const Color(0xff2d2d2d)
-                                    //   // pos: Offset(position.dx + width/2, position.dy + height/2)
-                                    // );
-                                  },
-                                ),
-                              myIconButton(
-                                  icon: const Icon(Icons.check),
-                                  onPressed: (){
-                                    if(!hasChangedNames()){
-                                      onConfirm();
-                                    }
-                                    else{
-                                      openConfirmNameChangePopUp();
-                                    }
-                                  }
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+                // /// faded box bottom screen
+                // Align(
+                //   alignment: Alignment.bottomCenter,
+                //   child: SizedBox(
+                //     height: _totalHeightBottomBox,
+                //     child: Stack(
+                //       alignment: Alignment.bottomCenter,
+                //       children: [
+                //         /// faded container
+                //         Positioned(
+                //           bottom: _heightBottomColoredBox - 0.2,
+                //           left: 0,
+                //           right: 0,
+                //           child: Container(
+                //             height: _totalHeightBottomBox - _heightBottomColoredBox,
+                //             decoration: BoxDecoration(
+                //                 gradient:  LinearGradient(
+                //                     begin: Alignment.topCenter,
+                //                     end: Alignment.bottomCenter,
+                //                     colors: [
+                //                       // Colors.transparent,
+                //                       // Colors.black,
+                //                       _color.withOpacity(0.0),
+                //                       _color
+                //                     ]
+                //                 )
+                //             ),
+                //           ),
+                //         ),
+                //         /// just colored container below faded container
+                //         Container(
+                //           height: _heightBottomColoredBox,
+                //           // color: Colors.black,
+                //           color: _color,
+                //         ),
+                //         /// bottom row with icons
+                //         Padding(
+                //           padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
+                //           child: Row(
+                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //             children: [
+                //               myIconButton(
+                //                   icon: const Icon(Icons.close),
+                //                   onPressed: onCancel
+                //               ),
+                //               if(cnNewWorkout.isUpdating)
+                //                 myIconButton(
+                //                   icon:const Icon(Icons.delete_forever),
+                //                   onPressed: (){
+                //                     HapticFeedback.selectionClick();
+                //                     askDeleteWorkout();
+                //                     // cnStandardPopUp.open(
+                //                     //     context: context,
+                //                     //     child: Text(
+                //                     //       AppLocalizations.of(context)!.panelWoDeleteWorkout,
+                //                     //       textAlign: TextAlign.center,
+                //                     //       textScaler: const TextScaler.linear(1.2),
+                //                     //       style: const TextStyle(color: Colors.white),
+                //                     //     ),
+                //                     //     onConfirm: onDelete,
+                //                     //     onCancel: (){},
+                //                     //     color: const Color(0xff2d2d2d)
+                //                     //   // pos: Offset(position.dx + width/2, position.dy + height/2)
+                //                     // );
+                //                   },
+                //                 ),
+                //               myIconButton(
+                //                   icon: const Icon(Icons.check),
+                //                   onPressed: (){
+                //                     if(!hasChangedNames()){
+                //                       onConfirm();
+                //                     }
+                //                     else{
+                //                       openConfirmNameChangePopUp();
+                //                     }
+                //                   }
+                //               )
+                //             ],
+                //           ),
+                //         )
+                //       ],
+                //     ),
+                //   ),
+                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
+                    CupertinoButton(
+                        onPressed: (){
+                          if(!hasChangedNames()){
+                            onConfirm();
+                          }
+                          else{
+                            openConfirmNameChangePopUp();
+                          }
+                        },
+                        child: const Text("Speichern")
                     ),
-                  ),
-                ),
+                  ],
+                )
               ],
             ),
           ),
@@ -1317,8 +1334,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   Future<void> openPanel() async{
     await panelController.animatePanelToPosition(
         1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.decelerate
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastEaseInToSlowEaseOut
     );
   }
 
@@ -1410,8 +1427,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     Future.delayed(const Duration(milliseconds: 50), (){
       panelController.animatePanelToPosition(
           0,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.decelerate
       ).then((value) => {
         SystemChrome.setPreferredOrientations([]),
         if(doClear){

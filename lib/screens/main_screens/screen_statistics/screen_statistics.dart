@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -368,6 +369,9 @@ class CnScreenStatistics extends ChangeNotifier {
   late List<String> allExerciseNames = getAllExerciseNames();
   List<ObSickDays> allSickDays = [];
 
+  Exercise selectedExerciseFirst = Exercise();
+  Exercise selectedExerciseLast = Exercise();
+  Exercise? selectedExerciseTemplate;
   String? selectedExerciseName;
   String? selectedWorkoutName;
   int selectedWorkoutIndex = 0;
@@ -446,6 +450,26 @@ class CnScreenStatistics extends ChangeNotifier {
     res.insert(0, "All Workouts");
     return res;
   }
+  
+  // void setSelectedExercise({required String exName}){
+  //   selectedExerciseName = exName;
+  //   if(Platform.isAndroid){
+  //     HapticFeedback.selectionClick();
+  //   }
+  //   final builder = objectbox.exerciseBox.query(ObExercise_.name.equals(exName));
+  //   builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
+  //   ObExercise? exTemplate = builder.build().findFirst();
+  //
+  //   if(exTemplate != null){
+  //     selectedExercise = Exercise.fromObExercise(exTemplate);
+  //     return;
+  //   }
+  //
+  //   final builder2 = objectbox.workoutBox.query().order(ObWorkout_.date, flags: Order.descending).linkMany(ObExercise_.);
+  //   // builder2.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
+  //   // ObExercise? exNonTemplate = builder2.build().findFirst();
+  //
+  // }
   
   List<String> getAllExerciseNames(){
     final builder = objectbox.exerciseBox.query();
@@ -557,10 +581,14 @@ class CnScreenStatistics extends ChangeNotifier {
     Map<DateTime, double> oneRepMaxPerDate = {};
     for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
       double oneRepMax = 0;
-      if(healthData.isNotEmpty){
+      if(healthData.isNotEmpty && (
+          (selectedExerciseTemplate != null && selectedExerciseTemplate!.bodyWeightPercent > 0.0) ||
+          (selectedExerciseTemplate == null && selectedExerciseLast.bodyWeightPercent > 0)
+      )){
         HealthDataPointWrapper datesBodyWeight = healthData.firstWhereOrNull((hdp) => hdp.dateFrom.isBefore(entry.key) | hdp.dateFrom.isSameDate(entry.key))??
             healthData.reversed.firstWhere((hdp) => hdp.dateFrom.isAfter(entry.key));
-        bodyWeight = datesBodyWeight.weight;
+        double bodyWeightPercent = selectedExerciseTemplate?.bodyWeightPercent?? selectedExerciseLast.bodyWeightPercent;
+        bodyWeight = datesBodyWeight.weight * bodyWeightPercent;
         print("SELECT Weight Point ${datesBodyWeight.dateFrom} for date ${entry.key}");
       }
       for(List set in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
@@ -582,6 +610,35 @@ class CnScreenStatistics extends ChangeNotifier {
     if (selectedExerciseName == "Gewicht"){
       minDate = healthData.last.dateFrom;
       maxDate = healthData.first.dateFrom;
+      return;
+    }
+    setExerciseTemplate();
+    setExerciseFirst();
+    setExerciseLast();
+    // ObWorkout? firstWorkout;
+    // final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
+    // if(selectedExerciseName != null) {
+    //   firstBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+    // }
+    // firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
+    // if(firstWorkout != null){
+    //   minDate = firstWorkout.date;
+    // }
+    //
+    // ObWorkout? lastWorkout;
+    // final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
+    // if(selectedExerciseName != null) {
+    //   lastBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+    // }
+    // lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
+    // if(lastWorkout != null){
+    //   maxDate = lastWorkout.date;
+    // }
+  }
+
+  void setExerciseFirst(){
+    if (selectedExerciseName == "Gewicht"){
+      return;
     }
     ObWorkout? firstWorkout;
     final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
@@ -591,8 +648,14 @@ class CnScreenStatistics extends ChangeNotifier {
     firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
     if(firstWorkout != null){
       minDate = firstWorkout.date;
+      selectedExerciseFirst = Exercise.fromObExercise(firstWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
     }
+  }
 
+  void setExerciseLast(){
+    if (selectedExerciseName == "Gewicht"){
+      return;
+    }
     ObWorkout? lastWorkout;
     final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
     if(selectedExerciseName != null) {
@@ -601,7 +664,28 @@ class CnScreenStatistics extends ChangeNotifier {
     lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
     if(lastWorkout != null){
       maxDate = lastWorkout.date;
+      selectedExerciseLast = Exercise.fromObExercise(lastWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
     }
+  }
+
+  void setExerciseTemplate(){
+    if (selectedExerciseName == "Gewicht"){
+      return;
+    }
+    ObWorkout? templateWorkout;
+    final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true));
+    if(selectedExerciseName != null) {
+      lastBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+      templateWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
+      if(templateWorkout != null){
+        selectedExerciseTemplate = Exercise.fromObExercise(templateWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
+      }
+      else{
+        selectedExerciseTemplate = null;
+      }
+      return;
+    }
+    selectedExerciseTemplate = null;
   }
 
   // final weekdayMapping = {

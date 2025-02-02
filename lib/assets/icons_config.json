@@ -59,6 +59,12 @@
       "css": "heart",
       "code": 59393,
       "src": "elusive"
+    },
+    {
+      "uid": "2169861329c13fef61a01e4cf0575997",
+      "css": "weight",
+      "code": 62614,
+      "src": "fontawesome5"
     }
   ]
 }

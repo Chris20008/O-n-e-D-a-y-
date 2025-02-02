@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:quiver/iterables.dart';
 
 import '../main.dart';
@@ -62,7 +61,8 @@ class Workout{
           seatLevel: e.seatLevel,
           linkName: e.linkName,
           category: e.category,
-          blockLink: e.blockLink
+          blockLink: e.blockLink,
+          bodyWeightPercent: e.bodyWeightPercent
       ))),
       date: w.date,
       id: w.id,
@@ -92,6 +92,7 @@ class Workout{
           ex.seatLevel = newExercise.seatLevel;
           ex.category = newExercise.category;
           ex.blockLink = newExercise.blockLink;
+          ex.bodyWeightPercent = newExercise.bodyWeightPercent;
           /// Put the updated exercise in the database
           objectbox.exerciseBox.put(ex, mode: PutMode.update);
         }
@@ -124,13 +125,13 @@ class Workout{
     date = DateTime.now();
   }
 
-  List<Key> generateKeysTotalAmountSets(){
-    List<Key> keys = [];
-    for (var ex in exercises) {
-      keys.addAll(ex.generateKeyForEachSet());
-    }
-    return keys;
-  }
+  // List<Key> generateKeysTotalAmountSets(){
+  //   List<Key> keys = [];
+  //   for (var ex in exercises) {
+  //     keys.addAll(ex.generateKeyForEachSet());
+  //   }
+  //   return keys;
+  // }
 
   ObWorkout toEmptyObWorkout() {
     return ObWorkout(

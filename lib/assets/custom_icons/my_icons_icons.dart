@@ -50,4 +50,5 @@ class MyIcons {
   static const IconData database = IconData(0xf1c0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData graph = IconData(0xf35a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData dumbbell = IconData(0xf44b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData weight = IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

@@ -448,6 +448,44 @@ Widget getSelectCategory({
   );
 }
 
+Widget getSelectBodyWeightPercent({
+  Key? key,
+  required Widget child,
+  required Function(int bodyWeight) onConfirm,
+  required BuildContext context,
+  required double currentBodyWeightPercent
+}) {
+  return PullDownButton(
+    key: key,
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List percents = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+      List<PullDownMenuItem> percentWidgets = List.generate(percents.length, (index) => PullDownMenuItem.selectable(
+          selected: currentBodyWeightPercent == percents[index]/100,
+          title: "${percents[index]} %",
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(percents[index]);
+            });
+          })
+      );
+      return percentWidgets;
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    ),
+  );
+}
+
 Widget getSet({
   required int index,
   required Exercise newEx,
@@ -575,6 +613,34 @@ Widget getSet({
           ),
         ),
       ),
+    ),
+  );
+}
+
+void notificationPopUp({
+  required BuildContext context,
+  required String title,
+  required String message
+}) {
+  showCupertinoModalPopup<void>(
+    context: context,
+    builder: (BuildContext context) => CupertinoActionSheet(
+      title: Column(
+        children: [
+          Text(title, textScaler: const TextScaler.linear(1.2)),
+          const SizedBox(height: 15,)
+        ],
+      ),
+      message: Text(message, textScaler: const TextScaler.linear(1.2)),
+      actions: <CupertinoActionSheetAction>[
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          isDefaultAction: true,
+          child: const Text('Ok'),
+        ),
+      ],
     ),
   );
 }

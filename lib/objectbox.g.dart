@@ -25,7 +25,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(2, 2510276494793380538),
       name: 'ObExercise',
-      lastPropertyId: const obx_int.IdUid(12, 64718899079331937),
+      lastPropertyId: const obx_int.IdUid(13, 6871642666147096332),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -77,6 +77,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(12, 64718899079331937),
             name: 'blockLink',
             type: 1,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(13, 6871642666147096332),
+            name: 'bodyWeightPercent',
+            type: 8,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -221,7 +226,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
               ? null
               : fbb.writeString(object.linkName!);
           final setTypesOffset = fbb.writeListInt64(object.setTypes);
-          fbb.startTable(13);
+          fbb.startTable(14);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addOffset(3, amountsOffset);
@@ -232,6 +237,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addOffset(8, setTypesOffset);
           fbb.addInt64(10, object.category);
           fbb.addBool(11, object.blockLink);
+          fbb.addFloat64(12, object.bodyWeightPercent);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -261,6 +267,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 24, 0);
           final blockLinkParam =
               const fb.BoolReader().vTableGet(buffer, rootOffset, 26, false);
+          final bodyWeightPercentParam =
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 28, 0);
           final object = ObExercise(
               id: idParam,
               name: nameParam,
@@ -271,7 +279,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
               seatLevel: seatLevelParam,
               linkName: linkNameParam,
               category: categoryParam,
-              blockLink: blockLinkParam);
+              blockLink: blockLinkParam,
+              bodyWeightPercent: bodyWeightPercentParam);
 
           return object;
         }),
@@ -399,6 +408,10 @@ class ObExercise_ {
   /// see [ObExercise.blockLink]
   static final blockLink =
       obx.QueryBooleanProperty<ObExercise>(_entities[0].properties[9]);
+
+  /// see [ObExercise.bodyWeightPercent]
+  static final bodyWeightPercent =
+      obx.QueryDoubleProperty<ObExercise>(_entities[0].properties[10]);
 }
 
 /// [ObWorkout] entity fields to define ObjectBox queries.

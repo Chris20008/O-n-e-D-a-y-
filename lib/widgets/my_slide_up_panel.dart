@@ -29,7 +29,7 @@ class MySlideUpPanel extends StatefulWidget {
     this.maxHeight,
     this.minHeight,
     this.isDraggable = true,
-    this.borderRadius = const BorderRadius.only(topRight: Radius.circular(25), topLeft: Radius.circular(25)),
+    this.borderRadius = const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
     this.color,
     this.onPanelSlide,
     this.panel,
