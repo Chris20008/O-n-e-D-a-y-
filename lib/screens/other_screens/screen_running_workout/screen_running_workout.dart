@@ -97,14 +97,15 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           height: double.maxFinite,
           width: double.maxFinite,
           decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    Color(0xffc26a0e),
-                    Color(0xbb110a02)
-                  ]
-              )
+            color: Colors.black
+              // gradient: LinearGradient(
+              //     begin: Alignment.topRight,
+              //     end: Alignment.bottomLeft,
+              //     colors: [
+              //       Color(0xffc26a0e),
+              //       Color(0xbb110a02)
+              //     ]
+              // )
           ),
           child: Stack(
             alignment: Alignment.center,
@@ -113,6 +114,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 backDropEnabled: true,
                 animationControllerName: "ScreenRunningWorkout",
                 child: Scaffold(
+                  backgroundColor: Theme.of(context).primaryColor,
                   extendBody: true,
                   bottomNavigationBar: viewInsetsBottom < 50? ClipRRect(
                     child: BackdropFilter(
@@ -659,7 +661,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         });
         Future.delayed(const Duration(milliseconds: (100)), (){
           FocusManager.instance.primaryFocus?.unfocus();
-          controllerSelectorExerciseToUpdate.open();
+          // controllerSelectorExerciseToUpdate.open();
+          controllerSelectorExerciseToUpdate.animatePanelToPosition(
+              1,
+              duration: Duration(milliseconds: 400),
+              curve: Curves.easeOutCubic
+          );
         });
       });
     }
@@ -802,7 +809,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                       controllerSelectorExercisePerLink = PanelController();
                       Future.delayed(const Duration(milliseconds: 100), (){
                         FocusManager.instance.primaryFocus?.unfocus();
-                        controllerSelectorExercisePerLink.open();
+                        controllerSelectorExercisePerLink.animatePanelToPosition(
+                            1,
+                            duration: Duration(milliseconds: 400),
+                            curve: Curves.easeOutCubic
+                        );
                       });
                     } else{
                       descendantNameExerciseToUpdate = "ScreenRunningWorkout";

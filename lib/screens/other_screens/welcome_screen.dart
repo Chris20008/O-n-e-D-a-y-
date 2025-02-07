@@ -72,7 +72,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             // backdropEnabled: false,
             // backdropColor: Colors.blue,
             // backdropOpacity: 1,
-            panelBuilder: (sc){
+            panelBuilder: (context, listView){
               return Column(
                 children: [
                   const SizedBox(height: 10,),
@@ -81,7 +81,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   Expanded(
                     child: ListView(
                       padding: EdgeInsets.zero,
-                      controller: sc,
+                      controller: ScrollController(),
                       children: [
                         getBackupDialogWelcomeScreen(context: context)
                       ],

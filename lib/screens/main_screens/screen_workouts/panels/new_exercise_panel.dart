@@ -42,6 +42,7 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
   double heightHeader = 120.0;
   final textDisappearOffset = 0.1;
   bool wasShownBigChild = true;
+  bool isTouchingListView = false;
 
   GlobalKey addSetKey = GlobalKey();
 
@@ -77,8 +78,8 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
   // }
 
   double get shrinkOffset {
-    final value = cnNewExercise.scrollControllerSets.hasClients
-        ? (cnNewExercise.scrollControllerSets.offset / 150.0).clamp(0.0, 1.0)
+    final value = cnNewExercise.scrollController.hasClients
+        ? (cnNewExercise.scrollController.offset / 150.0).clamp(0.0, 1.0)
         : 0.0;
     return value;
   }
@@ -110,324 +111,325 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
             },
             child: MySlideUpPanel(
               onPanelSlide: onPanelSlide,
+              // isTouchingListView: isTouchingListView,
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
               backdropOpacity: 0.25,
               color: _color,
               animationControllerName: "NewExercisePanel",
               descendantAnimationControllerName: "NewWorkoutPanel",
-              panel: ClipRRect(
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                child: Stack(
-                  children: [
-                    Container(
-                      // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+              // scrollControllerInnerList: cnNewExercise.scrollController,
+              panelBuilder: (context, listView) {
+                return ClipRRect(
+                  borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                  child: Stack(
+                    children: [
+                      Container(
+                        // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
 
-                      padding: const EdgeInsets.only(bottom: 0, right: 15.0, left: 15.0, top: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                        child: ListView(
-                          padding: EdgeInsets.only(top: heightHeader),
-                          controller: cnNewExercise.scrollControllerSets,
-                          physics: const BouncingScrollPhysics(),
-                          shrinkWrap: true,
-                          children: [
+                        padding: const EdgeInsets.only(bottom: 0, right: 15.0, left: 15.0, top: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            FocusScope.of(context).unfocus();
+                          },
+                          child: listView(
+                            padding: EdgeInsets.only(top: heightHeader),
+                            controller: cnNewExercise.scrollController,
+                            physics: const BouncingScrollPhysics(),
+                            shrinkWrap: true,
+                            children: [
 
-                            ...getSelectors(),
+                              ...getSelectors(),
 
-                            const SizedBox(height: 15,),
-                            Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
-                                Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
-                              ],
-                            ),
-                            ReorderableListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              // controller: ScrollController(),
-                              padding: const EdgeInsets.only(top: 10),
-                              shrinkWrap: true,
-                              // key: listViewKey,
-                              itemCount: cnNewExercise.exercise.sets.length,
-                              // itemCount: cnNewExercise.exercise.sets.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                Widget? child;
-                                child = Padding(
-                                  padding: const EdgeInsets.only(top: 3, bottom: 3),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      getSet(
-                                          context: context,
-                                          index: index,
-                                          newEx: cnNewExercise.exercise,
-                                          width: 50,
-                                          onConfirm: (){
-                                            cnNewExercise.refresh();
-                                          }
-                                      ),
-
-                                      /// Weight
-                                      Container(
-                                        width: _widthSetWeightAmount,
-                                        height: 35,
-                                        color: Colors.transparent,
-                                        child: TextField(
-                                          keyboardAppearance: Brightness.dark,
-                                          key: cnNewExercise.ensureVisibleKeys[index][0],
-                                          maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
-                                          style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
-                                          onTap: ()async{
-                                            cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
-                                            if(insetsBottom == 0) {
-                                              await Future.delayed(const Duration(milliseconds: 500));
+                              const SizedBox(height: 15,),
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+                                ],
+                              ),
+                              ReorderableListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(top: 10),
+                                shrinkWrap: true,
+                                itemCount: cnNewExercise.exercise.sets.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Widget? child;
+                                  child = Padding(
+                                    padding: const EdgeInsets.only(top: 3, bottom: 3),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        getSet(
+                                            context: context,
+                                            index: index,
+                                            newEx: cnNewExercise.exercise,
+                                            width: 50,
+                                            onConfirm: (){
+                                              cnNewExercise.refresh();
                                             }
-                                            Scrollable.ensureVisible(
-                                                cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
-                                                duration: const Duration(milliseconds: 300),
-                                                curve: Curves.easeInOut,
-                                                alignment: 0.38
-                                            );
-                                          },
-                                          textAlign: TextAlign.center,
-                                          controller: cnNewExercise.controllers[index][0],
-                                          keyboardType: const TextInputType.numberWithOptions(
-                                              decimal: true,
-                                              signed: false
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                            counterText: "",
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                          ),
-                                          onChanged: (value) {
-                                            value = value.trim();
-                                            if(value.isNotEmpty){
-                                              value = validateDoubleTextInput(value);
-                                              final newValue = double.tryParse(value);
-                                              cnNewExercise.exercise.sets[index].weight = newValue;
-                                              if(newValue == null){
-                                                cnNewExercise.controllers[index][0].clear();
-                                              } else{
-                                                cnNewExercise.controllers[index][0].text = value;
-                                              }
-                                            }
-                                            else{
-                                              cnNewExercise.exercise.sets[index].weight = null;
-                                            }
-                                            setState(() {});
-                                          },
                                         ),
-                                      ),
 
-                                      /// Amount
-                                      Container(
-                                        width: _widthSetWeightAmount,
-                                        height: 35,
-                                        color: Colors.transparent,
-                                        child: TextField(
-                                          keyboardAppearance: Brightness.dark,
-                                          key: cnNewExercise.ensureVisibleKeys[index][1],
-                                          maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
-                                          style: cnNewExercise.exercise.categoryIsReps()
-                                              ? const TextStyle(fontSize: 18)
-                                              : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
-                                          onTap: ()async{
-                                            cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
-                                            if(insetsBottom == 0) {
-                                              await Future.delayed(const Duration(milliseconds: 300));
-                                            }
-                                            Scrollable.ensureVisible(
-                                                cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
-                                                duration: const Duration(milliseconds: 300),
-                                                curve: Curves.easeInOut,
-                                                alignment: 0.38
-                                            );
-                                          },
-                                          textAlign: TextAlign.center,
-                                          controller: cnNewExercise.controllers[index][1],
-                                          keyboardType: TextInputType.number,
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                            counterText: "",
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                          ),
-                                          onChanged: (value){
-                                            value = value.trim();
-                                            /// For Reps
-                                            if(cnNewExercise.exercise.categoryIsReps()){
+                                        /// Weight
+                                        Container(
+                                          width: _widthSetWeightAmount,
+                                          height: 35,
+                                          color: Colors.transparent,
+                                          child: TextField(
+                                            keyboardAppearance: Brightness.dark,
+                                            key: cnNewExercise.ensureVisibleKeys[index][0],
+                                            maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
+                                            style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
+                                            onTap: ()async{
+                                              cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
+                                              if(insetsBottom == 0) {
+                                                await Future.delayed(const Duration(milliseconds: 500));
+                                              }
+                                              Scrollable.ensureVisible(
+                                                  cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
+                                                  duration: const Duration(milliseconds: 300),
+                                                  curve: Curves.easeInOut,
+                                                  alignment: 0.38
+                                              );
+                                            },
+                                            textAlign: TextAlign.center,
+                                            controller: cnNewExercise.controllers[index][0],
+                                            keyboardType: const TextInputType.numberWithOptions(
+                                                decimal: true,
+                                                signed: false
+                                            ),
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            onChanged: (value) {
+                                              value = value.trim();
                                               if(value.isNotEmpty){
-                                                final newValue = int.tryParse(value);
-                                                cnNewExercise.exercise.sets[index].amount = newValue;
+                                                value = validateDoubleTextInput(value);
+                                                final newValue = double.tryParse(value);
+                                                cnNewExercise.exercise.sets[index].weight = newValue;
                                                 if(newValue == null){
-                                                  cnNewExercise.controllers[index][1].clear();
+                                                  cnNewExercise.controllers[index][0].clear();
+                                                } else{
+                                                  cnNewExercise.controllers[index][0].text = value;
                                                 }
                                               }
                                               else{
-                                                cnNewExercise.exercise.sets[index].amount = null;
+                                                cnNewExercise.exercise.sets[index].weight = null;
                                               }
-                                            }
-                                            /// For Time
-                                            else{
-                                              List result = parseTextControllerAmountToTime(value);
-                                              cnNewExercise.controllers[index][1].text = result[1];
-                                              cnNewExercise.exercise.sets[index].amount = result[0];
                                               setState(() {});
-                                            }
-                                          },
+                                            },
+                                          ),
+                                        ),
+
+                                        /// Amount
+                                        Container(
+                                          width: _widthSetWeightAmount,
+                                          height: 35,
+                                          color: Colors.transparent,
+                                          child: TextField(
+                                            keyboardAppearance: Brightness.dark,
+                                            key: cnNewExercise.ensureVisibleKeys[index][1],
+                                            maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
+                                            style: cnNewExercise.exercise.categoryIsReps()
+                                                ? const TextStyle(fontSize: 18)
+                                                : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
+                                            onTap: ()async{
+                                              cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
+                                              if(insetsBottom == 0) {
+                                                await Future.delayed(const Duration(milliseconds: 300));
+                                              }
+                                              Scrollable.ensureVisible(
+                                                  cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
+                                                  duration: const Duration(milliseconds: 300),
+                                                  curve: Curves.easeInOut,
+                                                  alignment: 0.38
+                                              );
+                                            },
+                                            textAlign: TextAlign.center,
+                                            controller: cnNewExercise.controllers[index][1],
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            onChanged: (value){
+                                              value = value.trim();
+                                              /// For Reps
+                                              if(cnNewExercise.exercise.categoryIsReps()){
+                                                if(value.isNotEmpty){
+                                                  final newValue = int.tryParse(value);
+                                                  cnNewExercise.exercise.sets[index].amount = newValue;
+                                                  if(newValue == null){
+                                                    cnNewExercise.controllers[index][1].clear();
+                                                  }
+                                                }
+                                                else{
+                                                  cnNewExercise.exercise.sets[index].amount = null;
+                                                }
+                                              }
+                                              /// For Time
+                                              else{
+                                                List result = parseTextControllerAmountToTime(value);
+                                                cnNewExercise.controllers[index][1].text = result[1];
+                                                cnNewExercise.exercise.sets[index].amount = result[0];
+                                                setState(() {});
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  return Slidable(
+                                      key: cnNewExercise.slidableKeys[index],
+                                      // key: UniqueKey(),
+                                      startActionPane: ActionPane(
+                                        motion: const ScrollMotion(),
+                                        dismissible: DismissiblePane(
+                                            onDismissed: () {
+                                              dismissExercise(index);
+                                            }),
+                                        children: [
+                                          SlidableAction(
+                                            flex:10,
+                                            onPressed: (BuildContext context){
+                                              dismissExercise(index);
+                                            },
+                                            borderRadius: BorderRadius.circular(15),
+                                            backgroundColor: const Color(0xFFA12D2C),
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.delete,
+                                          ),
+                                          SlidableAction(
+                                            flex: 1,
+                                            onPressed: (BuildContext context){},
+                                            backgroundColor: Colors.transparent,
+                                            foregroundColor: Colors.transparent,
+                                            label: '',
+                                          ),
+                                        ],
+                                      ),
+                                      child: child
+                                  );
+                                },
+                                proxyDecorator: (
+                                    Widget child, int index, Animation<double> animation) {
+                                  return AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (BuildContext context, Widget? child) {
+                                      final double animValue = Curves.easeInOut.transform(animation.value);
+                                      final double scale = lerpDouble(1, 1.06, animValue)!;
+                                      return Transform.scale(
+                                        scale: scale,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Material(
+                                              child: Container(
+                                                  padding: const EdgeInsets.only(left: 2),
+                                                  color: Colors.grey.withOpacity(0.1),
+                                                  child: child
+                                              )
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: child,
+                                  );
+                                },
+                                onReorder: (int oldIndex, int newIndex){
+                                  setState(() {
+                                    if (oldIndex < newIndex) {
+                                      newIndex -= 1;
+                                    }
+                                    final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
+                                    cnNewExercise.exercise.sets.insert(newIndex, item);
+                                    final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
+                                    cnNewExercise.controllers.insert(newIndex, weightAndAmount);
+                                  });
+                                },
+                              ),
+                              Column(
+                                children: [
+                                  const SizedBox(height: 15,),
+
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: IconButton(
+                                            key: addSetKey,
+                                            color: Colors.amber[800],
+                                            style: ButtonStyle(
+                                                backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                            ),
+                                            onPressed: () {
+                                              addSet();
+                                            },
+                                            icon: const Icon(
+                                              Icons.add,
+                                              size: 20,
+                                            )
                                         ),
                                       ),
                                     ],
                                   ),
-                                );
-
-                                return Slidable(
-                                    key: cnNewExercise.slidableKeys[index],
-                                    // key: UniqueKey(),
-                                    startActionPane: ActionPane(
-                                      motion: const ScrollMotion(),
-                                      dismissible: DismissiblePane(
-                                          onDismissed: () {
-                                            dismissExercise(index);
-                                          }),
-                                      children: [
-                                        SlidableAction(
-                                          flex:10,
-                                          onPressed: (BuildContext context){
-                                            dismissExercise(index);
-                                          },
-                                          borderRadius: BorderRadius.circular(15),
-                                          backgroundColor: const Color(0xFFA12D2C),
-                                          foregroundColor: Colors.white,
-                                          icon: Icons.delete,
-                                        ),
-                                        SlidableAction(
-                                          flex: 1,
-                                          onPressed: (BuildContext context){},
-                                          backgroundColor: Colors.transparent,
-                                          foregroundColor: Colors.transparent,
-                                          label: '',
-                                        ),
-                                      ],
-                                    ),
-                                    child: child
-                                );
-                              },
-                              proxyDecorator: (
-                                  Widget child, int index, Animation<double> animation) {
-                                return AnimatedBuilder(
-                                  animation: animation,
-                                  builder: (BuildContext context, Widget? child) {
-                                    final double animValue = Curves.easeInOut.transform(animation.value);
-                                    final double scale = lerpDouble(1, 1.06, animValue)!;
-                                    return Transform.scale(
-                                      scale: scale,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Material(
-                                            child: Container(
-                                                padding: const EdgeInsets.only(left: 2),
-                                                color: Colors.grey.withOpacity(0.1),
-                                                child: child
-                                            )
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: child,
-                                );
-                              },
-                              onReorder: (int oldIndex, int newIndex){
-                                setState(() {
-                                  if (oldIndex < newIndex) {
-                                    newIndex -= 1;
-                                  }
-                                  final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
-                                  cnNewExercise.exercise.sets.insert(newIndex, item);
-                                  final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
-                                  cnNewExercise.controllers.insert(newIndex, weightAndAmount);
-                                });
-                              },
-                            ),
-                            Column(
-                              children: [
-                                const SizedBox(height: 15,),
-
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: IconButton(
-                                          key: addSetKey,
-                                          color: Colors.amber[800],
-                                          style: ButtonStyle(
-                                              backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                              shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                                          ),
-                                          onPressed: () {
-                                            addSet();
-                                          },
-                                          icon: const Icon(
-                                            Icons.add,
-                                            size: 20,
-                                          )
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
-                              ],
-                            )
-                          ],
+                                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        alignment: Alignment.bottomLeft,
-                        color: _color,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 10,),
-                            Center(child: panelTopBar),
-                            const SizedBox(height: 15,),
-                            SizedBox(
-                                height: 30,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!.exercise,
-                                        textScaler: TextScaler.linear(1.5)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            alignment: Alignment.bottomLeft,
+                            color: _color,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 10,),
+                                Center(child: panelTopBar),
+                                const SizedBox(height: 15,),
+                                SizedBox(
+                                    height: 30,
+                                    child: Center(
+                                        child: Text(
+                                            AppLocalizations.of(context)!.exercise,
+                                            textScaler: TextScaler.linear(1.5)
+                                        )
                                     )
-                                )
-                            ),
-                            const SizedBox(height: 10,),
+                                ),
+                                const SizedBox(height: 10,),
 
-                            getHeader(),
-                          ],
-                        )
+                                getHeader(),
+                              ],
+                            )
+                        ),
                       ),
-                    ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
-                        CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern")),
-                      ],
-                    )
-                  ],
-                ),
-              )
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
+                          CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern")),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              }
             )
           ),
         ],
@@ -482,7 +484,7 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
         final isVisible = widgetPosition.dy + widgetSize.height * 80 > 0 &&
             widgetPosition.dy + 80 + viewInsets < screenHeight;
         if(!isVisible){
-          cnNewExercise.scrollControllerSets.jumpTo(cnNewExercise.scrollControllerSets.position.pixels+41);
+          cnNewExercise.scrollController.jumpTo(cnNewExercise.scrollController.position.pixels+41);
         }
       }
     });
@@ -843,11 +845,11 @@ class CnNewExercisePanel extends ChangeNotifier {
   TextEditingController exerciseNameController = TextEditingController();
   TextEditingController restController = TextEditingController();
   TextEditingController seatLevelController = TextEditingController();
-  ScrollController scrollControllerSets = ScrollController();
+  ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
-  final int animationTime = 500;
-  late AnimationController animationController;
+  final int animationTime = 400;
+  // late AnimationController animationController;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -887,7 +889,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     panelController.animatePanelToPosition(
         1,
         duration: Duration(milliseconds: animationTime),
-        curve: Curves.fastEaseInToSlowEaseOut
+        curve: Curves.easeOutCubic
     );
   }
 
@@ -895,12 +897,12 @@ class CnNewExercisePanel extends ChangeNotifier {
     panelController.animatePanelToPosition(
         0,
         duration: Duration(milliseconds: animationTime-150),
-        curve: Curves.decelerate
+        curve: Curves.easeOutCubic
     ).then((value) => {
       if(doClear){
         clear()
       },
-      animationController.reset()
+      // animationController.reset()
     });
   }
 

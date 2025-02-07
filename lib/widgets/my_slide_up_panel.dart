@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:fitness_app/main.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quiver/time.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class MySlideUpPanel extends StatefulWidget {
@@ -17,10 +20,24 @@ class MySlideUpPanel extends StatefulWidget {
   final Widget? panel;
   final bool backdropEnabled;
   final Color backdropColor;
-  final Widget Function(ScrollController)? panelBuilder;
+  // final Widget Function(ScrollController)? panelBuilder;
   final double backdropOpacity;
   final String? animationControllerName;
   final String? descendantAnimationControllerName;
+  // final ScrollController? scrollControllerInnerList;
+  final bool isTouchingListView;
+  final bool bounce;
+  final Widget Function(
+      BuildContext context,
+      Widget Function({
+        ScrollPhysics physics,
+        EdgeInsets padding,
+        bool shrinkWrap,
+        Widget? child,
+        List<Widget>? children,
+        required ScrollController controller,
+      })
+      )? panelBuilder;
 
   const MySlideUpPanel({
     super.key,
@@ -29,16 +46,20 @@ class MySlideUpPanel extends StatefulWidget {
     this.maxHeight,
     this.minHeight,
     this.isDraggable = true,
-    this.borderRadius = const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+    this.borderRadius = const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
     this.color,
     this.onPanelSlide,
     this.panel,
     this.backdropEnabled = false,
     this.backdropColor = Colors.black,
-    this.panelBuilder,
+    // this.panelBuilder,
     this.backdropOpacity = 0.5,
     this.animationControllerName,
-    this.descendantAnimationControllerName
+    this.descendantAnimationControllerName,
+    // this.scrollControllerInnerList,
+    this.isTouchingListView = false,
+    this.panelBuilder,
+    this.bounce = true
   });
 
   @override
@@ -55,6 +76,19 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   AnimationController? descendantAnimationController2;
   final maxTopPadding = Platform.isAndroid? -45 : -52;
   late Color color = widget.color?? Theme.of(context).primaryColor;
+  double overScrollOffset = 0;
+  late PanelController panelController = widget.controller?? PanelController();
+  double pointerStartPositionPanelDrag = 0;
+  double initialPanelPosition = 0;
+  int startPositionScrollController = 0;
+  bool panelDragRunning = false;
+  ScrollController? scrollController;
+  bool bounceAllowed = false;
+  double underScrollOffset = 0;
+  bool isScrolling = false;
+  double lastDelta = 0;
+
+  bool isTouchingListView = false;
 
   @override
   void initState() {
@@ -65,32 +99,88 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     if(widget.animationControllerName != null){
       cnHomepage.animationControllers[widget.animationControllerName!] = animationController;
       if(descendantAnimationController != null){
-        // print("Put ${widget.animationControllerName!}2");
         cnHomepage.animationControllers["${widget.animationControllerName!}2"] = descendantAnimationController!;
       }
     }
-    // print("Try receive ${widget.descendantAnimationControllerName!}2");
     if(widget.descendantAnimationControllerName != null){
       descendantAnimationController2 = cnHomepage.animationControllers["${widget.descendantAnimationControllerName}2"];
     }
-  }
 
-  // @override
-  // void dispose() {
-  //   super.dispose();
-  //   cnHomepage.animationControllers.remove(widget.animationControllerName);
-  //   cnHomepage.animationControllers.remove(widget.descendantAnimationControllerName);
-  //   cnHomepage.animationControllers.remove("${widget.descendantAnimationControllerName}2");
-  // }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if(scrollController != null && scrollController!.hasClients){
+        scrollController?.addListener(() {
+          if(scrollController!.offset > 30){
+            isScrolling = true;
+          }
+        });
+      }
+    });
+
+    if(widget.panelBuilder == null){
+      bounceAllowed = true && widget.bounce;
+    }
+  }
 
   onPanelSlide(double value){
     if(descendantAnimationController != null){
       descendantAnimationController!.value = value*0.5;
     }
     if(descendantAnimationController2 != null){
-      // print("Descendant 2 != null");
       descendantAnimationController2!.value = 0.5 + value*0.5;
     }
+  }
+
+  void removeOverScrollOffset(){
+    Future.delayed(const Duration(milliseconds: 10), (){
+      setState(() {
+        overScrollOffset = overScrollOffset * 0.8;
+        if((overScrollOffset).abs() > 0.1 && !panelDragRunning){
+          removeOverScrollOffset();
+        } else{
+          overScrollOffset = 0;
+        }
+      });
+    });
+  }
+
+  Widget myListView({
+    ScrollPhysics? physics = const BouncingScrollPhysics(),
+    EdgeInsets padding = EdgeInsets.zero,
+    bool shrinkWrap = true,
+    Widget? child,
+    List<Widget>? children,
+    required ScrollController controller,
+  }){
+    assert((child != null) ^ (children != null), "Either child or children must be given. They can't be both null or not null at the same time");
+    scrollController = controller;
+    bounceAllowed = true && widget.bounce;
+    return Listener(
+      onPointerDown: (details){
+        setState(() {
+          isTouchingListView = controller.position.maxScrollExtent > 0;
+        });
+      },
+      onPointerUp: (details){
+        setState(() {
+          isTouchingListView = false;
+        });
+      },
+      child: children != null
+          ? ListView(
+              controller: controller,
+              physics: physics,
+              shrinkWrap: shrinkWrap,
+              padding: padding,
+              children: children,
+            )
+          : SingleChildScrollView(
+            controller: controller,
+            physics: physics,
+            // shrinkWrap: shrinkWrap,
+            padding: padding,
+            child: child,
+          ),
+    );
   }
 
   @override
@@ -98,25 +188,110 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     Widget panel = LayoutBuilder(
         builder: (context, constraints){
           final maxHeight = constraints.maxHeight - (Platform.isAndroid? 50 : 70);
-          return SlidingUpPanel(
-              controller: widget.controller,
-              defaultPanelState: widget.defaultPanelState,
-              maxHeight: (widget.maxHeight?? maxHeight).clamp(0, maxHeight),
-              minHeight: widget.minHeight?? 0,
-              isDraggable: widget.isDraggable,
-              borderRadius: widget.borderRadius,
-              color: color,
-              onPanelSlide: (value){
-                onPanelSlide(value);
-                if(widget.onPanelSlide != null){
-                  widget.onPanelSlide!(value);
+          double panelHeight = ((widget.maxHeight?? maxHeight) + overScrollOffset).clamp(0, maxHeight + overScrollOffset);
+          return Listener(
+            onPointerDown: (details){
+              if(!bounceAllowed){
+                return;
+              }
+              initialPanelPosition = panelController.panelPosition;
+              pointerStartPositionPanelDrag = details.position.dy;
+              if(scrollController != null &&
+                  scrollController!.hasClients
+              ){
+                startPositionScrollController = scrollController!.offset.toInt();
+              }
+            },
+            onPointerMove: (details) {
+              if(!bounceAllowed){
+                return;
+              }
+
+              /// Bounce
+              if ((panelController.panelPosition > 0.99 || panelDragRunning) &&
+                  !isTouchingListView
+              ){
+                // print("BOUNCE");
+                setState(() {
+                  double value =  pointerStartPositionPanelDrag - details.position.dy;
+                  value = pow(value, 0.5) * 1.0;
+                  value = value;
+                  panelDragRunning = true;
+                  overScrollOffset = ((value > 0) ? value : 0).clamp(0, 14) * 0.7;
+                });
+              }
+
+              /// Drag panel while touching list View
+              else if(scrollController != null &&
+                  scrollController!.offset <= 0 &&
+                  initialPanelPosition > 0.1
+              ){
+                // print(isScrolling);
+                // print("DRAG");
+                if(!isScrolling){
+                  lastDelta = details.delta.dy;
+                  setState(() {
+                    scrollController!.jumpTo(0);
+                    underScrollOffset = (underScrollOffset - details.delta.dy).clamp(-panelHeight+1, 0);
+                    final panelPosition = (panelHeight + underScrollOffset) / panelHeight;
+                    panelController.animatePanelToPosition(panelPosition, duration: const Duration(milliseconds: 0));
+                  });
+
                 }
-              },
-              panel: widget.panel,
-              panelBuilder: widget.panelBuilder,
-              backdropEnabled: widget.backdropEnabled,
-              backdropColor: widget.backdropColor,
-              backdropOpacity: widget.backdropOpacity
+                if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
+                  scrollController!.jumpTo(-details.delta.dy);
+                }
+              }
+              else{
+                // print("ELSE");
+                panelDragRunning = false;
+                removeOverScrollOffset();
+                underScrollOffset = 0;
+              }
+            },
+            onPointerUp: (details) {
+              if(!bounceAllowed){
+                return;
+              }
+              setState(() {
+                // print("--------------------------------- RESET SCROLLING");
+                isScrolling = false;
+                startPositionScrollController = 0;
+                panelDragRunning = false;
+                removeOverScrollOffset();
+                if(underScrollOffset < 0){
+                  underScrollOffset = 0;
+                  // print(lastDelta);
+                  if(lastDelta > 6 && MediaQuery.of(context).viewInsets.bottom <= 0){
+                    panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 0);
+                  }
+                  else{
+                    panelController.animatePanelToPosition(1, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 1);
+                  }
+                }
+              });
+            },
+            child: SlidingUpPanel(
+                controller: panelController,
+                defaultPanelState: widget.defaultPanelState,
+                maxHeight: panelHeight,
+                minHeight: widget.minHeight?? 0,
+                // isDraggable: widget.isDraggable, /// && !panelDragRunning,
+                borderRadius: widget.borderRadius,
+                color: color,
+                parallaxOffset: 0.9,
+                onPanelSlide: (value){
+                  onPanelSlide(value);
+                  if(widget.onPanelSlide != null){
+                    widget.onPanelSlide!(value);
+                  }
+                },
+                panel: widget.panel?? widget.panelBuilder!(context, myListView),
+                // panelBuilder: widget.panelBuilder,
+                backdropEnabled: widget.backdropEnabled,
+                backdropColor: widget.backdropColor,
+                backdropOpacity: widget.backdropOpacity
+            ),
           );
         }
     );

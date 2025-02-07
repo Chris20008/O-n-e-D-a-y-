@@ -41,6 +41,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   late List<bool> isCheckedList;
   late Workout workout;
   List<Exercise> relevantExercises = [];
+  ScrollController sc = ScrollController();
 
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
@@ -73,6 +74,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
       backdropEnabled: true,
       backdropOpacity: 0.25,
       controller: widget.controller,
+      bounce: false,
       // maxHeight: ((relevantExercises.length == 1? 192 : relevantExercises.length * 207) + cnBottomMenu.height + 94),
       panel: SafeArea(
         top: false,

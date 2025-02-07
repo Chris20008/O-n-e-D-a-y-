@@ -63,6 +63,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       descendantAnimationControllerName: "ScreenRunningWorkout",
       backdropEnabled: false,
       controller: widget.controller,
+      bounce: false,
       // maxHeight: ((groupedExercises.keys.length == 1? 192 : groupedExercises.keys.length * 207) + cnBottomMenu.height + 94),
       panel: SafeArea(
         top: false,

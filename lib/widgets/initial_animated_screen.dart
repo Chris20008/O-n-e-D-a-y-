@@ -45,8 +45,8 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
       animation: animationController,
       builder: (context, child) {
         double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.245));
-        double borderRadius = 26 - (scale*10-9)*20;
-        borderRadius = borderRadius > 25 ? 25 : borderRadius;
+
+        double borderRadius = (25 - ((1.0-scale)*150)).clamp(15, 30);
         double opacity = (animationController.value * 1.1).clamp(0, 1);
         if(!widget.backDropEnabled){
           opacity = 0;
@@ -73,6 +73,7 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
                         ignoring: opacity > 0 ? false : true,
                         child: Container(
                           color: Colors.black.withOpacity(opacity),
+                          // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
                         )
                     )
                   ],

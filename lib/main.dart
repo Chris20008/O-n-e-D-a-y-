@@ -304,16 +304,17 @@ class _MyHomePageState extends State<MyHomePage>{
       body: PopScope(
         canPop: false,
         child: Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      Color(0xffc26a0e),
-                      Color(0xbb110a02)
-                    ]
-                )
-            ),
+          color: Colors.black,
+            // decoration: const BoxDecoration(
+            //     gradient: LinearGradient(
+            //         begin: Alignment.topRight,
+            //         end: Alignment.bottomLeft,
+            //         colors: [
+            //           Color(0xffc26a0e),
+            //           Color(0xbb110a02)
+            //         ]
+            //     )
+            // ),
           // decoration: const BoxDecoration(
           //     gradient: LinearGradient(
           //         begin: Alignment.topRight,

@@ -42,6 +42,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   bool setOrientation = false;
   bool _showLoadingIndicator = false;
   PanelController controllerExplainBackups = PanelController();
+  ScrollController scrollControllerSetting = ScrollController();
+  ScrollController scrollControllerBackups = ScrollController();
 
   @override
   void initState() {
@@ -87,7 +89,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               // animationController: cnScreenStatistics.animationControllerStatisticsScreen,
               /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
               /// when swiping down in  ListView
-              panelBuilder: (ScrollController sc){
+              panelBuilder: (context, listView){
                 return Column(
                   children: [
                     const SizedBox(height: 10,),
@@ -96,9 +98,9 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                     Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
                     const SizedBox(height: 10),
                     Expanded(
-                      child: SingleChildScrollView(
+                      child: listView(
                         physics: const BouncingScrollPhysics(),
-                        controller: sc,
+                        controller: scrollControllerSetting,
                         child: Column(
                           children: [
                             /// General
@@ -450,16 +452,16 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               controller: controllerExplainBackups,
               animationControllerName: "ExplainBackups",
               descendantAnimationControllerName: "ScreenSettings",
-              panelBuilder: (sc){
+              panelBuilder: (context, listView){
                 return Column(
                   children: [
                     const SizedBox(height: 10,),
                     panelTopBar,
                     const SizedBox(height: 10,),
                     Expanded(
-                      child: ListView(
+                      child: listView(
                         padding: EdgeInsets.zero,
-                        controller: sc,
+                        controller: scrollControllerBackups,
                         children: [
                           CupertinoListTile(
                             // onTap: getSelectCreateBackup,

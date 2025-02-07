@@ -111,197 +111,113 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
         //   // cnNewWorkout.scrollController = sc;
         //   return
         // },
-        panel: ClipRRect(
-          borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () {
-              FocusScope.of(context).unfocus();
-              if(cnNewWorkout.panelController.isPanelClosed){
-                HapticFeedback.selectionClick();
-                // cnNewWorkout.openPanelWithRefresh();
-                cnNewWorkout.openPanel();
-              }
-            },
-            child: Stack(
-              children: [
-                SizedBox(
-                  // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
-                  height: double.maxFinite,
-                  width: double.maxFinite,
-                  // color: Colors.transparent,
-                  child: Stack(
-                    children: [
-                      ListView(
-                        controller: cnNewWorkout.scrollController,
-                        // controller: sc,
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
-                        shrinkWrap: true,
-                        children: [
-                          SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
-                          /// Exercises and Links
-                          ReorderableListView(
-                              scrollController: ScrollController(),
-                              physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.all(0),
-                              shrinkWrap: true,
-                              proxyDecorator: (
-                                  Widget child, int index, Animation<double> animation) {
-                                return AnimatedBuilder(
-                                  animation: animation,
-                                  builder: (BuildContext context, Widget? child) {
-                                    final double animValue = Curves.easeInOut.transform(animation.value);
-                                    final double scale = lerpDouble(1, 1.06, animValue)!;
-                                    return Transform.scale(
-                                      scale: scale,
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: Material(
-                                          child: Container(
-                                              padding: const EdgeInsets.only(left: 2),
-                                              color: Colors.grey.withOpacity(0.05),
-                                              child: child
+        panelBuilder: (context, listView){
+          return ClipRRect(
+            borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                if(cnNewWorkout.panelController.isPanelClosed){
+                  HapticFeedback.selectionClick();
+                  // cnNewWorkout.openPanelWithRefresh();
+                  cnNewWorkout.openPanel();
+                }
+              },
+              child: Stack(
+                children: [
+                  SizedBox(
+                    // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+                    height: double.maxFinite,
+                    width: double.maxFinite,
+                    // color: Colors.transparent,
+                    child: Stack(
+                      children: [
+                        listView(
+                          controller: cnNewWorkout.scrollController,
+                          physics: const BouncingScrollPhysics(),
+                          padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
+                          shrinkWrap: true,
+                          children: [
+                            SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
+                            /// Exercises and Links
+                            ReorderableListView(
+                                // scrollController: cnNewWorkout.scrollController,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.all(0),
+                                shrinkWrap: true,
+                                proxyDecorator: (
+                                    Widget child, int index, Animation<double> animation) {
+                                  return AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (BuildContext context, Widget? child) {
+                                      final double animValue = Curves.easeInOut.transform(animation.value);
+                                      final double scale = lerpDouble(1, 1.06, animValue)!;
+                                      return Transform.scale(
+                                        scale: scale,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Material(
+                                            child: Container(
+                                                padding: const EdgeInsets.only(left: 2),
+                                                color: Colors.grey.withOpacity(0.05),
+                                                child: child
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                  child: child,
-                                );
-                              },
-                              onReorder: (int oldIndex, int newIndex){
-                                setState(() {
-                                  if (oldIndex < newIndex) {
-                                    newIndex -= 1;
-                                  }
-                                  final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
-                                  cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
-                                  cnNewWorkout.updateExercisesLinks();
-                                });
-                              },
-                              children: [
-                                for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
-                                  if(cnNewWorkout.exercisesAndLinks[index] is Exercise)
-                                    getExerciseWithSlideActions(index)
-                                  else if(cnNewWorkout.exercisesAndLinks[index] is String)
-                                    getLinkWithSlideActions(index)
-                              ]
-                          ),
-                          if(!cnNewWorkout.isSickDays)
-                            getAddExerciseButton()
-                        ],
-                      ),
-                      getHeader(),
-                    ],
-                  ),
-                ),
-
-                // /// faded box bottom screen
-                // Align(
-                //   alignment: Alignment.bottomCenter,
-                //   child: SizedBox(
-                //     height: _totalHeightBottomBox,
-                //     child: Stack(
-                //       alignment: Alignment.bottomCenter,
-                //       children: [
-                //         /// faded container
-                //         Positioned(
-                //           bottom: _heightBottomColoredBox - 0.2,
-                //           left: 0,
-                //           right: 0,
-                //           child: Container(
-                //             height: _totalHeightBottomBox - _heightBottomColoredBox,
-                //             decoration: BoxDecoration(
-                //                 gradient:  LinearGradient(
-                //                     begin: Alignment.topCenter,
-                //                     end: Alignment.bottomCenter,
-                //                     colors: [
-                //                       // Colors.transparent,
-                //                       // Colors.black,
-                //                       _color.withOpacity(0.0),
-                //                       _color
-                //                     ]
-                //                 )
-                //             ),
-                //           ),
-                //         ),
-                //         /// just colored container below faded container
-                //         Container(
-                //           height: _heightBottomColoredBox,
-                //           // color: Colors.black,
-                //           color: _color,
-                //         ),
-                //         /// bottom row with icons
-                //         Padding(
-                //           padding: EdgeInsets.only(bottom: Platform.isAndroid? 20 : 30, left: 30, right: 30),
-                //           child: Row(
-                //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //             children: [
-                //               myIconButton(
-                //                   icon: const Icon(Icons.close),
-                //                   onPressed: onCancel
-                //               ),
-                //               if(cnNewWorkout.isUpdating)
-                //                 myIconButton(
-                //                   icon:const Icon(Icons.delete_forever),
-                //                   onPressed: (){
-                //                     HapticFeedback.selectionClick();
-                //                     askDeleteWorkout();
-                //                     // cnStandardPopUp.open(
-                //                     //     context: context,
-                //                     //     child: Text(
-                //                     //       AppLocalizations.of(context)!.panelWoDeleteWorkout,
-                //                     //       textAlign: TextAlign.center,
-                //                     //       textScaler: const TextScaler.linear(1.2),
-                //                     //       style: const TextStyle(color: Colors.white),
-                //                     //     ),
-                //                     //     onConfirm: onDelete,
-                //                     //     onCancel: (){},
-                //                     //     color: const Color(0xff2d2d2d)
-                //                     //   // pos: Offset(position.dx + width/2, position.dy + height/2)
-                //                     // );
-                //                   },
-                //                 ),
-                //               myIconButton(
-                //                   icon: const Icon(Icons.check),
-                //                   onPressed: (){
-                //                     if(!hasChangedNames()){
-                //                       onConfirm();
-                //                     }
-                //                     else{
-                //                       openConfirmNameChangePopUp();
-                //                     }
-                //                   }
-                //               )
-                //             ],
-                //           ),
-                //         )
-                //       ],
-                //     ),
-                //   ),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
-                    CupertinoButton(
-                        onPressed: (){
-                          if(!hasChangedNames()){
-                            onConfirm();
-                          }
-                          else{
-                            openConfirmNameChangePopUp();
-                          }
-                        },
-                        child: const Text("Speichern")
+                                      );
+                                    },
+                                    child: child,
+                                  );
+                                },
+                                onReorder: (int oldIndex, int newIndex){
+                                  setState(() {
+                                    if (oldIndex < newIndex) {
+                                      newIndex -= 1;
+                                    }
+                                    final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                    cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
+                                    cnNewWorkout.updateExercisesLinks();
+                                  });
+                                },
+                                children: [
+                                  for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
+                                    if(cnNewWorkout.exercisesAndLinks[index] is Exercise)
+                                      getExerciseWithSlideActions(index)
+                                    else if(cnNewWorkout.exercisesAndLinks[index] is String)
+                                      getLinkWithSlideActions(index)
+                                ]
+                            ),
+                            if(!cnNewWorkout.isSickDays)
+                              getAddExerciseButton()
+                          ],
+                        ),
+                        getHeader(),
+                      ],
                     ),
-                  ],
-                )
-              ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
+                      CupertinoButton(
+                          onPressed: (){
+                            if(!hasChangedNames()){
+                              onConfirm();
+                            }
+                            else{
+                              openConfirmNameChangePopUp();
+                            }
+                          },
+                          child: const Text("Speichern")
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }
       )
     );
   }
@@ -777,7 +693,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   Widget getLinkWithSlideActions(int index){
     return Slidable(
-        key: UniqueKey(),
+        key: ValueKey("NewWorkout$index"),
         startActionPane: ActionPane(
           motion: const ScrollMotion(),
           dismissible: DismissiblePane(
@@ -840,7 +756,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   Widget getExerciseWithSlideActions(int index){
     return Slidable(
-      key: index == 0 && tutorialIsRunning? cnNewWorkout.keyFirstExercise : UniqueKey(),
+      key: index == 0 && tutorialIsRunning? cnNewWorkout.keyFirstExercise : ValueKey("NewWorkout$index"),
       startActionPane: ActionPane(
         motion: const ScrollMotion(),
         dismissible: DismissiblePane(
@@ -1081,6 +997,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     cnNewWorkout.closePanel(doClear: true);
     cnNewExercisePanel.clear();
     _formKey.currentState?.reset();
+    if(cnNewWorkout.panelController.panelPosition < 0.1){
+      cnBottomMenu.refresh();
+    }
   }
 
   void onDelete(){
