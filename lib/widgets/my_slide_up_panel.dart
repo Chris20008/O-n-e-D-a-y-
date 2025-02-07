@@ -86,7 +86,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   bool bounceAllowed = false;
   double underScrollOffset = 0;
   bool isScrolling = false;
-  double lastDelta = 0;
+  PointerMoveEvent lastPointerMoveEvent = const PointerMoveEvent();
 
   bool isTouchingListView = false;
 
@@ -238,7 +238,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                   initialPanelPosition > 0.1
               ){
                 if(!isScrolling && startPositionScrollController < 10){
-                  lastDelta = details.delta.dy;
+                  lastPointerMoveEvent = details;
                   print("Jump one");
                   underScrollOffset = (underScrollOffset - details.delta.dy).clamp(-panelHeight+1, 0);
                   final panelPosition = (panelHeight + underScrollOffset) / panelHeight;
@@ -247,10 +247,12 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                     scrollController!.jumpTo(0);
                   }
                 }
-                // if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
-                //   print("Jump two");
-                //   scrollController!.jumpTo(-details.delta.dy);
-                // }
+
+                /// Necessary to prevent panel closing when user swipes horizontal for slidable gestures
+                if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
+                  print("Jump two");
+                  scrollController!.jumpTo(-details.delta.dy);
+                }
               }
               else{
                 // print("ELSE");
@@ -272,8 +274,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               if(underScrollOffset < 0){
                 underScrollOffset = 0;
                 final th = Platform.isAndroid? 6 : 1.3;
-                if(lastDelta > th && MediaQuery.of(context).viewInsets.bottom <= 0){
-                  panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 0);
+                if(lastPointerMoveEvent.delta.dy > th
+                    && MediaQuery.of(context).viewInsets.bottom <= 0
+                ){
+                  panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 150)).then((value) => initialPanelPosition = 0);
                 }
                 else{
                   panelController.animatePanelToPosition(1, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 1);
