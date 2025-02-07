@@ -120,6 +120,7 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
               descendantAnimationControllerName: "NewWorkoutPanel",
               // scrollControllerInnerList: cnNewExercise.scrollController,
               panelBuilder: (context, listView) {
+                print("Rebuild panel Builder");
                 return ClipRRect(
                   borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
                   child: Stack(

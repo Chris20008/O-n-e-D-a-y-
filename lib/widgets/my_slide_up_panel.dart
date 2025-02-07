@@ -92,6 +92,8 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
   @override
   void initState() {
+
+    print("INIT My Slide Panel");
     super.initState();
     if(widget.descendantAnimationControllerName != null){
       descendantAnimationController = cnHomepage.animationControllers[widget.descendantAnimationControllerName!];
@@ -109,8 +111,11 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if(scrollController != null && scrollController!.hasClients){
         scrollController?.addListener(() {
-          if(scrollController!.offset > 30){
+          if(scrollController!.offset > 30 || scrollController!.offset < -15){
             isScrolling = true;
+          }
+          else{
+            isScrolling = false;
           }
         });
       }
@@ -131,6 +136,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   }
 
   void removeOverScrollOffset(){
+    if(overScrollOffset == 0){
+      return;
+    }
     Future.delayed(const Duration(milliseconds: 10), (){
       setState(() {
         overScrollOffset = overScrollOffset * 0.8;
@@ -156,14 +164,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     bounceAllowed = true && widget.bounce;
     return Listener(
       onPointerDown: (details){
-        setState(() {
-          isTouchingListView = controller.position.maxScrollExtent > 0;
-        });
+        isTouchingListView = controller.position.maxScrollExtent > 0;
       },
       onPointerUp: (details){
-        setState(() {
-          isTouchingListView = false;
-        });
+        isTouchingListView = false;
       },
       child: children != null
           ? ListView(
@@ -185,6 +189,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    print("Build Whole My Slide Panel");
     Widget panel = LayoutBuilder(
         builder: (context, constraints){
           final maxHeight = constraints.maxHeight - (Platform.isAndroid? 50 : 70);
@@ -207,6 +212,11 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 return;
               }
 
+              // print("");
+              // print(scrollController!.offset);
+              // print(initialPanelPosition);
+              // print(!isScrolling);
+
               /// Bounce
               if ((panelController.panelPosition > 0.99 || panelDragRunning) &&
                   !isTouchingListView
@@ -221,26 +231,26 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 });
               }
 
+
               /// Drag panel while touching list View
               else if(scrollController != null &&
                   scrollController!.offset <= 0 &&
                   initialPanelPosition > 0.1
               ){
-                // print(isScrolling);
-                // print("DRAG");
-                if(!isScrolling){
+                if(!isScrolling && startPositionScrollController < 10){
                   lastDelta = details.delta.dy;
-                  setState(() {
+                  print("Jump one");
+                  underScrollOffset = (underScrollOffset - details.delta.dy).clamp(-panelHeight+1, 0);
+                  final panelPosition = (panelHeight + underScrollOffset) / panelHeight;
+                  panelController.animatePanelToPosition(panelPosition, duration: const Duration(milliseconds: 0));
+                  if (underScrollOffset < 0){
                     scrollController!.jumpTo(0);
-                    underScrollOffset = (underScrollOffset - details.delta.dy).clamp(-panelHeight+1, 0);
-                    final panelPosition = (panelHeight + underScrollOffset) / panelHeight;
-                    panelController.animatePanelToPosition(panelPosition, duration: const Duration(milliseconds: 0));
-                  });
-
+                  }
                 }
-                if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
-                  scrollController!.jumpTo(-details.delta.dy);
-                }
+                // if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
+                //   print("Jump two");
+                //   scrollController!.jumpTo(-details.delta.dy);
+                // }
               }
               else{
                 // print("ELSE");
@@ -253,23 +263,22 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               if(!bounceAllowed){
                 return;
               }
-              setState(() {
-                // print("--------------------------------- RESET SCROLLING");
-                isScrolling = false;
-                startPositionScrollController = 0;
-                panelDragRunning = false;
-                removeOverScrollOffset();
-                if(underScrollOffset < 0){
-                  underScrollOffset = 0;
-                  // print(lastDelta);
-                  if(lastDelta > 6 && MediaQuery.of(context).viewInsets.bottom <= 0){
-                    panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 0);
-                  }
-                  else{
-                    panelController.animatePanelToPosition(1, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 1);
-                  }
+              // setState(() {
+              // print("--------------------------------- RESET SCROLLING");
+              isScrolling = false;
+              startPositionScrollController = 0;
+              panelDragRunning = false;
+              removeOverScrollOffset();
+              if(underScrollOffset < 0){
+                underScrollOffset = 0;
+                final th = Platform.isAndroid? 6 : 1.3;
+                if(lastDelta > th && MediaQuery.of(context).viewInsets.bottom <= 0){
+                  panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 0);
                 }
-              });
+                else{
+                  panelController.animatePanelToPosition(1, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 1);
+                }
+              }
             },
             child: SlidingUpPanel(
                 controller: panelController,
