@@ -27,7 +27,7 @@ class NewExercisePanel extends StatefulWidget {
   State<NewExercisePanel> createState() => _NewExercisePanelState();
 }
 
-class _NewExercisePanelState extends State<NewExercisePanel> {
+class _NewExercisePanelState extends State<NewExercisePanel>{
   late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
@@ -38,23 +38,43 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
   final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
   late TextStyle _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 8);
-  final _color = const Color(0xff1c1001);
-  final heightHeader = 280.0;
+  late final _color = Theme.of(context).primaryColor;
+  double heightHeader = 120.0;
   final textDisappearOffset = 0.1;
+  bool wasShownBigChild = true;
 
   GlobalKey addSetKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      cnNewExercise.scrollControllerSets.addListener(() {
-        setState(() {
-
-        });
-      });
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    //   cnNewExercise.animationController = _controller;
+    //   cnNewExercise.scrollControllerSets.addListener(() {
+    //     setState(() {
+    //       if(cnNewExercise.scrollControllerSets.offset > 30 && _controller.value < 1 && !_controller.isAnimating){
+    //         print("forward");
+    //         _controller.forward();
+    //         cnNewExercise.scrollControllerSets.animateTo(0, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
+    //       }
+    //       else if(cnNewExercise.scrollControllerSets.offset < -40 && _controller.value > 0 && !_controller.isAnimating && MediaQuery.of(context).viewInsets.bottom <= 0){
+    //         print("reverse");
+    //         _controller.reverse();
+    //       }
+    //     });
+    //   });
+    // });
   }
+
+  // void onKeyboardClose(){
+  //   /// Wait until Keyboard os closed
+  //   Future.delayed(const Duration(milliseconds: 300), (){
+  //     if(wasShownBigChild){
+  //       _controller.reverse().then((value) => setState(() => {}));
+  //       wasShownBigChild = false;
+  //     }
+  //   });
+  // }
 
   double get shrinkOffset {
     final value = cnNewExercise.scrollControllerSets.hasClients
@@ -67,9 +87,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
   Widget build(BuildContext context) {
     final insetsBottom = MediaQuery.of(context).viewInsets.bottom;
     // print(_style.fontSize);
-    // _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 2);
-    // _iconSize = 25 - shrinkOffset * 2;
-    // _style.cop
+    // _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 5);
+    // _iconSize = 25 - shrinkOffset * 10;
+    // heightHeader = 280 - _controller.value*150;
+
+    // print("MAX SCROLL EXTEND");
+    // print(cnNewExercise.scrollControllerSets.position.maxScrollExtent);
 
     return PopScope(
       canPop: false,
@@ -83,6 +106,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           GestureDetector(
             onTap: () {
               FocusScope.of(context).unfocus();
+              // onKeyboardClose();
             },
             child: MySlideUpPanel(
               onPanelSlide: onPanelSlide,
@@ -97,32 +121,22 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                 child: Stack(
                   children: [
                     Container(
-                      padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+                      // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+
+                      padding: const EdgeInsets.only(bottom: 0, right: 15.0, left: 15.0, top: 10),
                       child: GestureDetector(
-                        // onTap: () {
-                        //   FocusScope.of(context).unfocus();
-                        // },
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                        },
                         child: ListView(
                           padding: EdgeInsets.only(top: heightHeader),
                           controller: cnNewExercise.scrollControllerSets,
                           physics: const BouncingScrollPhysics(),
                           shrinkWrap: true,
                           children: [
-                            // Center(child: panelTopBar),
-                            // const SizedBox(height: 15,),
-                            // Center(child: Text(AppLocalizations.of(context)!.exercise, textScaler: const TextScaler.linear(1.5))),
-                            // const SizedBox(height: 10,),
-                            //
-                            // getHeader(),
-                            //
-                            // const SizedBox(height: 25,),
-                            // Container(
-                            //   height: 1,
-                            //   decoration: BoxDecoration(
-                            //       color: Colors.white.withOpacity(0.5),
-                            //       borderRadius: BorderRadius.circular(2)
-                            //   ),
-                            // ),
+
+                            ...getSelectors(),
+
                             const SizedBox(height: 15,),
                             Row(
                               // mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -372,20 +386,14 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                       ),
                     ),
 
-                    // Dynamischer Header
                     Positioned(
                       top: 0,
                       left: 0,
                       right: 0,
                       child: Container(
-                        // height: heightHeader - ((shrinkOffset > 0.26? sqrt(shrinkOffset-0.26) : 0) * 185).clamp(0, 90), // Verkleinerung beim Scrollen
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         alignment: Alignment.bottomLeft,
                         color: _color,
-                        // decoration: BoxDecoration(
-                        //   color: Colors.blue, ///.withOpacity(1 - shrinkOffset * 0.8),
-                        //   borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-                        // ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,42 +401,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
                             const SizedBox(height: 10,),
                             Center(child: panelTopBar),
                             const SizedBox(height: 15,),
-                            if (shrinkOffset < 0.6)
-                              SizedBox(
-                                  height: 30 - (30 * shrinkOffset),
-                                  child: Center(
-                                      child: Text(
-                                          AppLocalizations.of(context)!.exercise,
-                                          textScaler: TextScaler.linear(1.5 - (1.5 * shrinkOffset))
-                                      )
-                                  )
-                              )
-                            else
-                              SizedBox(height: 12),
+                            SizedBox(
+                                height: 30,
+                                child: Center(
+                                    child: Text(
+                                        AppLocalizations.of(context)!.exercise,
+                                        textScaler: TextScaler.linear(1.5)
+                                    )
+                                )
+                            ),
                             const SizedBox(height: 10,),
 
                             getHeader(),
-
-                            // const SizedBox(height: 25,),
-                            // Text(
-                            //   "Max Mustermann",
-                            //   style: TextStyle(
-                            //     fontSize: 24 - shrinkOffset * 8, // Schrumpft mit Scroll
-                            //     fontWeight: FontWeight.bold,
-                            //     color: Colors.white,
-                            //   ),
-                            // ),
-                            // if (shrinkOffset < 0.8)
-                            //   Opacity(
-                            //     opacity: (1 - shrinkOffset),
-                            //     child: Text(
-                            //       "Zusätzliche Infos",
-                            //       style: TextStyle(fontSize: 16, color: Colors.white70),
-                            //     ),
-                            //   ),
-                            // SizedBox(height: 10),
                           ],
-                        ),
+                        )
                       ),
                     ),
 
@@ -533,18 +519,22 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     }
   }
 
-  Widget getRestInSecondsSelector(TextStyle descriptionStyle) {
+  Widget getRestInSecondsSelector() {
     return getSelectRestInSeconds(
         currentTime: cnNewExercise.exercise.restInSeconds,
         context: context,
-        child: SizedBox(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
           height: 35,
           child: Row(
             children: [
               Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
               const SizedBox(width: 5,),
-              if(shrinkOffset < textDisappearOffset)
-                Text(AppLocalizations.of(context)!.restTime, style: descriptionStyle),
+              Text(AppLocalizations.of(context)!.restTime, style: _style),
               const Spacer(),
               Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
               const SizedBox(width: 10),
@@ -608,40 +598,44 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
-  Widget getSeatLevelSelector(TextStyle descriptionStyle) {
+  Widget getSeatLevelSelector() {
     return getSelectSeatLevel(
-      currentSeatLevel: cnNewExercise.exercise.seatLevel,
-      context: context,
-      onConfirm: (dynamic value){
-        if(value is int){
-          cnNewExercise.exercise.seatLevel = value;
-          cnNewExercise.refresh();
-        }
-        else if(value == AppLocalizations.of(context)!.clear){
-          cnNewExercise.exercise.seatLevel = null;
-          cnNewExercise.refresh();
-        }
-      },
-      child: SizedBox(
-        height: 35,
-        child: Row(
-          children: [
-            Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-            const SizedBox(width: 5,),
-            if(shrinkOffset < textDisappearOffset)
-              Text(AppLocalizations.of(context)!.seatLevel, style: descriptionStyle),
-            const Spacer(),
-            const Spacer(flex: 4,),
-            Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
-            const SizedBox(width: 10),
-            trailingChoice()
-          ],
-        ),
-      )
+        currentSeatLevel: cnNewExercise.exercise.seatLevel,
+        context: context,
+        onConfirm: (dynamic value){
+          if(value is int){
+            cnNewExercise.exercise.seatLevel = value;
+            cnNewExercise.refresh();
+          }
+          else if(value == AppLocalizations.of(context)!.clear){
+            cnNewExercise.exercise.seatLevel = null;
+            cnNewExercise.refresh();
+          }
+        },
+        child: Container(
+          height: 35,
+          decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          child: Row(
+            children: [
+              Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+              const SizedBox(width: 5,),
+              Text(AppLocalizations.of(context)!.seatLevel, style: _style),
+              const Spacer(),
+              const Spacer(flex: 4,),
+              Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
+              const SizedBox(width: 10),
+              trailingChoice()
+            ],
+          ),
+        )
     );
   }
 
-  Widget getExerciseCategorySelector(TextStyle descriptionStyle) {
+  Widget getExerciseCategorySelector() {
     return getSelectCategory(
         context: context,
         currentCategory: cnNewExercise.exercise.category,
@@ -650,14 +644,18 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           cnNewExercise.refresh();
           cnNewExercise.clearTextControllers();
         },
-        child: SizedBox(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
           height: 35,
           child: Row(
             children: [
               Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
               const SizedBox(width: 8,),
-              if(shrinkOffset < textDisappearOffset)
-                Text("Kategorie", style: descriptionStyle),
+              Text("Kategorie", style: _style),
               const Spacer(),
               const Spacer(flex: 4,),
               Text(cnNewExercise.exercise.getCategoryName(), style: _style),
@@ -669,7 +667,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
-  Widget getBodyWeightPercentSelector(TextStyle descriptionStyle) {
+  Widget getBodyWeightPercentSelector() {
     return getSelectBodyWeightPercent(
         context: context,
         currentBodyWeightPercent: cnNewExercise.exercise.bodyWeightPercent,
@@ -677,14 +675,19 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
           cnNewExercise.exercise.bodyWeightPercent = bodyWeight/100;
           cnNewExercise.refresh();
         },
-        child: SizedBox(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 5),
           height: 35,
           child: Row(
             children: [
               Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
               const SizedBox(width: 8,),
-              if(shrinkOffset < textDisappearOffset)
-                Text("Körpergewicht", style: descriptionStyle),
+              // if(shrinkOffset < textDisappearOffset)
+              Text("Körpergewicht", style: _style),
               const Spacer(),
               const Spacer(flex: 4,),
               Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
@@ -696,200 +699,135 @@ class _NewExercisePanelState extends State<NewExercisePanel> {
     );
   }
 
-  getHeader() {
-    return LayoutBuilder(
-        builder: (context, constraints){
-          final widthSelectors = (constraints.maxWidth - (constraints.maxWidth * (sqrt(shrinkOffset)))).clamp(constraints.maxWidth*0.5, constraints.maxWidth);
-          final TextStyle _descriptionStyle = _style.copyWith(
-              color: _style.color?.withOpacity(1 - (shrinkOffset*10).clamp(0, 1)),
-              fontSize: _style.fontSize! - (2 * shrinkOffset*30)
-          );
-          return Wrap(
-            key: cnNewExercise.keyHeader,
-            children: [
-              /// Exercise name
-              Form(
-                key: _formKey,
-                child: TextFormField(
-                  focusNode: cnNewExercise.focusNodeTextFieldExerciseName,
-                  key: cnNewExercise.keyExerciseName,
-                  keyboardAppearance: Brightness.dark,
-                  maxLength: 40,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    value = value?.trim();
-                    if (value == null || value.isEmpty) {
-                      return AppLocalizations.of(context)!.panelExEnterName;
-                    }
-                    else if(
-                    exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
-                        cnNewExercise.exercise.originalName?.toLowerCase() != cnNewExercise.exercise.name.toLowerCase()
-                    ){
-                      return AppLocalizations.of(context)!.panelExAlreadyExists;
-                    }
-                    return null;
-                  },
-                  style: const TextStyle(
-                      fontSize: 20
-                  ),
-                  controller: cnNewExercise.exerciseNameController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    labelText: AppLocalizations.of(context)!.name,
-                    counterText: "",
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                  ),
-                  onChanged: (value){
-                    value = value.trim();
-                    cnNewExercise.exercise.name = value;
-                  },
-                ),
-              ),
-              const SizedBox(height: 15,),
+  Widget getHeader() {
 
-              /// Rest in Seconds Row and Selector
-              ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: widthSelectors),
-                  child: getRestInSecondsSelector(_descriptionStyle)
-              ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        /// Exercise name
+        Form(
+          key: _formKey,
+          child: TextFormField(
+            focusNode: cnNewExercise.focusNodeTextFieldExerciseName,
+            key: cnNewExercise.keyExerciseName,
+            keyboardAppearance: Brightness.dark,
+            maxLength: 40,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            onTap: (){
+              // if(MediaQuery.of(context).viewInsets.bottom <= 0){
+              //   wasShownBigChild = _controller.value < 0.1;
+              // }
+            },
+            validator: (value) {
+              value = value?.trim();
+              if (value == null || value.isEmpty) {
+                return AppLocalizations.of(context)!.panelExEnterName;
+              }
+              else if(
+              exerciseNameExistsInWorkout(workout: cnNewExercise.workout, exerciseName: cnNewExercise.exercise.name) &&
+                  cnNewExercise.exercise.originalName?.toLowerCase() != cnNewExercise.exercise.name.toLowerCase()
+              ){
+                return AppLocalizations.of(context)!.panelExAlreadyExists;
+              }
+              return null;
+            },
+            style: const TextStyle(
+                fontSize: 20
+            ),
+            controller: cnNewExercise.exerciseNameController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              labelText: AppLocalizations.of(context)!.name,
+              counterText: "",
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+            ),
+            onChanged: (value){
+              value = value.trim();
+              cnNewExercise.exercise.name = value;
+            },
+          ),
+        ),
 
-              const SizedBox(height: 0),
-
-              /// Seat Level Row and Selector
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: widthSelectors),
-                child: getSeatLevelSelector(_descriptionStyle),
-              ),
-
-              const SizedBox(height: 5),
-
-              /// Exercise Category Selector
-              ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: widthSelectors),
-                  child: cnNewExercise.exercise.isNewExercise()
-                      ? getExerciseCategorySelector(_descriptionStyle)
-                      : Listener(
-                    onPointerUp: (PointerUpEvent event)async{
-                      HapticFeedback.selectionClick();
-                      notificationPopUp(
-                          context: context,
-                          title: 'Change category',
-                          message: "You can't change the Category of an existing exercise"
-                      );
-                    },
-                    child: SizedBox(
-                      height: 35,
-                      child: Row(
-                        children: [
-                          Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-                          const SizedBox(width: 8,),
-                          if(shrinkOffset < textDisappearOffset)
-                            Text("Kategorie", style: _descriptionStyle),
-                          // const Spacer(),
-                          // const Spacer(flex: 4,),
-                          Expanded(child: OverflowSafeText(cnNewExercise.exercise.getCategoryName(), style: _style, maxLines: 1, textAlign: TextAlign.end, minFontSize: 15)),
-                          const SizedBox(width: 20),
-                        ],
-                      ),
-                    ),
-                  ),
-              ),
-
-              // /// Exercise Category Selector
-              // if(cnNewExercise.exercise.isNewExercise())
-              //   getExerciseCategorySelector()
-              // else
-              //   Listener(
-              //     onPointerUp: (PointerUpEvent event)async{
-              //       HapticFeedback.selectionClick();
-              //       notificationPopUp(
-              //           context: context,
-              //           title: 'Change category',
-              //           message: "You can't change the Category of an existing exercise"
-              //       );
-              //     },
-              //     child: SizedBox(
-              //       height: 35,
-              //       child: Row(
-              //         children: [
-              //           Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-              //           const SizedBox(width: 8,),
-              //           Text("Kategorie", style: _style),
-              //           const Spacer(),
-              //           const Spacer(flex: 4,),
-              //           Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-              //           const SizedBox(width: 20),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-
-              const SizedBox(height: 5),
-
-              /// Seat Level Row and Selector
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: widthSelectors),
-                child: cnNewExercise.exercise.isNewExercise()
-                    ? getBodyWeightPercentSelector(_descriptionStyle)
-                    : Listener(
-                  onPointerUp: (PointerUpEvent event)async{
-                    HapticFeedback.selectionClick();
-                    notificationPopUp(
-                        context: context,
-                        title: "Bodyweight",
-                        message: "You can't change the used bodyweight of an existing exercise"
-                    );
-                  },
-                  child: SizedBox(
-                    height: 35,
-                    child: Row(
-                      children: [
-                        Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
-                        const SizedBox(width: 8,),
-                        if(shrinkOffset < textDisappearOffset)
-                          Text("Körpergewicht", style: _descriptionStyle),
-                        const Spacer(),
-                        const Spacer(flex: 4,),
-                        Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
-                        const SizedBox(width: 20),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // /// Seat Level Row and Selector
-              // if(cnNewExercise.exercise.isNewExercise())
-              //   getBodyWeightPercentSelector()
-              // else
-              //   Listener(
-              //     onPointerUp: (PointerUpEvent event)async{
-              //       HapticFeedback.selectionClick();
-              //       notificationPopUp(
-              //           context: context,
-              //           title: "Bodyweight",
-              //           message: "You can't change the used bodyweight of an existing exercise"
-              //       );
-              //     },
-              //     child: SizedBox(
-              //       height: 35,
-              //       child: Row(
-              //         children: [
-              //           Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
-              //           const SizedBox(width: 8,),
-              //           Text("Körpergewicht", style: _style),
-              //           const Spacer(),
-              //           const Spacer(flex: 4,),
-              //           Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
-              //           const SizedBox(width: 20),
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-            ],
-          );
-        }
+        const SizedBox(height: 15,),
+      ],
     );
+  }
+
+  List<Widget> getSelectors() {
+    return [
+      /// Rest in Seconds Row and Selector
+      getRestInSecondsSelector(),
+
+      /// Seat Level Row and Selector
+      getSeatLevelSelector(),
+
+      /// Exercise Category Selector
+      cnNewExercise.exercise.isNewExercise()
+          ? getExerciseCategorySelector()
+          : CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Container(
+            height: 35,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              children: [
+                Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                const SizedBox(width: 8,),
+                Text("Kategorie", style: _style),
+                const Spacer(),
+                const Spacer(flex: 4,),
+                Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+                const SizedBox(width: 20),
+              ],
+            ),
+          ),
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            notificationPopUp(
+                context: context,
+                title: 'Change category',
+                message: "You can't change the Category of an existing exercise"
+            );
+          }
+      ),
+
+      /// Seat Level Row and Selector
+      cnNewExercise.exercise.isNewExercise()
+          ? getBodyWeightPercentSelector()
+          : CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Container(
+            height: 35,
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 5),
+            child: Row(
+              children: [
+                Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
+                const SizedBox(width: 8,),
+                Text("Körpergewicht", style: _style),
+                const Spacer(flex: 4,),
+                Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
+                const SizedBox(width: 20),
+              ],
+            ),
+          ),
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            notificationPopUp(
+                context: context,
+                title: "Bodyweight",
+                message: "You can't change the used bodyweight of an existing exercise"
+            );
+          }
+      ),
+    ];
   }
 }
 
@@ -909,6 +847,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
   final int animationTime = 500;
+  late AnimationController animationController;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -960,7 +899,8 @@ class CnNewExercisePanel extends ChangeNotifier {
     ).then((value) => {
       if(doClear){
         clear()
-      }
+      },
+      animationController.reset()
     });
   }
 

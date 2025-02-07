@@ -753,7 +753,7 @@ class CnScreenStatistics extends ChangeNotifier {
       }
     }
     showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
-    onlyWorkingSets = data["onlyWorkingSets"] ?? false;
+    onlyWorkingSets = data["onlyWorkingSets"] ?? true;
     showSickDays = data["showSickDays"] ?? true;
     showOneRepMax = data["showOneRepMax"] ?? true;
   }

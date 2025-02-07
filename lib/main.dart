@@ -30,8 +30,7 @@ import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
-
-import 'package:health/health.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
@@ -110,6 +109,8 @@ class MyAppState extends State<MyApp> {
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
+            cardColor: Color(0xFF2c2c2c),
+            primaryColor: Color(0xFF181818),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             // useMaterial3: true,
             splashFactory: InkSparkle.splashFactory,
@@ -490,16 +491,47 @@ class _MyHomePageState extends State<MyHomePage>{
                       ),
                     ),
                   ),
-                // Center(
-                //   child: ElevatedButton(
-                //     child: Text("Test"),
-                //     onPressed: ()async{
-                //       print("Presses Center button");
-                //       tryHealthData();
-                //       // print("RESULT res: $res");
-                //     },
-                //   ),
-                // )
+                Center(
+                  child: ElevatedButton(
+                    child: Text("Test"),
+                    onPressed: ()async{
+                      // Navigator.push(
+                      //     context,
+                      //     ModalBottomSheetRoute(
+                      //       showDragHandle: true,
+                      //         builder: (context){
+                      //           return Container(height: 400, color: Colors.red);
+                      //         },
+                      //         isScrollControlled: true
+                      //     )
+                      // );
+                      showCupertinoModalBottomSheet(
+                        context: context,
+                        bounce: true,
+                        builder: (context) => Container(color: Colors.red, height: 400,),
+                      );
+                      // ModalBottomSheetRoute(
+                      //     builder: (context){
+                      //       return Container(height: 400, color: Colors.red);
+                      //     },
+                      //     isScrollControlled: true
+                      // );
+                      // showMaterialModalBottomSheet(
+                      //   elevation: 20,
+                      //   bounce: true,
+                      //   context: context,
+                      //   builder: (context) => ModalFit(),
+                      //   // builder: (context) => Container(color: Colors.red, height: 400,),
+                      //   // builder: (context){
+                      //   //   return NewWorkOutPanel();
+                      //   // }
+                      // );
+                      // print("Presses Center button");
+                      // tryHealthData();
+                      // print("RESULT res: $res");
+                    },
+                  ),
+                )
               ],
             ),
         ),
@@ -734,3 +766,46 @@ class CnHomepage extends ChangeNotifier {
 //     );
 //   }
 // }
+
+
+class ModalFit extends StatelessWidget {
+  const ModalFit({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: Text('Edit'),
+                leading: Icon(Icons.edit),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+              ListTile(
+                title: Text('Copy'),
+                leading: Icon(Icons.content_copy),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+              ListTile(
+                title: Text('Cut'),
+                leading: Icon(Icons.content_cut),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+              ListTile(
+                title: Text('Move'),
+                leading: Icon(Icons.folder_open),
+                onTap: () => Navigator.of(context).pop(),
+              ),
+              ListTile(
+                title: Text('Delete'),
+                leading: Icon(Icons.delete),
+                onTap: () => Navigator.of(context).pop(),
+              )
+            ],
+          ),
+        ));
+  }
+}

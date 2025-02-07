@@ -58,7 +58,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   // final _color = const Color(0xff221b14);
   // final _color = const Color(0xff231b13);
   // Color _color = const Color(0xff663a0b);
-  final _color = const Color(0xff1c1001);
+  // final _color = const Color(0xff1c1001);
+  late final _color = Theme.of(context).primaryColor;
 
   void checkTutorialState(){
     if(tutorialIsRunning && MediaQuery.of(context).viewInsets.bottom == 0){
