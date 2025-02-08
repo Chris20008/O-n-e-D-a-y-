@@ -31,7 +31,7 @@ class ExerciseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
       height: double.maxFinite,
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -39,54 +39,53 @@ class ExerciseRow extends StatelessWidget {
         borderRadius: borderRadius?? BorderRadius.circular(8)
       ),
       margin: margin,
-      child: Padding(
-        padding: padding?? const EdgeInsets.all(0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            child?? OverflowSafeText(
-              exercise.name,
-              textAlign: TextAlign.center,
-              // fontSize: 12,
-              style: style,
-              minFontSize: 12,
-              maxLines: 1,
-            ),
-            const SizedBox(height: 2),
-            SizedBox(
-              height: _height,
-              child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (var set in exercise.sets)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 3, right: 3),
-                          child: SizedBox(
-                            width: _widthOfField,
-                            height: _height,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
+      padding: padding?? const EdgeInsets.all(0),
+      duration: const Duration(milliseconds: 300),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          child?? OverflowSafeText(
+            exercise.name,
+            textAlign: TextAlign.center,
+            // fontSize: 12,
+            style: style,
+            minFontSize: 12,
+            maxLines: 1,
+          ),
+          const SizedBox(height: 2),
+          SizedBox(
+            height: _height,
+            child: ListView(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var set in exercise.sets)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 3, right: 3),
+                        child: SizedBox(
+                          width: _widthOfField,
+                          height: _height,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
 
-                                /// Background of single set
-                                backgroundSingleSet,
+                              /// Background of single set
+                              backgroundSingleSet,
 
-                                /// One Column for each set (weight / amount)
-                                dataSingleSet(set, exercise)
-                              ],
-                            ),
+                              /// One Column for each set (weight / amount)
+                              dataSingleSet(set, exercise)
+                            ],
                           ),
                         ),
                       ),
-                  ]
-              ),
+                    ),
+                ]
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
