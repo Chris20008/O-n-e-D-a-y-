@@ -996,7 +996,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       PointerUpEvent(position: Offset(100, endY), pointer: pointer),
     );
 
-    await Future.delayed(Duration(milliseconds: 600));
+    await Future.delayed(Duration(milliseconds: 300));
 
     setState(() {
       blockUi = false;
