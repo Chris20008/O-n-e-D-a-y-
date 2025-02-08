@@ -106,7 +106,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                             /// General
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(
@@ -295,7 +295,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                             /// Backup
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(
@@ -380,7 +380,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                             /// About
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(

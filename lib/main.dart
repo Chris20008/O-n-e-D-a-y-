@@ -108,8 +108,8 @@ class MyAppState extends State<MyApp> {
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
-            cardColor: Color(0xFF2c2c2c),
-            primaryColor: Color(0xFF181818),
+            cardColor: Color(0xFF2C2C2E),
+            primaryColor: Color(0xFF1C1C1E),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             // useMaterial3: true,
             splashFactory: InkSparkle.splashFactory,

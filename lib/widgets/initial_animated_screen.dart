@@ -44,9 +44,20 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
     return AnimatedBuilder(
       animation: animationController,
       builder: (context, child) {
-        double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.245));
 
-        double borderRadius = (25 - ((1.0-scale)*150)).clamp(15, 30);
+        // Scale
+        const iOSValue = 0.245;
+        const androidValue = 0.15;
+        final platformValue = animationController.value * (Platform.isAndroid? androidValue : iOSValue);
+        double scale = 1.0 - (platformValue);
+
+        /// BorderRadius
+        const double minBorderRadius = 15;
+        final double maxBorderRadius = Platform.isAndroid? 30 : 50;
+        final double multiplier = (maxBorderRadius - minBorderRadius) / 0.5;
+        double borderRadius = (maxBorderRadius - multiplier * animationController.value).clamp(minBorderRadius, maxBorderRadius);
+
+        /// Opacity
         double opacity = (animationController.value * 1.1).clamp(0, 1);
         if(!widget.backDropEnabled){
           opacity = 0;

@@ -143,11 +143,11 @@ const routeTheme = PullDownMenuRouteTheme(
 
 const trailingArrow = Icon(
   Icons.arrow_forward_ios,
-  size: 12,
+  size: 14,
   color: Colors.grey,
 );
 
-Widget trailingChoice({double size = 14, Color color = Colors.grey}){
+Widget trailingChoice({double size = 16, Color color = Colors.grey}){
  return Stack(
    alignment: Alignment.center,
    children: [

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -78,22 +79,28 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   late Color color = widget.color?? Theme.of(context).primaryColor;
   double overScrollOffset = 0;
   late PanelController panelController = widget.controller?? PanelController();
-  double pointerStartPositionPanelDrag = 0;
-  double initialPanelPosition = 0;
-  int startPositionScrollController = 0;
-  bool panelDragRunning = false;
   ScrollController? scrollController;
-  bool bounceAllowed = false;
-  double underScrollOffset = 0;
-  bool isScrolling = false;
-  PointerMoveEvent lastPointerMoveEvent = const PointerMoveEvent();
 
+  final thresholdVerticalDrag = 0;
+
+  PointerDownEvent initialPointerDownEvent = const PointerDownEvent();
+  PointerMoveEvent lastPointerMoveEvent = const PointerMoveEvent();
+  Timer? longPressTimer;
+
+  double initialPanelPosition = 0;
+  double underScrollOffset = 0;
+  double initialScrollControllerPosition = 0;
+  bool isScrolling = false;
   bool isTouchingListView = false;
+  bool panelDragRunning = false;
+  bool bounceAllowed = false;
+  bool recognizedLongPress = false;
+  bool? isDraggingVertical;
 
   @override
   void initState() {
 
-    print("INIT My Slide Panel");
+    // print("INIT My Slide Panel");
     super.initState();
     if(widget.descendantAnimationControllerName != null){
       descendantAnimationController = cnHomepage.animationControllers[widget.descendantAnimationControllerName!];
@@ -165,9 +172,30 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     return Listener(
       onPointerDown: (details){
         isTouchingListView = controller.position.maxScrollExtent > 0;
+
+        /// Recognize Long Press after 500 milliseconds, if the time was not cancelled
+        /// This will disable dragging panel and bouncing panel
+        longPressTimer = Timer(const Duration(milliseconds: 500), (){
+          recognizedLongPress = true;
+        });
+
+      },
+      onPointerMove: (details){
+        /// Recognize long press
+        if(longPressTimer?.isActive?? false){
+          const th = 5;
+          final dx = (details.position.dx - initialPointerDownEvent.position.dx).abs();
+          final dy = (details.position.dy - initialPointerDownEvent.position.dy).abs();
+          if(dx > th || dy > th) {
+            recognizedLongPress = false;
+            longPressTimer?.cancel();
+          }
+        }
       },
       onPointerUp: (details){
         isTouchingListView = false;
+        recognizedLongPress = false;
+        longPressTimer?.cancel();
       },
       child: children != null
           ? ListView(
@@ -189,7 +217,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    print("Build Whole My Slide Panel");
+    // print("Build Whole My Slide Panel");
     Widget panel = LayoutBuilder(
         builder: (context, constraints){
           final maxHeight = constraints.maxHeight - (Platform.isAndroid? 50 : 70);
@@ -200,30 +228,37 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 return;
               }
               initialPanelPosition = panelController.panelPosition;
-              pointerStartPositionPanelDrag = details.position.dy;
+              initialPointerDownEvent = details;
               if(scrollController != null &&
                   scrollController!.hasClients
               ){
-                startPositionScrollController = scrollController!.offset.toInt();
+                initialScrollControllerPosition = scrollController!.offset;
               }
             },
             onPointerMove: (details) {
-              if(!bounceAllowed){
+              if(!bounceAllowed || recognizedLongPress){
                 return;
               }
 
-              // print("");
-              // print(scrollController!.offset);
-              // print(initialPanelPosition);
-              // print(!isScrolling);
+              /// Recognize horizontal or vertical drag
+              if(isDraggingVertical == null){
+                final dx = (details.position.dx - initialPointerDownEvent.position.dx).abs();
+                final dy = (details.position.dy - initialPointerDownEvent.position.dy).abs();
+                if(dx > thresholdVerticalDrag || dy > thresholdVerticalDrag){
+                  if(dx > dy){
+                    isDraggingVertical = false;
+                  } else{
+                    isDraggingVertical = true;
+                  }
+                }
+              }
 
               /// Bounce
               if ((panelController.panelPosition > 0.99 || panelDragRunning) &&
                   !isTouchingListView
               ){
-                // print("BOUNCE");
                 setState(() {
-                  double value =  pointerStartPositionPanelDrag - details.position.dy;
+                  double value =  initialPointerDownEvent.position.dy - details.position.dy;
                   value = pow(value, 0.5) * 1.0;
                   value = value;
                   panelDragRunning = true;
@@ -235,27 +270,27 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               /// Drag panel while touching list View
               else if(scrollController != null &&
                   scrollController!.offset <= 0 &&
-                  initialPanelPosition > 0.1
+                  initialPanelPosition > 0.1 &&
+                  (isDraggingVertical?? false)
               ){
-                if(!isScrolling && startPositionScrollController < 10){
+                if(!isScrolling && initialScrollControllerPosition < 10){
+                  const int smoothStartThreshold = 10;
                   lastPointerMoveEvent = details;
-                  print("Jump one");
                   underScrollOffset = (underScrollOffset - details.delta.dy).clamp(-panelHeight+1, 0);
-                  final panelPosition = (panelHeight + underScrollOffset) / panelHeight;
+                  final double panelPosition = ((panelHeight + underScrollOffset + smoothStartThreshold) / panelHeight).clamp(0, 1);
                   panelController.animatePanelToPosition(panelPosition, duration: const Duration(milliseconds: 0));
                   if (underScrollOffset < 0){
                     scrollController!.jumpTo(0);
                   }
                 }
 
-                /// Necessary to prevent panel closing when user swipes horizontal for slidable gestures
-                if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
-                  print("Jump two");
-                  scrollController!.jumpTo(-details.delta.dy);
-                }
+                // /// Necessary to prevent panel closing when user swipes horizontal for slidable gestures
+                // if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
+                //   print("Jump two");
+                //   scrollController!.jumpTo(-details.delta.dy);
+                // }
               }
               else{
-                // print("ELSE");
                 panelDragRunning = false;
                 removeOverScrollOffset();
                 underScrollOffset = 0;
@@ -265,11 +300,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               if(!bounceAllowed){
                 return;
               }
-              // setState(() {
-              // print("--------------------------------- RESET SCROLLING");
               isScrolling = false;
-              startPositionScrollController = 0;
+              initialScrollControllerPosition = 0;
               panelDragRunning = false;
+              isDraggingVertical = null;
               removeOverScrollOffset();
               if(underScrollOffset < 0){
                 underScrollOffset = 0;
