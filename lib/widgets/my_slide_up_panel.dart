@@ -255,7 +255,8 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
               /// Bounce
               if ((panelController.panelPosition > 0.99 || panelDragRunning) &&
-                  !isTouchingListView
+                  !isTouchingListView &&
+                  (isDraggingVertical?? false)
               ){
                 setState(() {
                   double value =  initialPointerDownEvent.position.dy - details.position.dy;
