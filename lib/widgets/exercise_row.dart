@@ -9,6 +9,9 @@ class ExerciseRow extends StatelessWidget {
   final Widget? child;
   final int flexLeft;
   final int flexRight;
+  final TextStyle? style;
+  final EdgeInsetsGeometry? margin;
+  final BorderRadius? borderRadius;
 
   const ExerciseRow({
     super.key,
@@ -17,7 +20,10 @@ class ExerciseRow extends StatelessWidget {
     this.padding,
     this.child,
     this.flexLeft = 3,
-    this.flexRight = 7
+    this.flexRight = 7,
+    this.style,
+    this.margin,
+    this.borderRadius
   });
 
   final double _widthOfField = 44;
@@ -25,17 +31,29 @@ class ExerciseRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: padding?? const EdgeInsets.all(0),
-      child: Row(
-        children: [
-          Expanded(
-              flex:flexLeft,
-              child: child?? OverflowSafeText(exercise.name)
-          ),
-          Expanded(
-            flex: flexRight,
-            child: SizedBox(
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.07),
+        // color: Color(0x921c1001),
+        borderRadius: borderRadius?? BorderRadius.circular(8)
+      ),
+      margin: margin,
+      child: Padding(
+        padding: padding?? const EdgeInsets.all(0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            child?? OverflowSafeText(
+              exercise.name,
+              textAlign: TextAlign.center,
+              // fontSize: 12,
+              style: style,
+              minFontSize: 12,
+              maxLines: 1,
+            ),
+            const SizedBox(height: 2),
+            SizedBox(
               height: _height,
               child: ListView(
                   physics: const BouncingScrollPhysics(),
@@ -66,8 +84,8 @@ class ExerciseRow extends StatelessWidget {
                   ]
               ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

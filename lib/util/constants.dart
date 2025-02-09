@@ -171,19 +171,30 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
-Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color, Key? key, bool ignoring= true}){
+Widget mySeparator({
+  Key? key,
+  double heightTop = 20,
+  double heightBottom = 20,
+  double minusWidth = 50,
+  double opacity = 0.4,
+  Color? color,
+  bool ignoring= true,
+  double height = 1,
+  CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+  double width = double.maxFinite
+}){
   return IgnorePointer(
     key: key,
     ignoring: ignoring,
     child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: crossAxisAlignment,
       children: [
         Container(height: heightTop, color: Colors.transparent,),
         Container(
-          height: 1,
-          width: double.maxFinite - minusWidth,
-          // color: const Color(0xFFC16A03).withOpacity(opacity),
+          height: height,
+          width: width - minusWidth,
             color: (color?? Colors.amber[900])!.withOpacity(opacity)
-          // color: Colors.amber[900]!.withOpacity(0.6),
         ),
         Container(height: heightTop, color: Colors.transparent,),
       ],
