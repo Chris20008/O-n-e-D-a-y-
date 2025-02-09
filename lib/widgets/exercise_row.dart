@@ -27,13 +27,14 @@ class ExerciseRow extends StatelessWidget {
   });
 
   final double _widthOfField = 44;
-  final double _height = 60;
+  final double _height = 40;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: double.maxFinite,
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.07),
+        color: Theme.of(context).cardColor,
         // color: Color(0x921c1001),
         borderRadius: borderRadius?? BorderRadius.circular(8)
       ),

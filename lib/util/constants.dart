@@ -56,31 +56,17 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
     child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // Row(
-        //   mainAxisSize: MainAxisSize.min,
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     Expanded(
-        //       child: OverflowSafeText(
-        //           (set.weightAsTrimmedDouble?? " ").toString(),
-        //           maxLines: 1,
-        //           fontSize: 14,
-        //           minFontSize: 9,
-        //         textAlign: TextAlign.right
-        //       ),
-        //     ),
-        //     Text(exercise.categoryIsCardio()? "km":"kg", textScaler: TextScaler.linear(0.6),)
-        //   ],
-        // ),
         Expanded(
           child: Center(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: getTextStyleForSetView((set.weightAsTrimmedDouble?? " ").toString())),
-                  TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: TextStyle(fontSize: 8))
-                ]
-              )
+            child: FittedBox(
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: TextStyle(fontWeight: FontWeight.w500)),
+                    TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400))
+                  ]
+                )
+              ),
             ),
           ),
         ),
@@ -89,23 +75,14 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
           height: 1,
           width: 20,
         ),
-        // Text(
-        //     exercise.categoryIsReps()
-        //         ? "${set.amount}"
-        //         : (set.amountAsTime?? "").toString(),
-        //     style: (getTextStyleForSetView(exercise.categoryIsReps()
-        //       ? "${set.amount}"
-        //       : (set.amountAsTime?? "").toString()))
-        // ),
         Expanded(
           child: Center(
-            child: OverflowSafeText(
-              exercise.categoryIsReps()
-                ? "${set.amount}"
+            child: FittedBox(
+              child: Text(exercise.categoryIsReps()
+                  ? "${set.amount}"
                   : (set.amountAsTime?? "").toString(),
-              maxLines: 1,
-              fontSize: 15,
-              minFontSize: 9,
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
             ),
           ),
         )
@@ -300,12 +277,13 @@ TextStyle getTextStyleForTextField(String text, {Color? color, bool sizeSmall = 
 
 TextStyle getTextStyleForSetView(String text){
   return TextStyle(
-    fontSize: text.length < 4
-        ? 15
-        : text.length < 5
-        ? 13
-        : text.length < 6
-        ? 11 : 9,
+    // fontSize: text.length < 3
+    //     ? 15
+    //     : text.length < 4
+    //     ? 13
+    //     : text.length < 6
+    //     ? 11 : 9,
+    fontSize: 15,
     fontWeight: text.length > 4? FontWeight.w500 : FontWeight.w400
   );
 }

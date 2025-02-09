@@ -8,6 +8,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/spacer_list_view.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_add_exercise.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_explain_exercise_drag_options.dart';
 import 'package:flutter/cupertino.dart';
@@ -39,8 +40,8 @@ class NewWorkOutPanel extends StatefulWidget {
   State<NewWorkOutPanel> createState() => _NewWorkOutPanelState();
 }
 
-class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
-  late CnNewWorkOutPanel cnNewWorkout;
+class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderStateMixin{
+  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
@@ -60,6 +61,25 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   // Color _color = const Color(0xff663a0b);
   // final _color = const Color(0xff1c1001);
   late final _color = Theme.of(context).primaryColor;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      cnNewWorkout.initVsync(this);
+      cnNewWorkout.scrollController.addListener(() {
+        // print("Call Listener");
+        for (SlidableExerciseOrLink item in cnNewWorkout.exercisesAndLinks) {
+          SlidableController controller = item.slidableController;
+          if(controller.animation.value > 0 && !controller.closing){
+            controller.close();
+          }
+        }
+      });
+    });
+  }
 
   void checkTutorialState(){
     if(tutorialIsRunning && MediaQuery.of(context).viewInsets.bottom == 0){
@@ -85,8 +105,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   @override
   Widget build(BuildContext context) {
-    cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
-
     checkTutorialState();
 
     return PopScope(
@@ -127,81 +145,71 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               child: Stack(
                 children: [
                   SizedBox(
-                    // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
                     height: double.maxFinite,
                     width: double.maxFinite,
-                    // color: Colors.transparent,
                     child: Stack(
                       children: [
-                        listView(
-                          controller: cnNewWorkout.scrollController,
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
-                          shrinkWrap: true,
-                          children: [
-                            SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
-                            /// Exercises and Links
-                            ReorderableListView(
-                                // scrollController: cnNewWorkout.scrollController,
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: const EdgeInsets.all(0),
-                                shrinkWrap: true,
-                                proxyDecorator: (
-                                    Widget child, int index, Animation<double> animation) {
-                                  return AnimatedBuilder(
-                                    animation: animation,
-                                    builder: (BuildContext context, Widget? child) {
-                                      final double animValue = Curves.easeInOut.transform(animation.value);
-                                      final double scale = lerpDouble(1, 1.06, animValue)!;
-                                      return Transform.scale(
-                                        scale: scale,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: Material(
-                                            child: Container(
-                                                padding: const EdgeInsets.only(left: 2),
-                                                color: Colors.grey.withOpacity(0.05),
-                                                child: child
+                        SlidableAutoCloseBehavior(
+                          child: listView(
+                            controller: cnNewWorkout.scrollController,
+                            physics: const BouncingScrollPhysics(),
+                            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
+                            shrinkWrap: true,
+                            children: [
+                              // SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
+                              SizedBox(height: cnNewWorkout.workout.isTemplate? 140 : 190),
+                              /// Exercises and Links
+                              ReorderableListView(
+                                  // scrollController: cnNewWorkout.scrollController,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.all(0),
+                                  shrinkWrap: true,
+                                  proxyDecorator: (
+                                      Widget child, int index, Animation<double> animation) {
+                                    return AnimatedBuilder(
+                                      animation: animation,
+                                      builder: (BuildContext context, Widget? child) {
+                                        final double animValue = Curves.easeInOut.transform(animation.value);
+                                        final double scale = lerpDouble(1, 1.06, animValue)!;
+                                        return Transform.scale(
+                                          scale: scale,
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(8),
+                                            child: Material(
+                                              child: Container(
+                                                  padding: const EdgeInsets.only(left: 2),
+                                                  color: Colors.grey.withOpacity(0.05),
+                                                  child: child
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    child: child,
-                                  );
-                                },
-                                onReorder: (int oldIndex, int newIndex){
-                                  setState(() {
-                                    if (oldIndex < newIndex) {
-                                      newIndex -= 1;
-                                    }
-                                    final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
-                                    cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
-                                    cnNewWorkout.updateExercisesLinks();
-                                  });
-                                },
-                                children: [
-                                  for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
-                                    if(cnNewWorkout.exercisesAndLinks[index] is Exercise)
-                                      getExerciseWithSlideActions(index)
-                                    else if(cnNewWorkout.exercisesAndLinks[index].contains("Separator"))
-                                    //   mySeparator(
-                                    //       key: ValueKey(cnNewWorkout.exercisesAndLinks[index]),
-                                    //       ignoring:false,
-                                    //       height: 0.15,
-                                    //       color: Colors.white30,
-                                    //       crossAxisAlignment: CrossAxisAlignment.end,
-                                    //       width: MediaQuery.of(context).size.width,
-                                    //       minusWidth: 100
-                                    //   )
-                                      SizedBox(key: ValueKey(cnNewWorkout.exercisesAndLinks[index]))
-                                    else if(cnNewWorkout.exercisesAndLinks[index] is String)
-                                        getLinkWithSlideActions(index)
-                                ]
-                            ),
-                            if(!cnNewWorkout.isSickDays)
-                              getAddExerciseButton()
-                          ],
+                                        );
+                                      },
+                                      child: child,
+                                    );
+                                  },
+                                  onReorder: (int oldIndex, int newIndex){
+                                    setState(() {
+                                      if (oldIndex < newIndex) {
+                                        newIndex -= 1;
+                                      }
+                                      final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                      cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
+                                      cnNewWorkout.updateExercisesLinks();
+                                    });
+                                  },
+                                  children: [
+                                    for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
+                                      if(cnNewWorkout.exercisesAndLinks[index].isExercise)
+                                        getExerciseWithSlideActions(index)
+                                      else if(cnNewWorkout.exercisesAndLinks[index].isLink)
+                                        getLinkWithSlideActions(index),
+                                  ]
+                              ),
+                              if(!cnNewWorkout.isSickDays)
+                                getAddExerciseButton()
+                            ],
+                          ),
                         ),
                         getHeader(),
                       ],
@@ -606,23 +614,23 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
                       ],
                     ),
                   )
-                else
-                  const SizedBox(height: 25,),
-                if(!cnNewWorkout.isSickDays)
-                  Column(
-                    children: [
-                      Container(
-                        height: 1,
-                        decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(2)
-                        ),
-                      ),
-                      Container(height: 15,),
-                      Text(AppLocalizations.of(context)!.panelWoExercises, textScaler: const TextScaler.linear(1.2)),
-                      Container(height: 16,),
-                    ],
-                  )
+                // else
+                //   const SizedBox(height: 25,),
+                // if(!cnNewWorkout.isSickDays)
+                //   Column(
+                //     children: [
+                //       Container(
+                //         height: 1,
+                //         decoration: BoxDecoration(
+                //             color: Colors.white.withOpacity(0.5),
+                //             borderRadius: BorderRadius.circular(2)
+                //         ),
+                //       ),
+                //       Container(height: 15,),
+                //       Text(AppLocalizations.of(context)!.panelWoExercises, textScaler: const TextScaler.linear(1.2)),
+                //       Container(height: 16,),
+                //     ],
+                //   )
 
               ],
             ),
@@ -704,37 +712,38 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
 
   Widget getLinkWithSlideActions(int index){
     bool isLast = cnNewWorkout.exercisesAndLinks.length-1 == index;
+    // if(index > cnNewWorkout.slidableControllers.length-1){
+    //   return SizedBox(
+    //     key: ValueKey("Filler$index")
+    //   );
+    // }
     return Slidable(
-        key: ValueKey("NewWorkout$index"),
-        startActionPane: ActionPane(
+        // controller: cnNewWorkout.slidableControllers[index],
+        controller: cnNewWorkout.exercisesAndLinks[index].slidableController,
+        closeOnScroll: false,
+        groupTag: 1,
+        // key: ValueKey("Slidable${cnNewWorkout.exercisesAndLinks[index].linkName}"),
+        key: cnNewWorkout.exercisesAndLinks[index].key,
+        endActionPane: ActionPane(
           motion: const ScrollMotion(),
           dismissible: DismissiblePane(
               onDismissed: () {dismissLink(cnNewWorkout.exercisesAndLinks[index]);
               }),
           children: [
             SlidableAction(
-              flex:10,
               onPressed: (BuildContext context){
                 dismissLink(cnNewWorkout.exercisesAndLinks[index]);
               },
-              borderRadius: BorderRadius.circular(15),
               backgroundColor: const Color(0xFFA12D2C),
               foregroundColor: Colors.white,
               icon: Icons.delete,
             ),
-            SlidableAction(
-              flex: 1,
-              onPressed: (BuildContext context){},
-              backgroundColor: Colors.transparent,
-              foregroundColor: Colors.transparent,
-              label: '',
-            ),
           ],
         ),
         child: Container(
-          margin: EdgeInsets.only(top: 3),
+          // margin: EdgeInsets.only(top: 3),
           decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.07),
+              color: Theme.of(context).cardColor,
               borderRadius: isLast? BorderRadius.circular(8) : BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
           ),
           child: Row(
@@ -743,7 +752,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
               Container(
                 margin: EdgeInsets.only(top: 5, bottom: 5, left: 10, right: 10),
                 child: OverflowSafeText(
-                  cnNewWorkout.exercisesAndLinks[index],
+                  cnNewWorkout.exercisesAndLinks[index].linkName!,
                   textAlign: TextAlign.center,
                   // fontSize: 12,
                   // style: style,
@@ -758,168 +767,139 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   Widget getExerciseWithSlideActions(int index){
-    final bool hasLink = (cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName != null;
-    Exercise? nextExercise =  cnNewWorkout.exercisesAndLinks.length > index+1 && cnNewWorkout.exercisesAndLinks[index+1] is Exercise? cnNewWorkout.exercisesAndLinks[index+1] : null;
-    print("Names");
-    print(cnNewWorkout.exercisesAndLinks[index].linkName);
-    print(nextExercise?.linkName);
-    return Slidable(
+    final bool hasLink = (cnNewWorkout.exercisesAndLinks[index].exercise as Exercise).linkName != null;
+    Exercise? nextExercise =  cnNewWorkout.exercisesAndLinks.length > index+1
+        && cnNewWorkout.exercisesAndLinks[index+1].isExercise
+          ? cnNewWorkout.exercisesAndLinks[index+1].exercise!
+          : null;
+    bool withSpacer = nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName
+        || (nextExercise?.blockLink?? false)
+        || (nextExercise?.linkName == null);
+    // if(index > cnNewWorkout.slidableControllers.length-1){
+    //   return SizedBox(
+    //       key: ValueKey("Filler$index")
+    //   );
+    // }
+    return Column(
       key: index == 0 && tutorialIsRunning? cnNewWorkout.keyFirstExercise : ValueKey("NewWorkout$index"),
-      startActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        dismissible: DismissiblePane(
-            onDismissed: () {dismissExercise(cnNewWorkout.exercisesAndLinks[index]);
-            }),
-        children: [
-          SlidableAction(
-            flex:10,
-            onPressed: (BuildContext context){
-              dismissExercise(cnNewWorkout.exercisesAndLinks[index]);
-            },
-            borderRadius: BorderRadius.circular(15),
-            backgroundColor: const Color(0xFFA12D2C),
-            foregroundColor: Colors.white,
-            icon: Icons.delete,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (hasLink)
+          SpaceFixerHorizontalLine(
+            key: UniqueKey(),
+            context: context,
+            overflowHeight: 2,
+            width: MediaQuery.of(context).size.width - 40,
+            overflowColor: Theme.of(context).cardColor,
           ),
-          SlidableAction(
-            flex: 1,
-            onPressed: (BuildContext context){},
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.transparent,
-            label: '',
-          ),
-        ],
-      ),
-
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          SlidableAction(
-            flex: 1,
-            onPressed: (BuildContext context){},
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.transparent,
-            label: '',
-          ),
-          SlidableAction(
-            padding: const EdgeInsets.all(0),
-            flex:10,
-            onPressed: (BuildContext context){
-              if(cnNewWorkout.exercisesAndLinks[index].blockLink){
-                cnNewWorkout.exercisesAndLinks[index].linkName = null;
-                cnNewWorkout.exercisesAndLinks[index].blockLink = false;
-                cnNewWorkout.updateExercisesLinks();
-              }
-              else{
-                cnNewWorkout.exercisesAndLinks[index].linkName = null;
-                cnNewWorkout.exercisesAndLinks[index].blockLink = true;
-                cnNewWorkout.orderExercises();
-              }
-              setState(() {});
-            },
-            borderRadius: BorderRadius.circular(15),
-            backgroundColor: const Color(0xFF5F9561),
-            // backgroundColor: Colors.white.withOpacity(0.1),
-            foregroundColor: Colors.white,
-            icon: cnNewWorkout.exercisesAndLinks[index].blockLink? Icons.link : Icons.link_off,
-          ),
-          SlidableAction(
-            flex: 1,
-            onPressed: (BuildContext context){},
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.transparent,
-            label: '',
-          ),
-          SlidableAction(
-            padding: const EdgeInsets.all(0),
-            flex:10,
-            onPressed: (BuildContext context){
-              openExercise(cnNewWorkout.exercisesAndLinks[index], copied: true);
-            },
-            borderRadius: BorderRadius.circular(15),
-            backgroundColor: const Color(0xFF617EB1),
-            // backgroundColor: Colors.white.withOpacity(0.1),
-            foregroundColor: Colors.white,
-            icon: Icons.copy,
-          ),
-          SlidableAction(
-            flex: 1,
-            onPressed: (BuildContext context){},
-            backgroundColor: Colors.transparent,
-            foregroundColor: Colors.transparent,
-            label: '',
-          ),
-          SlidableAction(
-            padding: const EdgeInsets.all(0),
-            flex:10,
-            onPressed: (BuildContext context){
-              openExercise(cnNewWorkout.exercisesAndLinks[index]);
-            },
-            borderRadius: BorderRadius.circular(15),
-            backgroundColor: const Color(0xFFAE7B32),
-            // backgroundColor: Colors.white.withOpacity(0.1),
-            foregroundColor: Colors.white,
-            icon: Icons.edit,
-          ),
-        ],
-      ),
-      child: SizedBox(
-        height: 70,
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            ExerciseRow(
-              exercise: cnNewWorkout.exercisesAndLinks[index],
-              padding: const EdgeInsets.only(left: 20, right: 10, bottom: 5, top: 5),
-            ),
-            if ((cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName != null)
-              Row(
-                children: [
-                  const SizedBox(width: 10,),
-                  Container(
-                    width: 3,
-                    height: 50,
-                    decoration: BoxDecoration(
-                        color: (
-                            getLinkColor(
-                                linkName: (cnNewWorkout.exercisesAndLinks[index] as Exercise).linkName!,
-                                workout: cnNewWorkout.workout
-                            )?? Colors.grey
-                        ).withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(10)
-                    ),
-                  ),
-                ],
-              ),
-            if(cnNewWorkout.exercisesAndLinks[index].blockLink)
-              Positioned(
-                top: 5,
-                left: 5,
-                child: Icon(
-                  Icons.link_off,
-                  size: 10,
-                  color: const Color(0xFF5F9561),
+        Slidable(
+            key: cnNewWorkout.exercisesAndLinks[index].key,
+            // key: ValueKey("Slidable${cnNewWorkout.exercisesAndLinks[index].exercise.}"),
+            controller: cnNewWorkout.exercisesAndLinks[index].slidableController,
+            closeOnScroll: false,
+            groupTag: 1,
+            endActionPane: ActionPane(
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(
+                  onDismissed: () {dismissExercise(cnNewWorkout.exercisesAndLinks[index]);
+                  }),
+              children: [
+                SlidableAction(
+                  // flex:32,
+                  onPressed: (BuildContext context){
+                    dismissExercise(cnNewWorkout.exercisesAndLinks[index]);
+                  },
+                  // borderRadius: BorderRadius.circular(15),
+                  backgroundColor: const Color(0xFFA12D2C),
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
                 ),
-      child: Padding(
-        padding: hasLink? EdgeInsets.zero :  const EdgeInsets.symmetric(vertical: 3),
-        child: ExerciseRow(
-          exercise: cnNewWorkout.exercisesAndLinks[index],
-          // padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 5, top: 5),
-          padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 6, top: 3),
-          margin: hasLink? const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0) : null,
-          style: hasLink
-              ? const TextStyle(
-              fontSize: 13,
-              color: Colors.white70
-              )
-              : null,
-          borderRadius: hasLink
-              ? (nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null
-                ? BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))
-                : BorderRadius.zero)
-              : null,
+              ],
+            ),
+
+            startActionPane: ActionPane(
+              motion: const ScrollMotion(),
+              children: [
+                SlidableAction(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: (BuildContext context){
+                    if(cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink){
+                      cnNewWorkout.exercisesAndLinks[index].exercise!.linkName = null;
+                      cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink = false;
+                      cnNewWorkout.updateExercisesLinks();
+                    }
+                    else{
+                      cnNewWorkout.exercisesAndLinks[index].exercise!.linkName = null;
+                      cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink = true;
+                      cnNewWorkout.orderExercises();
+                    }
+                    setState(() {});
+                  },
+                  backgroundColor: const Color(0xFF5F9561),
+                  // backgroundColor: Colors.white.withOpacity(0.1),
+                  foregroundColor: Colors.white,
+                  icon: cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink? Icons.link : Icons.link_off,
+                ),
+                SlidableAction(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: (BuildContext context){
+                    openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!, copied: true);
+                  },
+                  backgroundColor: const Color(0xFF617EB1),
+                  foregroundColor: Colors.white,
+                  icon: Icons.copy,
+                ),
+                SlidableAction(
+                  padding: const EdgeInsets.all(0),
+                  onPressed: (BuildContext context){
+                    openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
+                  },
+                  backgroundColor: const Color(0xFFAE7B32),
+                  // backgroundColor: Colors.white.withOpacity(0.1),
+                  foregroundColor: Colors.white,
+                  icon: Icons.edit,
+                ),
+              ],
+            ),
+            child: SizedBox(
+                height: hasLink? 70 : 75,
+                child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ExerciseRow(
+                        exercise: cnNewWorkout.exercisesAndLinks[index].exercise!,
+                        // padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 5, top: 5),
+                        padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 6, top: 3),
+                        margin: hasLink? const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0) : null,
+                        style: hasLink
+                            ? const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white70
+                        )
+                            : null,
+                        borderRadius: hasLink
+                            ? (nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null
+                            ? const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))
+                            : BorderRadius.zero)
+                            : null,
+                      ),
+                      if(cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink)
+                        const Positioned(
+                          top: 5,
+                          left: 5,
+                          child: Icon(
+                            Icons.link_off,
+                            size: 10,
+                            color: Color(0xFF5F9561),
+                          ),
+                        )
+                    ]
+                )
+            )
         ),
-      ),
+        if(withSpacer)
+          const SizedBox(height: 8,)
+      ],
     );
   }
 
@@ -949,14 +929,28 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
     return false;
   }
 
-  void dismissExercise(Exercise ex){
-    cnNewWorkout.workout.exercises.remove(ex);
+  void dismissExercise(SlidableExerciseOrLink ex){
+    // final index = cnNewWorkout.exercisesAndLinks.indexOf(ex);
+    // final controller = cnNewWorkout.slidableControllers.removeAt(index);
+    // Future.delayed(const Duration(milliseconds: 1000), (){
+    //   ex.slidableController.dispose();
+    // });
+    // ex.slidableController.ratio = 0.0;
+
+    cnNewWorkout.workout.exercises.remove(ex.exercise);
     cnNewWorkout.updateExercisesAndLinksList();
     cnNewWorkout.refresh();
   }
 
-  void dismissLink(String linkName){
-    cnNewWorkout.workout.linkedExercises.remove(linkName);
+  void dismissLink(SlidableExerciseOrLink linkName){
+    // final index = cnNewWorkout.exercisesAndLinks.indexOf(linkName);
+    // final controller = cnNewWorkout.slidableControllers.removeAt(index);
+    // Future.delayed(const Duration(milliseconds: 100), (){
+    //   controller.dispose();
+    // });
+    // controller.dispose();
+
+    cnNewWorkout.workout.linkedExercises.remove(linkName.linkName);
     cnNewWorkout.updateExercisesAndLinksList();
     cnNewWorkout.updateExercisesLinks();
     cnNewWorkout.refresh();
@@ -978,9 +972,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 
   void addLink(String linkName){
-    // if (cnNewWorkout.workout.linkedExercises.contains(linkName)) {
-    //   linkName = "Curls";
-    // }
     if (cnNewWorkout.workout.linkedExercises.contains(linkName)){
       return;
     }
@@ -1148,7 +1139,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> {
   }
 }
 
-class CnNewWorkOutPanel extends ChangeNotifier {
+class CnNewWorkOutPanel extends ChangeNotifier{
   final GlobalKey keyAddLink = GlobalKey();
   final GlobalKey keyAddExercise = GlobalKey();
   final GlobalKey keyTextFieldWorkoutName = GlobalKey();
@@ -1162,7 +1153,8 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   TextEditingController linkNameController = TextEditingController();
   bool isUpdating = false;
   ScrollController scrollController = ScrollController();
-  List<dynamic> exercisesAndLinks = [];
+  List<SlidableExerciseOrLink> exercisesAndLinks = [];
+  // List<SlidableController> slidableControllers = [];
   double minPanelHeight = 0;
   bool isCurrentlyRebuilding = false;
   bool applyNameChanges = false;
@@ -1174,6 +1166,11 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   late CnWorkouts cnWorkouts;
   late CnWorkoutHistory cnWorkoutHistory;
   late Map<DateTime, dynamic> allWorkoutDates = getAllWorkoutDays();
+  late TickerProvider vsync;
+
+  void initVsync(TickerProvider vsync){
+    this.vsync = vsync;
+  }
 
   Map<DateTime, dynamic> getAllWorkoutDays(){
     Map<DateTime, dynamic> dates = {};
@@ -1292,76 +1289,103 @@ class CnNewWorkOutPanel extends ChangeNotifier {
 
   void updateExercisesAndLinksList(){
     /// Updates the exercisesAndLinksList which is responsible for showing the exercises and links together in new_workout_panel
-    Set itemsToRemove = {};
-    Set itemsToAdd = {};
+    Set<SlidableExerciseOrLink> itemsToRemove = {};
+    Set<SlidableExerciseOrLink> itemsToAdd = {};
 
-    // if(exercisesAndLinks.isNotEmpty && exercisesAndLinks.lastOrNull.toString().contains("Separator")){
-    //   exercisesAndLinks.removeLast();
-    // }
-
-    for(dynamic item in exercisesAndLinks){
-      if(item is Exercise && !workout.exercises.map((e) => e.name).contains(item.name)){
+    for(SlidableExerciseOrLink item in exercisesAndLinks){
+      if(item.isExercise && !(workout.exercises.map((e) => e.name).contains(item.exercise?.name))){
         itemsToRemove.add(item);
       }
-      else if(item is String && !workout.linkedExercises.contains(item) /*&& !item.contains("Separator")*/){
+      else if(item.isLink && !workout.linkedExercises.contains(item.linkName)){
         itemsToRemove.add(item);
       }
     }
 
     for(Exercise ex in workout.exercises){
-      if(!exercisesAndLinks.whereType<Exercise>().map((e) => e.name).contains(ex.name)){
-        itemsToAdd.add(ex);
+      // if(!exercisesAndLinks.whereType<Exercise>().map((e) => e.name).contains(ex.name)){
+      if(!(exercisesAndLinks.where((element) => element.isExercise).map((e) => e.exercise!.name).contains(ex.name))){
+        itemsToAdd.add(SlidableExerciseOrLink(
+            exercise: ex,
+            linkName: ex.linkName,
+            slidableController: SlidableController(vsync)
+        ));
       }
     }
 
     for(final linkName in workout.linkedExercises){
-      if(!exercisesAndLinks.contains(linkName)){
-        itemsToAdd.add(linkName);
+      if(!(exercisesAndLinks.where((element) => element.isLink).map((e) => e.linkName).contains(linkName))){
+        itemsToAdd.add(SlidableExerciseOrLink(
+            exercise: null,
+            linkName: linkName,
+            slidableController: SlidableController(vsync)
+        ));
       }
     }
 
     for (var element in itemsToRemove) {
+      element.slidableController.dispose();
       exercisesAndLinks.remove(element);
     }
 
+    print("to remove");
+    itemsToRemove.forEach((element) {print(element.exercise?.name?? element.linkName);});
+    print("");
+    print("to add");
+    itemsToAdd.forEach((element) {print(element.exercise?.name?? element.linkName);});
+    print("");
+
     exercisesAndLinks.addAll(itemsToAdd);
-    // if(exercisesAndLinks.isNotEmpty && !exercisesAndLinks.lastOrNull.toString().contains("Separator")){
-    //   print("ADD SEPARATOR");
-    //   exercisesAndLinks.add("Separator${DateTime.now()}");
-    // }
     exercisesAndLinks = List.from(exercisesAndLinks.toSet());
+
+    itemsToRemove.clear();
+    itemsToAdd.clear();
   }
 
   void insertLinksAtPlace(){
-    final List<String> links = exercisesAndLinks.whereType<String>().toList();
+    final List<SlidableExerciseOrLink> links = exercisesAndLinks.where((element) => element.isLink).toList();
     for (final link in links){
-      // if(!link.contains("Separator")){
         exercisesAndLinks.remove(link);
-        final index = exercisesAndLinks.indexWhere((element) => element is Exercise && element.linkName == link);
+        final index = exercisesAndLinks.indexWhere((element) => element.isExercise && element.linkName == link.linkName);
         if(index >= 0){
           exercisesAndLinks.insert(index, link);
         }
-        int lastIndex = exercisesAndLinks.lastIndexWhere((element) => element is Exercise && element.linkName == link);
-        if(lastIndex >= 0){
-          lastIndex += 1;
-          // if(lastIndex < exercisesAndLinks.length && exercisesAndLinks[lastIndex].linkName == null){
-          //   exercisesAndLinks.insert(lastIndex, "Separator${DateTime.now()}");
-          // }
-        }
-      // }
     }
   }
 
+  // void insertLinksAtPlaceOld(){
+  //   final List<String> links = exercisesAndLinks.whereType<String>().toList();
+  //   for (final link in links){
+  //     // if(!link.contains("Separator")){
+  //     exercisesAndLinks.remove(link);
+  //     final index = exercisesAndLinks.indexWhere((element) => element is Exercise && element.linkName == link);
+  //     if(index >= 0){
+  //       exercisesAndLinks.insert(index, link);
+  //     }
+  //     int lastIndex = exercisesAndLinks.lastIndexWhere((element) => element is Exercise && element.linkName == link);
+  //     if(lastIndex >= 0){
+  //       lastIndex += 1;
+  //       // if(lastIndex < exercisesAndLinks.length && exercisesAndLinks[lastIndex].linkName == null){
+  //       //   exercisesAndLinks.insert(lastIndex, "Separator${DateTime.now()}");
+  //       // }
+  //     }
+  //     // }
+  //   }
+  // }
+
   void refreshExercise(Exercise ex){
-    final index = exercisesAndLinks.indexWhere((element) => element is Exercise && (element.name == ex.originalName || element.name == ex.name));
+    final index = exercisesAndLinks.indexWhere((element) => element.isExercise && (element.name == ex.originalName || element.name == ex.name));
     if(index >= 0){
-      exercisesAndLinks.removeAt(index);
-      exercisesAndLinks.insert(index, ex);
+      final item = exercisesAndLinks.removeAt(index);
+      exercisesAndLinks.insert(
+          index,
+          item
+      );
     }
   }
 
   void updateExercisesOrderInWorkoutObject(){
-    List<Exercise> orderedExercises = exercisesAndLinks.whereType<Exercise>().toList();
+    // List<Exercise> orderedExercises = exercisesAndLinks.whereType<Exercise>().toList();
+    List<Exercise> orderedExercises = exercisesAndLinks.where((element) => element.isExercise).map((e) => e.exercise!).toList();
     workout.exercises.clear();
     workout.exercises.addAll(orderedExercises);
   }
@@ -1369,18 +1393,21 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   void updateExercisesLinks(){
     /// Gives the exercises their correct linkName, if they need one, otherwise null
     String currentLinkName = "";
-    for(dynamic item in exercisesAndLinks){
-      if(item is Exercise){
+    for(SlidableExerciseOrLink item in exercisesAndLinks){
+      if(item.isExercise){
         if(currentLinkName.isEmpty){
-          item.linkName = null;
+          item.exercise!.linkName = null;
           continue;
         }
-        else if(!item.blockLink){
-          item.linkName = currentLinkName;
+        else if(!(item.exercise!.blockLink)){
+          print("OLD NAME: ${item.linkName}");
+          print("NEW NAME: ${currentLinkName}");
+          print("");
+          item.exercise!.linkName = currentLinkName;
         }
       }
       else{
-        currentLinkName = item;
+        currentLinkName = item.linkName!;
       }
     }
     orderExercises();
@@ -1404,7 +1431,16 @@ class CnNewWorkOutPanel extends ChangeNotifier {
     cnHomepage.refresh();
     cnWorkouts.refresh();
     cnWorkoutHistory.refresh();
+
+    // for (var element in slidableControllers) {
+    //   element.dispose();
+    // }
+    // slidableControllers.clear();
   }
+
+  // void initSlidableControllers(){
+  //   slidableControllers = exercisesAndLinks.map((e) => SlidableController(vsync)).toList();
+  // }
 
   void editWorkout({
     Workout? workout,
@@ -1424,6 +1460,7 @@ class CnNewWorkOutPanel extends ChangeNotifier {
         isUpdating = true;
         setWorkout(w);
         updateExercisesAndLinksList();
+        // initSlidableControllers();
         insertLinksAtPlace();
         orderExercises();
         openPanelWithRefresh();
@@ -1470,40 +1507,77 @@ class CnNewWorkOutPanel extends ChangeNotifier {
 
   void orderExercises() {
     exercisesAndLinks.sort(((a, b) {
+      // print("A");
+      // print(a.isExercise);
+      // print(a.exercise?.name);
+      // print(a.linkName);
+      // print(a.exercise?.blockLink);
+      // print("B");
+      // print(b.isExercise);
+      // print(b.exercise?.name);
+      // print(b.linkName);
+      // print(b.exercise?.blockLink);
 
       /// blocked Link
-      if(a is Exercise && a.blockLink){
+      if(a.isExercise && a.exercise!.blockLink){
+        // print((a.linkName??"") + " " + a.isExercise.toString());
+        // print((b.linkName??"") + " " + b.isExercise.toString());
         /// b is LinkName so a is after b
-        if(b is String){
+        if(b.isLink){
+          // print("-1");
+          // print("");
           return -1;
         }
         /// b is blockedLink, don't change order
-        if(b is Exercise && b.blockLink){
+        if(b.isExercise && b.exercise!.blockLink){
+          // print("0");
+          // print("");
           return 0;
         }
         /// b is Exercise with link, a after b
+        // print("1");
+        // print("");
         return 1;
       }
 
 
-      if(a is String && b is Exercise){
-        if(a == b.linkName || b.blockLink){
+      if(a.isLink && b.isExercise){
+        // print((a.linkName??"") + " " + a.isExercise.toString());
+        // print((b.linkName??"") + " " + b.isExercise.toString());
+        if(a.linkName == b.linkName || b.exercise!.blockLink){
+          // print("-1");
+          // print("");
           return -1;
         }
+        // print("1");
+        // print("");
         return 1;
       }
 
-      if(a is String && b is String){
+      if(a.isLink && b.isLink){
+        // print((a.linkName??"") + " " + a.isExercise.toString());
+        // print((b.linkName??"") + " " + b.isExercise.toString());
+        // print("0");
+        // print("");
         return 0;
       }
 
-      if(a is Exercise && b is String){
-        if(a.linkName == b){
+      if(a.isExercise && b.isLink){
+        // print((a.linkName??"") + " " + a.isExercise.toString());
+        // print((b.linkName??"") + " " + b.isExercise.toString());
+        if(a.linkName == b.linkName){
+          // print("1");
+          // print("");
           return 1;
         } else{
+          // print("-1");
+          // print("");
           return -1;
         }
       }
+
+      // print("Else");
+      // print("");
 
       return 0;
     }));
@@ -1518,4 +1592,22 @@ class CnNewWorkOutPanel extends ChangeNotifier {
   //     exercisesAndLinks.insert(newIndex, ex);
   //   }
   // }
+}
+
+class SlidableExerciseOrLink{
+  final Exercise? exercise;
+  final String? _linkName;
+  final SlidableController slidableController;
+  final key = UniqueKey();
+
+  SlidableExerciseOrLink({
+    required this.exercise,
+    required linkName,
+    required this.slidableController
+  }) : _linkName = linkName;
+
+  bool get isExercise => exercise != null;
+  bool get isLink => !isExercise;
+  String get name => exercise?.name?? "";
+  String? get linkName => isLink? _linkName : exercise?.linkName;
 }

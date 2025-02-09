@@ -168,7 +168,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   }){
     assert((child != null) ^ (children != null), "Either child or children must be given. They can't be both null or not null at the same time");
     scrollController = controller;
-    bounceAllowed = true && widget.bounce;
+    bounceAllowed = widget.bounce;
     return Listener(
       onPointerDown: (details){
         isTouchingListView = controller.position.maxScrollExtent > 0;
