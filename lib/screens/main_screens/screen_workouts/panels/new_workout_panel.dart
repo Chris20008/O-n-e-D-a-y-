@@ -886,7 +886,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       if(cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink)
                         const Positioned(
                           top: 5,
-                          left: 5,
+                          right: 5,
                           child: Icon(
                             Icons.link_off,
                             size: 10,
