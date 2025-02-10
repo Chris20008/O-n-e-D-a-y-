@@ -1368,3 +1368,26 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
     ),
   );
 }
+
+Offset getWidgetPosition(GlobalKey key) {
+  Offset position = const Offset(0, 0);
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+    final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      position = renderBox.localToGlobal(Offset.zero);
+    }
+  // });
+  return position;
+}
+
+Size getWidgetSize(GlobalKey key){
+  Size size = const Size(0, 0);
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+    final RenderBox? renderBox =
+    key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      size = renderBox.size;
+    }
+  // });
+  return size;
+}
