@@ -6,6 +6,7 @@ import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/spacer_list_view.dart';
@@ -225,6 +226,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
+                        Expanded(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
+                                ?getWorkoutOrSickDaysPicker()
+                                :Text(
+                                cnNewWorkout.workout.isTemplate
+                                    ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
+                                    : cnNewWorkout.isSickDays
+                                    ? "Krank"
+                                    : AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                                textScaler: const TextScaler.linear(1.3),
+                                // style: TextStyle(color: Colors.grey)
+                            ),
+                          ),
+                        ),
                         CupertinoButton(
                             onPressed: (){
                               if(!hasChangedNames()){
@@ -377,7 +394,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 7),
             // color: const Color(0xff0a0604),
             // color: Theme.of(context).primaryColor,
             color: _color,
@@ -389,18 +406,20 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                   children: [
                     Column(
                       children: [
-                        panelTopBar,
-                        const SizedBox(height: 15,),
-                        cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
-                            ?getWorkoutOrSickDaysPicker()
-                            :Text(
-                            cnNewWorkout.workout.isTemplate
-                                ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
-                                : cnNewWorkout.isSickDays
-                                  ? "Krank"
-                                  : AppLocalizations.of(context)!.panelWoWorkoutFinished,
-                            textScaler: const TextScaler.linear(1.5)),
-                        const SizedBox(height: 10,),
+                        // panelTopBar,
+                        const SizedBox(height: 5,),
+                        // cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
+                        //     ?getWorkoutOrSickDaysPicker()
+                        //     :Text(
+                        //     cnNewWorkout.workout.isTemplate
+                        //         ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
+                        //         : cnNewWorkout.isSickDays
+                        //           ? "Krank"
+                        //           : AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                        //     textScaler: const TextScaler.linear(1.2),
+                        //     style: TextStyle(color: Colors.grey)
+                        // ),
+                        const SizedBox(height: 40,),
                       ],
                     ),
                     /// Button to completely close workout when it is minimized
@@ -700,13 +719,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              OverflowSafeText(
-                  minFontSize: 22,
-                  maxLines: 1,
+              Text(
                   cnNewWorkout.isSickDays
-                      ?"Krank"
-                      :cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished,
-                  style: const TextStyle(color: Colors.white)
+                  ?"Krank"
+                  :cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                  // style: const TextStyle(color: Colors.grey),
+                  textScaler: TextScaler.linear(1.1),
               ),
               const SizedBox(width: 10),
               trailingChoice()
@@ -718,7 +736,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   }
 
   Widget getLinkWithSlideActions(int index){
-    bool withSpacer = cnNewWorkout.exercisesAndLinks.length-1 == index || cnNewWorkout.exercisesAndLinks[index+1].linkName != cnNewWorkout.exercisesAndLinks[index].linkName;
+    bool withSpacer = cnNewWorkout.exercisesAndLinks.length-1 == index
+        || cnNewWorkout.exercisesAndLinks[index+1].linkName != cnNewWorkout.exercisesAndLinks[index].linkName;
     return Column(
       key: ValueKey(cnNewWorkout.exercisesAndLinks[index].linkName),
       children: [
@@ -840,6 +859,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                     if(!cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink){
                       if(cnNewWorkout.exercisesAndLinks[index].exercise?.linkName == null   /// has no linkname
                           || cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink      /// link is blocked
+                          || cnNewWorkout.exercisesAndLinks.length-1 == index               /// is last item
                           || cnNewWorkout.exercisesAndLinks[index].exercise!.linkName
                               != cnNewWorkout.exercisesAndLinks[index+1].linkName           /// is last item in link group
                       ){
@@ -907,51 +927,73 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                   foregroundColor: Colors.white,
                   icon: Icons.copy,
                 ),
-                SlidableAction(
-                  padding: const EdgeInsets.all(0),
-                  onPressed: (BuildContext context){
-                    openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
-                  },
-                  backgroundColor: const Color(0xFFAE7B32),
-                  // backgroundColor: Colors.white.withOpacity(0.1),
-                  foregroundColor: Colors.white,
-                  icon: Icons.edit,
-                ),
+                // SlidableAction(
+                //   padding: const EdgeInsets.all(0),
+                //   onPressed: (BuildContext context){
+                //     openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
+                //   },
+                //   backgroundColor: const Color(0xFFAE7B32),
+                //   // backgroundColor: Colors.white.withOpacity(0.1),
+                //   foregroundColor: Colors.white,
+                //   icon: Icons.edit,
+                // ),
               ],
             ),
             child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 height: hasLink? 70 : 75,
-                child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      ExerciseRow(
-                        exercise: cnNewWorkout.exercisesAndLinks[index].exercise!,
-                        padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 6, top: 3),
-                        margin: hasLink? const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0) : null,
-                        style: hasLink
-                            ? const TextStyle(
-                            fontSize: 13,
-                            color: Colors.white70
-                        )
-                            : null,
-                        borderRadius: hasLink
-                            ? (nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null
-                            ? const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))
-                            : BorderRadius.zero)
-                            : null,
+                child: ClipRRect(
+                  borderRadius: hasLink
+                      ? (nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null
+                      ? const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))
+                      : BorderRadius.zero)
+                      : BorderRadius.circular(8),
+                  child: Material(
+                    color: Theme.of(context).cardColor,
+                    child: InkWell(
+                      focusColor: null,
+                      highlightColor: Colors.grey.withOpacity(0.2),
+                      hoverColor: null,
+                      // overlayColor: Colors.transparent,
+                      splashColor: null,
+                      splashFactory: NoSplash.splashFactory,
+                      hoverDuration: const Duration(milliseconds: 0),
+                      onTap: (){
+                        openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
+                      },
+                      child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            ExerciseRow(
+                              exercise: cnNewWorkout.exercisesAndLinks[index].exercise!,
+                              padding: EdgeInsets.only(left: hasLink? 30 : 10, right: 10, bottom: 6, top: 3),
+                              margin: hasLink? const EdgeInsets.only(left: 0, right: 0, bottom: 0, top: 0) : null,
+                              style: hasLink
+                                  ? const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white70
+                              )
+                                  : null,
+                              borderRadius: hasLink
+                                  ? (nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null
+                                  ? const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8))
+                                  : BorderRadius.zero)
+                                  : null,
+                            ),
+                            if(cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink)
+                              const Positioned(
+                                top: 5,
+                                right: 5,
+                                child: Icon(
+                                  Icons.link_off,
+                                  size: 10,
+                                  color: Color(0xFF5F9561),
+                                ),
+                              )
+                          ]
                       ),
-                      if(cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink)
-                        const Positioned(
-                          top: 5,
-                          right: 5,
-                          child: Icon(
-                            Icons.link_off,
-                            size: 10,
-                            color: Color(0xFF5F9561),
-                          ),
-                        )
-                    ]
+                    ),
+                  ),
                 )
             )
         ),
@@ -1023,6 +1065,34 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
     if((cnNewWorkout.originalWorkout.name != cnNewWorkout.workout.name && cnNewWorkout.originalWorkout.name.isNotEmpty)
         || cnNewWorkout.exerciseNewNameMapping.isNotEmpty){
+      return true;
+    }
+
+    return false;
+  }
+
+  bool hasChangedBodyWeight(){
+    if(!cnNewWorkout.workout.isTemplate){
+      return false;
+    }
+
+    /// calculate Exercises that have had a bodyWeight change
+    final changedExercises = cnNewWorkout.workout.exercises.where(
+            (exercise) => cnNewWorkout.originalWorkout.exercises.any(
+                (ex) => ex.id == exercise.id
+                && ex.bodyWeightPercent != exercise.bodyWeightPercent
+        )
+    ).toList();
+
+    cnNewWorkout.exerciseNewBodyWeight = changedExercises;
+
+    // /// create exercise name mapping oldName: newName
+    // for(Exercise ex in changedExercises){
+    //   cnNewWorkout.exerciseNewBodyWeight.add(cnNewWorkout.workout.exercises.firstWhere((exercise) => exercise.id == ex.id).name);
+    //   // cnNewWorkout.exerciseNewBodyWeightMapping[ex.name] = cnNewWorkout.workout.exercises.firstWhere((exercise) => exercise.id == ex.id).name;
+    // }
+
+    if(cnNewWorkout.exerciseNewBodyWeight.isNotEmpty){
       return true;
     }
 
@@ -1158,6 +1228,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       if(cnNewWorkout.applyNameChanges){
         changeSameNameWorkouts();
       }
+      if(hasChangedBodyWeight()){
+        changeSameNameExercisesBodyWeight();
+      }
       cnWorkouts.refreshAllWorkouts();
       await cnWorkoutHistory.refreshAllWorkouts();
       if(cnBottomMenu.index == 0){
@@ -1199,6 +1272,31 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       }
       wo.save();
     }
+  }
+
+  void changeSameNameExercisesBodyWeight(){
+    print("Should change same name workout");
+    for(Exercise ex in cnNewWorkout.exerciseNewBodyWeight){
+      print(ex.name);
+      print(ex.bodyWeightPercent);
+      List<ObExercise> sameNameExercises = objectbox.exerciseBox.query(ObExercise_.name.equals(ex.name)).build().find();
+      for(ObExercise obEx in sameNameExercises){
+        obEx.bodyWeightPercent = ex.bodyWeightPercent;
+        objectbox.exerciseBox.put(obEx);
+      }
+    }
+
+
+
+    // for(ObWorkout wo in currentObWorkouts){
+    //   wo.name = cnNewWorkout.workout.name;
+    //   for(MapEntry mapping in cnNewWorkout.exerciseNewNameMapping.entries){
+    //     if(wo.exercises.map((e) => e.name).contains(mapping.key)){
+    //       wo.exercises.firstWhere((e) => e.name == mapping.key).name = mapping.value;
+    //     }
+    //   }
+    //   wo.save();
+    // }
   }
 
   void onPanelSlide(value){
@@ -1275,6 +1373,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   double keepShowingPanelHeight = Platform.isAndroid? 180 : 212;
   double keepShowingPanelHeightSickDays = Platform.isAndroid? 210 : 242;
   Map<String, String> exerciseNewNameMapping = {};
+  List<Exercise> exerciseNewBodyWeight = [];
   late CnHomepage cnHomepage;
   late CnWorkouts cnWorkouts;
   late CnWorkoutHistory cnWorkoutHistory;
@@ -1466,12 +1565,10 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
   void refreshExercise(Exercise ex){
     final index = exercisesAndLinks.indexWhere((element) => element.isExercise && (element.name == ex.originalName || element.name == ex.name));
+    print("INDEX");
+    print(index);
     if(index >= 0){
-      final item = exercisesAndLinks.removeAt(index);
-      exercisesAndLinks.insert(
-          index,
-          item
-      );
+      exercisesAndLinks[index].exercise = ex;
     }
   }
 
@@ -1578,6 +1675,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     originalWorkout = Workout();
     sickDays = ObSickDays(startDate: DateTime.now(), endDate: DateTime.now());
     exerciseNewNameMapping.clear();
+    exerciseNewBodyWeight.clear();
     applyNameChanges = false;
     refreshAllWorkoutDays();
     workoutNameController = TextEditingController();
@@ -1683,8 +1781,8 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 }
 
 class SlidableExerciseOrLink{
-  final Exercise? exercise;
-  final String? _linkName;
+  Exercise? exercise;
+  String? _linkName;
   final SlidableController slidableController;
   final key = GlobalKey();
 

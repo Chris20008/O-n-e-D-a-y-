@@ -157,11 +157,14 @@ class Workout{
 
   void addOrUpdateExercise(Exercise exercise){
     List<String> existingExercises = exercises.map((e) => e.name).toList();
-
+    print("IN ADD ORD UPDATE");
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
+      print("Exercise changed");
       exercises[existingExercises.indexOf(exercise.originalName!)] = exercise;
+      print(exercise.restInSeconds);
     }
     else{
+      print("New exercise");
       exercises.add(
           exercise
       );

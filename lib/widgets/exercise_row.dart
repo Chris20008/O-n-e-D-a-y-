@@ -34,7 +34,7 @@ class ExerciseRow extends StatelessWidget {
     return AnimatedContainer(
       height: double.maxFinite,
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        // color: Theme.of(context).cardColor,
         // color: Color(0x921c1001),
         borderRadius: borderRadius?? BorderRadius.circular(8)
       ),

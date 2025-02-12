@@ -924,7 +924,9 @@ Widget buildCalendarDialogButton({
           : calendarType == CalendarDatePicker2Type.single
             ? [DateTime.now()]
             : [DateTime.now(), DateTime.now()],
-        dialogBackgroundColor: Theme.of(context).primaryColor
+        // dialogBackgroundColor: Theme.of(context).primaryColor
+        //   dialogBackgroundColor: Color(0xFF303030)
+          dialogBackgroundColor: Theme.of(context).cardColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);

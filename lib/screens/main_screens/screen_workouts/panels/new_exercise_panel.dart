@@ -400,17 +400,17 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 10,),
-                                Center(child: panelTopBar),
+                                const SizedBox(height: 12,),
+                                // Center(child: panelTopBar),
                                 const SizedBox(height: 15,),
                                 SizedBox(
                                     height: 30,
-                                    child: Center(
-                                        child: Text(
-                                            AppLocalizations.of(context)!.exercise,
-                                            textScaler: TextScaler.linear(1.5)
-                                        )
-                                    )
+                                    // child: Center(
+                                    //     child: Text(
+                                    //         AppLocalizations.of(context)!.exercise,
+                                    //         textScaler: TextScaler.linear(1.5)
+                                    //     )
+                                    // )
                                 ),
                                 const SizedBox(height: 10,),
 
@@ -424,6 +424,12 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
+                          Expanded(child: Text(
+                              AppLocalizations.of(context)!.exercise,
+                              textScaler: TextScaler.linear(1.3),
+                              textAlign: TextAlign.center,
+                              // style: TextStyle(color: Colors.grey)
+                          )),
                           CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern")),
                         ],
                       )
@@ -799,7 +805,7 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
       ),
 
       /// Seat Level Row and Selector
-      cnNewExercise.exercise.isNewExercise()
+      cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate
           ? getBodyWeightPercentSelector()
           : CupertinoButton(
           padding: EdgeInsets.zero,
@@ -826,7 +832,7 @@ class _NewExercisePanelState extends State<NewExercisePanel>{
             notificationPopUp(
                 context: context,
                 title: "Bodyweight",
-                message: "You can't change the used bodyweight of an existing exercise"
+                message: "You can change the bodyweight only in the exercise template. The changes will be applied to all exercises with the same name."
             );
           }
       ),
