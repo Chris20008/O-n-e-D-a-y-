@@ -959,7 +959,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       splashFactory: NoSplash.splashFactory,
                       hoverDuration: const Duration(milliseconds: 0),
                       onTap: (){
-                        openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
+                        if(MediaQuery.of(context).viewInsets.bottom <= 0){
+                          openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
+                        } else{
+                          FocusScope.of(context).unfocus();
+                        }
                       },
                       child: Stack(
                           alignment: Alignment.center,
