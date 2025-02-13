@@ -45,7 +45,8 @@ const int maxTutorialStep = 999999;
 
 Widget backgroundSingleSet = Container(
   decoration: BoxDecoration(
-    color: Colors.grey[500]!.withOpacity(0.2),
+    // color: Colors.grey[500]!.withOpacity(0.2),
+    color: Colors.white.withOpacity(0.15),
     borderRadius: BorderRadius.circular(5),
   ),
 );

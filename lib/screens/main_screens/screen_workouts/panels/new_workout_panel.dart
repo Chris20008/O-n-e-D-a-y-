@@ -65,13 +65,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cnNewWorkout.initVsync(this);
       cnNewWorkout.scrollController.addListener(() {
-        // print("Call Listener");
         for (SlidableExerciseOrLink item in cnNewWorkout.exercisesAndLinks) {
           SlidableController controller = item.slidableController;
           if(controller.animation.value > 0 && !controller.closing){
@@ -130,12 +128,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           // reduceSizeWorkoutsScreen: true,
           color: _color,
           onPanelSlide: onPanelSlide,
-          /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
-          /// when swiping down in  ListView
-          // panelBuilder: (sc){
-          //   // cnNewWorkout.scrollController = sc;
-          //   return
-          // },
           panelBuilder: (context, listView){
             return ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
@@ -223,6 +215,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       ),
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
@@ -236,7 +229,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                     ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
                                     : cnNewWorkout.isSickDays
                                     ? "Krank"
-                                    : AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                                    : " ", /// Due to Fitted Box the length must be greater than 0 //AppLocalizations.of(context)!.panelWoWorkoutFinished,
                                 textScaler: const TextScaler.linear(1.3),
                                 // style: TextStyle(color: Colors.grey)
                             ),
@@ -390,280 +383,224 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   }
 
   Widget getHeader(){
-    return ClipRRect(
+    return Container(
+      padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 7),
+      color: _color,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 7),
-            // color: const Color(0xff0a0604),
-            // color: Theme.of(context).primaryColor,
-            color: _color,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+          const SizedBox(height:50),
+          if (!cnNewWorkout.isSickDays)
+            Row(
               children: [
-                Stack(
-                  alignment: Alignment.topCenter,
-                  children: [
-                    Column(
-                      children: [
-                        // panelTopBar,
-                        const SizedBox(height: 5,),
-                        // cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
-                        //     ?getWorkoutOrSickDaysPicker()
-                        //     :Text(
-                        //     cnNewWorkout.workout.isTemplate
-                        //         ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
-                        //         : cnNewWorkout.isSickDays
-                        //           ? "Krank"
-                        //           : AppLocalizations.of(context)!.panelWoWorkoutFinished,
-                        //     textScaler: const TextScaler.linear(1.2),
-                        //     style: TextStyle(color: Colors.grey)
-                        // ),
-                        const SizedBox(height: 40,),
-                      ],
-                    ),
-                    /// Button to completely close workout when it is minimized
-                    /// currently not working in first build, because panelController is then not attached
-                    // if (cnNewWorkout.panelController.isPanelClosed)
-                    //   Align(
-                    //     alignment: Alignment.centerRight,
-                    //     child: IconButton(
-                    //         onPressed: onCancel,
-                    //         icon: const Icon(Icons.close)
-                    //     ),
-                    //   )
-                  ],
-                ),
-                if (!cnNewWorkout.isSickDays)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Form(
-                          key: _formKey,
-                          child: TextFormField(
-                            focusNode: cnNewWorkout.focusNodeTextFieldWorkoutName,
-                            key: cnNewWorkout.keyTextFieldWorkoutName,
-                            keyboardAppearance: Brightness.dark,
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                            validator: (value) {
-                              value = value?.trim();
-                              bool first = workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name);
-                              bool second = cnNewWorkout.workout.isTemplate;
-                              bool third = cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase();
-                              if (value == null || value.isEmpty) {
-                                return AppLocalizations.of(context)!.panelWoEnterName;
-                              }
-                              /// Check if the workout name already exists, but only when the current name is different from the
-                              /// initializing name. Otherwise editing an existing workout could lead to error
-                              else if(first   &&                                                       /// only check if template
-                                      second && /// Name is not equal to initial name when opening editing
-                                      third                          /// Name exists in database
-                              ){
-                                return AppLocalizations.of(context)!.panelWoAlreadyExists;
-                              }
-                              return null;
-                            },
-                            onTap: ()async{
-                              if(cnNewWorkout.panelController.isPanelClosed){
-                                Future.delayed(const Duration(milliseconds: 300), (){
-                                  HapticFeedback.selectionClick();
-                                  /// We need to use the panel controllers own open methode because, when we use our open
-                                  /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
-                                  /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
-                                  /// Maybe due to speed of opening the panel
-                                  cnNewWorkout.panelController.open();
-                                });
-                              }
-                            },
-                            style: const TextStyle(
-                              fontSize: 20
-                            ),
-                            controller: cnNewWorkout.workoutNameController,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                              labelText: AppLocalizations.of(context)!.name,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                            ),
-                            onChanged: (value){
-                              cnNewWorkout.workout.name = value;
-                            },
-                          ),
-                        ),
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      focusNode: cnNewWorkout.focusNodeTextFieldWorkoutName,
+                      key: cnNewWorkout.keyTextFieldWorkoutName,
+                      keyboardAppearance: Brightness.dark,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        value = value?.trim();
+                        bool first = workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name);
+                        bool second = cnNewWorkout.workout.isTemplate;
+                        bool third = cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase();
+                        if (value == null || value.isEmpty) {
+                          return AppLocalizations.of(context)!.panelWoEnterName;
+                        }
+                        /// Check if the workout name already exists, but only when the current name is different from the
+                        /// initializing name. Otherwise editing an existing workout could lead to error
+                        else if(first   &&                                                       /// only check if template
+                                second && /// Name is not equal to initial name when opening editing
+                                third                          /// Name exists in database
+                        ){
+                          return AppLocalizations.of(context)!.panelWoAlreadyExists;
+                        }
+                        return null;
+                      },
+                      onTap: () async{
+                        if(cnNewWorkout.panelController.isPanelClosed){
+                          Future.delayed(const Duration(milliseconds: 300), (){
+                            HapticFeedback.selectionClick();
+                            /// We need to use the panel controllers own open methode because, when we use our open
+                            /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
+                            /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
+                            /// Maybe due to speed of opening the panel
+                            cnNewWorkout.panelController.open();
+                          });
+                        }
+                      },
+                      style: const TextStyle(
+                        fontSize: 20
                       ),
-                      const SizedBox(width: 5,),
-                      if(cnNewWorkout.workout.isTemplate)
-                        SizedBox(
-                          width: 50,
-                          height: 50,
-                          child: IconButton(
-                            key: cnNewWorkout.keyAddLink,
-                            icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
-                            onPressed: ()async{
-                              if(cnNewWorkout.panelController.isPanelClosed){
-                                HapticFeedback.selectionClick();
-                                await cnNewWorkout.openPanel();
-                              }
-                              cnStandardPopUp.open(
-                                  context: context,
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: TextField(
-                                          keyboardAppearance: Brightness.dark,
-                                          maxLength: 15,
-                                          keyboardType: TextInputType.text,
-                                          controller: cnNewWorkout.linkNameController,
-                                          style: const TextStyle(
-                                              fontSize: 20
-                                          ),
-                                          decoration: InputDecoration(
-                                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                            isDense: true,
-                                            labelText: AppLocalizations.of(context)!.groupName,
-                                            counterText: "",
-                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
-                                            suffixIcon: IconButton(
-                                                onPressed: () async{
-                                                  HapticFeedback.selectionClick();
-                                                  await showDialog(
-                                                      context: context,
-                                                      builder: (context){
-                                                        return Center(
-                                                            child: standardDialog(
-                                                                context: context,
-                                                                child: getExplainExerciseGroups(context)
-                                                            )
-                                                        );
-                                                      }
-                                                  );
-                                                  HapticFeedback.selectionClick();
-                                                  FocusManager.instance.primaryFocus?.unfocus();
-                                                },
-                                                icon: const Icon(
-                                                    Icons.info_outline_rounded
-                                                )
-                                            )
-                                          ),
-                                          onChanged: (value){},
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  onConfirm: (){
-                                    // bool added = false;
-                                    final linkName = cnNewWorkout.linkNameController.text;
-                                    if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
-                                      // added = true;
-                                      cnNewWorkout.workout.linkedExercises.add(linkName);
-                                      cnNewWorkout.updateExercisesAndLinksList();
-                                      cnNewWorkout.updateExercisesLinks();
-                                      cnNewWorkout.refresh();
-                                    }
-                                    cnNewWorkout.linkNameController.clear();
-                                    Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
-                                      FocusScope.of(context).unfocus();
-                                      /// Scrolling to maxScrollExtend not working properly, overshoots
-                                      // if(added){
-                                      //   print("POSITION SCROLL CONTROLLER");
-                                      //   print(cnNewWorkout.scrollController.position.pixels);
-                                      //   cnNewWorkout.scrollController.animateTo(
-                                      //       cnNewWorkout.scrollController.position.maxScrollExtent,
-                                      //       duration: const Duration(milliseconds: 500),
-                                      //       curve: Curves.easeInOut);
-                                      // }
-                                    });
-                                  },
-                                  onCancel: (){
-                                    cnNewWorkout.linkNameController.clear();
-                                    Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
-                                      FocusScope.of(context).unfocus();
-                                    });
-                                  },
-                                  color: const Color(0xff2d2d2d)
-                              );
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                              shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
-                            ),
-                          ),
-                        )
-                    ],
-                  )
-                else if(cnNewWorkout.isSickDays)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text("Dauer", textScaler: TextScaler.linear(1.3),),
-                            const Spacer(),
-                            buildCalendarDialogButton(
-                                context: context,
-                                cnNewWorkout: cnNewWorkout,
-                                calendarType: CalendarDatePicker2Type.range,
-                                dateValues: [cnNewWorkout.sickDays.startDate, cnNewWorkout.sickDays.endDate],
-                                onConfirm: (List<DateTime?>? values){
-                                  if(values != null) {
-                                    cnNewWorkout.sickDays.startDate = values.firstOrNull?? cnNewWorkout.sickDays.startDate;
-                                    cnNewWorkout.sickDays.endDate =  values.lastOrNull?? cnNewWorkout.sickDays.endDate;
-                                    if (cnNewWorkout.sickDays.startDate.isAfter(cnNewWorkout.sickDays.endDate)) {
-                                      cnNewWorkout.sickDays.endDate = cnNewWorkout.sickDays.startDate;
-                                    }
-                                  }
-                                }
-                            )
-                          ],
-                        ),
-                      ],
+                      controller: cnNewWorkout.workoutNameController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        labelText: AppLocalizations.of(context)!.name,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                      ),
+                      onChanged: (value){
+                        cnNewWorkout.workout.name = value;
+                      },
                     ),
                   ),
-                if(!cnNewWorkout.workout.isTemplate && !cnNewWorkout.isSickDays)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(AppLocalizations.of(context)!.panelWoDate, textScaler: const TextScaler.linear(1.3),),
-                        const Spacer(),
-                        if(cnNewWorkout.workout.date != null)
-                          buildCalendarDialogButton(
-                              context: context,
-                              dateValues: [cnNewWorkout.workout.date?? DateTime.now()],
-                              cnNewWorkout: cnNewWorkout,
-                              onConfirm: (List<DateTime?>? values){
-                                cnNewWorkout.workout.date = values?[0]?? cnNewWorkout.workout.date;
+                ),
+                const SizedBox(width: 5,),
+                if(cnNewWorkout.workout.isTemplate)
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: IconButton(
+                      key: cnNewWorkout.keyAddLink,
+                      icon: const Icon(Icons.add_link, color: Color(0xFF5F9561)),
+                      onPressed: ()async{
+                        if(cnNewWorkout.panelController.isPanelClosed){
+                          HapticFeedback.selectionClick();
+                          await cnNewWorkout.openPanel();
+                        }
+                        cnStandardPopUp.open(
+                            context: context,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    keyboardAppearance: Brightness.dark,
+                                    maxLength: 15,
+                                    keyboardType: TextInputType.text,
+                                    controller: cnNewWorkout.linkNameController,
+                                    style: const TextStyle(
+                                        fontSize: 20
+                                    ),
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      isDense: true,
+                                      labelText: AppLocalizations.of(context)!.groupName,
+                                      counterText: "",
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 8.0),
+                                      suffixIcon: IconButton(
+                                          onPressed: () async{
+                                            HapticFeedback.selectionClick();
+                                            await showDialog(
+                                                context: context,
+                                                builder: (context){
+                                                  return Center(
+                                                      child: standardDialog(
+                                                          context: context,
+                                                          child: getExplainExerciseGroups(context)
+                                                      )
+                                                  );
+                                                }
+                                            );
+                                            HapticFeedback.selectionClick();
+                                            FocusManager.instance.primaryFocus?.unfocus();
+                                          },
+                                          icon: const Icon(
+                                              Icons.info_outline_rounded
+                                          )
+                                      )
+                                    ),
+                                    onChanged: (value){},
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onConfirm: (){
+                              // bool added = false;
+                              final linkName = cnNewWorkout.linkNameController.text;
+                              if(linkName.isNotEmpty && !cnNewWorkout.workout.linkedExercises.contains(linkName)){
+                                // added = true;
+                                cnNewWorkout.workout.linkedExercises.add(linkName);
+                                cnNewWorkout.updateExercisesAndLinksList();
+                                cnNewWorkout.updateExercisesLinks();
+                                cnNewWorkout.refresh();
                               }
-                          )
-                      ],
+                              cnNewWorkout.linkNameController.clear();
+                              Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
+                                FocusScope.of(context).unfocus();
+                                /// Scrolling to maxScrollExtend not working properly, overshoots
+                                // if(added){
+                                //   print("POSITION SCROLL CONTROLLER");
+                                //   print(cnNewWorkout.scrollController.position.pixels);
+                                //   cnNewWorkout.scrollController.animateTo(
+                                //       cnNewWorkout.scrollController.position.maxScrollExtent,
+                                //       duration: const Duration(milliseconds: 500),
+                                //       curve: Curves.easeInOut);
+                                // }
+                              });
+                            },
+                            onCancel: (){
+                              cnNewWorkout.linkNameController.clear();
+                              Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime*2), (){
+                                FocusScope.of(context).unfocus();
+                              });
+                            },
+                            color: const Color(0xff2d2d2d)
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10))),
+                      ),
                     ),
                   )
-                // else
-                //   const SizedBox(height: 25,),
-                // if(!cnNewWorkout.isSickDays)
-                //   Column(
-                //     children: [
-                //       Container(
-                //         height: 1,
-                //         decoration: BoxDecoration(
-                //             color: Colors.white.withOpacity(0.5),
-                //             borderRadius: BorderRadius.circular(2)
-                //         ),
-                //       ),
-                //       Container(height: 15,),
-                //       Text(AppLocalizations.of(context)!.panelWoExercises, textScaler: const TextScaler.linear(1.2)),
-                //       Container(height: 16,),
-                //     ],
-                //   )
-
               ],
+            )
+          else if(cnNewWorkout.isSickDays)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Dauer", textScaler: TextScaler.linear(1.3),),
+                      const Spacer(),
+                      buildCalendarDialogButton(
+                          context: context,
+                          cnNewWorkout: cnNewWorkout,
+                          calendarType: CalendarDatePicker2Type.range,
+                          dateValues: [cnNewWorkout.sickDays.startDate, cnNewWorkout.sickDays.endDate],
+                          onConfirm: (List<DateTime?>? values){
+                            if(values != null) {
+                              cnNewWorkout.sickDays.startDate = values.firstOrNull?? cnNewWorkout.sickDays.startDate;
+                              cnNewWorkout.sickDays.endDate =  values.lastOrNull?? cnNewWorkout.sickDays.endDate;
+                              if (cnNewWorkout.sickDays.startDate.isAfter(cnNewWorkout.sickDays.endDate)) {
+                                cnNewWorkout.sickDays.endDate = cnNewWorkout.sickDays.startDate;
+                              }
+                            }
+                          }
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
+
+          if(!cnNewWorkout.workout.isTemplate && !cnNewWorkout.isSickDays)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(AppLocalizations.of(context)!.panelWoDate, textScaler: const TextScaler.linear(1.3),),
+                  const Spacer(),
+                  if(cnNewWorkout.workout.date != null)
+                    buildCalendarDialogButton(
+                        context: context,
+                        dateValues: [cnNewWorkout.workout.date?? DateTime.now()],
+                        cnNewWorkout: cnNewWorkout,
+                        onConfirm: (List<DateTime?>? values){
+                          cnNewWorkout.workout.date = values?[0]?? cnNewWorkout.workout.date;
+                        }
+                    )
+                ],
+              ),
+            ),
+
           if(!cnNewWorkout.isSickDays)
             Container(
-              height: 25,
+              height: 15,
               decoration: BoxDecoration(
                   gradient:  LinearGradient(
                       begin: Alignment.bottomCenter,
@@ -722,8 +659,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
               Text(
                   cnNewWorkout.isSickDays
                   ?"Krank"
-                  :cnNewWorkout.workout.isTemplate? AppLocalizations.of(context)!.panelWoWorkoutTemplate : AppLocalizations.of(context)!.panelWoWorkoutFinished,
-                  // style: const TextStyle(color: Colors.grey),
+                  :cnNewWorkout.workout.isTemplate
+                      ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
+                      : "",//AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                  style: const TextStyle(color: Colors.white),
                   textScaler: TextScaler.linear(1.1),
               ),
               const SizedBox(width: 10),
@@ -1261,6 +1200,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       cnNewWorkout.closePanel(doClear: true);
       cnNewExercisePanel.clear();
       saveCurrentData(cnConfig);
+    }
+    if(cnNewWorkout.panelController.panelPosition < 0.05){
+      cnBottomMenu.refresh();
     }
   }
 
