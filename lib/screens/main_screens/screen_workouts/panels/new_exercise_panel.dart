@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:io';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,6 +39,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   final textDisappearOffset = 0.1;
   bool wasShownBigChild = true;
   bool isTouchingListView = false;
+  int currentIndexFocus = 0;
+  int currentIndexWeightOrAmount = 0;
 
   GlobalKey addSetKey = GlobalKey();
 
@@ -67,7 +70,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final insetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    double insetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     return PopScope(
       canPop: false,
@@ -76,355 +79,431 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           cnNewExercise.closePanel(doClear: false, context: context);
         }
       },
-      child: Stack(
-        children: [
-          GestureDetector(
-            onTap: () {
-              FocusManager.instance.primaryFocus?.unfocus();
-            },
-            child: MySlideUpPanel(
-              // onPanelSlide: onPanelSlide,
-              // isTouchingListView: isTouchingListView,
-              key: cnNewExercise.key,
-              controller: cnNewExercise.panelController,
-              backdropOpacity: 0.25,
-              color: _color,
-              animationControllerName: "NewExercisePanel",
-              descendantAnimationControllerName: "NewWorkoutPanel",
-              // scrollControllerInnerList: cnNewExercise.scrollController,
-              panelBuilder: (context, listView) {
-                return ClipRRect(
-                  borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                  child: Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                        },
-                        child: SlidableAutoCloseBehavior(
-                          child: listView(
-                            padding: EdgeInsets.only(top: heightHeader),
-                            controller: cnNewExercise.scrollController,
-                            physics: const BouncingScrollPhysics(),
-                            shrinkWrap: true,
+      child: GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: MySlideUpPanel(
+          // onPanelSlide: onPanelSlide,
+          // isTouchingListView: isTouchingListView,
+          key: cnNewExercise.key,
+          controller: cnNewExercise.panelController,
+          backdropOpacity: 0.25,
+          color: _color,
+          animationControllerName: "NewExercisePanel",
+          descendantAnimationControllerName: "NewWorkoutPanel",
+          // scrollControllerInnerList: cnNewExercise.scrollController,
+          panelBuilder: (context, listView) {
+            return ClipRRect(
+              borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+              child: Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    child: SlidableAutoCloseBehavior(
+                      child: listView(
+                        padding: EdgeInsets.only(top: heightHeader),
+                        controller: cnNewExercise.scrollController,
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        children: [
+
+                          CupertinoListSection.insetGrouped(
+                            key: cnNewExercise.keyHeader,
+                            decoration: BoxDecoration(
+                                color: Theme.of(context).cardColor
+                            ),
+                            backgroundColor: Colors.transparent,
                             children: [
+                              /// Rest in Seconds Row and Selector
+                              getRestInSecondsSelector(),
 
-                              CupertinoListSection.insetGrouped(
-                                key: cnNewExercise.keyHeader,
-                                decoration: BoxDecoration(
-                                    color: Theme.of(context).cardColor
-                                ),
-                                backgroundColor: Colors.transparent,
-                                children: [
-                                  /// Rest in Seconds Row and Selector
-                                  getRestInSecondsSelector(),
+                              /// Seat Level Row and Selector
+                              getSeatLevelSelector(),
 
-                                  /// Seat Level Row and Selector
-                                  getSeatLevelSelector(),
+                              /// Exercise Category Selector
+                              getExerciseCategorySelector(isTemplate: cnNewExercise.exercise.isNewExercise()),
 
-                                  /// Exercise Category Selector
-                                  getExerciseCategorySelector(isTemplate: cnNewExercise.exercise.isNewExercise()),
-
-                                  /// Body Weight selector
-                                  getBodyWeightPercentSelector(isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate),
-                                ],
-                              ),
-
-                              const SizedBox(height: 15,),
-                              Row(
-                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
-                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
-                                ],
-                              ),
-                              ReorderableListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: const EdgeInsets.only(top: 10),
-                                shrinkWrap: true,
-                                itemCount: cnNewExercise.exercise.sets.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  Widget? child;
-                                  child = Padding(
-                                    padding: const EdgeInsets.only(top: 3, bottom: 3),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                      children: [
-                                        getSet(
-                                            context: context,
-                                            index: index,
-                                            newEx: cnNewExercise.exercise,
-                                            width: 50,
-                                            onConfirm: (){
-                                              cnNewExercise.refresh();
-                                            }
-                                        ),
-
-                                        /// Weight
-                                        Container(
-                                          width: _widthSetWeightAmount,
-                                          height: 35,
-                                          color: Colors.transparent,
-                                          child: TextField(
-                                            focusNode: cnNewExercise.focusNodes[index][0],
-                                            onSubmitted: (value){
-                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
-                                              onTapField(index, insetsBottom, 1);
-                                            },
-                                            textInputAction: TextInputAction.next,
-                                            keyboardAppearance: Brightness.dark,
-                                            key: cnNewExercise.ensureVisibleKeys[index][0],
-                                            maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
-                                            style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
-                                            onTap: ()async{
-                                              onTapField(index, insetsBottom, 0);
-                                            },
-                                            textAlign: TextAlign.center,
-                                            controller: cnNewExercise.controllers[index][0],
-                                            keyboardType: const TextInputType.numberWithOptions(
-                                                decimal: true,
-                                                signed: false
-                                            ),
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              counterText: "",
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                            ),
-                                            onChanged: (value) {
-                                              value = value.trim();
-                                              if(value.isNotEmpty){
-                                                value = validateDoubleTextInput(value);
-                                                final newValue = double.tryParse(value);
-                                                cnNewExercise.exercise.sets[index].weight = newValue;
-                                                if(newValue == null){
-                                                  cnNewExercise.controllers[index][0].clear();
-                                                } else{
-                                                  cnNewExercise.controllers[index][0].text = value;
-                                                }
-                                              }
-                                              else{
-                                                cnNewExercise.exercise.sets[index].weight = null;
-                                              }
-                                              setState(() {});
-                                            },
-                                          ),
-                                        ),
-
-                                        /// Amount
-                                        Container(
-                                          width: _widthSetWeightAmount,
-                                          height: 35,
-                                          color: Colors.transparent,
-                                          child: TextField(
-                                            focusNode: cnNewExercise.focusNodes[index][1],
-                                            onSubmitted: (value){
-                                              if (index < cnNewExercise.exercise.sets.length - 1) {
-                                                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
-                                                onTapField(index+1, insetsBottom, 0);
-                                              } else {
-                                                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
-                                                addSet();
-                                                WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                  FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
-                                                    onTapField(index+1, insetsBottom, 0);
-                                                });
-                                                // FocusScope.of(context).unfocus();
-                                              }
-                                            },
-                                            textInputAction: TextInputAction.next,
-                                            keyboardAppearance: Brightness.dark,
-                                            key: cnNewExercise.ensureVisibleKeys[index][1],
-                                            maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
-                                            style: cnNewExercise.exercise.categoryIsReps()
-                                                ? const TextStyle(fontSize: 18)
-                                                : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
-                                            onTap: ()async{
-                                              onTapField(index, insetsBottom, 1);
-                                            },
-                                            textAlign: TextAlign.center,
-                                            controller: cnNewExercise.controllers[index][1],
-                                            keyboardType: TextInputType.number,
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                              counterText: "",
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                            ),
-                                            onChanged: (value){
-                                              value = value.trim();
-                                              /// For Reps
-                                              if(cnNewExercise.exercise.categoryIsReps()){
-                                                if(value.isNotEmpty){
-                                                  final newValue = int.tryParse(value);
-                                                  cnNewExercise.exercise.sets[index].amount = newValue;
-                                                  if(newValue == null){
-                                                    cnNewExercise.controllers[index][1].clear();
-                                                  }
-                                                }
-                                                else{
-                                                  cnNewExercise.exercise.sets[index].amount = null;
-                                                }
-                                              }
-                                              /// For Time
-                                              else{
-                                                List result = parseTextControllerAmountToTime(value);
-                                                cnNewExercise.controllers[index][1].text = result[1];
-                                                cnNewExercise.exercise.sets[index].amount = result[0];
-                                                setState(() {});
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-
-                                  return Slidable(
-                                      key: cnNewExercise.slidableKeys[index],
-                                      // key: UniqueKey(),
-                                      endActionPane: cnNewExercise.exercise.sets.length > 1?
-                                      ActionPane(
-                                        motion: const ScrollMotion(),
-                                        dismissible: DismissiblePane(
-                                            onDismissed: () {
-                                              dismissExercise(index);
-                                            }),
-                                        children: [
-                                          SlidableAction(
-                                            flex:10,
-                                            onPressed: (BuildContext context){
-                                              dismissExercise(index);
-                                            },
-                                            backgroundColor: const Color(0xFFA12D2C),
-                                            foregroundColor: Colors.white,
-                                            icon: Icons.delete,
-                                          ),
-                                        ],
-                                      ) : null,
-                                      child: child
-                                  );
-                                },
-                                proxyDecorator: (
-                                    Widget child, int index, Animation<double> animation) {
-                                  return AnimatedBuilder(
-                                    animation: animation,
-                                    builder: (BuildContext context, Widget? child) {
-                                      final double animValue = Curves.easeInOut.transform(animation.value);
-                                      final double scale = lerpDouble(1, 1.06, animValue)!;
-                                      return Transform.scale(
-                                        scale: scale,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(8),
-                                          child: Material(
-                                              child: Container(
-                                                  padding: const EdgeInsets.only(left: 2),
-                                                  color: Colors.grey.withOpacity(0.1),
-                                                  child: child
-                                              )
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: child,
-                                  );
-                                },
-                                onReorder: (int oldIndex, int newIndex){
-                                  setState(() {
-                                    if (oldIndex < newIndex) {
-                                      newIndex -= 1;
-                                    }
-                                    final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
-                                    cnNewExercise.exercise.sets.insert(newIndex, item);
-                                    final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
-                                    cnNewExercise.controllers.insert(newIndex, weightAndAmount);
-                                  });
-                                },
-                              ),
-                              Column(
-                                children: [
-                                  const SizedBox(height: 15,),
-
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: IconButton(
-                                            key: addSetKey,
-                                            color: Colors.amber[800],
-                                            style: ButtonStyle(
-                                                backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                                            ),
-                                            onPressed: () {
-                                              addSet();
-                                            },
-                                            icon: const Icon(
-                                              Icons.add,
-                                              size: 20,
-                                            )
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
-                                ],
-                              )
+                              /// Body Weight selector
+                              getBodyWeightPercentSelector(isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate),
                             ],
                           ),
-                        ),
-                      ),
 
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            alignment: Alignment.bottomLeft,
-                            color: _color,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 67,),
-                                getHeader(),
-                              ],
+                          const SizedBox(height: 15,),
+                          Row(
+                            // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+                            ],
+                          ),
+                          ReorderableListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(top: 10),
+                            shrinkWrap: true,
+                            itemCount: cnNewExercise.exercise.sets.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              Widget? child;
+                              child = Padding(
+                                padding: const EdgeInsets.only(top: 3, bottom: 3),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    getSet(
+                                        context: context,
+                                        index: index,
+                                        newEx: cnNewExercise.exercise,
+                                        width: 50,
+                                        onConfirm: (){
+                                          cnNewExercise.refresh();
+                                        }
+                                    ),
+
+                                    /// Weight
+                                    Container(
+                                      width: _widthSetWeightAmount,
+                                      height: 35,
+                                      color: Colors.transparent,
+                                      child: TextField(
+                                        focusNode: cnNewExercise.focusNodes[index][0],
+                                        onSubmitted: (value){
+                                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                          onTapField(index, insetsBottom, 1);
+                                        },
+                                        textInputAction: TextInputAction.next,
+                                        keyboardAppearance: Brightness.dark,
+                                        key: cnNewExercise.ensureVisibleKeys[index][0],
+                                        maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
+                                        style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
+                                        onTap: ()async{
+                                          onTapField(index, insetsBottom, 0);
+                                        },
+                                        textAlign: TextAlign.center,
+                                        controller: cnNewExercise.controllers[index][0],
+                                        keyboardType: const TextInputType.numberWithOptions(
+                                            decimal: true,
+                                            signed: false
+                                        ),
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          counterText: "",
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                        ),
+                                        onChanged: (value) {
+                                          value = value.trim();
+                                          if(value.isNotEmpty){
+                                            value = validateDoubleTextInput(value);
+                                            final newValue = double.tryParse(value);
+                                            cnNewExercise.exercise.sets[index].weight = newValue;
+                                            if(newValue == null){
+                                              cnNewExercise.controllers[index][0].clear();
+                                            } else{
+                                              cnNewExercise.controllers[index][0].text = value;
+                                            }
+                                          }
+                                          else{
+                                            cnNewExercise.exercise.sets[index].weight = null;
+                                          }
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
+
+                                    /// Amount
+                                    Container(
+                                      width: _widthSetWeightAmount,
+                                      height: 35,
+                                      color: Colors.transparent,
+                                      child: TextField(
+                                        focusNode: cnNewExercise.focusNodes[index][1],
+                                        onSubmitted: (value){
+                                          if (index < cnNewExercise.exercise.sets.length - 1) {
+                                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
+                                            onTapField(index+1, insetsBottom, 0);
+                                          } else {
+                                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                            addSet();
+                                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
+                                                onTapField(index+1, insetsBottom, 0);
+                                            });
+                                            // FocusScope.of(context).unfocus();
+                                          }
+                                        },
+                                        textInputAction: TextInputAction.next,
+                                        keyboardAppearance: Brightness.dark,
+                                        key: cnNewExercise.ensureVisibleKeys[index][1],
+                                        maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
+                                        style: cnNewExercise.exercise.categoryIsReps()
+                                            ? const TextStyle(fontSize: 18)
+                                            : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
+                                        onTap: ()async{
+                                          onTapField(index, insetsBottom, 1);
+                                        },
+                                        textAlign: TextAlign.center,
+                                        controller: cnNewExercise.controllers[index][1],
+                                        keyboardType: TextInputType.number,
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          counterText: "",
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                        ),
+                                        onChanged: (value){
+                                          value = value.trim();
+                                          /// For Reps
+                                          if(cnNewExercise.exercise.categoryIsReps()){
+                                            if(value.isNotEmpty){
+                                              final newValue = int.tryParse(value);
+                                              cnNewExercise.exercise.sets[index].amount = newValue;
+                                              if(newValue == null){
+                                                cnNewExercise.controllers[index][1].clear();
+                                              }
+                                            }
+                                            else{
+                                              cnNewExercise.exercise.sets[index].amount = null;
+                                            }
+                                          }
+                                          /// For Time
+                                          else{
+                                            List result = parseTextControllerAmountToTime(value);
+                                            cnNewExercise.controllers[index][1].text = result[1];
+                                            cnNewExercise.exercise.sets[index].amount = result[0];
+                                            setState(() {});
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              return Slidable(
+                                  key: cnNewExercise.slidableKeys[index],
+                                  // key: UniqueKey(),
+                                  endActionPane: cnNewExercise.exercise.sets.length > 1?
+                                  ActionPane(
+                                    motion: const ScrollMotion(),
+                                    dismissible: DismissiblePane(
+                                        onDismissed: () {
+                                          dismissExercise(index);
+                                        }),
+                                    children: [
+                                      SlidableAction(
+                                        flex:10,
+                                        onPressed: (BuildContext context){
+                                          dismissExercise(index);
+                                        },
+                                        backgroundColor: const Color(0xFFA12D2C),
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                      ),
+                                    ],
+                                  ) : null,
+                                  child: child
+                              );
+                            },
+                            proxyDecorator: (
+                                Widget child, int index, Animation<double> animation) {
+                              return AnimatedBuilder(
+                                animation: animation,
+                                builder: (BuildContext context, Widget? child) {
+                                  final double animValue = Curves.easeInOut.transform(animation.value);
+                                  final double scale = lerpDouble(1, 1.06, animValue)!;
+                                  return Transform.scale(
+                                    scale: scale,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Material(
+                                          child: Container(
+                                              padding: const EdgeInsets.only(left: 2),
+                                              color: Colors.grey.withOpacity(0.1),
+                                              child: child
+                                          )
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: child,
+                              );
+                            },
+                            onReorder: (int oldIndex, int newIndex){
+                              setState(() {
+                                if (oldIndex < newIndex) {
+                                  newIndex -= 1;
+                                }
+                                final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
+                                cnNewExercise.exercise.sets.insert(newIndex, item);
+                                final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
+                                cnNewExercise.controllers.insert(newIndex, weightAndAmount);
+                              });
+                            },
+                          ),
+                          Column(
+                            children: [
+                              const SizedBox(height: 15,),
+
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: IconButton(
+                                        key: addSetKey,
+                                        color: Colors.amber[800],
+                                        style: ButtonStyle(
+                                            backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                            shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                        ),
+                                        onPressed: () {
+                                          addSet();
+                                        },
+                                        icon: const Icon(
+                                          Icons.add,
+                                          size: 20,
+                                        )
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        alignment: Alignment.bottomLeft,
+                        color: _color,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 67,),
+                            getHeader(),
+                          ],
+                        )
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: 50,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                            flex: 10,
+                            child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                        ),
+                        Expanded(
+                            flex: 13,
+                            child: Center(
+                              child: Text(
+                              AppLocalizations.of(context)!.exercise,
+                              textScaler: const TextScaler.linear(1.3),
+                              textAlign: TextAlign.center,
+                              ),
                             )
                         ),
-                      ),
-
-                      SizedBox(
-                        height: 50,
+                        Expanded(
+                            flex: 10,
+                            child: Align(alignment: Alignment.centerRight, child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern", textAlign: TextAlign.right)))
+                        ),
+                      ],
+                    ),
+                  ),
+                  if(Platform.isIOS && MediaQuery.of(context).viewInsets.bottom > 100)
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                      child: Container(
+                        color: const Color(0XFF333335),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Expanded(
-                                flex: 10,
-                                child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                            CupertinoButton(
+                                child: Text("Back"),
+                                onPressed: (){
+                                  int delay = 500;
+
+                                  if(currentIndexWeightOrAmount == 0){
+                                    currentIndexFocus -= 1;
+                                    currentIndexWeightOrAmount = 1;
+                                  } else{
+                                    currentIndexWeightOrAmount = 0;
+                                  }
+                                  if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                                    delay = 50;
+                                    insetsBottom = 0;
+                                  }
+
+                                  if(currentIndexFocus < 0){
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    return;
+                                  }
+
+                                  if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                                    onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                                  } else {
+                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                                    addSet();
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                                      onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                                    });
+                                    // FocusScope.of(context).unfocus();
+                                  }
+                                }
                             ),
-                            Expanded(
-                                flex: 13,
-                                child: Center(
-                                  child: Text(
-                                  AppLocalizations.of(context)!.exercise,
-                                  textScaler: const TextScaler.linear(1.3),
-                                  textAlign: TextAlign.center,
-                                  ),
-                                )
-                            ),
-                            Expanded(
-                                flex: 10,
-                                child: Align(alignment: Alignment.centerRight, child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern", textAlign: TextAlign.right)))
-                            ),
+                            CupertinoButton(
+                                child: Text("Next"),
+                                onPressed: (){
+                                  int delay = 500;
+
+                                  if(currentIndexWeightOrAmount == 0){
+                                    currentIndexWeightOrAmount = 1;
+                                  } else{
+                                    currentIndexWeightOrAmount = 0;
+                                    currentIndexFocus += 1;
+                                  }
+                                  if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                                    delay = 50;
+                                    insetsBottom = 0;
+                                  }
+
+                                  if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                                    onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                                  } else {
+                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                                    addSet();
+                                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                                      onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                                    });
+                                    // FocusScope.of(context).unfocus();
+                                  }
+
+                                }
+                            )
                           ],
                         ),
-                      )
-                    ],
-                  ),
-                );
-              }
-            )
-          ),
-        ],
+                      ),
+                    )
+                ],
+              ),
+            );
+          }
+        )
       ),
     );
   }
@@ -704,6 +783,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
             maxLength: 40,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             textInputAction: TextInputAction.next,
+            onTap: (){
+              currentIndexWeightOrAmount = 1;
+              currentIndexFocus = -1;
+            },
             onFieldSubmitted: (value){
               FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
               onTapField(0, 0, 0, scrollDelay: 50);
@@ -744,6 +827,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   Future onTapField(int index, double insetsBottom, int weightOrAmountIndex, {int scrollDelay = 500}) async{
+    currentIndexFocus = index;
+    currentIndexWeightOrAmount = weightOrAmountIndex;
     cnNewExercise.controllers[index][weightOrAmountIndex].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][weightOrAmountIndex].value.text.length);
     if(insetsBottom == 0) {
       await Future.delayed(Duration(milliseconds: scrollDelay));
