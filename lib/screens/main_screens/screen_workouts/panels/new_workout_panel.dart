@@ -225,10 +225,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       children: [
                         Expanded(
                             flex: 10,
-                            child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel))
+                            child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left))
                         ),
                         Expanded(
-                          flex: 14,
+                          flex: 13,
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
@@ -255,7 +255,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                   openConfirmNameChangePopUp();
                                 }
                               },
-                              child: const Text("Speichern")
+                              child: const Text("Speichern", textAlign: TextAlign.right)
                           ),
                         ),
                       ],
@@ -286,7 +286,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                     backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
                     shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
                 ),
-                onPressed: () {
+                onPressed: () async{
+                  if(MediaQuery.of(context).viewInsets.bottom > 0){
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    await Future.delayed(const Duration(milliseconds: 300));
+                  }
                   addExercise();
                 },
                 icon: const Icon(
