@@ -392,26 +392,31 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                         ),
                       ),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                              flex: 10,
-                              child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left))
-                          ),
-                          Expanded(
-                              flex: 13,
-                              child: Text(
-                              AppLocalizations.of(context)!.exercise,
-                              textScaler: const TextScaler.linear(1.3),
-                              textAlign: TextAlign.center,
-                              // style: TextStyle(color: Colors.grey)
-                          )),
-                          Expanded(
-                              flex: 10,
-                              child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern", textAlign: TextAlign.right))
-                          ),
-                        ],
+                      SizedBox(
+                        height: 50,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                                flex: 10,
+                                child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                            ),
+                            Expanded(
+                                flex: 13,
+                                child: Center(
+                                  child: Text(
+                                  AppLocalizations.of(context)!.exercise,
+                                  textScaler: const TextScaler.linear(1.3),
+                                  textAlign: TextAlign.center,
+                                  ),
+                                )
+                            ),
+                            Expanded(
+                                flex: 10,
+                                child: Align(alignment: Alignment.centerRight, child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern", textAlign: TextAlign.right)))
+                            ),
+                          ],
+                        ),
                       )
                     ],
                   ),

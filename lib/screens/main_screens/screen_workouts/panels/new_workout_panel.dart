@@ -219,46 +219,54 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                            flex: 10,
-                            child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left))
-                        ),
-                        Expanded(
-                          flex: 13,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
-                                ?getWorkoutOrSickDaysPicker()
-                                :Text(
-                                cnNewWorkout.workout.isTemplate
-                                    ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
-                                    : cnNewWorkout.isSickDays
-                                    ? "Krank"
-                                    : " ", /// Due to Fitted Box the length must be greater than 0 //AppLocalizations.of(context)!.panelWoWorkoutFinished,
-                                textScaler: const TextScaler.linear(1.3),
-                                // style: TextStyle(color: Colors.grey)
+                    SizedBox(
+                      height: 50,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                              flex: 10,
+                              child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                          ),
+                          Expanded(
+                            flex: 13,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
+                                    ?getWorkoutOrSickDaysPicker()
+                                    :Text(
+                                    cnNewWorkout.workout.isTemplate
+                                        ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
+                                        : cnNewWorkout.isSickDays
+                                        ? "Krank"
+                                        : " ", /// Due to Fitted Box the length must be greater than 0 //AppLocalizations.of(context)!.panelWoWorkoutFinished,
+                                    textScaler: const TextScaler.linear(1.3),
+                                    // style: TextStyle(color: Colors.grey)
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          flex: 10,
-                          child: CupertinoButton(
-                              onPressed: (){
-                                if(!hasChangedNames()){
-                                  onConfirm();
-                                }
-                                else{
-                                  openConfirmNameChangePopUp();
-                                }
-                              },
-                              child: const Text("Speichern", textAlign: TextAlign.right)
+                          Expanded(
+                            flex: 10,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: CupertinoButton(
+                                  onPressed: (){
+                                    if(!hasChangedNames()){
+                                      onConfirm();
+                                    }
+                                    else{
+                                      openConfirmNameChangePopUp();
+                                    }
+                                  },
+                                  child: const Text("Speichern", textAlign: TextAlign.right)
+                              ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -648,6 +656,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
               onTap: () {
                 cnNewWorkout.isSickDays = false;
                 cnNewWorkout.minPanelHeight = cnNewWorkout.keepShowingPanelHeight;
+                cnNewWorkout.refresh();
                 cnWorkouts.refresh();
                 cnHomepage.refresh();
               },
@@ -657,6 +666,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
               onTap: () {
                 cnNewWorkout.isSickDays = true;
                 cnNewWorkout.minPanelHeight = cnNewWorkout.keepShowingPanelHeightSickDays;
+                cnNewWorkout.refresh();
                 cnWorkouts.refresh();
                 cnHomepage.refresh();
               },

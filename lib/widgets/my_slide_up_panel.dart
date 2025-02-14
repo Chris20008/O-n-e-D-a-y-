@@ -144,7 +144,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   }
 
   onPanelSlide(double value){
-    print("PANEL SLIDE");
     if(descendantAnimationController != null){
       descendantAnimationController!.value = value*0.5;
     }
@@ -378,7 +377,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               panelDragRunning = false;
               isDraggingVertical = null;
               removeOverScrollOffset();
-              print("POINTER UP");
               if(underScrollOffset < 0){
                 underScrollOffset = 0;
                 final th = Platform.isAndroid? 6 : 1.3;
