@@ -366,7 +366,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                                   ),
                                 ],
                               ),
-                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+(Platform.isAndroid? 10: 50) : 60)
                             ],
                           )
                         ],
@@ -419,83 +419,88 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                       ],
                     ),
                   ),
-                  if(Platform.isIOS && MediaQuery.of(context).viewInsets.bottom > 100)
+
+                  if(Platform.isIOS && MediaQuery.of(context).viewInsets.bottom > 100 && currentIndexFocus >= 0)
                     Positioned(
                       left: 0,
                       right: 0,
                       bottom: MediaQuery.of(context).viewInsets.bottom,
-                      child: Container(
-                        color: const Color(0XFF333335),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            CupertinoButton(
-                                child: Text("Back"),
-                                onPressed: (){
-                                  int delay = 500;
+                      child: GestureDetector(
+                        onTap: (){}, /// Empty Gesture Detector to override higher Gesture Detector
+                        child: Container(
+                          height: 40,
+                          color: const Color(0XFF333335),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              CupertinoButton(
+                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 23, right: 23),
+                                  onPressed: (){
+                                    int delay = 500;
 
-                                  if(currentIndexWeightOrAmount == 0){
-                                    currentIndexFocus -= 1;
-                                    currentIndexWeightOrAmount = 1;
-                                  } else{
-                                    currentIndexWeightOrAmount = 0;
-                                  }
-                                  if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
-                                    delay = 50;
-                                    insetsBottom = 0;
-                                  }
+                                    if(currentIndexWeightOrAmount == 0){
+                                      currentIndexFocus -= 1;
+                                      currentIndexWeightOrAmount = 1;
+                                    } else{
+                                      currentIndexWeightOrAmount = 0;
+                                    }
+                                    if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                                      delay = 50;
+                                      insetsBottom = 0;
+                                    }
 
-                                  if(currentIndexFocus < 0){
-                                    FocusManager.instance.primaryFocus?.unfocus();
-                                    return;
-                                  }
+                                    if(currentIndexFocus < 0){
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      return;
+                                    }
 
-                                  if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
-                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
-                                    onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
-                                  } else {
-                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
-                                    addSet();
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
-                                      onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
-                                    });
-                                    // FocusScope.of(context).unfocus();
-                                  }
-                                }
-                            ),
-                            CupertinoButton(
-                                child: Text("Next"),
-                                onPressed: (){
-                                  int delay = 500;
+                                    if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                                      onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                                    } else {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                                      addSet();
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                                        onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                                      });
+                                    }
+                                  },
+                                  child: const Text("Back", style: TextStyle(fontWeight: FontWeight.w500), textScaler: TextScaler.linear(1.1),)
+                              ),
+                              CupertinoButton(
+                                  padding: const EdgeInsets.only(top: 5, bottom: 5, right: 23, left: 23),
+                                  onPressed: (){
+                                    int delay = 500;
 
-                                  if(currentIndexWeightOrAmount == 0){
-                                    currentIndexWeightOrAmount = 1;
-                                  } else{
-                                    currentIndexWeightOrAmount = 0;
-                                    currentIndexFocus += 1;
-                                  }
-                                  if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
-                                    delay = 50;
-                                    insetsBottom = 0;
-                                  }
+                                    if(currentIndexWeightOrAmount == 0){
+                                      currentIndexWeightOrAmount = 1;
+                                    } else{
+                                      currentIndexWeightOrAmount = 0;
+                                      currentIndexFocus += 1;
+                                    }
+                                    if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                                      delay = 50;
+                                      insetsBottom = 0;
+                                    }
 
-                                  if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
-                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
-                                    onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
-                                  } else {
-                                    FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
-                                    addSet();
-                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
-                                      onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
-                                    });
-                                    // FocusScope.of(context).unfocus();
-                                  }
+                                    if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                                      onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                                    } else {
+                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                                      addSet();
+                                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                                        FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                                        onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                                      });
+                                    }
 
-                                }
-                            )
-                          ],
+                                  },
+                                  child: const Text("Next", style: TextStyle(fontWeight: FontWeight.w500), textScaler: TextScaler.linear(1.1),)
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -790,6 +795,9 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
             onFieldSubmitted: (value){
               FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
               onTapField(0, 0, 0, scrollDelay: 50);
+              // Future.delayed(const Duration(milliseconds: 16), (){
+              //   setState(() {});
+              // });
             },
             validator: (value) {
               value = value?.trim();

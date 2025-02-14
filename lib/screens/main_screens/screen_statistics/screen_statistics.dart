@@ -57,11 +57,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     /// WidgetsBindings.instance.addPostFrameCallback() inside it
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
-        // setBottomMenuHeight();
         handleOrientation();
-        // _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 35 : 30);
-        // final double paddingBottom = MediaQuery.of(context).padding.bottom;
-        // cnBottomMenu.height = paddingBottom + _height;
       });
     });
   }
