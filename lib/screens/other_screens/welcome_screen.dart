@@ -362,7 +362,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     GestureDetector(
                       onTap: () async{
                         HapticFeedback.selectionClick();
-                        controllerExplainBackups.open();
+                        controllerExplainBackups.animatePanelToPosition(
+                            1,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.fastEaseInToSlowEaseOut
+                        );
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20),

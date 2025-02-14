@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
@@ -17,7 +16,6 @@ import '../../../../util/constants.dart';
 import '../../../../widgets/standard_popup.dart';
 import '../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screen_workouts.dart';
-import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewExercisePanel extends StatefulWidget {
@@ -34,9 +32,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
-  final _formKey = GlobalKey<FormState>();
-  final double _heightBottomColoredBox = Platform.isAndroid? 15 : 25;
-  final double _totalHeightBottomBox = Platform.isAndroid? 70 : 80;
   late TextStyle _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 8);
   late final _color = Theme.of(context).primaryColor;
   double heightHeader = 120.0;
@@ -78,18 +73,17 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       canPop: false,
       onPopInvoked: (doPop){
         if (cnNewExercise.panelController.isPanelOpen){
-          cnNewExercise.closePanel(doClear: false);
+          cnNewExercise.closePanel(doClear: false, context: context);
         }
       },
       child: Stack(
         children: [
           GestureDetector(
             onTap: () {
-              FocusScope.of(context).unfocus();
-              // onKeyboardClose();
+              FocusManager.instance.primaryFocus?.unfocus();
             },
             child: MySlideUpPanel(
-              onPanelSlide: onPanelSlide,
+              // onPanelSlide: onPanelSlide,
               // isTouchingListView: isTouchingListView,
               key: cnNewExercise.key,
               controller: cnNewExercise.panelController,
@@ -99,284 +93,282 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               descendantAnimationControllerName: "NewWorkoutPanel",
               // scrollControllerInnerList: cnNewExercise.scrollController,
               panelBuilder: (context, listView) {
-                print("Rebuild panel Builder");
                 return ClipRRect(
                   borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
                   child: Stack(
                     children: [
-                      Container(
-                        // padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 10),
+                      GestureDetector(
+                        onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                        },
+                        child: SlidableAutoCloseBehavior(
+                          child: listView(
+                            padding: EdgeInsets.only(top: heightHeader),
+                            controller: cnNewExercise.scrollController,
+                            physics: const BouncingScrollPhysics(),
+                            shrinkWrap: true,
+                            children: [
 
-                        // padding: const EdgeInsets.only(bottom: 0, right: 15.0, left: 15.0, top: 10),
-                        // padding: const EdgeInsets.only(top: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            FocusScope.of(context).unfocus();
-                          },
-                          child: SlidableAutoCloseBehavior(
-                            child: listView(
-                              padding: EdgeInsets.only(top: heightHeader),
-                              controller: cnNewExercise.scrollController,
-                              physics: const BouncingScrollPhysics(),
-                              shrinkWrap: true,
-                              children: [
-
-                                CupertinoListSection.insetGrouped(
-                                  key: cnNewExercise.keyHeader,
-                                  decoration: BoxDecoration(
-                                      color: Theme.of(context).cardColor
-                                  ),
-                                  backgroundColor: Colors.transparent,
-                                  children: [
-                                    /// Rest in Seconds Row and Selector
-                                    getRestInSecondsSelector(),
-
-                                    /// Seat Level Row and Selector
-                                    getSeatLevelSelector(),
-
-                                    /// Exercise Category Selector
-                                    getExerciseCategorySelector(isTemplate: cnNewExercise.exercise.isNewExercise()),
-
-                                    /// Body Weight selector
-                                    getBodyWeightPercentSelector(isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate),
-                                  ],
+                              CupertinoListSection.insetGrouped(
+                                key: cnNewExercise.keyHeader,
+                                decoration: BoxDecoration(
+                                    color: Theme.of(context).cardColor
                                 ),
+                                backgroundColor: Colors.transparent,
+                                children: [
+                                  /// Rest in Seconds Row and Selector
+                                  getRestInSecondsSelector(),
 
-                                const SizedBox(height: 15,),
-                                Row(
-                                  // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-                                    Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
-                                    Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
-                                  ],
-                                ),
-                                ReorderableListView.builder(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.only(top: 10),
-                                  shrinkWrap: true,
-                                  itemCount: cnNewExercise.exercise.sets.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    Widget? child;
-                                    child = Padding(
-                                      padding: const EdgeInsets.only(top: 3, bottom: 3),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                        children: [
-                                          getSet(
-                                              context: context,
-                                              index: index,
-                                              newEx: cnNewExercise.exercise,
-                                              width: 50,
-                                              onConfirm: (){
-                                                cnNewExercise.refresh();
-                                              }
-                                          ),
+                                  /// Seat Level Row and Selector
+                                  getSeatLevelSelector(),
 
-                                          /// Weight
-                                          Container(
-                                            width: _widthSetWeightAmount,
-                                            height: 35,
-                                            color: Colors.transparent,
-                                            child: TextField(
-                                              keyboardAppearance: Brightness.dark,
-                                              key: cnNewExercise.ensureVisibleKeys[index][0],
-                                              maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
-                                              style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
-                                              onTap: ()async{
-                                                cnNewExercise.controllers[index][0].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][0].value.text.length);
-                                                if(insetsBottom == 0) {
-                                                  await Future.delayed(const Duration(milliseconds: 500));
-                                                }
-                                                Scrollable.ensureVisible(
-                                                    cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
-                                                    duration: const Duration(milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                    alignment: 0.38
-                                                );
-                                              },
-                                              textAlign: TextAlign.center,
-                                              controller: cnNewExercise.controllers[index][0],
-                                              keyboardType: const TextInputType.numberWithOptions(
-                                                  decimal: true,
-                                                  signed: false
-                                              ),
-                                              decoration: InputDecoration(
-                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                counterText: "",
-                                                contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                              ),
-                                              onChanged: (value) {
-                                                value = value.trim();
-                                                if(value.isNotEmpty){
-                                                  value = validateDoubleTextInput(value);
-                                                  final newValue = double.tryParse(value);
-                                                  cnNewExercise.exercise.sets[index].weight = newValue;
-                                                  if(newValue == null){
-                                                    cnNewExercise.controllers[index][0].clear();
-                                                  } else{
-                                                    cnNewExercise.controllers[index][0].text = value;
-                                                  }
-                                                }
-                                                else{
-                                                  cnNewExercise.exercise.sets[index].weight = null;
-                                                }
-                                                setState(() {});
-                                              },
-                                            ),
-                                          ),
+                                  /// Exercise Category Selector
+                                  getExerciseCategorySelector(isTemplate: cnNewExercise.exercise.isNewExercise()),
 
-                                          /// Amount
-                                          Container(
-                                            width: _widthSetWeightAmount,
-                                            height: 35,
-                                            color: Colors.transparent,
-                                            child: TextField(
-                                              keyboardAppearance: Brightness.dark,
-                                              key: cnNewExercise.ensureVisibleKeys[index][1],
-                                              maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
-                                              style: cnNewExercise.exercise.categoryIsReps()
-                                                  ? const TextStyle(fontSize: 18)
-                                                  : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
-                                              onTap: ()async{
-                                                cnNewExercise.controllers[index][1].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][1].value.text.length);
-                                                if(insetsBottom == 0) {
-                                                  await Future.delayed(const Duration(milliseconds: 300));
-                                                }
-                                                Scrollable.ensureVisible(
-                                                    cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
-                                                    duration: const Duration(milliseconds: 300),
-                                                    curve: Curves.easeInOut,
-                                                    alignment: 0.38
-                                                );
-                                              },
-                                              textAlign: TextAlign.center,
-                                              controller: cnNewExercise.controllers[index][1],
-                                              keyboardType: TextInputType.number,
-                                              decoration: InputDecoration(
-                                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                                counterText: "",
-                                                contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                                              ),
-                                              onChanged: (value){
-                                                value = value.trim();
-                                                /// For Reps
-                                                if(cnNewExercise.exercise.categoryIsReps()){
-                                                  if(value.isNotEmpty){
-                                                    final newValue = int.tryParse(value);
-                                                    cnNewExercise.exercise.sets[index].amount = newValue;
-                                                    if(newValue == null){
-                                                      cnNewExercise.controllers[index][1].clear();
-                                                    }
-                                                  }
-                                                  else{
-                                                    cnNewExercise.exercise.sets[index].amount = null;
-                                                  }
-                                                }
-                                                /// For Time
-                                                else{
-                                                  List result = parseTextControllerAmountToTime(value);
-                                                  cnNewExercise.controllers[index][1].text = result[1];
-                                                  cnNewExercise.exercise.sets[index].amount = result[0];
-                                                  setState(() {});
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    );
+                                  /// Body Weight selector
+                                  getBodyWeightPercentSelector(isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate),
+                                ],
+                              ),
 
-                                    return Slidable(
-                                        key: cnNewExercise.slidableKeys[index],
-                                        // key: UniqueKey(),
-                                        endActionPane: ActionPane(
-                                          motion: const ScrollMotion(),
-                                          dismissible: DismissiblePane(
-                                              onDismissed: () {
-                                                dismissExercise(index);
-                                              }),
-                                          children: [
-                                            SlidableAction(
-                                              flex:10,
-                                              onPressed: (BuildContext context){
-                                                dismissExercise(index);
-                                              },
-                                              backgroundColor: const Color(0xFFA12D2C),
-                                              foregroundColor: Colors.white,
-                                              icon: Icons.delete,
-                                            ),
-                                          ],
-                                        ),
-                                        child: child
-                                    );
-                                  },
-                                  proxyDecorator: (
-                                      Widget child, int index, Animation<double> animation) {
-                                    return AnimatedBuilder(
-                                      animation: animation,
-                                      builder: (BuildContext context, Widget? child) {
-                                        final double animValue = Curves.easeInOut.transform(animation.value);
-                                        final double scale = lerpDouble(1, 1.06, animValue)!;
-                                        return Transform.scale(
-                                          scale: scale,
-                                          child: ClipRRect(
-                                            borderRadius: BorderRadius.circular(8),
-                                            child: Material(
-                                                child: Container(
-                                                    padding: const EdgeInsets.only(left: 2),
-                                                    color: Colors.grey.withOpacity(0.1),
-                                                    child: child
-                                                )
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: child,
-                                    );
-                                  },
-                                  onReorder: (int oldIndex, int newIndex){
-                                    setState(() {
-                                      if (oldIndex < newIndex) {
-                                        newIndex -= 1;
-                                      }
-                                      final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
-                                      cnNewExercise.exercise.sets.insert(newIndex, item);
-                                      final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
-                                      cnNewExercise.controllers.insert(newIndex, weightAndAmount);
-                                    });
-                                  },
-                                ),
-                                Column(
-                                  children: [
-                                    const SizedBox(height: 15,),
-
-                                    Row(
+                              const SizedBox(height: 15,),
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+                                ],
+                              ),
+                              ReorderableListView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: const EdgeInsets.only(top: 10),
+                                shrinkWrap: true,
+                                itemCount: cnNewExercise.exercise.sets.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Widget? child;
+                                  child = Padding(
+                                    padding: const EdgeInsets.only(top: 3, bottom: 3),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                                       children: [
-                                        Expanded(
-                                          child: IconButton(
-                                              key: addSetKey,
-                                              color: Colors.amber[800],
-                                              style: ButtonStyle(
-                                                  backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                                  shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                                              ),
-                                              onPressed: () {
+                                        getSet(
+                                            context: context,
+                                            index: index,
+                                            newEx: cnNewExercise.exercise,
+                                            width: 50,
+                                            onConfirm: (){
+                                              cnNewExercise.refresh();
+                                            }
+                                        ),
+
+                                        /// Weight
+                                        Container(
+                                          width: _widthSetWeightAmount,
+                                          height: 35,
+                                          color: Colors.transparent,
+                                          child: TextField(
+                                            focusNode: cnNewExercise.focusNodes[index][0],
+                                            onSubmitted: (value){
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                              onTapField(index, insetsBottom, 1);
+                                            },
+                                            textInputAction: TextInputAction.next,
+                                            keyboardAppearance: Brightness.dark,
+                                            key: cnNewExercise.ensureVisibleKeys[index][0],
+                                            maxLength: cnNewExercise.controllers[index][0].text.contains(".")? 6 : 4,
+                                            style: getTextStyleForTextField(cnNewExercise.controllers[index][0].text),
+                                            onTap: ()async{
+                                              onTapField(index, insetsBottom, 0);
+                                            },
+                                            textAlign: TextAlign.center,
+                                            controller: cnNewExercise.controllers[index][0],
+                                            keyboardType: const TextInputType.numberWithOptions(
+                                                decimal: true,
+                                                signed: false
+                                            ),
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            onChanged: (value) {
+                                              value = value.trim();
+                                              if(value.isNotEmpty){
+                                                value = validateDoubleTextInput(value);
+                                                final newValue = double.tryParse(value);
+                                                cnNewExercise.exercise.sets[index].weight = newValue;
+                                                if(newValue == null){
+                                                  cnNewExercise.controllers[index][0].clear();
+                                                } else{
+                                                  cnNewExercise.controllers[index][0].text = value;
+                                                }
+                                              }
+                                              else{
+                                                cnNewExercise.exercise.sets[index].weight = null;
+                                              }
+                                              setState(() {});
+                                            },
+                                          ),
+                                        ),
+
+                                        /// Amount
+                                        Container(
+                                          width: _widthSetWeightAmount,
+                                          height: 35,
+                                          color: Colors.transparent,
+                                          child: TextField(
+                                            focusNode: cnNewExercise.focusNodes[index][1],
+                                            onSubmitted: (value){
+                                              if (index < cnNewExercise.exercise.sets.length - 1) {
+                                                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
+                                                onTapField(index+1, insetsBottom, 0);
+                                              } else {
+                                                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
                                                 addSet();
-                                              },
-                                              icon: const Icon(
-                                                Icons.add,
-                                                size: 20,
-                                              )
+                                                WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                  FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
+                                                    onTapField(index+1, insetsBottom, 0);
+                                                });
+                                                // FocusScope.of(context).unfocus();
+                                              }
+                                            },
+                                            textInputAction: TextInputAction.next,
+                                            keyboardAppearance: Brightness.dark,
+                                            key: cnNewExercise.ensureVisibleKeys[index][1],
+                                            maxLength: cnNewExercise.exercise.categoryIsReps()? 3 : 8,
+                                            style: cnNewExercise.exercise.categoryIsReps()
+                                                ? const TextStyle(fontSize: 18)
+                                                : getTextStyleForTextField(cnNewExercise.controllers[index][1].text),
+                                            onTap: ()async{
+                                              onTapField(index, insetsBottom, 1);
+                                            },
+                                            textAlign: TextAlign.center,
+                                            controller: cnNewExercise.controllers[index][1],
+                                            keyboardType: TextInputType.number,
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                              counterText: "",
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                            ),
+                                            onChanged: (value){
+                                              value = value.trim();
+                                              /// For Reps
+                                              if(cnNewExercise.exercise.categoryIsReps()){
+                                                if(value.isNotEmpty){
+                                                  final newValue = int.tryParse(value);
+                                                  cnNewExercise.exercise.sets[index].amount = newValue;
+                                                  if(newValue == null){
+                                                    cnNewExercise.controllers[index][1].clear();
+                                                  }
+                                                }
+                                                else{
+                                                  cnNewExercise.exercise.sets[index].amount = null;
+                                                }
+                                              }
+                                              /// For Time
+                                              else{
+                                                List result = parseTextControllerAmountToTime(value);
+                                                cnNewExercise.controllers[index][1].text = result[1];
+                                                cnNewExercise.exercise.sets[index].amount = result[0];
+                                                setState(() {});
+                                              }
+                                            },
                                           ),
                                         ),
                                       ],
                                     ),
-                                    SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
-                                  ],
-                                )
-                              ],
-                            ),
+                                  );
+
+                                  return Slidable(
+                                      key: cnNewExercise.slidableKeys[index],
+                                      // key: UniqueKey(),
+                                      endActionPane: cnNewExercise.exercise.sets.length > 1?
+                                      ActionPane(
+                                        motion: const ScrollMotion(),
+                                        dismissible: DismissiblePane(
+                                            onDismissed: () {
+                                              dismissExercise(index);
+                                            }),
+                                        children: [
+                                          SlidableAction(
+                                            flex:10,
+                                            onPressed: (BuildContext context){
+                                              dismissExercise(index);
+                                            },
+                                            backgroundColor: const Color(0xFFA12D2C),
+                                            foregroundColor: Colors.white,
+                                            icon: Icons.delete,
+                                          ),
+                                        ],
+                                      ) : null,
+                                      child: child
+                                  );
+                                },
+                                proxyDecorator: (
+                                    Widget child, int index, Animation<double> animation) {
+                                  return AnimatedBuilder(
+                                    animation: animation,
+                                    builder: (BuildContext context, Widget? child) {
+                                      final double animValue = Curves.easeInOut.transform(animation.value);
+                                      final double scale = lerpDouble(1, 1.06, animValue)!;
+                                      return Transform.scale(
+                                        scale: scale,
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(8),
+                                          child: Material(
+                                              child: Container(
+                                                  padding: const EdgeInsets.only(left: 2),
+                                                  color: Colors.grey.withOpacity(0.1),
+                                                  child: child
+                                              )
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: child,
+                                  );
+                                },
+                                onReorder: (int oldIndex, int newIndex){
+                                  setState(() {
+                                    if (oldIndex < newIndex) {
+                                      newIndex -= 1;
+                                    }
+                                    final item = cnNewExercise.exercise.sets.removeAt(oldIndex);
+                                    cnNewExercise.exercise.sets.insert(newIndex, item);
+                                    final weightAndAmount = cnNewExercise.controllers.removeAt(oldIndex);
+                                    cnNewExercise.controllers.insert(newIndex, weightAndAmount);
+                                  });
+                                },
+                              ),
+                              Column(
+                                children: [
+                                  const SizedBox(height: 15,),
+
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: IconButton(
+                                            key: addSetKey,
+                                            color: Colors.amber[800],
+                                            style: ButtonStyle(
+                                                backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
+                                                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
+                                            ),
+                                            onPressed: () {
+                                              addSet();
+                                            },
+                                            icon: const Icon(
+                                              Icons.add,
+                                              size: 20,
+                                            )
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+10 : 60)
+                                ],
+                              )
+                            ],
                           ),
                         ),
                       ),
@@ -386,27 +378,14 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                         left: 0,
                         right: 0,
                         child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
                             alignment: Alignment.bottomLeft,
                             color: _color,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const SizedBox(height: 12,),
-                                // Center(child: panelTopBar),
-                                const SizedBox(height: 15,),
-                                SizedBox(
-                                    height: 30,
-                                    // child: Center(
-                                    //     child: Text(
-                                    //         AppLocalizations.of(context)!.exercise,
-                                    //         textScaler: TextScaler.linear(1.5)
-                                    //     )
-                                    // )
-                                ),
-                                const SizedBox(height: 10,),
-
+                                const SizedBox(height: 67,),
                                 getHeader(),
                               ],
                             )
@@ -416,14 +395,22 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
-                          Expanded(child: Text(
+                          Expanded(
+                              flex: 10,
+                              child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel))
+                          ),
+                          Expanded(
+                              flex: 14,
+                              child: Text(
                               AppLocalizations.of(context)!.exercise,
                               textScaler: TextScaler.linear(1.3),
                               textAlign: TextAlign.center,
                               // style: TextStyle(color: Colors.grey)
                           )),
-                          CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern")),
+                          Expanded(
+                              flex: 10,
+                              child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern"))
+                          ),
                         ],
                       )
                     ],
@@ -438,26 +425,9 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   void onCancel(){
-    cnNewExercise.closePanel(doClear: true);
-    _formKey.currentState?.reset();
+    cnNewExercise.closePanel(doClear: true, context: context);
+    cnNewExercise.formKey.currentState?.reset();
     vibrateCancel();
-  }
-
-  void onPanelSlide(value){
-
-    /// Clear panel when it's completely closed
-    if(value == 0){
-      /// add animationTime delay to prevent clearing while opening since opening
-      /// can trigger one call with value 0
-      // Future.delayed(Duration(milliseconds: cnNewExercise.animationTime), (){
-      Future.delayed(Duration(milliseconds: 100), (){
-        /// After delay we check again if the value is still null
-        if(cnNewExercise.panelController.panelPosition == 0){
-          _formKey.currentState?.reset();
-          cnNewExercise.clear();
-        }
-      });
-    }
   }
 
   void dismissExercise(int index){
@@ -466,15 +436,21 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       cnNewExercise.slidableKeys.removeAt(index);
       cnNewExercise.controllers.removeAt(index);
       cnNewExercise.ensureVisibleKeys.removeAt(index);
+      cnNewExercise.focusNodes.removeAt(index);
     });
   }
 
   void addSet(){
     setState(() {
-      cnNewExercise.exercise.addSet();
+      final previousSet = cnNewExercise.exercise.sets.last;
+      cnNewExercise.exercise.addSet(weight: previousSet.weight, amount: previousSet.amount);
       cnNewExercise.slidableKeys.add(UniqueKey());
-      cnNewExercise.controllers.add([TextEditingController(),TextEditingController()]);
+      cnNewExercise.controllers.add([
+        TextEditingController(text: cnNewExercise.controllers.last[0].text),
+        TextEditingController(text: cnNewExercise.controllers.last[1].text)
+      ]);
       cnNewExercise.ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
+      cnNewExercise.focusNodes.add([FocusNode(), FocusNode()]);
       final RenderObject? renderObject = addSetKey.currentContext?.findRenderObject();
       if (renderObject is RenderBox) {
         final Offset widgetPosition = renderObject.localToGlobal(Offset.zero);
@@ -492,7 +468,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   void closePanelAndSaveExercise(){
-    if (_formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
+    if (cnNewExercise.formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
       final copy = Exercise.copy(cnNewExercise.exercise);
       copy.removeEmptySets();
 
@@ -503,8 +479,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           cnNewExercise.onConfirm!(cnNewExercise.exercise);
         }
 
-        cnNewExercise.closePanel(doClear: true);
-        _formKey.currentState?.reset();
+        cnNewExercise.closePanel(doClear: true, context: context);
+        cnNewExercise.formKey.currentState?.reset();
       }
       else{
         setState(() {
@@ -560,14 +536,14 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                   // cnNewExercise.restController.clear();
                   cnNewExercise.refresh();
                   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                    FocusScope.of(context).unfocus();
+                    FocusManager.instance.primaryFocus?.unfocus();
                   });
                 },
                 onCancel: (){
                   cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
                   // cnNewExercise.restController.clear();
                   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                    FocusScope.of(context).unfocus();
+                    FocusManager.instance.primaryFocus?.unfocus();
                   });
                 },
                 child: TextField(
@@ -715,17 +691,17 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       children: [
         /// Exercise name
         Form(
-          key: _formKey,
+          key: cnNewExercise.formKey,
           child: TextFormField(
             focusNode: cnNewExercise.focusNodeTextFieldExerciseName,
             key: cnNewExercise.keyExerciseName,
             keyboardAppearance: Brightness.dark,
             maxLength: 40,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            onTap: (){
-              // if(MediaQuery.of(context).viewInsets.bottom <= 0){
-              //   wasShownBigChild = _controller.value < 0.1;
-              // }
+            textInputAction: TextInputAction.next,
+            onFieldSubmitted: (value){
+              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
+              onTapField(0, 0, 0, scrollDelay: 50);
             },
             validator: (value) {
               value = value?.trim();
@@ -761,6 +737,33 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       ],
     );
   }
+
+  Future onTapField(int index, double insetsBottom, int weightOrAmountIndex, {int scrollDelay = 500}) async{
+    cnNewExercise.controllers[index][weightOrAmountIndex].selection =  TextSelection(baseOffset: 0, extentOffset: cnNewExercise.controllers[index][weightOrAmountIndex].value.text.length);
+    if(insetsBottom == 0) {
+      await Future.delayed(Duration(milliseconds: scrollDelay));
+    }
+    Scrollable.ensureVisible(
+        cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        alignment: 0.38
+    );
+  }
+
+  // Future onTapAmount(int index, double insetsBottom) async {
+  //   cnNewExercise.controllers[index][1].selection = TextSelection(baseOffset: 0,
+  //       extentOffset: cnNewExercise.controllers[index][1].value.text.length);
+  //   if (insetsBottom == 0) {
+  //     await Future.delayed(const Duration(milliseconds: 300));
+  //   }
+  //   Scrollable.ensureVisible(
+  //       cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
+  //       duration: const Duration(milliseconds: 300),
+  //       curve: Curves.easeInOut,
+  //       alignment: 0.38
+  //   );
+  // }
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
@@ -768,6 +771,7 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   GlobalKey keyHeader = GlobalKey();
   GlobalKey keyExerciseName = GlobalKey();
+  final formKey = GlobalKey<FormState>();
   final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
   Exercise exercise = Exercise();
@@ -778,11 +782,12 @@ class CnNewExercisePanel extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
-  final int animationTime = 400;
+  final int animationTime = 500;
   late TickerProvider vsync;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+  late List<List<FocusNode>> focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
 
   CnNewExercisePanel(){
     clear();
@@ -797,6 +802,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     slidableKeys = exercise.generateKeyForEachSet();
     controllers = exercise.sets.map((set) => ([TextEditingController(text: "${set.weightAsTrimmedDouble}"), TextEditingController(text: "${exercise.categoryIsReps()? (set.amount) : parseTextControllerAmountToTime(set.amount)[1]}")])).toList();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+    focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
     restController = TextEditingController(text: ex.restInSeconds > 0? ex.restInSeconds.toString() : "");
     seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
@@ -814,6 +820,8 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void openPanel({required Workout workout, Exercise? exercise, Function? onConfirm}){
+    formKey.currentState?.reset();
+    clear();
     if(exercise != null){
       setExercise(exercise);
     }
@@ -823,15 +831,19 @@ class CnNewExercisePanel extends ChangeNotifier {
     panelController.animatePanelToPosition(
         1,
         duration: Duration(milliseconds: animationTime),
-        curve: Curves.easeOutCubic
+        curve: Curves.fastEaseInToSlowEaseOut
     );
   }
 
-  void closePanel({bool doClear = false}){
+  void closePanel({bool doClear = false, required BuildContext context}) async {
+    if(MediaQuery.of(context).viewInsets.bottom > 0){
+      FocusManager.instance.primaryFocus?.unfocus();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
     panelController.animatePanelToPosition(
         0,
         duration: Duration(milliseconds: animationTime-150),
-        curve: Curves.easeOutCubic
+        curve: Curves.decelerate
     ).then((value) => {
       if(doClear){
         clear()
@@ -840,16 +852,18 @@ class CnNewExercisePanel extends ChangeNotifier {
     });
   }
 
-  void clear(){
+  void clear({bool withRefresh = true}){
     exercise = Exercise();
     workout = Workout();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
     restController = TextEditingController();
     seatLevelController = TextEditingController();
-    // key = UniqueKey();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
-    refresh();
+    focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
+    if(withRefresh){
+      refresh();
+    }
   }
 
   void refresh(){

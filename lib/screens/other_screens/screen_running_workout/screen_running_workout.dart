@@ -664,8 +664,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           // controllerSelectorExerciseToUpdate.open();
           controllerSelectorExerciseToUpdate.animatePanelToPosition(
               1,
-              duration: Duration(milliseconds: 400),
-              curve: Curves.easeOutCubic
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.fastEaseInToSlowEaseOut
           );
         });
       });
@@ -811,8 +811,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                         FocusManager.instance.primaryFocus?.unfocus();
                         controllerSelectorExercisePerLink.animatePanelToPosition(
                             1,
-                            duration: Duration(milliseconds: 400),
-                            curve: Curves.easeOutCubic
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.fastEaseInToSlowEaseOut
                         );
                       });
                     } else{

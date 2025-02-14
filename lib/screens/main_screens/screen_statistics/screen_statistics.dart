@@ -589,13 +589,11 @@ class CnScreenStatistics extends ChangeNotifier {
             healthData.reversed.firstWhere((hdp) => hdp.dateFrom.isAfter(entry.key));
         double bodyWeightPercent = selectedExerciseTemplate?.bodyWeightPercent?? selectedExerciseLast.bodyWeightPercent;
         bodyWeight = datesBodyWeight.weight * bodyWeightPercent;
-        print("SELECT Weight Point ${datesBodyWeight.dateFrom} for date ${entry.key}");
       }
       for(List set in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
         if(onlyWorkingSets && set[2] == 1){
           continue;
         }
-        print(bodyWeight);
         final tempOneRepMax = calcEpley(weight: set[0], reps: set[1], bodyWeight: bodyWeight);
         if(tempOneRepMax > oneRepMax){
           oneRepMax = tempOneRepMax;
@@ -713,8 +711,8 @@ class CnScreenStatistics extends ChangeNotifier {
     HapticFeedback.selectionClick();
     panelControllerSettings.animatePanelToPosition(
         1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.decelerate
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastEaseInToSlowEaseOut
     );
   }
 

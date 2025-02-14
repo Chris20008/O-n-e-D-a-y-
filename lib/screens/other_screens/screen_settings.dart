@@ -75,7 +75,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
         onPopInvoked: (doPop){
           cnScreenStatistics.panelControllerSettings.animatePanelToPosition(
               0,
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 350),
               curve: Curves.decelerate
           );
         },
@@ -306,7 +306,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                               footer: GestureDetector(
                                 onTap: () async{
                                   HapticFeedback.selectionClick();
-                                  controllerExplainBackups.open();
+                                  controllerExplainBackups.animatePanelToPosition(
+                                      1,
+                                      duration: const Duration(milliseconds: 500),
+                                      curve: Curves.fastEaseInToSlowEaseOut
+                                  );
                                   // await showDialog(
                                   //     context: context,
                                   //     builder: (context){

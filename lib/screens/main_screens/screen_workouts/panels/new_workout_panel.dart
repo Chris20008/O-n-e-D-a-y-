@@ -62,6 +62,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   // final _color = const Color(0xff1c1001);
   late final _color = Theme.of(context).primaryColor;
   bool blockUi = false;
+  double heightSpacerExerciseRow = 8;
+  Offset lastPointerPosition = const Offset(0, 0);
 
   @override
   void initState() {
@@ -137,7 +139,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                   FocusScope.of(context).unfocus();
                   if(cnNewWorkout.panelController.isPanelClosed){
                     HapticFeedback.selectionClick();
-                    // cnNewWorkout.openPanelWithRefresh();
                     cnNewWorkout.openPanel();
                   }
                 },
@@ -148,66 +149,70 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       width: double.maxFinite,
                       child: Stack(
                         children: [
-                          SlidableAutoCloseBehavior(
-                            child: listView(
-                              controller: cnNewWorkout.scrollController,
-                              physics: const BouncingScrollPhysics(),
-                              padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
-                              shrinkWrap: true,
-                              children: [
-                                // SizedBox(height: cnNewWorkout.workout.isTemplate? 220 : 240),
-                                SizedBox(height: cnNewWorkout.workout.isTemplate? 140 : 190),
-                                /// Exercises and Links
-                                ReorderableListView(
-                                    // scrollController: cnNewWorkout.scrollController,
-                                    physics: const NeverScrollableScrollPhysics(),
-                                    padding: const EdgeInsets.all(0),
-                                    shrinkWrap: true,
-                                    proxyDecorator: (
-                                        Widget child, int index, Animation<double> animation) {
-                                      return AnimatedBuilder(
-                                        animation: animation,
-                                        builder: (BuildContext context, Widget? child) {
-                                          final double animValue = Curves.easeInOut.transform(animation.value);
-                                          final double scale = lerpDouble(1, 1.06, animValue)!;
-                                          return Transform.scale(
-                                            scale: scale,
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.circular(8),
-                                              child: Material(
-                                                child: Container(
-                                                    padding: const EdgeInsets.only(left: 2),
-                                                    color: Colors.grey.withOpacity(0.05),
-                                                    child: child
+                          Listener(
+                            onPointerDown: (details){
+                              lastPointerPosition = details.position;
+                            },
+                            child: SlidableAutoCloseBehavior(
+                              child: listView(
+                                controller: cnNewWorkout.scrollController,
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0),
+                                shrinkWrap: true,
+                                autoScroll: !blockUi,
+                                children: [
+                                  SizedBox(height: cnNewWorkout.workout.isTemplate? 140 : 190),
+                                  /// Exercises and Links
+                                  ReorderableListView(
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.all(0),
+                                      shrinkWrap: true,
+                                      proxyDecorator: (
+                                          Widget child, int index, Animation<double> animation) {
+                                        return AnimatedBuilder(
+                                          animation: animation,
+                                          builder: (BuildContext context, Widget? child) {
+                                            final double animValue = Curves.easeInOut.transform(animation.value);
+                                            final double scale = lerpDouble(1, 1.06, animValue)!;
+                                            return Transform.scale(
+                                              scale: scale,
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(8),
+                                                child: Material(
+                                                  child: Container(
+                                                      padding: const EdgeInsets.only(left: 2),
+                                                      color: Colors.grey.withOpacity(0.05),
+                                                      child: child
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                        child: child,
-                                      );
-                                    },
-                                    onReorder: (int oldIndex, int newIndex){
-                                      setState(() {
-                                        if (oldIndex < newIndex) {
-                                          newIndex -= 1;
-                                        }
-                                        final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
-                                        cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
-                                        cnNewWorkout.updateExercisesLinks();
-                                      });
-                                    },
-                                    children: [
-                                      for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
-                                        if(cnNewWorkout.exercisesAndLinks[index].isExercise)
-                                          getExerciseWithSlideActions(index)
-                                        else if(cnNewWorkout.exercisesAndLinks[index].isLink)
-                                          getLinkWithSlideActions(index),
-                                    ]
-                                ),
-                                if(!cnNewWorkout.isSickDays)
-                                  getAddExerciseButton()
-                              ],
+                                            );
+                                          },
+                                          child: child,
+                                        );
+                                      },
+                                      onReorder: (int oldIndex, int newIndex){
+                                        setState(() {
+                                          if (oldIndex < newIndex) {
+                                            newIndex -= 1;
+                                          }
+                                          final item = cnNewWorkout.exercisesAndLinks.removeAt(oldIndex);
+                                          cnNewWorkout.exercisesAndLinks.insert(newIndex, item);
+                                          cnNewWorkout.updateExercisesLinks();
+                                        });
+                                      },
+                                      children: [
+                                        for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
+                                          if(cnNewWorkout.exercisesAndLinks[index].isExercise)
+                                            getExerciseWithSlideActions(index)
+                                          else if(cnNewWorkout.exercisesAndLinks[index].isLink)
+                                            getLinkWithSlideActions(index),
+                                      ]
+                                  ),
+                                  if(!cnNewWorkout.isSickDays)
+                                    getAddExerciseButton()
+                                ],
+                              ),
                             ),
                           ),
                           getHeader(),
@@ -218,8 +223,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        CupertinoButton(onPressed: onCancel, child: const Text("Abbrechen")),
                         Expanded(
+                            flex: 10,
+                            child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel))
+                        ),
+                        Expanded(
+                          flex: 14,
                           child: FittedBox(
                             fit: BoxFit.scaleDown,
                             child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty()
@@ -235,16 +244,19 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                             ),
                           ),
                         ),
-                        CupertinoButton(
-                            onPressed: (){
-                              if(!hasChangedNames()){
-                                onConfirm();
-                              }
-                              else{
-                                openConfirmNameChangePopUp();
-                              }
-                            },
-                            child: const Text("Speichern")
+                        Expanded(
+                          flex: 10,
+                          child: CupertinoButton(
+                              onPressed: (){
+                                if(!hasChangedNames()){
+                                  onConfirm();
+                                }
+                                else{
+                                  openConfirmNameChangePopUp();
+                                }
+                              },
+                              child: const Text("Speichern")
+                          ),
                         ),
                       ],
                     )
@@ -427,7 +439,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                             /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
                             /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
                             /// Maybe due to speed of opening the panel
-                            cnNewWorkout.panelController.open();
+                            cnNewWorkout.openPanel();
                           });
                         }
                       },
@@ -727,7 +739,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
         ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          height: withSpacer? 8 : 0,
+          height: withSpacer? heightSpacerExerciseRow : 0,
         )
       ],
     );
@@ -785,16 +797,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                   padding: const EdgeInsets.all(0),
                   onPressed: (BuildContext context) async{
 
-                    // if(index == 0                                                         /// first item
-                    // ){
-                    //   Future.delayed(const Duration(milliseconds: 200), (){
-                    //     setState(() {
-                    //       changeBlockLinkState(index);
-                    //     });
-                    //   });
-                    //   return;
-                    // }
-
                     if(!cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink){
                       if(cnNewWorkout.exercisesAndLinks[index].exercise?.linkName == null   /// has no linkname
                           || cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink      /// link is blocked
@@ -815,10 +817,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                         return;
                       }
 
-                      final Offset widgetPosition = getWidgetPosition(cnNewWorkout.exercisesAndLinks[index].key);
-                      final Size widgetSize = getWidgetSize(cnNewWorkout.exercisesAndLinks[index].key);
-
-                      await moveTile(startY: widgetPosition.dy, endY: widgetPosition.dy + widgetSize.height * (newIndex - index));
+                      double distance = 0;
+                      for(int i = index; i < newIndex; i++){
+                        distance += getWidgetSize(cnNewWorkout.exercisesAndLinks[index].key).height;
+                      }
+                      await moveTile(startY: lastPointerPosition.dy, endY: lastPointerPosition.dy + distance);
 
                       setState(() {
                         changeBlockLinkState(newIndex);
@@ -827,30 +830,42 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
                     else{
                       final element = cnNewWorkout.exercisesAndLinks.lastWhereIndexedOrNull((previousIndex, element) => previousIndex < index && element.linkName != null);
-                      if(element != null){
-                        final newIndex = cnNewWorkout.exercisesAndLinks.indexOf(element);
-                        if(index - newIndex == 1){
-                          Future.delayed(const Duration(milliseconds: 200), (){
-                            setState(() {
-                              changeBlockLinkState(index);
-                            });
-                          });
-                          return;
-                        }
-                        else{
-                          final Offset widgetPosition = getWidgetPosition(cnNewWorkout.exercisesAndLinks[index].key);
-                          final Size widgetSize = getWidgetSize(cnNewWorkout.exercisesAndLinks[index].key);
-
-                          await moveTile(startY: widgetPosition.dy, endY: widgetPosition.dy - widgetSize.height * (index - (newIndex + 1)));
-
+                      if(element == null){
+                        Future.delayed(const Duration(milliseconds: 200), (){
                           setState(() {
-                            changeBlockLinkState(newIndex+1);
+                            changeBlockLinkState(index);
                           });
+                        });
+                        return;
+                      }
+
+                      final newIndex = cnNewWorkout.exercisesAndLinks.indexOf(element);
+                      if(index - newIndex == 1){
+                        Future.delayed(const Duration(milliseconds: 200), (){
+                          setState(() {
+                            changeBlockLinkState(index);
+                          });
+                        });
+                        return;
+                      }
+                      else{
+                        final Offset widgetPosition = getWidgetPosition(cnNewWorkout.exercisesAndLinks[index].key);
+
+                        double distance = 0;
+                        for(int i = newIndex+1; i < index; i++){
+                          final element = cnNewWorkout.exercisesAndLinks[index];
+                          distance += getWidgetSize(element.key).height;
+                          if(element.isExercise && element.exercise!.blockLink){
+                            distance += heightSpacerExerciseRow;
+                          }
                         }
+                        await moveTile(startY: widgetPosition.dy, endY: widgetPosition.dy - distance);
+
+                        setState(() {
+                          changeBlockLinkState(newIndex+1);
+                        });
                       }
                     }
-
-
                   },
                   backgroundColor: const Color(0xFF5F9561),
                   // backgroundColor: Colors.white.withOpacity(0.1),
@@ -866,16 +881,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                   foregroundColor: Colors.white,
                   icon: Icons.copy,
                 ),
-                // SlidableAction(
-                //   padding: const EdgeInsets.all(0),
-                //   onPressed: (BuildContext context){
-                //     openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
-                //   },
-                //   backgroundColor: const Color(0xFFAE7B32),
-                //   // backgroundColor: Colors.white.withOpacity(0.1),
-                //   foregroundColor: Colors.white,
-                //   icon: Icons.edit,
-                // ),
               ],
             ),
             child: AnimatedContainer(
@@ -942,7 +947,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
         ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          height: withSpacer? 8 : 0,
+          height: withSpacer? heightSpacerExerciseRow : 0,
         )
         // if(withSpacer)
         //   const SizedBox(height: 8,)
@@ -1108,13 +1113,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       /// If copied means a copy of the original exercise is made to create a completely new exercise
       exToEdit.name = "";
     } else {
-      /// Otherwise the user is editing the exercise so we keep track of the origina name in case
+      /// Otherwise the user is editing the exercise so we keep track of the original name in case
       /// the user changes the exercises name
       exToEdit.originalName = ex.name;
     }
 
     if(cnNewWorkout.panelController.isPanelOpen){
-      // cnNewExercisePanel.setExercise(exToEdit);
       cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, exercise: exToEdit, onConfirm: cnNewWorkout.confirmAddExercise);
       cnNewExercisePanel.refresh();
     }
@@ -1122,7 +1126,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   void onCancel(){
     vibrateCancel();
-    cnNewWorkout.closePanel(doClear: true);
+    cnNewWorkout.closePanel(doClear: true, context: context);
     cnNewExercisePanel.clear();
     _formKey.currentState?.reset();
     if(cnNewWorkout.panelController.panelPosition < 0.05){
@@ -1139,7 +1143,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       cnWorkouts.refreshAllWorkouts();
     }
     cnWorkoutHistory.refreshAllWorkouts();
-    cnNewWorkout.closePanel(doClear: true);
+    cnNewWorkout.closePanel(doClear: true, context: context);
     cnNewExercisePanel.clear();
     saveCurrentData(cnConfig);
   }
@@ -1148,7 +1152,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
     if(cnNewWorkout.isSickDays){
       vibrateConfirm();
       cnNewWorkout.sickDays.save();
-      cnNewWorkout.closePanel(doClear: true);
+      cnNewWorkout.closePanel(doClear: true, context: context);
       cnNewExercisePanel.clear();
       _formKey.currentState?.reset();
       saveCurrentData(cnConfig);
@@ -1197,7 +1201,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           }
         }
       }
-      cnNewWorkout.closePanel(doClear: true);
+      cnNewWorkout.closePanel(doClear: true, context: context);
       cnNewExercisePanel.clear();
       saveCurrentData(cnConfig);
     }
@@ -1221,10 +1225,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   }
 
   void changeSameNameExercisesBodyWeight(){
-    print("Should change same name workout");
     for(Exercise ex in cnNewWorkout.exerciseNewBodyWeight){
-      print(ex.name);
-      print(ex.bodyWeightPercent);
       List<ObExercise> sameNameExercises = objectbox.exerciseBox.query(ObExercise_.name.equals(ex.name)).build().find();
       for(ObExercise obEx in sameNameExercises){
         obEx.bodyWeightPercent = ex.bodyWeightPercent;
@@ -1248,7 +1249,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   void onPanelSlide(value){
     // cnWorkouts.animationControllerWorkoutsScreen.value = value*0.5;
     if(value == 0){
-      FocusScope.of(context).unfocus();
+      // FocusScope.of(context).unfocus();
       cnNewWorkout.refresh();
     }
     else if(value == 1){
@@ -1511,8 +1512,6 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
   void refreshExercise(Exercise ex){
     final index = exercisesAndLinks.indexWhere((element) => element.isExercise && (element.name == ex.originalName || element.name == ex.name));
-    print("INDEX");
-    print(index);
     if(index >= 0){
       exercisesAndLinks[index].exercise = ex;
     }
@@ -1544,7 +1543,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     orderExercises();
   }
 
-  void closePanel({bool doClear = false}){
+  void closePanel({bool doClear = false, required BuildContext context})async{
+    if(MediaQuery.of(context).viewInsets.bottom > 0){
+      FocusManager.instance.primaryFocus?.unfocus();
+      await Future.delayed(const Duration(milliseconds: 300));
+    }
     minPanelHeight = 0;
     refresh();
     Future.delayed(const Duration(milliseconds: 50), (){

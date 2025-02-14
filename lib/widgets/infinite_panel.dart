@@ -31,7 +31,11 @@ class _InfinitePanelState extends State<InfinitePanel> {
     if(attached && !didOpen){
       didOpen = true;
       Future.delayed(const Duration(milliseconds: 10), (){
-        controllerChild.open();
+        controllerChild.animatePanelToPosition(
+            1,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.fastEaseInToSlowEaseOut
+        );
       });
     }
 
