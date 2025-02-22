@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../screen_statistics.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExerciseSelector extends StatefulWidget {
   const ExerciseSelector({super.key});
@@ -37,7 +38,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       ),
     );
     if(initExercise != cnScreenStatistics.selectedExerciseName){
-      cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.calcMinMaxDates(context);
       cnScreenStatistics.refresh();
       cnScreenStatistics.cache();
     }
@@ -80,7 +81,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                       )
                   )
               );
-              if (exName == "Gewicht"){
+              if (exName == AppLocalizations.of(context)!.statisticsWeight){
                 child = Column(
                   children: [
                     const Spacer(),

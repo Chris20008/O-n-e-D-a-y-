@@ -61,7 +61,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   void didChangeAppLifecycleState(AppLifecycleState state)async{
     Future.delayed(const Duration(milliseconds: 500), ()async{
       await cnScreenStatistics.refreshHealthData();
-      cnScreenStatistics.calcMinMaxDates();
+      cnScreenStatistics.calcMinMaxDates(context);
       cnScreenStatistics.refresh();
     });
     setState(() {});
@@ -125,18 +125,56 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 CupertinoListTile(
                                   onTap: (){
                                     if(currentTutorialStep != 0){
-                                      cnConfig.setCurrentTutorialStep(0);
-                                      currentTutorialStep = 0;
-                                      tutorialIsRunning = false;
-                                      Fluttertoast.showToast(
-                                          msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.SNACKBAR,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                                          textColor: Colors.white,
-                                          fontSize: 16.0
+                                      showCupertinoModalPopup<void>(
+                                        context: context,
+                                        builder: (BuildContext context) => CupertinoActionSheet(
+                                          cancelButton: getActionSheetCancelButton(
+                                            context,
+                                            text: AppLocalizations.of(context)!.yes,
+                                            onPressed: (){
+                                              cnConfig.setCurrentTutorialStep(0);
+                                              currentTutorialStep = 0;
+                                              tutorialIsRunning = false;
+                                              Fluttertoast.showToast(
+                                                  msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                                  toastLength: Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.SNACKBAR,
+                                                  timeInSecForIosWeb: 1,
+                                                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0
+                                              );
+                                            }
+                                          ),
+                                          title: Column(
+                                            children: [
+                                              Text("${AppLocalizations.of(context)!.settingsTutorialReset}?", textScaler: const TextScaler.linear(1.2)),
+                                            ],
+                                          ),
+                                          // message: Text(message, textScaler: const TextScaler.linear(1.2)),
+                                          actions: <CupertinoActionSheetAction>[
+                                            CupertinoActionSheetAction(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              isDefaultAction: false,
+                                              child: Text(AppLocalizations.of(context)!.no),
+                                            ),
+                                          ],
+                                        ),
                                       );
+                                      // cnConfig.setCurrentTutorialStep(0);
+                                      // currentTutorialStep = 0;
+                                      // tutorialIsRunning = false;
+                                      // Fluttertoast.showToast(
+                                      //     msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                      //     toastLength: Toast.LENGTH_LONG,
+                                      //     gravity: ToastGravity.SNACKBAR,
+                                      //     timeInSecForIosWeb: 1,
+                                      //     backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                                      //     textColor: Colors.white,
+                                      //     fontSize: 16.0
+                                      // );
                                     }
                                   },
                                   leading: const Icon(
@@ -231,7 +269,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   title: Row(
                                     children: [
-                                      Text("Apple Health", style: const TextStyle(color: Colors.white)),
+                                      Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
                                       const SizedBox(width: 5),
                                       if(cnConfig.useHealthData)
                                         FutureBuilder(
@@ -279,11 +317,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                           }
                                           await cnScreenStatistics.refreshHealthData().then((value){
                                             if(value){
-                                              cnScreenStatistics.selectedExerciseName = "Gewicht";
+                                              cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
                                             }
                                           });
-                                          cnScreenStatistics.refreshData();
-                                          cnScreenStatistics.calcMinMaxDates();
+                                          cnScreenStatistics.refreshData(context);
+                                          cnScreenStatistics.calcMinMaxDates(context);
                                           cnScreenStatistics.refresh();
                                         });
                                       }
@@ -545,7 +583,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               tutorialIsRunning = false;
               currentTutorialStep = maxTutorialStep;
               cnConfig.setCurrentTutorialStep(currentTutorialStep);
-              cnScreenStatistics.refreshData();
+              cnScreenStatistics.refreshData(context);
               cnScreenStatistics.resetGraph();
               cnScreenStatistics.refresh();
               await cnConfig.config.save();

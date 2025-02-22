@@ -144,7 +144,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         context: context,
         child: getPopUpChild(context),
         onConfirm: (){
-          cnScreenStatistics.refreshData();
+          cnScreenStatistics.refreshData(context);
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
             cnScreenStatistics.refresh();
             cnScreenStatistics.cache();
@@ -254,7 +254,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OverflowSafeText("1RM Anzeigen", maxLines: 1),
+                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilter1RM, maxLines: 1),
                   ],
                 ),
               ),
@@ -319,16 +319,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OverflowSafeText("Krankheitstage anzeigen", maxLines: 1),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 15),
-                    //   child: OverflowSafeText(
-                    //     AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
-                    //     minFontSize: 9,
-                    //     maxLines: 4,
-                    //     style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    //   ),
-                    // ),
+                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilterSickDays, maxLines: 1),
                   ],
                 ),
               ),
@@ -362,7 +353,7 @@ class CnScreenStatistics extends ChangeNotifier {
   DateTime minDate = DateTime.now();
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   late List<String> allWorkoutNames = getAllWorkoutNames();
-  late List<String> allExerciseNames = getAllExerciseNames();
+  late List<String> allExerciseNames;
   List<ObSickDays> allSickDays = [];
 
   Exercise selectedExerciseFirst = Exercise();
@@ -402,13 +393,14 @@ class CnScreenStatistics extends ChangeNotifier {
     HealthDataType.WEIGHT
   ];
 
-  void init(Map? data) async{
+  void init(Map? data, BuildContext context) async{
     isInitialized = true;
     await health.configure();
     await refreshHealthData();
-    calcMinMaxDates();
+    allExerciseNames = getAllExerciseNames(context);
+    calcMinMaxDates(context);
     if(data != null){
-      initCachedData(data);
+      initCachedData(data, context);
     }
   }
 
@@ -418,7 +410,7 @@ class CnScreenStatistics extends ChangeNotifier {
       return false;
     }
     var now = DateTime.now();
-    DateTime startTime = DateTime(2000, 1, 1);
+    DateTime startTime = DateTime(2025, 1, 1);
     try{
       healthData = await health.getHealthDataFromTypes(
           startTime: startTime,
@@ -467,7 +459,7 @@ class CnScreenStatistics extends ChangeNotifier {
   //
   // }
   
-  List<String> getAllExerciseNames(){
+  List<String> getAllExerciseNames(BuildContext context){
     final builder = objectbox.exerciseBox.query();
     builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
     if(selectedWorkoutName != null && selectedWorkoutName != "All Workouts") {
@@ -477,7 +469,7 @@ class CnScreenStatistics extends ChangeNotifier {
     query.distinct = true;
     final res = query.find();
     res.sort();
-    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && (selectedExerciseName != "Gewicht" || !cnConfig.useHealthData)){
+    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && (selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight || !cnConfig.useHealthData)){
       selectedExerciseName = res.firstOrNull;
     }
     return res;
@@ -512,8 +504,8 @@ class CnScreenStatistics extends ChangeNotifier {
   //   return [minWeight, maxWeight];
   // }
 
-  Map<DateTime, double>? getMaxWeightsPerDate(){
-    if(selectedExerciseName == "Gewicht"){
+  Map<DateTime, double>? getMaxWeightsPerDate(BuildContext context){
+    if(selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       return { for (var e in healthData) e.dateFrom : e.weight };
     }
     final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
@@ -600,38 +592,19 @@ class CnScreenStatistics extends ChangeNotifier {
     return oneRepMaxPerDate;
   }
 
-  void calcMinMaxDates()async{
-    if (selectedExerciseName == "Gewicht"){
+  void calcMinMaxDates(BuildContext context)async{
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       minDate = healthData.last.dateFrom;
       maxDate = healthData.first.dateFrom;
       return;
     }
-    setExerciseTemplate();
-    setExerciseFirst();
-    setExerciseLast();
-    // ObWorkout? firstWorkout;
-    // final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
-    // if(selectedExerciseName != null) {
-    //   firstBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
-    // }
-    // firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
-    // if(firstWorkout != null){
-    //   minDate = firstWorkout.date;
-    // }
-    //
-    // ObWorkout? lastWorkout;
-    // final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
-    // if(selectedExerciseName != null) {
-    //   lastBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
-    // }
-    // lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
-    // if(lastWorkout != null){
-    //   maxDate = lastWorkout.date;
-    // }
+    setExerciseTemplate(context);
+    setExerciseFirst(context);
+    setExerciseLast(context);
   }
 
-  void setExerciseFirst(){
-    if (selectedExerciseName == "Gewicht"){
+  void setExerciseFirst(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       return;
     }
     ObWorkout? firstWorkout;
@@ -646,8 +619,8 @@ class CnScreenStatistics extends ChangeNotifier {
     }
   }
 
-  void setExerciseLast(){
-    if (selectedExerciseName == "Gewicht"){
+  void setExerciseLast(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       return;
     }
     ObWorkout? lastWorkout;
@@ -662,8 +635,8 @@ class CnScreenStatistics extends ChangeNotifier {
     }
   }
 
-  void setExerciseTemplate(){
-    if (selectedExerciseName == "Gewicht"){
+  void setExerciseTemplate(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       return;
     }
     ObWorkout? templateWorkout;
@@ -730,19 +703,19 @@ class CnScreenStatistics extends ChangeNotifier {
     showSickDays = showSickDaysLast;
   }
 
-  void refreshData(){
+  void refreshData(BuildContext context){
     allWorkoutNames = getAllWorkoutNames();
-    allExerciseNames = getAllExerciseNames();
+    allExerciseNames = getAllExerciseNames(context);
     if(cnConfig.useHealthData){
-      allExerciseNames.insert(0, "Gewicht");
+      allExerciseNames.insert(0, AppLocalizations.of(context)!.statisticsWeight);
     }
-    calcMinMaxDates();
+    calcMinMaxDates(context);
     allSickDays = objectbox.sickDaysBox.getAll();
   }
 
-  void initCachedData(Map data){
+  void initCachedData(Map data, BuildContext context){
     if(data.containsKey("selectedExerciseName")){
-      if((allExerciseNames.contains(data["selectedExerciseName"])) | (data["selectedExerciseName"] == "Gewicht" && cnConfig.useHealthData)){
+      if((allExerciseNames.contains(data["selectedExerciseName"])) | (data["selectedExerciseName"] == AppLocalizations.of(context)!.statisticsWeight && cnConfig.useHealthData)){
         selectedExerciseName = data["selectedExerciseName"];
       }
     }

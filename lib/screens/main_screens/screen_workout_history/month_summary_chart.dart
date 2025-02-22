@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class MonthSummaryChart extends StatefulWidget {
   final MonthSummary summary;
@@ -35,11 +36,11 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
   Widget build(BuildContext context) {
 
     widget.summary.workoutCounts["Restdays"] = 0;
-    int amountOfWorkouts = widget.summary.workoutCounts.values.sum - (widget.summary.workoutCounts["Krank"]?? 0);
+    int amountOfWorkouts = widget.summary.workoutCounts.values.sum - (widget.summary.workoutCounts["Sick"]?? 0);
     int amountOfDifferentWorkoutDays = widget.summary.differentDaysWithWorkoutOrSick["Workouts"]?.length?? 0;
-    int amountOfSickDays = widget.summary.differentDaysWithWorkoutOrSick["Krank"]?.length?? 0;
-    Set workoutDatesSickDaysCombined = Set.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
-    List workoutAndSickSameDate = List.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Krank"]??{});
+    int amountOfSickDays = widget.summary.differentDaysWithWorkoutOrSick["Sick"]?.length?? 0;
+    Set workoutDatesSickDaysCombined = Set.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Sick"]??{});
+    List workoutAndSickSameDate = List.from(widget.summary.differentDaysWithWorkoutOrSick["Workouts"]??{})..addAll(widget.summary.differentDaysWithWorkoutOrSick["Sick"]??{});
     int amountWorkoutAndSickSameDate = workoutAndSickSameDate.getDuplicates().length;
     restDays = widget.summary.date.numOfDaysOfMonth() - workoutDatesSickDaysCombined.length;
 
@@ -48,7 +49,7 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
     }
 
     if(amountOfSickDays > 0){
-      widget.summary.workoutCounts["Krank"] = amountOfSickDays;
+      widget.summary.workoutCounts["Sick"] = amountOfSickDays;
     }
     if(restDays > 0){
       widget.summary.workoutCounts["Restdays"] = restDays;
@@ -68,22 +69,22 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("${amountOfWorkouts.toString()} Workouts"),
+                  Text("${amountOfWorkouts.toString()} ${amountOfWorkouts == 1? "Workout" : "Workouts"}"),
                   if(amountOfDifferentWorkoutDays != amountOfWorkouts)
                     Text(
-                      "An ${amountOfDifferentWorkoutDays.toString()} Tagen",
+                      AppLocalizations.of(context)!.historyWoAtDays(amountOfDifferentWorkoutDays.toString()),
                       textScaler: const TextScaler.linear(0.75),
                       style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
                     ),
                   if(amountWorkoutAndSickSameDate > 0)
                     Text(
-                      "${amountWorkoutAndSickSameDate.toString()} als Krank",
+                      AppLocalizations.of(context)!.historyWoWhenSick(amountWorkoutAndSickSameDate.toString(), AppLocalizations.of(context)!.statisticsSick),
                       textScaler: const TextScaler.linear(0.75),
                       style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.w600),
                     ),
                   if(amountOfSickDays > 0)
-                    Text("${amountOfSickDays.toString()} Krank"),
-                  Text("${restDays} Restdays")
+                    Text("${amountOfSickDays.toString()} ${AppLocalizations.of(context)!.statisticsSick}"),
+                  Text("$restDays ${restDays > 1? AppLocalizations.of(context)!.historyRestdays : AppLocalizations.of(context)!.historyRestday}")
                 ],
               ),
             ),
@@ -161,7 +162,7 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
       return PieChartSectionData(
         color: colorsShades[i < colorsShades.length ?  i % colorsShades.length : (i+1) % colorsShades.length],
         value: (widget.summary.workoutCounts[names[i]]??0 / totalCount) * 360,
-        title: names[i],
+        title: getChartNames(i),
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,
@@ -171,5 +172,22 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
         ),
       );
     });
+  }
+
+  String getChartNames(int index){
+    switch (names[index]){
+      case "Sick" :{
+        return AppLocalizations.of(context)!.statisticsSick;
+      }
+      case "Restdays" :{
+        if(widget.summary.workoutCounts[names[index]]! > 1){
+          return AppLocalizations.of(context)!.historyRestdays;
+        }
+        return AppLocalizations.of(context)!.historyRestday;
+      }
+      default : {
+        return names[index];
+      }
+    }
   }
 }

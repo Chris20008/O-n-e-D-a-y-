@@ -8,12 +8,23 @@ class InitialAnimatedScreen extends StatefulWidget {
   final String animationControllerName;
   final Widget child;
   final bool backDropEnabled;
+  final BoxDecoration? decoration;
 
   const InitialAnimatedScreen({
     super.key,
     required this.animationControllerName,
     required this.child,
-    this.backDropEnabled = true
+    this.backDropEnabled = true,
+    this.decoration = const BoxDecoration(
+        gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [
+              Color(0xffc26a0e),
+              Color(0xbb110a02)
+            ]
+        )
+    )
   });
 
   @override
@@ -67,16 +78,7 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
           child: ClipRRect(
               borderRadius: BorderRadius.circular(borderRadius),
               child: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                        colors: [
-                          Color(0xffc26a0e),
-                          Color(0xbb110a02)
-                        ]
-                    )
-                ),
+                decoration: widget.decoration,
                 child: Stack(
                   children: [
                     child?? const SizedBox(),

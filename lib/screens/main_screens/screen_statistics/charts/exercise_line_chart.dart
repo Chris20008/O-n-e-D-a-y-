@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
@@ -77,8 +78,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   bool graphLocked = false;
   int countSteps = 0;
   double percent = 0.7;
-  int? startTimePointerDown;
-  int allowedMovementForGraphLock = 3;
+  int allowedMovementForGraphLock = 4;
+  Timer? lockGraphTimer;
 
   @override
   void initState() {
@@ -93,12 +94,12 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     List<FlSpot> tempSickDaysSpots = [];
 
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
-    if(t == null && cnScreenStatistics.selectedExerciseName != null && cnScreenStatistics.selectedExerciseName != "Gewicht"){
-      return const SizedBox(
+    if(t == null && cnScreenStatistics.selectedExerciseName != null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
+      return SizedBox(
         height: 200,
         child: Center(
           child: Text(
-            "The Category of this Exercise is currently not supported for statistics",
+            AppLocalizations.of(context)!.statisticsCurrentlyNotSupported,
             textAlign: TextAlign.center,
           ),
         ),
@@ -121,7 +122,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       cnScreenStatistics.currentVisibleDays = tempMaxX;
     }
 
-    maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
+    maxWeights = cnScreenStatistics.getMaxWeightsPerDate(context);
     avgWeights = cnScreenStatistics.getAvgMovedWeightPerSet();
     oneRepMaxPerDate = cnScreenStatistics.getOneRepMaxPerDate();
 
@@ -272,16 +273,22 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             return Listener(
               behavior: HitTestBehavior.translucent,
               onPointerDown: (PointerDownEvent details){
+                if(cnScreenStatistics.offsetMinX != 0 || cnScreenStatistics.offsetMaxX != 0){
+                  lockGraphTimer ??= Timer(const Duration(milliseconds: 250), (){
+                    graphLocked = true;
+                    HapticFeedback.selectionClick();
+                  });
+                }
+
                 animationTime = 0;
                 if(pointerAIdentifier == null){
-                  startTimePointerDown = DateTime.now().millisecondsSinceEpoch;
                   pointerAIdentifier = details.pointer;
                   pointerA = details.position;
                   pointerAStartPositionForGraphLock = details.position;
                   pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
                 }
                 else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier && !graphLocked){
-                  startTimePointerDown = null;
+                  lockGraphTimer?.cancel();
                   pointerBIdentifier = details.pointer;
                   pointerB = details.position;
                   lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
@@ -335,16 +342,10 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                   sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
                   final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
 
-                  if(pointerAStartPositionForGraphLock != null && (pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() < allowedMovementForGraphLock){
-                    if(startTimePointerDown != null && (DateTime.now().millisecondsSinceEpoch - startTimePointerDown! > 200)){
-                      graphLocked = true;
-                      HapticFeedback.selectionClick();
-                      return;
-                    }
-                  }
-                  else{
-                    pointerAStartPositionForGraphLock = null;
-                    startTimePointerDown = null;
+                  if((pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() > allowedMovementForGraphLock){
+                    lockGraphTimer?.cancel();
+                    lockGraphTimer = null;
+                    graphLocked = false;
                   }
 
                   double newOffsetMinX;
@@ -361,7 +362,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
               },
               onPointerUp: (PointerUpEvent details){
-                startTimePointerDown = null;
+                lockGraphTimer?.cancel();
+                lockGraphTimer = null;
                 graphLocked = false;
                 // if(details.pointer == pointerAIdentifier){
                   pointerA = null;
@@ -511,7 +513,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          // showOnTopOfTheChartBoxArea: true,
+          showOnTopOfTheChartBoxArea: true,
           fitInsideVertically: true,
           fitInsideHorizontally: true,
           getTooltipItems: (List<LineBarSpot> spots){
@@ -693,8 +695,14 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       data = oneRepMaxPerDate!;
     }
     else{
-      return "Krank";
+      return AppLocalizations.of(context)!.statisticsSick;
     }
-    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex].round()} kg";
+    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
   }
+}
+
+String formatNumber(double value) {
+  return value % 1 == 0
+      ? value.toInt().toString() // Ganze Zahl ohne Nachkommastellen
+      : value.toStringAsFixed(value * 10 % 1 == 0 ? 1 : 2); // Eine oder zwei Nachkommastellen
 }

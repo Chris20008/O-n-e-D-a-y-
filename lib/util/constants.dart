@@ -82,7 +82,7 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
               child: Text(exercise.categoryIsReps()
                   ? "${set.amount}"
                   : (set.amountAsTime?? "").toString(),
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: const TextStyle(fontWeight: FontWeight.w500),
               ),
             ),
           ),
@@ -301,12 +301,6 @@ List<dynamic> parseTextControllerAmountToTime(dynamic amount){
   String hours = timeAsString.substring(0, 1);
   String minutes = timeAsString.substring(1, 3);
   String seconds = timeAsString.substring(3, 5);
-  // if((int.tryParse(minutes)??60) > 59){
-  //   minutes = "59";
-  // }
-  // if((int.tryParse(seconds)??60) > 59){
-  //   seconds = "59";
-  // }
   if(timeAsString.substring(0, 1) == "0"){
     timeAsString = "$minutes:$seconds";
   }
@@ -650,7 +644,7 @@ double calcEpley({
   required int reps,
   double bodyWeight = 0
 }){
-  return (((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight).round() * 1.0;
+  return double.parse((((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight).toStringAsFixed(1));
 }
 
 String validateDoubleTextInput(String text){
@@ -696,15 +690,6 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
     ),
   );
 }
-
-// enum TimeInterval {
-//   // monthly ("Monthly"),
-//   // quarterly ("Quarterly"),
-//   yearly ("Yearly");
-//
-//   const TimeInterval(this.value);
-//   final String value;
-// }
 
 Widget OverflowSafeText(
     String name,
@@ -785,10 +770,12 @@ Widget buildCalendarDialogButton({
 }) {
   dateValues = List.from(dateValues.map((e) => e.toDate()));
   const colorAmber = Color(0xFFC16A03);
-  const colorAmberDark = Color(0xFF583305);
+  // const colorAmberDark = Color(0xFF583305);
+  const colorAmberDark = Color(0xFF6D4919);
   const arrowSize = 15.0;
   const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
   final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
+  String translatedSickText = AppLocalizations.of(context)!.statisticsSick;
   final config = CalendarDatePicker2WithActionButtonsConfig(
     // cancelButton: justShow? Container() : null,
     // okButton: justShow? Container() : null,
@@ -859,9 +846,15 @@ Widget buildCalendarDialogButton({
         }
       }
       if (exists) {
+        if(cnNewWorkout.allWorkoutDates[relevantDate] is List && cnNewWorkout.allWorkoutDates[relevantDate].contains("Sick")){
+          cnNewWorkout.allWorkoutDates[relevantDate] = (cnNewWorkout.allWorkoutDates[relevantDate] as List).map((e) => !e.contains("Sick")? e : translatedSickText).toList();
+          print(cnNewWorkout.allWorkoutDates[relevantDate]);
+        } else if(cnNewWorkout.allWorkoutDates[relevantDate] == "Sick"){
+          cnNewWorkout.allWorkoutDates[relevantDate] = translatedSickText;
+        }
         String dayText = cnNewWorkout.allWorkoutDates[relevantDate] is List
-            ? cnNewWorkout.allWorkoutDates[relevantDate].contains("Krank")
-              ?"Krank + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
+            ? cnNewWorkout.allWorkoutDates[relevantDate].contains(translatedSickText)
+              ?"$translatedSickText + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
               :"${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts"
             : cnNewWorkout.allWorkoutDates[relevantDate];
         dayWidget = Container(
@@ -895,7 +888,7 @@ Widget buildCalendarDialogButton({
                         style: TextStyle(
                             color: ((isSelected?? false) || (dateValues.contains(date.toDate())))
                                 ? Colors.white
-                                : dayText.contains("Krank")
+                                : dayText.contains(translatedSickText)
                                 ? colorAmberDark
                                 : colorAmber,
                           fontWeight: FontWeight.w600
@@ -985,12 +978,14 @@ Widget getCalendarChild({
 }
 
 Widget getExplainExerciseGroups(BuildContext context){
+  /// ToDo
   return Column(
     mainAxisSize: MainAxisSize.min,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       Text(
-        AppLocalizations.of(context)!.t3Group,
+        "empty",
+        // AppLocalizations.of(context)!.t3Group,
         style: const TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -999,8 +994,8 @@ Widget getExplainExerciseGroups(BuildContext context){
       ),
       Padding(
         padding: const EdgeInsets.only(top: 10.0),
-        child: Text(
-          AppLocalizations.of(context)!.t3GroupExplanation,
+        child: Text("empty",
+          // AppLocalizations.of(context)!.t3GroupExplanation,
           style: const TextStyle(color: Colors.white),
         ),
       ),
@@ -1080,10 +1075,7 @@ Widget getCloudOptionsColumn({
                   ),
                 ),
                 if(!cnConfig.connectWithCloud)
-                  SizedBox(width: 15),
-                /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
-                /// so calling it will lead to an crash
-                /// We have to make sure it is only called on Android!
+                  const SizedBox(width: 15),
                 if(cnConfig.connectWithCloud)
                   FutureBuilder(
                       future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
@@ -1198,7 +1190,8 @@ Widget getCloudOptionsColumn({
     );
 }
 
-Widget getActionSheetCancelButton (BuildContext context, {String? text}){
+Widget getActionSheetCancelButton (BuildContext context, {String? text, Function? onPressed}){
+  onPressed = onPressed?? (){};
   const Color kDialogColor = CupertinoDynamicColor.withBrightness(
     color: Color(0xCCF2F2F2),
     darkColor: Color(0xBF1E1E1E),
@@ -1212,6 +1205,7 @@ Widget getActionSheetCancelButton (BuildContext context, {String? text}){
         /// default behavior, turns the action's text to bold text.
         isDefaultAction: true,
         onPressed: () {
+          onPressed!();
           Navigator.pop(context);
         },
         child: Text(text?? AppLocalizations.of(context)!.cancel),
@@ -1287,20 +1281,19 @@ Widget getDialogCantChangeCategory(BuildContext context){
     maxWidth: 400,
     widthFactor: 0.6,
     maxHeight: 680,
-    child: Center(child: Text("You can't change the Category of an existing exercise\nPlease create an new exercise with another name", textAlign: TextAlign.center,)),
+    child: Center(child: Text(AppLocalizations.of(context)!.panelWoChangeExerciseCategory, textAlign: TextAlign.center,)),
   );
 }
 
 Widget getBackupDialogWelcomeScreen({required BuildContext context}){
   return Padding(
-    padding: EdgeInsets.only(right: 15),
+    padding: const EdgeInsets.only(right: 15),
     child: Column(
       children: [
 
         /// Save Backup Automatic
         CupertinoListTile(
           leading: const Icon(Icons.sync),
-          // title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
           title: OverflowSafeText(
               maxLines: 1,
               AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -1393,4 +1386,48 @@ Size getWidgetSize(GlobalKey key){
     }
   // });
   return size;
+}
+
+Widget getAddButton({Key? key, required BuildContext context, required double minusWidth, required Function() onPressed}){
+  return Row(
+    children: [
+      SizedBox(width: minusWidth),
+      Expanded(
+        child: IconButton(
+            key: key,
+          // splashRadius: 0,
+            alignment: Alignment.center,
+            color: Colors.amber[800],
+            style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Theme.of(context).cardColor),
+                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10)))
+            ),
+            onPressed: onPressed,
+            icon: const Icon(
+              Icons.add,
+              size: 20,
+            )
+        ),
+      ),
+      SizedBox(width: minusWidth)
+    ],
+  );
+}
+
+void blockUserInput(BuildContext context, {int duration = 1000}) {
+  OverlayEntry overlayEntry = OverlayEntry(
+    builder: (context) => Positioned.fill(
+      child: AbsorbPointer(
+        child: Container(
+          color: Colors.red.withOpacity(0.4),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context).insert(overlayEntry);
+
+  Future.delayed(Duration(milliseconds: duration), () {
+    overlayEntry.remove();
+  });
 }

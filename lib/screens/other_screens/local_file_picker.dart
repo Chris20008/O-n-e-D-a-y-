@@ -23,7 +23,6 @@ class LocalFilePicker extends StatefulWidget {
 }
 
 class _LocalFilePickerState extends State<LocalFilePicker> {
-  // late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context);
@@ -87,7 +86,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                                             tutorialIsRunning = false;
                                             currentTutorialStep = maxTutorialStep;
                                             cnConfig.setCurrentTutorialStep(currentTutorialStep);
-                                            cnScreenStatistics.refreshData();
+                                            cnScreenStatistics.refreshData(currentContext);
                                             cnScreenStatistics.resetGraph();
                                             cnScreenStatistics.refresh();
                                             await cnConfig.config.save();
@@ -215,7 +214,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
               if(widget.localFiles.isEmpty)
                 Center(
                   child: Text(
-                    "No local Backups"
+                      AppLocalizations.of(context)!.settingsNoLocalBackups
                   ),
                 ),
               const StandardPopUp(),

@@ -151,10 +151,8 @@
   "t2SetExerciseOptions": "Aqui você pode definir nome, tempo de descanso e altura do assento para cada exercício",
   "t2EnterExName": "Digite um nome para o seu primeiro exercício",
   "t3ExOptions": "Opções de exercício",
-  "t3SwipeLeft1": "Deslize para a esquerda",
-  "t3SwipeLeft2": "para copiar ou editar um exercício",
-  "t3SwipeRight1": "Deslize para a direita",
-  "t3SwipeRight2": "para excluir um exercício",
+  "t3SwipeLeft": "Nach links wischen, um eine Übung zu löschen",
+  "t3SwipeRight": "Nach rechts wischen, um die Gruppierung zu lösen/setzen oder ein Kopie zu erstellen",
   "t3LongPress": "Pressione longamente um exercício para movê-lo",
   "t3Group": "Grupos de exercícios",
   "t3GroupExplanation": "Você pode agrupar exercícios. Isso pode ser útil se você tiver exercícios alternados em um treino ou simplesmente quiser ter uma alternativa se o seu exercício principal não estiver disponível.\n\nGrupos podem ser movidos e excluídos assim como exercícios.\n\nExercícios abaixo de um grupo são automaticamente adicionados a esse grupo. Exercícios que não devem ser adicionados a nenhum grupo devem ser posicionados acima do primeiro grupo."

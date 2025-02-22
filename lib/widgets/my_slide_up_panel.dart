@@ -35,6 +35,9 @@ class MySlideUpPanel extends StatefulWidget {
         Widget? child,
         List<Widget>? children,
         required ScrollController controller,
+        Widget? Function(BuildContext context, int index)? itemBuilder,
+        Widget Function(BuildContext context, int index)? separatorBuilder,
+        int? itemCount
       })
       )? panelBuilder;
 
@@ -182,11 +185,52 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     bool autoScroll = true,
     Widget? child,
     List<Widget>? children,
+    Widget? Function(BuildContext context, int index)? itemBuilder,
+    Widget Function(BuildContext context, int index)? separatorBuilder,
     required ScrollController controller,
+    int? itemCount
   }){
-    assert((child != null) ^ (children != null), "Either child or children must be given. They can't be both null or not null at the same time");
+    assert((child != null) ^ (children != null) ^ (itemBuilder != null), "Either child or children or itemBuilder must be given. They can't all be null or not null at the same time");
+    assert(itemBuilder == null || itemCount != null, "itemCount must be provided if itemBuilder is provided");
+
     scrollController = controller;
     bounceAllowed = widget.bounce;
+
+    Widget getDynamicListView(){
+      if(child != null){
+        return SingleChildScrollView(
+          controller: controller,
+          physics: physics,
+          // shrinkWrap: shrinkWrap,
+          padding: padding,
+          child: child,
+        );
+      }
+      else if(children != null){
+        return ListView(
+          controller: controller,
+          physics: physics,
+          shrinkWrap: shrinkWrap,
+          padding: padding,
+          children: children,
+        );
+      }
+      else if(itemBuilder != null){
+        return ListView.separated(
+          controller: controller,
+            physics: physics,
+            shrinkWrap: shrinkWrap,
+            padding: padding,
+            itemBuilder: itemBuilder,
+            separatorBuilder: separatorBuilder?? (context, index){
+              return const SizedBox();
+            },
+            itemCount: itemCount?? 0
+        );
+      }
+      return const SizedBox();
+    }
+
     return Listener(
       onPointerDown: (details){
         isTouchingListView = controller.position.maxScrollExtent > 0;
@@ -268,27 +312,27 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
         delta = 0;
         longPressTimer?.cancel();
       },
-      child: children != null
-          ? ListView(
-              controller: controller,
-              physics: physics,
-              shrinkWrap: shrinkWrap,
-              padding: padding,
-              children: children,
-            )
-          : SingleChildScrollView(
-            controller: controller,
-            physics: physics,
-            // shrinkWrap: shrinkWrap,
-            padding: padding,
-            child: child,
-          ),
+      child: getDynamicListView()
+      // child: children != null
+      //     ? ListView(
+      //         controller: controller,
+      //         physics: physics,
+      //         shrinkWrap: shrinkWrap,
+      //         padding: padding,
+      //         children: children,
+      //       )
+      //     : SingleChildScrollView(
+      //       controller: controller,
+      //       physics: physics,
+      //       // shrinkWrap: shrinkWrap,
+      //       padding: padding,
+      //       child: child,
+      //     ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    // print("Build Whole My Slide Panel");
     Widget panel = LayoutBuilder(
         builder: (context, constraints){
           final maxHeight = constraints.maxHeight - (Platform.isAndroid? 50 : 70);
@@ -355,12 +399,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                     scrollController!.jumpTo(0);
                   }
                 }
-
-                // /// Necessary to prevent panel closing when user swipes horizontal for slidable gestures
-                // if(panelController.isPanelOpen && details.delta.dy < 0 && (scrollController!.offset).abs() < 1){
-                //   print("Jump two");
-                //   scrollController!.jumpTo(-details.delta.dy);
-                // }
               }
               else{
                 panelDragRunning = false;
@@ -386,7 +424,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                   panelController.animatePanelToPosition(0, duration: const Duration(milliseconds: 150)).then((value) => initialPanelPosition = 0);
                 }
                 else{
-                  print("ANIMATE TO 1");
                   panelController.animatePanelToPosition(1, duration: const Duration(milliseconds: 200)).then((value) => initialPanelPosition = 1);
                 }
               }

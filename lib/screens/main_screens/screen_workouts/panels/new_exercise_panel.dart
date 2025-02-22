@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'dart:io';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
+import 'package:fitness_app/main.dart';
+import 'package:fitness_app/widgets/keyboard_top_bar.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +33,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
   late TextStyle _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 8);
@@ -41,6 +44,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   bool isTouchingListView = false;
   int currentIndexFocus = 0;
   int currentIndexWeightOrAmount = 0;
+  bool useTutorialKey = true;
 
   GlobalKey addSetKey = GlobalKey();
 
@@ -50,14 +54,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cnNewExercise.initVsync(this);
-      cnNewExercise.scrollController.addListener(() {
-        // for (SlidableExerciseOrLink item in cnNewWorkout.exercisesAndLinks) {
-        //   SlidableController controller = item.slidableController;
-        //   if(controller.animation.value > 0 && !controller.closing){
-        //     controller.close();
-        //   }
-        // }
-      });
     });
   }
 
@@ -72,6 +68,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   Widget build(BuildContext context) {
     double insetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
+    print("EX NAME: " + cnNewExercise.exercise.name);
+
     return PopScope(
       canPop: false,
       onPopInvoked: (doPop){
@@ -84,15 +82,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           FocusManager.instance.primaryFocus?.unfocus();
         },
         child: MySlideUpPanel(
-          // onPanelSlide: onPanelSlide,
-          // isTouchingListView: isTouchingListView,
           key: cnNewExercise.key,
           controller: cnNewExercise.panelController,
           backdropOpacity: 0.25,
           color: _color,
           animationControllerName: "NewExercisePanel",
           descendantAnimationControllerName: "NewWorkoutPanel",
-          // scrollControllerInnerList: cnNewExercise.scrollController,
           panelBuilder: (context, listView) {
             return ClipRRect(
               borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
@@ -170,8 +165,21 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                                       child: TextField(
                                         focusNode: cnNewExercise.focusNodes[index][0],
                                         onSubmitted: (value){
-                                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
-                                          onTapField(index, insetsBottom, 1);
+                                          /// Handle if tutorial
+                                          if(tutorialIsRunning){
+                                            if(value.isNotEmpty){
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                            }
+                                            else{
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][0]);
+                                            }
+                                          }
+
+                                          /// Handle if not tutorial
+                                          else{
+                                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                            onTapField(index, insetsBottom, 1);
+                                          }
                                         },
                                         textInputAction: TextInputAction.next,
                                         keyboardAppearance: Brightness.dark,
@@ -220,17 +228,31 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                                       child: TextField(
                                         focusNode: cnNewExercise.focusNodes[index][1],
                                         onSubmitted: (value){
-                                          if (index < cnNewExercise.exercise.sets.length - 1) {
-                                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
-                                            onTapField(index+1, insetsBottom, 0);
-                                          } else {
-                                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
-                                            addSet();
-                                            WidgetsBinding.instance.addPostFrameCallback((_) {
+
+                                          /// Handle if tutorial
+                                          if(tutorialIsRunning){
+                                            if(value.isNotEmpty && cnNewExercise.controllers[index][0].text.isNotEmpty){
+                                              cnHomepage.tutorial?.next();
+                                              blockUserInput(context);
+                                            }
+                                            else{
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                            }
+                                          }
+
+                                          /// Handle if not tutorial
+                                          else{
+                                            if (index < cnNewExercise.exercise.sets.length - 1) {
                                               FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
+                                              onTapField(index+1, insetsBottom, 0);
+                                            } else {
+                                              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index][1]);
+                                              addSet();
+                                              WidgetsBinding.instance.addPostFrameCallback((_) {
+                                                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[index + 1][0]);
                                                 onTapField(index+1, insetsBottom, 0);
-                                            });
-                                            // FocusScope.of(context).unfocus();
+                                              });
+                                            }
                                           }
                                         },
                                         textInputAction: TextInputAction.next,
@@ -281,20 +303,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                               );
 
                               return Slidable(
-                                  key: cnNewExercise.slidableKeys[index],
-                                  // key: UniqueKey(),
+                                  key: tutorialIsRunning && index == 0 && useTutorialKey? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
                                   endActionPane: cnNewExercise.exercise.sets.length > 1?
                                   ActionPane(
+                                    extentRatio: 0.3,
                                     motion: const ScrollMotion(),
                                     dismissible: DismissiblePane(
                                         onDismissed: () {
-                                          dismissExercise(index);
+                                          dismissSet(index);
                                         }),
                                     children: [
                                       SlidableAction(
                                         flex:10,
                                         onPressed: (BuildContext context){
-                                          dismissExercise(index);
+                                          dismissSet(index);
                                         },
                                         backgroundColor: const Color(0xFFA12D2C),
                                         foregroundColor: Colors.white,
@@ -345,28 +367,13 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             children: [
                               const SizedBox(height: 15,),
 
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: IconButton(
-                                        key: addSetKey,
-                                        color: Colors.amber[800],
-                                        style: ButtonStyle(
-                                            backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-                                        ),
-                                        onPressed: () {
-                                          addSet();
-                                        },
-                                        icon: const Icon(
-                                          Icons.add,
-                                          size: 20,
-                                        )
-                                    ),
-                                  ),
-                                ],
+                              getAddButton(
+                                  context: context,
+                                  minusWidth: 20,
+                                  onPressed: addSet
                               ),
-                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+(Platform.isAndroid? 10: 50) : 60)
+
+                              SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom+(Platform.isAndroid? 50: 50) : 60)
                             ],
                           )
                         ],
@@ -413,96 +420,84 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             )
                         ),
                         Expanded(
+                            key: cnNewExercise.keySaveButton,
                             flex: 10,
-                            child: Align(alignment: Alignment.centerRight, child: CupertinoButton(onPressed: closePanelAndSaveExercise, child: const Text("Speichern", textAlign: TextAlign.right)))
+                            child: Align(
+                                alignment: Alignment.centerRight,
+                                child: CupertinoButton(
+                                    onPressed: () {
+                                      cnNewExercise.closePanelAndSaveExercise(context);
+                                    },
+                                    child: Text(AppLocalizations.of(context)!.save, textAlign: TextAlign.right)
+                                )
+                            )
                         ),
                       ],
                     ),
                   ),
 
-                  if(Platform.isIOS && MediaQuery.of(context).viewInsets.bottom > 100 && currentIndexFocus >= 0)
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: MediaQuery.of(context).viewInsets.bottom,
-                      child: GestureDetector(
-                        onTap: (){}, /// Empty Gesture Detector to override higher Gesture Detector
-                        child: Container(
-                          height: 40,
-                          color: const Color(0XFF333335),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              CupertinoButton(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, left: 23, right: 23),
-                                  onPressed: (){
-                                    int delay = 500;
+                  if(!tutorialIsRunning /*&& Platform.isIOS*/ && MediaQuery.of(context).viewInsets.bottom > 100 && currentIndexFocus >= 0)
+                    KeyboardTopBar(
+                      key: cnHomepage.keyKeyboardTopBar,
+                      onPressedLeft: (){
+                        int delay = 500;
 
-                                    if(currentIndexWeightOrAmount == 0){
-                                      currentIndexFocus -= 1;
-                                      currentIndexWeightOrAmount = 1;
-                                    } else{
-                                      currentIndexWeightOrAmount = 0;
-                                    }
-                                    if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
-                                      delay = 50;
-                                      insetsBottom = 0;
-                                    }
+                        if(currentIndexWeightOrAmount == 0){
+                          currentIndexFocus -= 1;
+                          currentIndexWeightOrAmount = 1;
+                        } else{
+                          currentIndexWeightOrAmount = 0;
+                        }
+                        if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                          delay = 50;
+                          insetsBottom = 0;
+                        }
 
-                                    if(currentIndexFocus < 0){
-                                      FocusManager.instance.primaryFocus?.unfocus();
-                                      return;
-                                    }
+                        if(currentIndexFocus < 0){
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          return;
+                        }
 
-                                    if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
-                                      onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
-                                    } else {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
-                                      addSet();
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
-                                        onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
-                                      });
-                                    }
-                                  },
-                                  child: const Text("Back", style: TextStyle(fontWeight: FontWeight.w500), textScaler: TextScaler.linear(1.1),)
-                              ),
-                              CupertinoButton(
-                                  padding: const EdgeInsets.only(top: 5, bottom: 5, right: 23, left: 23),
-                                  onPressed: (){
-                                    int delay = 500;
+                        if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                          onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                        } else {
+                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                          addSet();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                            onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                          });
+                        }
+                      },
+                      onPressedRight: (){
+                        int delay = 500;
 
-                                    if(currentIndexWeightOrAmount == 0){
-                                      currentIndexWeightOrAmount = 1;
-                                    } else{
-                                      currentIndexWeightOrAmount = 0;
-                                      currentIndexFocus += 1;
-                                    }
-                                    if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
-                                      delay = 50;
-                                      insetsBottom = 0;
-                                    }
+                        if(currentIndexWeightOrAmount == 0){
+                          currentIndexWeightOrAmount = 1;
+                        } else{
+                          currentIndexWeightOrAmount = 0;
+                          currentIndexFocus += 1;
+                        }
+                        if(currentIndexFocus == 0 && currentIndexWeightOrAmount == 0){
+                          delay = 50;
+                          insetsBottom = 0;
+                        }
 
-                                    if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
-                                      onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
-                                    } else {
-                                      FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
-                                      addSet();
-                                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
-                                        onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
-                                      });
-                                    }
+                        if (currentIndexFocus < cnNewExercise.exercise.sets.length) {
+                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][currentIndexWeightOrAmount]);
+                          onTapField(currentIndexFocus, insetsBottom, currentIndexWeightOrAmount, scrollDelay: delay);
+                        }
+                        else{
+                          FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus-1][1]);
+                          addSet();
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[currentIndexFocus][0]);
+                            onTapField(currentIndexFocus, insetsBottom, 0, scrollDelay: delay);
+                          });
+                        }
 
-                                  },
-                                  child: const Text("Next", style: TextStyle(fontWeight: FontWeight.w500), textScaler: TextScaler.linear(1.1),)
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
+                      },
                     )
                 ],
               ),
@@ -519,7 +514,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     vibrateCancel();
   }
 
-  void dismissExercise(int index){
+  void dismissSet(int index){
+    useTutorialKey = false;
     setState(() {
       cnNewExercise.exercise.sets.removeAt(index);
       cnNewExercise.slidableKeys.removeAt(index);
@@ -556,36 +552,36 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     });
   }
 
-  void closePanelAndSaveExercise(){
-    if (cnNewExercise.formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
-      final copy = Exercise.copy(cnNewExercise.exercise);
-      copy.removeEmptySets();
-
-      if(copy.sets.isNotEmpty){
-        vibrateConfirm();
-        cnNewExercise.exercise.removeEmptySets();
-        if(cnNewExercise.onConfirm != null){
-          cnNewExercise.onConfirm!(cnNewExercise.exercise);
-        }
-
-        cnNewExercise.closePanel(doClear: true, context: context);
-        cnNewExercise.formKey.currentState?.reset();
-      }
-      else{
-        setState(() {
-          Fluttertoast.showToast(
-              msg: "Add at least one Set",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.SNACKBAR,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-              textColor: Colors.white,
-              fontSize: 16.0
-          );
-        });
-      }
-    }
-  }
+  // void closePanelAndSaveExercise(){
+  //   if (cnNewExercise.formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
+  //     final copy = Exercise.copy(cnNewExercise.exercise);
+  //     copy.removeEmptySets();
+  //
+  //     if(copy.sets.isNotEmpty){
+  //       vibrateConfirm();
+  //       cnNewExercise.exercise.removeEmptySets();
+  //       if(cnNewExercise.onConfirm != null){
+  //         cnNewExercise.onConfirm!(cnNewExercise.exercise);
+  //       }
+  //
+  //       cnNewExercise.closePanel(doClear: true, context: context);
+  //       cnNewExercise.formKey.currentState?.reset();
+  //     }
+  //     else{
+  //       setState(() {
+  //         Fluttertoast.showToast(
+  //             msg: "Add at least one Set",
+  //             toastLength: Toast.LENGTH_SHORT,
+  //             gravity: ToastGravity.SNACKBAR,
+  //             timeInSecForIosWeb: 1,
+  //             backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+  //             textColor: Colors.white,
+  //             fontSize: 16.0
+  //         );
+  //       });
+  //     }
+  //   }
+  // }
 
   Widget getRestInSecondsSelector() {
     return getSelectRestInSeconds(
@@ -616,13 +612,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               cnNewExercise.refresh();
             }
             else{
-              // cnNewExercise.restController.clear();
               cnStandardPopUp.open(
                 context: context,
                 onConfirm: (){
                   cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
                   vibrateCancel();
-                  // cnNewExercise.restController.clear();
                   cnNewExercise.refresh();
                   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
                     FocusManager.instance.primaryFocus?.unfocus();
@@ -630,7 +624,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                 },
                 onCancel: (){
                   cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
-                  // cnNewExercise.restController.clear();
                   Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
                     FocusManager.instance.primaryFocus?.unfocus();
                   });
@@ -793,13 +786,20 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               currentIndexFocus = -1;
             },
             onFieldSubmitted: (value){
-              FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
-              onTapField(0, 0, 0, scrollDelay: 50);
-              // Future.delayed(const Duration(milliseconds: 16), (){
-              //   setState(() {});
-              // });
+              if(tutorialIsRunning){
+                if(value.isNotEmpty){
+                  cnHomepage.tutorial?.next();
+                  blockUserInput(context);
+                  FocusManager.instance.primaryFocus?.unfocus();
+                }
+              }
+              else{
+                FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
+                onTapField(0, 0, 0, scrollDelay: 50);
+              }
             },
             validator: (value) {
+              print("Run Validator");
               value = value?.trim();
               if (value == null || value.isEmpty) {
                 return AppLocalizations.of(context)!.panelExEnterName;
@@ -823,8 +823,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
             ),
             onChanged: (value){
+              print("On Changed");
               value = value.trim();
               cnNewExercise.exercise.name = value;
+
+              print("EX NAME: " + cnNewExercise.exercise.name);
             },
           ),
         ),
@@ -841,27 +844,26 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     if(insetsBottom == 0) {
       await Future.delayed(Duration(milliseconds: scrollDelay));
     }
-    Scrollable.ensureVisible(
-        cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        alignment: 0.38
-    );
-  }
 
-  // Future onTapAmount(int index, double insetsBottom) async {
-  //   cnNewExercise.controllers[index][1].selection = TextSelection(baseOffset: 0,
-  //       extentOffset: cnNewExercise.controllers[index][1].value.text.length);
-  //   if (insetsBottom == 0) {
-  //     await Future.delayed(const Duration(milliseconds: 300));
-  //   }
-  //   Scrollable.ensureVisible(
-  //       cnNewExercise.ensureVisibleKeys[index][1].currentContext!,
-  //       duration: const Duration(milliseconds: 300),
-  //       curve: Curves.easeInOut,
-  //       alignment: 0.38
-  //   );
-  // }
+    final position = getWidgetPosition(cnNewExercise.ensureVisibleKeys[index][0]);
+    final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
+
+    if(positionKeyboard.dy == 0){
+      return;
+    }
+
+    if(position.dy + 80 > positionKeyboard.dy){
+      Future.delayed(const Duration(milliseconds: 10), (){
+        Scrollable.ensureVisible(
+            cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: 0.42
+        );
+      });
+    }
+
+  }
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
@@ -869,6 +871,9 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   GlobalKey keyHeader = GlobalKey();
   GlobalKey keyExerciseName = GlobalKey();
+  GlobalKey keySetRow = GlobalKey();
+  GlobalKey keySaveButton = GlobalKey();
+
   final formKey = GlobalKey<FormState>();
   final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
@@ -917,7 +922,43 @@ class CnNewExercisePanel extends ChangeNotifier {
     }
   }
 
-  void openPanel({required Workout workout, Exercise? exercise, Function? onConfirm}){
+  void closePanelAndSaveExercise(BuildContext context) async{
+    print("In Save with name: " +  exercise.name);
+    if (formKey.currentState!.validate() && exercise.name.isNotEmpty) {
+      final copy = Exercise.copy(exercise);
+      copy.removeEmptySets();
+
+      if(copy.sets.isNotEmpty){
+        // vibrateConfirm();
+        // exercise.removeEmptySets();
+        // if(onConfirm != null){
+        //   print("In Save with name: " +  exercise.name);
+        //   onConfirm!(exercise);
+        // }
+
+        await closePanel(doClear: true, context: context);
+        exercise.removeEmptySets();
+        if(onConfirm != null){
+          print("In Save with name: " +  exercise.name);
+          onConfirm!(exercise);
+        }
+        // formKey.currentState?.reset();
+      }
+      else{
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.panelWoAddAtLeastOneSet,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.SNACKBAR,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    }
+  }
+
+  Future openPanel({required Workout workout, Exercise? exercise, Function? onConfirm})async{
     formKey.currentState?.reset();
     clear();
     if(exercise != null){
@@ -926,33 +967,31 @@ class CnNewExercisePanel extends ChangeNotifier {
     this.workout = workout;
     this.onConfirm = onConfirm;
     HapticFeedback.selectionClick();
-    panelController.animatePanelToPosition(
+    await panelController.animatePanelToPosition(
         1,
         duration: Duration(milliseconds: animationTime),
         curve: Curves.fastEaseInToSlowEaseOut
     );
+    return;
   }
 
-  void closePanel({bool doClear = false, required BuildContext context}) async {
+  Future closePanel({bool doClear = false, required BuildContext context}) async {
     if(MediaQuery.of(context).viewInsets.bottom > 0){
       FocusManager.instance.primaryFocus?.unfocus();
       await Future.delayed(const Duration(milliseconds: 300));
     }
-    panelController.animatePanelToPosition(
+    await panelController.animatePanelToPosition(
         0,
         duration: Duration(milliseconds: animationTime-150),
         curve: Curves.decelerate
-    ).then((value) => {
-      if(doClear){
-        clear()
-      },
-      // animationController.reset()
-    });
+    );
+    return;
   }
 
   void clear({bool withRefresh = true}){
     exercise = Exercise();
     workout = Workout();
+    formKey.currentState?.reset();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
     restController = TextEditingController();

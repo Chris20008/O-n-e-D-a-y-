@@ -18,7 +18,7 @@ import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
-import 'package:fitness_app/widgets/tutorials/tutorial_add_workout.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_create_workout_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +30,8 @@ import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
+
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
@@ -73,7 +75,6 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // setIntlLanguage(countryCode: _language.countryCode);
     setIntlLanguage();
   }
 
@@ -176,8 +177,8 @@ class _MyHomePageState extends State<MyHomePage>{
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
+      final res = await findSystemLocale();
       if(context.mounted){
-        final res = await findSystemLocale();
         MyApp.of(context)?.setLocale(languageCode: res);
       }
     }
@@ -187,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage>{
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
-    cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
+    cnScreenStatistics.init(cnConfig.config.cnScreenStatistics, context);
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
 
@@ -290,12 +291,16 @@ class _MyHomePageState extends State<MyHomePage>{
       );
     }
 
-    if(cnConfig.currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
+    if(cnConfig.currentTutorialStep == 0
+        && showWelcomeScreen == false
+        && closeWelcomeScreen == true
+        && !tutorialIsRunning
+        && cnBottomMenu.index == 1
+    ){
       tutorialIsRunning = true;
-      initTutorialAddWorkout(context);
-      showTutorialAddWorkout(context);
+      initTutorialCreateWorkoutTemplate(context);
+      cnHomepage.tutorial = showTutorialCreateWorkoutTemplate(context);
     }
-    // print("is running $tutorialIsRunning");
 
     return Scaffold(
       extendBody: true,
@@ -328,48 +333,10 @@ class _MyHomePageState extends State<MyHomePage>{
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
-                if(cnBottomMenu.index != 2)
+
+                if(cnBottomMenu.index != 2 && !showWelcomeScreen)
                   Stack(
                     children: [
-                      /// Animated Builder to Reduce Size of left and middle screen when workout panel is opened
-                      // AnimatedBuilder(
-                      //   animation: _animationControllerWorkoutsScreen,
-                      //   builder: (context, child) {
-                      //     double scale = 1.0 - (_animationControllerWorkoutsScreen.value * (Platform.isAndroid? 0.15 : 0.2));
-                      //     double borderRadius = 26 - (scale*10-9)*20;
-                      //     borderRadius = borderRadius > 25 ? 25 : borderRadius;
-                      //     return Transform.scale(
-                      //       scale: scale,
-                      //       child: ClipRRect(
-                      //         borderRadius: BorderRadius.circular(borderRadius),
-                      //           child: Container(
-                      //             decoration: const BoxDecoration(
-                      //                   gradient: LinearGradient(
-                      //                       begin: Alignment.topRight,
-                      //                       end: Alignment.bottomLeft,
-                      //                       colors: [
-                      //                         Color(0xffc26a0e),
-                      //                         Color(0xbb110a02)
-                      //                       ]
-                      //                   )
-                      //               ),
-                      //             child: Container(
-                      //                 color: Colors.black.withOpacity((_animationControllerWorkoutsScreen.value * 1.1).clamp(0, 1)),
-                      //                 child: child
-                      //             ),
-                      //           )
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: AnimatedCrossFade(
-                      //       firstChild: const ScreenWorkoutHistory(),
-                      //       secondChild: const ScreenWorkout(),
-                      //       crossFadeState: cnBottomMenu.index == 0?
-                      //       CrossFadeState.showFirst:
-                      //       CrossFadeState.showSecond,
-                      //       duration: const Duration(milliseconds: 100)
-                      //   ),
-                      // ),
                       InitialAnimatedScreen(
                           animationControllerName: "ScreenWorkouts",
                           child: AnimatedCrossFade(
@@ -400,13 +367,12 @@ class _MyHomePageState extends State<MyHomePage>{
                       const NewExercisePanel(),
                     ],
                   )
-                else
+
+                else if(!showWelcomeScreen)
                   const ScreenStatistics(),
-                // const Align(
-                //     alignment: Alignment.bottomCenter,
-                //     child: BottomMenu()
-                // ),
+
                 const StandardPopUp(),
+
                 if(showWelcomeScreen)
                   AnimatedCrossFade(
                     duration: const Duration(milliseconds: 500),
@@ -495,9 +461,13 @@ class _MyHomePageState extends State<MyHomePage>{
                 //   child: ElevatedButton(
                 //     child: Text("Test"),
                 //     onPressed: ()async{
-                //       // print("Presses Center button");
-                //       // tryHealthData();
-                //       // print("RESULT res: $res");
+                //       Overlay.of(context).insert(
+                //           OverlayEntry(
+                //               builder: (context) => Positioned.fill(
+                //                 child: KeyboardTopBar(onPressedLeft: (){}, onPressedRight: (){})
+                //               )
+                //           )
+                //       );
                 //     },
                 //   ),
                 // )
@@ -569,8 +539,8 @@ class _MyHomePageState extends State<MyHomePage>{
       setState(() {
         cnBottomMenu.showBottomMenuAnimated();
         if(doShowTutorial && currentTutorialStep == 0) {
-          initTutorialAddWorkout(context);
-          showTutorialAddWorkout(context);
+          initTutorialCreateWorkoutTemplate(context);
+          cnHomepage.tutorial = showTutorialCreateWorkoutTemplate(context);
         } else if(!doShowTutorial){
           currentTutorialStep = maxTutorialStep;
           cnConfig.setCurrentTutorialStep(currentTutorialStep);
@@ -622,6 +592,8 @@ class CnHomepage extends ChangeNotifier {
   double? percent;
   String msg = "";
   Map<String, AnimationController> animationControllers = {};
+  TutorialCoachMark? tutorial;
+  GlobalKey keyKeyboardTopBar = GlobalKey();
 
   updateSyncStatus(double percent){
     this.percent = percent;

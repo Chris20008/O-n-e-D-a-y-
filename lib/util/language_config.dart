@@ -6,11 +6,11 @@ List<Locale> supportedLocales = const [
   Locale('en'),
   Locale('de'),
   Locale('es'),
-  Locale('fr'),
-  Locale('it'),
-  Locale('nl'),
-  Locale('pl'),
-  Locale('pt'),
+  // Locale('fr'),
+  // Locale('it'),
+  // Locale('nl'),
+  // Locale('pl'),
+  // Locale('pt'),
 ];
 
 class Language{

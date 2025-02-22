@@ -32,7 +32,6 @@ class SpotifyBar extends StatefulWidget {
 }
 
 class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
-// class _SpotifyBarState extends State<SpotifyBar>{
   late CnSpotifyBar cnSpotifyBar = cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundColor cnBackgroundColor = Provider.of<CnBackgroundColor>(context, listen: false);
@@ -46,7 +45,6 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
     "portrait": 0,
     "landscape": 0
   };
-  // late bool isFirstScreen = ModalRoute.of(context)?.settings.name == "/";
 
   @override
   void initState() {
@@ -450,28 +448,22 @@ class CnSpotifyBar extends ChangeNotifier {
   bool isRebuilding = false;
   bool tryStayConnected = false;
   String accessToken = "";
-  // bool imageGotUpdated = false;
   Image? lastImage;
   List<Color?> currentColorPair = [];
-  // int waitCounter = 0;
   double height = 60;
   double preservedSpaceOpenSpotify = 0;
   double width = 0;
   double heightOfButton = 54;
   late CnAnimatedColumn cnAnimatedColumn;
-  // late CnRunningWorkout cnRunningWorkout;
   Key progressIndicatorKey = UniqueKey();
   Key futureKey = UniqueKey();
   bool justClosed = false;
-  // bool isFirstScreen = true;
   bool isHandlingControlAction = false;
   String currentTrackName = "";
-  // bool isVisible = true;
 
   late StreamSubscription<PlayerState> _subscription;
   late StreamSubscription<ConnectionStatus> _subscriptionConnectionStatus;
   PlayerState? data;
-  // late PlayerState _currentPlayerState;
 
   CnSpotifyBar(BuildContext context){
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
@@ -480,7 +472,6 @@ class CnSpotifyBar extends ChangeNotifier {
   void _subscribeToPlayerState() {
     _subscription = SpotifySdk.subscribePlayerState().listen((playerState) {
       data = playerState;
-      // SpotifySdk.getPlayerState().then((value) => value.track.uri);
       if(data?.isPaused ?? false){
         if(!tryStayConnected){
           tryStayConnected = true;
@@ -498,13 +489,6 @@ class CnSpotifyBar extends ChangeNotifier {
       }
     });
   }
-
-  // PlayerState? get currentPlayerState => _currentPlayerState;
-
-  // void setVisibility(bool isVisible){
-  //   this.isVisible = isVisible;
-  //   refresh();
-  // }
 
   @override
   void dispose() {
@@ -527,7 +511,6 @@ class CnSpotifyBar extends ChangeNotifier {
           dimension: ImageDimension.xSmall,
         ),
         builder: (BuildContext context, AsyncSnapshot<Uint8List?> snapshot) {
-          // print("GET IMAGE");
           if (snapshot.hasData) {
             currentTrackName = data?.track?.name?? "";
             lastImage = Image.memory(
@@ -539,9 +522,6 @@ class CnSpotifyBar extends ChangeNotifier {
             );
             setMainColor(lastImage!.image, cn);
           }
-          // else if(snapshot.data == null){
-          //   lastImage = null;
-          // }
           return ClipRRect(
             /// Due to spotify guidelines it is permitted to change the shape of cover art
             /// https://developer.spotify.com/documentation/design#using-our-content
@@ -634,17 +614,6 @@ class CnSpotifyBar extends ChangeNotifier {
             fontSize: 16.0
         );
       }
-      // else{
-      //   Fluttertoast.showToast(
-      //       msg: e.toString(),
-      //       toastLength: Toast.LENGTH_LONG,
-      //       gravity: ToastGravity.CENTER,
-      //       timeInSecForIosWeb: 1,
-      //       backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-      //       textColor: Colors.white,
-      //       fontSize: 16.0
-      //   );
-      // }
     }
     isTryingToConnect = false;
     Future.delayed(Duration(milliseconds: animationTimeSpotifyBar), (){
@@ -692,15 +661,7 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
     try {
       await SpotifySdk.pause().timeout(const Duration(seconds: 1), onTimeout: () => throw TimeoutException("Timeout, do disconnect")).then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
       });
-      // if(!tryStayConnected){
-      //   tryStayConnected = true;
-      //   keepConnectedWhenPaused();
-      // }
-      // await SpotifySdk.pause();
     } catch (_) {}
     isHandlingControlAction = false;
   }
@@ -711,22 +672,11 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
     try {
       await SpotifySdk.resume().timeout(const Duration(seconds: 1), onTimeout: () => throw new TimeoutException("Timeout, do disconnect")).then((value) => {
-        // Future.delayed(const Duration(milliseconds: 150), (){
-        //   refresh();
-        // })
+
       });
-      // await SpotifySdk.resume();
     } catch (_) {}
     isHandlingControlAction = false;
   }
-
-  // Future<void> reconnectAfterConnectionLoss() async {
-  //   accessToken = "";
-  //   isTryingToConnect = false;
-  //   isConnected = false;
-  //   justClosed = false;
-  //   await connectToSpotify();
-  // }
 
   Future<void> seekToRelative(int milliseconds) async {
     if(Platform.isAndroid){

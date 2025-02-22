@@ -42,15 +42,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // color: Theme.of(context).primaryColor,
-      child: Stack(
-        children: [
-          InitialAnimatedScreen(
-            animationControllerName: "ScreenWelcome",
-            child: Container(
-              color: Theme.of(context).primaryColor,
-              child: Stack(
+    return Stack(
+      children: [
+        InitialAnimatedScreen(
+          decoration: null,
+          animationControllerName: "ScreenWelcome",
+          child: Container(
+            color: Theme.of(context).primaryColor,
+            child: Stack(
                 children: [
                   animatedScreen(0, screenOne()),
                   animatedScreen(1, screenTwo()),
@@ -62,37 +61,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     backButton(),
                   imprintButton(),
                 ]
-              ),
             ),
           ),
-          MySlideUpPanel(
-            controller: controllerExplainBackups,
-            animationControllerName: "ExplainBackups",
-            descendantAnimationControllerName: "ScreenWelcome",
-            // backdropEnabled: false,
-            // backdropColor: Colors.blue,
-            // backdropOpacity: 1,
-            panelBuilder: (context, listView){
-              return Column(
-                children: [
-                  const SizedBox(height: 10,),
-                  panelTopBar,
-                  const SizedBox(height: 10,),
-                  Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      controller: ScrollController(),
-                      children: [
-                        getBackupDialogWelcomeScreen(context: context)
-                      ],
-                    ),
+        ),
+        MySlideUpPanel(
+          controller: controllerExplainBackups,
+          animationControllerName: "ExplainBackups",
+          descendantAnimationControllerName: "ScreenWelcome",
+          // backdropEnabled: false,
+          // backdropColor: Colors.blue,
+          // backdropOpacity: 1,
+          panelBuilder: (context, listView){
+            return Column(
+              children: [
+                const SizedBox(height: 10,),
+                panelTopBar,
+                const SizedBox(height: 10,),
+                Expanded(
+                  child: listView(
+                    padding: EdgeInsets.zero,
+                    controller: ScrollController(),
+                    children: [
+                      getBackupDialogWelcomeScreen(context: context)
+                    ],
                   ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
+                ),
+              ],
+            );
+          },
+        ),
+      ],
     );
   }
 
@@ -232,7 +230,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     textScaler: const TextScaler.linear(1.8),
                   ),
                   const Text(
-                      "OneDay",
+                      "O̶n̶e̶D̶a̶y̶",
                       textScaler: TextScaler.linear(1.8),
                       style: TextStyle(decoration: TextDecoration.lineThrough)
                   )

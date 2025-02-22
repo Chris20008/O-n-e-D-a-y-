@@ -234,7 +234,6 @@ class CnBackgroundColor extends ChangeNotifier {
   // }
 
   void refresh(){
-    // print("refresh called");
     notifyListeners();
   }
 }

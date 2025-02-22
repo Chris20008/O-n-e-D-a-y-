@@ -151,10 +151,8 @@
   "t2SetExerciseOptions": "Hier kun je de naam, rusttijd en stoelhoogte voor elke oefening instellen",
   "t2EnterExName": "Voer een naam in voor je eerste oefening",
   "t3ExOptions": "Oefeningen bewerken",
-  "t3SwipeLeft1": "Veeg naar links",
-  "t3SwipeLeft2": "om een oefening te kopiëren of te bewerken",
-  "t3SwipeRight1": "Veeg naar rechts",
-  "t3SwipeRight2": "om een oefening te verwijderen",
+  "t3SwipeLeft": "Nach links wischen, um eine Übung zu löschen",
+  "t3SwipeRight": "Nach rechts wischen, um die Gruppierung zu lösen/setzen oder ein Kopie zu erstellen",
   "t3LongPress": "Houd een oefening ingedrukt om te verplaatsen",
   "t3Group": "Oefeningsgroepen",
   "t3GroupExplanation": "Je kunt oefeningen groeperen. Dit kan handig zijn als je afwisselende oefeningen in een workout hebt of gewoon een alternatief wilt als je hoofdoefening niet beschikbaar is.\n\nGroepen kunnen net als oefeningen worden verplaatst en verwijderd.\n\nOefeningen onder een groep worden automatisch aan die groep toegevoegd. Oefeningen die niet aan een groep moeten worden toegevoegd, moeten boven de eerste groep worden geplaatst."

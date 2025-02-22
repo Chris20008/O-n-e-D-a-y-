@@ -1,22 +1,26 @@
+import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class SetRow extends StatelessWidget {
   final CnRunningWorkout cnRunningWorkout;
-  final dynamic i;
+  final dynamic item;
   final dynamic groupedExerciseKey;
-  // final Function() setState;
+  final int index;
+  final CnHomepage cnHomepage;
 
   const SetRow({
     super.key,
     required this.cnRunningWorkout,
-    required this.i,
+    required this.item,
     required this.groupedExerciseKey,
-    // required this.setState
+    required this.index,
+    required this.cnHomepage
   });
 
 
@@ -28,7 +32,8 @@ class SetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     NamedSet? tempSet;
     Widget? child;
-    dynamic item = i;
+
+    dynamic item = this.item;
 
     if(item is NamedSet){
       tempSet = item;
@@ -56,6 +61,8 @@ class SetRow extends StatelessWidget {
     }
 
     SingleSet? templateSet = templateEx.sets[set.index];
+
+    final double viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     child = Padding(
       padding: EdgeInsets.only(bottom: _setPadding, top: _setPadding),
@@ -93,6 +100,8 @@ class SetRow extends StatelessWidget {
                     height: _heightOfSetRow,
                     child: Center(
                       child: TextField(
+                        focusNode: set.focusNodeWeight,
+                        key: set.weightKey,
                         keyboardAppearance: Brightness.dark,
                         maxLength: (weightController.text.contains("."))? 6 : 4,
                         textAlign: TextAlign.center,
@@ -103,6 +112,9 @@ class SetRow extends StatelessWidget {
                         controller: weightController,
                         onTap: (){
                           weightController.selection =  TextSelection(baseOffset: 0, extentOffset: weightController.value.text.length);
+                          cnRunningWorkout.currentIndexFocus = index;
+                          cnRunningWorkout.currentIndexWeightOrAmount = 0;
+                          onTapField(viewInsetsBottom, set: set, context: context);
                         },
                         decoration: InputDecoration(
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -149,6 +161,8 @@ class SetRow extends StatelessWidget {
                     height: _heightOfSetRow,
                     child: Center(
                       child: TextField(
+                        focusNode: set.focusNodeAmount,
+                        key: set.amountKey,
                         keyboardAppearance: Brightness.dark,
                         maxLength: set.ex.categoryIsReps()? 3 : 8,
                         textAlign: TextAlign.center,
@@ -159,6 +173,9 @@ class SetRow extends StatelessWidget {
                         controller: amountController,
                         onTap: (){
                           amountController.selection =  TextSelection(baseOffset: 0, extentOffset: amountController.value.text.length);
+                          cnRunningWorkout.currentIndexFocus = index;
+                          cnRunningWorkout.currentIndexWeightOrAmount = 1;
+                          onTapField(viewInsetsBottom, set: set, context: context);
                         },
                         decoration: InputDecoration(
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
@@ -222,8 +239,9 @@ class SetRow extends StatelessWidget {
 
     if(set.ex.sets.length > 1){
       child = Slidable(
-          key: set.key,
-          startActionPane: ActionPane(
+          key: set.slidableKey,
+          endActionPane: ActionPane(
+            extentRatio: 0.3,
             motion: const ScrollMotion(),
             dismissible: DismissiblePane(
                 onDismissed: () {
@@ -235,17 +253,9 @@ class SetRow extends StatelessWidget {
                 onPressed: (BuildContext context){
                   dismiss(set.ex, templateEx, set);
                 },
-                borderRadius: BorderRadius.circular(15),
                 backgroundColor: const Color(0xFFA12D2C),
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
-              ),
-              SlidableAction(
-                flex: 1,
-                onPressed: (BuildContext context){},
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.transparent,
-                label: '',
               ),
             ],
           ),
@@ -253,112 +263,38 @@ class SetRow extends StatelessWidget {
       );
     }
 
-    // if(set.index == (set.ex.sets.length - 1)){
-    //   child = Column(
-    //     mainAxisSize: MainAxisSize.min,
-    //     children: [
-    //       child,
-    //       getAddSetButton(set.ex, templateEx)
-    //     ],
-    //   );
-    // }
-
     return child;
   }
 
   void dismiss(Exercise ex, Exercise templateEx, NamedSet set){
-    // final oldSetsAmount = ex.sets.length;
-    // ex.sets.removeAt(set.index);
-    // templateEx.sets.removeAt(set.index);
     cnRunningWorkout.removeSpecificSetFromExercise(set);
-    // if(ex.linkName == null){
-    //   for(int i = set.index; i <= (oldSetsAmount-1); i++){
-    //     if(i == oldSetsAmount-1){
-    //       cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.name, i));
-    //       break;
-    //     }
-    //     NamedSet nextNamedSet = cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, i+1)];
-    //     nextNamedSet.index -= 1;
-    //     cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, i)] = nextNamedSet;
-    //   }
-    // }
-    // else {
-    //   for(int i = set.index; i <= (oldSetsAmount-1); i++){
-    //     if(i == oldSetsAmount-1){
-    //       cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].remove(ex.name);
-    //       if(cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].isEmpty()){
-    //         cnRunningWorkout.groupedExercises.remove(getSetKeyName(ex.linkName!, i));
-    //       }
-    //       break;
-    //     }
-    //     NamedSet nextNamedSet = cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i+1)].getSet(ex.name);
-    //     nextNamedSet.index -= 1;
-    //     cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, i)].set(nextNamedSet);
-    //   }
-    // }
     cnRunningWorkout.refresh();
-    // setState();
     cnRunningWorkout.cache();
   }
 
-  // Widget getAddSetButton(Exercise newEx, Exercise templateEx){
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //         child: GestureDetector(
-  //           onLongPress: (){},
-  //           child: IconButton(
-  //               alignment: Alignment.center,
-  //               color: Colors.amber[800],
-  //               style: ButtonStyle(
-  //                   backgroundColor: MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
-  //                   shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(20)))
-  //               ),
-  //               onPressed: () {
-  //                 addSet(newEx, templateEx);
-  //               },
-  //               icon: const Icon(
-  //                 Icons.add,
-  //                 size: 20,
-  //               )
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Future onTapField(double insetsBottom,{
+        required NamedSet set,
+        required BuildContext context
+      }) async{
+    final position = getWidgetPosition(set.weightKey);
+    final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
 
-  // void addSet(Exercise ex, Exercise lastEx){
-  //   int newIndex = ex.sets.length;
-  //   ex.addSet();
-  //   lastEx.addSet();
-  //   SingleSet newSet = ex.sets[newIndex];
-  //   NamedSet newNamedSet = NamedSet(
-  //       set: newSet,
-  //       name: ex.name,
-  //       index: newIndex,
-  //       ex: ex,
-  //       weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-  //       amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
-  //   );
-  //   if(ex.linkName == null){
-  //     cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
-  //   } else{
-  //     final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
-  //     if(cnRunningWorkout.groupedExercises.containsKey(newSetKey)){
-  //       (cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
-  //     } else{
-  //       cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
-  //     }
-  //   }
-  //   cnRunningWorkout.slideableKeys[ex.name]?.add(UniqueKey());
-  //   final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
-  //   // if(newControllerPos >= 0 && cnRunningWorkout.scrollController.position.maxScrollExtent >= newControllerPos){
-  //   cnRunningWorkout.scrollController.jumpTo(newControllerPos);
-  //   // }
-  //   cnRunningWorkout.refresh();
-  //   // setState();
-  // }
+    if(positionKeyboard.dy == 0){
+      return;
+    }
+
+    if(position.dy + 80 > positionKeyboard.dy){
+      Future.delayed(const Duration(milliseconds: 10), (){
+        Scrollable.ensureVisible(
+            set.weightKey.currentContext!,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            alignment: 0.8
+        );
+      });
+
+    }
+  }
 
   Widget getButtonInsertTemplatesData({
     required SingleSet newSet,

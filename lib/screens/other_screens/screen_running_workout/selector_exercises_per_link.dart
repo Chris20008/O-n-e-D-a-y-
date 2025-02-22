@@ -37,6 +37,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
   late List<List<bool>> isCheckedList;
   Map groupedExercises = {};
+  ScrollController sc = ScrollController();
 
   @override
   void initState() {
@@ -63,228 +64,233 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
       descendantAnimationControllerName: "ScreenRunningWorkout",
       backdropEnabled: false,
       controller: widget.controller,
-      bounce: false,
       // maxHeight: ((groupedExercises.keys.length == 1? 192 : groupedExercises.keys.length * 207) + cnBottomMenu.height + 94),
-      panel: SafeArea(
-        top: false,
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Stack(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(bottom: 2),
-                  color: Theme.of(context).primaryColor,
-                  child: ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      padding: EdgeInsets.only(bottom: cnBottomMenu.height+10, top: 100),
-                      shrinkWrap: true,
-                      separatorBuilder: (context, index){
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 15, right: 15),
-                          child: mySeparator(heightBottom: 15, heightTop: 15),
-                        );
-                      },
-                      itemCount: groupedExercises.keys.length,
-                      itemBuilder: (context, index){
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Center(
-                                      child: OverflowSafeText(
-                                          "${AppLocalizations.of(context)!.runningWorkoutGroup}: ${linkNames[index]}",
-                                          minFontSize: 20,
-                                          maxLines: 1
+      panelBuilder: (context, listView){
+        return SafeArea(
+          top: false,
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Stack(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 2),
+                    color: Theme.of(context).primaryColor,
+                    child: listView(
+                        controller: sc,
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.only(bottom: cnBottomMenu.height+10, top: 100),
+                        shrinkWrap: true,
+                        separatorBuilder: (context, index){
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 15, right: 15),
+                            child: mySeparator(heightBottom: 15, heightTop: 15),
+                          );
+                        },
+                        itemCount: groupedExercises.keys.length,
+                        itemBuilder: (context, index){
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 15),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Center(
+                                        child: OverflowSafeText(
+                                            "${AppLocalizations.of(context)!.runningWorkoutGroup}: ${linkNames[index]}",
+                                            minFontSize: 20,
+                                            maxLines: 1
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15,),
-                              for(Exercise ex in groupedExercises[linkNames[index]])
+                                  ],
+                                ),
+                                const SizedBox(height: 15,),
+                                for(Exercise ex in groupedExercises[linkNames[index]])
                                 /// show only exercises that actually to have filled sets
                                 /// In a Group with 3 or more Exercises it is likely to happen
                                 /// that the user fills two exercises. However the not filled
                                 /// exercises are still in the group. Here we filter for only those
                                 /// that actually have filled sets
-                                if(ex.sets.isNotEmpty)
-                                  GestureDetector(
-                                    onTap: (){
-                                      setState(() {
-                                        final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
-                                        isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
-                                        if(!currentState){
-                                          vibrateConfirm();
-                                        } else{
-                                          vibrateCancel();
-                                        }
-                                      });
-                                    },
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: MultipleExerciseRow(
-                                            exercises: [ex],
-                                            fontSize: 15,
-                                            colorFade: Theme.of(context).primaryColor,
+                                  if(ex.sets.isNotEmpty)
+                                    GestureDetector(
+                                      onTap: (){
+                                        setState(() {
+                                          final currentState = isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)];
+                                          isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = !currentState;
+                                          if(!currentState){
+                                            vibrateConfirm();
+                                          } else{
+                                            vibrateCancel();
+                                          }
+                                        });
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: MultipleExerciseRow(
+                                              exercises: [ex],
+                                              fontSize: 15,
+                                              colorFade: Theme.of(context).primaryColor,
+                                            ),
                                           ),
-                                        ),
-                                        Transform.scale(
-                                          scale: 1.4,
-                                          child: Checkbox(
-                                            checkColor: Colors.white,
-                                            value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
-                                            shape: const CircleBorder(),
-                                            onChanged: (bool? value) {
-                                              setState(() {
-                                                isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value?? false;
-                                                if(value?? false){
-                                                  vibrateConfirm();
-                                                } else{
-                                                  vibrateCancel();
-                                                }
-                                              });
-                                            },
+                                          Transform.scale(
+                                            scale: 1.4,
+                                            child: Checkbox(
+                                              checkColor: Colors.white,
+                                              value: isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)],
+                                              shape: const CircleBorder(),
+                                              onChanged: (bool? value) {
+                                                setState(() {
+                                                  isCheckedList[index][groupedExercises[linkNames[index]].indexOf(ex)] = value?? false;
+                                                  if(value?? false){
+                                                    vibrateConfirm();
+                                                  } else{
+                                                    vibrateCancel();
+                                                  }
+                                                });
+                                              },
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                            ],
-                          ),
-                        );
-                      }
-                  ),
-                ),
-                /// top text
-                Container(
-                  height: 84,
-                  // padding: const EdgeInsets.all(10),
-                  color: Theme.of(context).primaryColor,
-                  child: Column(
-                    children: [
-                      Padding(
-                          padding: const EdgeInsets.only(top:10, bottom: 10),
-                          child: panelTopBar
-                      ),
-                      Center(
-                          child: OverflowSafeText(
-                            AppLocalizations.of(context)!.runningWorkoutSelectGroup,
-                            textAlign: TextAlign.center,
-                            fontSize: 22,
-                          )
-                      ),
-                    ],
-                  ),
-                ),
-                /// top faded box
-                Positioned(
-                  top: 83.8,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient:  LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Theme.of(context).primaryColor.withOpacity(0.0),
-                            Theme.of(context).primaryColor,
-                          ]
-                      ),
+                                        ],
+                                      ),
+                                    )
+                              ],
+                            ),
+                          );
+                        }
                     ),
-                    height: 30,
                   ),
-                ),
-                /// bottom colored box
-                Positioned(
-                    bottom: 0,
+                  /// top text
+                  Container(
+                    height: 84,
+                    // padding: const EdgeInsets.all(10),
+                    color: Theme.of(context).primaryColor,
+                    child: Column(
+                      children: [
+                        Padding(
+                            padding: const EdgeInsets.only(top:10, bottom: 10),
+                            child: panelTopBar
+                        ),
+                        Center(
+                            child: OverflowSafeText(
+                              AppLocalizations.of(context)!.runningWorkoutSelectGroup,
+                              textAlign: TextAlign.center,
+                              fontSize: 22,
+                            )
+                        ),
+                      ],
+                    ),
+                  ),
+                  /// top faded box
+                  Positioned(
+                    top: 83.8,
                     left: 0,
                     right: 0,
                     child: Container(
-                      color: Theme.of(context).primaryColor,
-                      height: cnBottomMenu.height-10,
-                    )
-                ),
-                /// bottom faded box
-                Positioned(
-                  bottom: cnBottomMenu.height - 10.5,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient:  LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Theme.of(context).primaryColor.withOpacity(0.0),
-                            Theme.of(context).primaryColor,
-                          ]
+                      decoration: BoxDecoration(
+                        gradient:  LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Theme.of(context).primaryColor.withOpacity(0.0),
+                              Theme.of(context).primaryColor,
+                            ]
+                        ),
                       ),
+                      height: 30,
                     ),
-                    height: 30,
                   ),
-                ),
-                /// bottom buttons
-                Positioned(
-                    bottom: -10,
+                  /// bottom colored box
+                  Positioned(
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        color: Theme.of(context).primaryColor,
+                        height: cnBottomMenu.height-10,
+                      )
+                  ),
+                  /// bottom faded box
+                  Positioned(
+                    bottom: cnBottomMenu.height - 10.5,
                     left: 0,
                     right: 0,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CupertinoButton(
-                            child: SizedBox(
-                                height: cnBottomMenu.height-10,
-                                child: Center(child: Text(AppLocalizations.of(context)!.confirm))
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient:  LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).primaryColor.withOpacity(0.0),
+                              Theme.of(context).primaryColor,
+                            ]
+                        ),
+                      ),
+                      height: 30,
+                    ),
+                  ),
+                  /// bottom buttons
+                  Positioned(
+                      bottom: -10,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CupertinoButton(
+                              child: SizedBox(
+                                  height: cnBottomMenu.height-10,
+                                  child: Center(child: Text(AppLocalizations.of(context)!.cancel))
+                              ),
+                              onPressed: () {
+                                HapticFeedback.selectionClick();
+                                widget.onCancel();
+                              },
                             ),
-                            onPressed: () {
-                              List<String> exToRemove = [];
-                              int index = 0;
-                              int indexJ = 0;
-                              for(List<bool> checks in isCheckedList){
-                                for(bool check in checks){
-                                  if(check){
+                          ),
+
+                          const Spacer(),
+
+                          Expanded(
+                            child: CupertinoButton(
+                              child: SizedBox(
+                                  height: cnBottomMenu.height-10,
+                                  child: Center(child: Text(AppLocalizations.of(context)!.confirm))
+                              ),
+                              onPressed: () {
+                                List<String> exToRemove = [];
+                                int index = 0;
+                                int indexJ = 0;
+                                for(List<bool> checks in isCheckedList){
+                                  for(bool check in checks){
+                                    if(check){
+                                      indexJ += 1;
+                                      continue;
+                                    }
+                                    exToRemove.add(groupedExercises[linkNames[index]][indexJ].name);
                                     indexJ += 1;
-                                    continue;
                                   }
-                                  exToRemove.add(groupedExercises[linkNames[index]][indexJ].name);
-                                  indexJ += 1;
+                                  indexJ = 0;
+                                  index += 1;
                                 }
-                                indexJ = 0;
-                                index += 1;
-                              }
-                              HapticFeedback.selectionClick();
-                              widget.onConfirm(exToRemove: exToRemove);
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CupertinoButton(
-                            child: SizedBox(
-                                height: cnBottomMenu.height-10,
-                                child: Center(child: Text(AppLocalizations.of(context)!.cancel))
+                                HapticFeedback.selectionClick();
+                                widget.onConfirm(exToRemove: exToRemove);
+                              },
                             ),
-                            onPressed: () {
-                              HapticFeedback.selectionClick();
-                              widget.onCancel();
-                            },
                           ),
-                        ),
-                      ],
-                    )
-                )
-              ],
+                        ],
+                      )
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

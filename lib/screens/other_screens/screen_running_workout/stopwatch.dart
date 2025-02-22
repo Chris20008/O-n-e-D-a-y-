@@ -274,11 +274,6 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   }
 
   String getTimeString() {
-    // String elapsedMinutes = (cnStopwatchWidget.stopwatch.elapsed.inMinutes%60).toString();
-    // elapsedMinutes = elapsedMinutes.length==1? "0$elapsedMinutes" : elapsedMinutes;
-    //
-    // String elapsedSeconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
-    // elapsedSeconds = elapsedSeconds.length==1? "0$elapsedSeconds" : elapsedSeconds;
     int restCountdownSeconds;
     if(cnStopwatchWidget.countdownTime != null){
       restCountdownSeconds = cnStopwatchWidget.countdownTime! - cnStopwatchWidget.stopwatch.elapsed.inSeconds;

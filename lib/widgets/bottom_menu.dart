@@ -153,7 +153,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       cnWorkouts.refreshAllWorkouts();
     }
     else if(index == 2) {
-      cnScreenStatistics.refreshData();
+      cnScreenStatistics.refreshData(context);
       if(lastIndex == 2){
         cnScreenStatistics.resetGraph(withKeyReset: false);
         cnScreenStatistics.refresh();
