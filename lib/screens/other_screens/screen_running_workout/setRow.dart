@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'dart:io';
 
 class SetRow extends StatelessWidget {
   final CnRunningWorkout cnRunningWorkout;
@@ -273,26 +274,34 @@ class SetRow extends StatelessWidget {
   }
 
   Future onTapField(double insetsBottom,{
-        required NamedSet set,
-        required BuildContext context
-      }) async{
+    required NamedSet set,
+    required BuildContext context
+  }) async{
+
+    // await Future.delayed(Duration(milliseconds: 200));
+
     final position = getWidgetPosition(set.weightKey);
-    final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
 
-    if(positionKeyboard.dy == 0){
-      return;
-    }
 
-    if(position.dy + 80 > positionKeyboard.dy){
-      Future.delayed(const Duration(milliseconds: 10), (){
-        Scrollable.ensureVisible(
+    final value = Platform.isAndroid? 80 : 100;
+    final height = MediaQuery.of(context).size.height;
+    // final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
+    final relativeHeight = height - 291;
+    // double factor = (relativeHeight - 90) / relativeHeight;
+    double factor = (relativeHeight - value) / height;
+
+    if(position.dy + value > relativeHeight){
+      print("Do Scroll");
+      await Future.delayed(const Duration(milliseconds: 10), () async{
+        // final factor = Platform.isAndroid? 0.8 : 0.84;
+        await Scrollable.ensureVisible(
             set.weightKey.currentContext!,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            alignment: 0.8
+            alignment: factor
         );
+        onTapField(insetsBottom, set:set, context:context);
       });
-
     }
   }
 

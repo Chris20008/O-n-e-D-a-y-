@@ -72,15 +72,17 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   int timeAnimatedColumn = 1000;
   bool isShowingAnimatedColumn = true;
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
+    print("ViewInsets Bttom");
+    print(viewInsetsBottom);
 
     // return Scaffold(
     //   resizeToAvoidBottomInset: false,
@@ -537,6 +539,13 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                           );
                                         }
 
+                                        if(indexExercise == cnRunningWorkout.groupedExercises.length-1){
+                                          child = Padding(
+                                            padding: EdgeInsets.only(bottom: viewInsetsBottom),
+                                            child: child
+                                          );
+                                        }
+
                                         return Container(
                                             key: currentDraggingKey == null ||
                                                 ((item is NamedSet || item is GroupedSet)
@@ -551,12 +560,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                   ),
                                 ),
                                 // SizedBox(
-                                //   height: viewInsetsBottom,
+                                //   height: 150,
                                 // )
-                                AnimatedContainer(
-                                    height: viewInsetsBottom,
-                                    duration: const Duration(milliseconds: 0)
-                                )
+                                // AnimatedContainer(
+                                //     height: viewInsetsBottom,
+                                //     duration: const Duration(milliseconds: 0)
+                                // )
                               ],
                             ),
                           ),
@@ -591,10 +600,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                               alignment: Alignment.bottomRight,
                                 child: SizedBox(width: double.maxFinite)
                             ),
-                            crossFadeState: viewInsetsBottom == 0
+                            crossFadeState: viewInsetsBottom < 100
                               ? CrossFadeState.showFirst
                               : CrossFadeState.showSecond,
-                            duration: Duration(milliseconds: viewInsetsBottom < 50? 700 : 0)
+                            duration: Duration(milliseconds: viewInsetsBottom < 100? 150 : 0)
                         ),
                       ],
                     ),
@@ -616,7 +625,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               //     ),
               //   ),
 
-              if(/*Platform.isIOS &&*/ MediaQuery.of(context).viewInsets.bottom > 0)
+              if(/*Platform.isIOS &&*/ viewInsetsBottom > 100)
                 KeyboardTopBar(
                   key: cnRunningWorkout.keyKeyboardTopBar,
                   onPressedLeft: onPressedLeft,
@@ -713,7 +722,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     print("In Function");
     print(viewInsetsBottom);
     print(isShowingAnimatedColumn);
-    if(viewInsetsBottom == 0 && !isShowingAnimatedColumn){
+    if(100 > viewInsetsBottom && !isShowingAnimatedColumn){
       print("First if");
       isShowingAnimatedColumn = true;
       timeAnimatedColumn = 1000;
@@ -817,16 +826,19 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     cnRunningWorkout.currentIndexWeightOrAmount = weightOrAmountIndex;
     TextEditingController controller = weightOrAmountIndex == 0? set.weightController : set.amountController;
     controller.selection =  TextSelection(baseOffset: 0, extentOffset: controller.value.text.length);
-    // if(insetsBottom == 0) {
-    print("In on tap field running wokrout");
     await Future.delayed(Duration(milliseconds: 50));
-    // }
-    print("Ensure in running workout");
+    // double factor = Platform.isAndroid? 0.8 : 1;
+    // final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
+    final value = Platform.isAndroid? 80 : 100;
+    final height = MediaQuery.of(context).size.height;
+    final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
+    // double factor = (relativeHeight - 90) / relativeHeight;
+    double factor = (relativeHeight - value) / height;
     Scrollable.ensureVisible(
         set.weightKey.currentContext!,
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        alignment: 0.8
+        alignment: factor
     );
   }
 

@@ -847,18 +847,22 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
     final position = getWidgetPosition(cnNewExercise.ensureVisibleKeys[index][0]);
     final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
+    final value = Platform.isAndroid? 80 : 100;
+    final height = MediaQuery.of(context).size.height;
+    final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
+    double factor = (relativeHeight - value) / height;
 
     if(positionKeyboard.dy == 0){
       return;
     }
 
-    if(position.dy + 80 > positionKeyboard.dy){
+    if(position.dy + value > relativeHeight){
       Future.delayed(const Duration(milliseconds: 10), (){
         Scrollable.ensureVisible(
             cnNewExercise.ensureVisibleKeys[index][0].currentContext!,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            alignment: 0.42
+            alignment: factor
         );
       });
     }

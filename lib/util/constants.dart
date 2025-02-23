@@ -1376,6 +1376,25 @@ Offset getWidgetPosition(GlobalKey key) {
   return position;
 }
 
+// Offset getWidgetPosition(GlobalKey key) {
+//   Offset position = const Offset(0, 0);
+//   // // WidgetsBinding.instance.addPostFrameCallback((_) {
+//   // final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+//   // if (renderBox != null) {
+//   //   position = renderBox.localToGlobal(Offset.zero);
+//   // }
+//   // // });
+//   // print(position);
+//   // return position;
+//   final renderObject = key.currentContext?.findRenderObject();
+//   final translation = renderObject?.getTransformTo(null).getTranslation();
+//   if(translation != null && renderObject?.paintBounds != null){
+//     position = Offset(translation.x, translation.y);
+//   }
+//   print(position);
+//   return position;
+// }
+
 Size getWidgetSize(GlobalKey key){
   Size size = const Size(0, 0);
   // WidgetsBinding.instance.addPostFrameCallback((_) {

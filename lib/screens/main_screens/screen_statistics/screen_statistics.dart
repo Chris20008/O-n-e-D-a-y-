@@ -410,7 +410,7 @@ class CnScreenStatistics extends ChangeNotifier {
       return false;
     }
     var now = DateTime.now();
-    DateTime startTime = DateTime(2025, 1, 1);
+    DateTime startTime = DateTime(2000, 1, 1);
     try{
       healthData = await health.getHealthDataFromTypes(
           startTime: startTime,
