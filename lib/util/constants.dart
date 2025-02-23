@@ -1438,7 +1438,7 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
     builder: (context) => Positioned.fill(
       child: AbsorbPointer(
         child: Container(
-          color: Colors.red.withOpacity(0.4),
+          color: Colors.black.withOpacity(0.0),
         ),
       ),
     ),

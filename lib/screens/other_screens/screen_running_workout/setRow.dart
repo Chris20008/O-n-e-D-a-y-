@@ -280,29 +280,29 @@ class SetRow extends StatelessWidget {
 
     // await Future.delayed(Duration(milliseconds: 200));
 
-    final position = getWidgetPosition(set.weightKey);
-
-
-    final value = Platform.isAndroid? 80 : 100;
-    final height = MediaQuery.of(context).size.height;
-    // final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
-    final relativeHeight = height - 291;
-    // double factor = (relativeHeight - 90) / relativeHeight;
-    double factor = (relativeHeight - value) / height;
-
-    if(position.dy + value > relativeHeight){
-      print("Do Scroll");
-      await Future.delayed(const Duration(milliseconds: 10), () async{
-        // final factor = Platform.isAndroid? 0.8 : 0.84;
-        await Scrollable.ensureVisible(
-            set.weightKey.currentContext!,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            alignment: factor
-        );
-        onTapField(insetsBottom, set:set, context:context);
-      });
-    }
+    // final position = getWidgetPosition(set.weightKey);
+    //
+    //
+    // final value = Platform.isAndroid? 80 : 100;
+    // final height = MediaQuery.of(context).size.height;
+    // // final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
+    // final relativeHeight = height - 291;
+    // // double factor = (relativeHeight - 90) / relativeHeight;
+    // double factor = (relativeHeight - value) / height;
+    //
+    // if(position.dy + value > relativeHeight){
+    //   print("Do Scroll");
+    //   await Future.delayed(const Duration(milliseconds: 10), () async{
+    //     // final factor = Platform.isAndroid? 0.8 : 0.84;
+    //     await Scrollable.ensureVisible(
+    //         set.weightKey.currentContext!,
+    //         duration: const Duration(milliseconds: 300),
+    //         curve: Curves.easeInOut,
+    //         alignment: factor
+    //     );
+    //     onTapField(insetsBottom, set:set, context:context);
+    //   });
+    // }
   }
 
   Widget getButtonInsertTemplatesData({

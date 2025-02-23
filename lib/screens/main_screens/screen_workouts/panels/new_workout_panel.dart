@@ -622,7 +622,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
           if(!cnNewWorkout.workout.isTemplate && !cnNewWorkout.isSickDays)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              padding: const EdgeInsets.only(left: 10.0, right: 10, top: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -642,22 +642,22 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
               ),
             ),
 
-          if(!cnNewWorkout.isSickDays)
-            Container(
-              height: 15,
-              decoration: BoxDecoration(
-                  gradient:  LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        // Colors.transparent,
-                        // Color(0xff0a0604),
-                        _color.withOpacity(0.0),
-                        _color
-                      ]
-                  )
-              ),
-            ),
+          // if(!cnNewWorkout.isSickDays)
+          //   Container(
+          //     height: 15,
+          //     decoration: BoxDecoration(
+          //         gradient:  LinearGradient(
+          //             begin: Alignment.bottomCenter,
+          //             end: Alignment.topCenter,
+          //             colors: [
+          //               // Colors.transparent,
+          //               // Color(0xff0a0604),
+          //               _color.withOpacity(0.0),
+          //               _color
+          //             ]
+          //         )
+          //     ),
+          //   ),
         ],
       ),
     );

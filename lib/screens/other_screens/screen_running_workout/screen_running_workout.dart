@@ -153,7 +153,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                           top: false,
                           bottom: false,
                           child: Padding(
-                            padding: const EdgeInsets.only(top:0,bottom: 0,left: 20, right: 20),
+                            padding: EdgeInsets.only(top:0,bottom: viewInsetsBottom ,left: 20, right: 20),
                             child: Column(
                               children: [
 
@@ -539,12 +539,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                           );
                                         }
 
-                                        if(indexExercise == cnRunningWorkout.groupedExercises.length-1){
-                                          child = Padding(
-                                            padding: EdgeInsets.only(bottom: viewInsetsBottom),
-                                            child: child
-                                          );
-                                        }
+                                        // if(indexExercise == cnRunningWorkout.groupedExercises.length-1){
+                                        //   child = Padding(
+                                        //     padding: EdgeInsets.only(bottom: viewInsetsBottom),
+                                        //     child: child
+                                        //   );
+                                        // }
 
                                         return Container(
                                             key: currentDraggingKey == null ||
@@ -625,12 +625,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               //     ),
               //   ),
 
-              if(/*Platform.isIOS &&*/ viewInsetsBottom > 100)
-                KeyboardTopBar(
-                  key: cnRunningWorkout.keyKeyboardTopBar,
-                  onPressedLeft: onPressedLeft,
-                  onPressedRight: onPressedRight
-                ),
+              // if(/*Platform.isIOS &&*/ viewInsetsBottom > 100)
+              //   KeyboardTopBar(
+              //     key: cnRunningWorkout.keyKeyboardTopBar,
+              //     onPressedLeft: onPressedLeft,
+              //     onPressedRight: onPressedRight
+              //   ),
 
               // Positioned(
               //   left: 0,
@@ -826,20 +826,20 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     cnRunningWorkout.currentIndexWeightOrAmount = weightOrAmountIndex;
     TextEditingController controller = weightOrAmountIndex == 0? set.weightController : set.amountController;
     controller.selection =  TextSelection(baseOffset: 0, extentOffset: controller.value.text.length);
-    await Future.delayed(Duration(milliseconds: 50));
-    // double factor = Platform.isAndroid? 0.8 : 1;
-    // final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
-    final value = Platform.isAndroid? 80 : 100;
-    final height = MediaQuery.of(context).size.height;
-    final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
-    // double factor = (relativeHeight - 90) / relativeHeight;
-    double factor = (relativeHeight - value) / height;
-    Scrollable.ensureVisible(
-        set.weightKey.currentContext!,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        alignment: factor
-    );
+    // await Future.delayed(Duration(milliseconds: 50));
+    // // double factor = Platform.isAndroid? 0.8 : 1;
+    // // final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
+    // final value = Platform.isAndroid? 80 : 100;
+    // final height = MediaQuery.of(context).size.height;
+    // final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
+    // // double factor = (relativeHeight - 90) / relativeHeight;
+    // double factor = (relativeHeight - value) / height;
+    // Scrollable.ensureVisible(
+    //     set.weightKey.currentContext!,
+    //     duration: const Duration(milliseconds: 300),
+    //     curve: Curves.easeInOut,
+    //     alignment: factor
+    // );
   }
 
   void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
