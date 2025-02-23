@@ -92,8 +92,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               panelBuilder: (context, listView){
                 return Column(
                   children: [
-                    const SizedBox(height: 10,),
-                    panelTopBar,
+                    // const SizedBox(height: 10,),
+                    // panelTopBar,
                     const SizedBox(height: 10,),
                     Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
                     const SizedBox(height: 10),
@@ -498,7 +498,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                 return Column(
                   children: [
                     const SizedBox(height: 10,),
-                    panelTopBar,
+                    // panelTopBar,
                     const SizedBox(height: 10,),
                     Expanded(
                       child: listView(

@@ -16,28 +16,52 @@ class ExerciseSelector extends StatefulWidget {
 
 class _ExerciseSelectorState extends State<ExerciseSelector> {
   late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
+  late String? selectedExerciseName = cnScreenStatistics.selectedExerciseName;
 
   Future _showDialog(Widget child) async{
     HapticFeedback.selectionClick();
 
     final initExercise = cnScreenStatistics.selectedExerciseName;
+    selectedExerciseName = cnScreenStatistics.selectedExerciseName;
 
     await showCupertinoModalPopup<void>(
       context: context,
-      builder: (BuildContext context) => Container(
-        height: 250,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: child,
+      builder: (BuildContext context) => ClipRRect(
+        borderRadius: const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
+        child: Container(
+          height: 350,
+          color: CupertinoColors.systemBackground.resolveFrom(context),
+          child: SafeArea(
+            top: false,
+            bottom: true,
+            child: Stack(
+              children: [
+                child,
+                Row(
+                  children: [
+                    CupertinoButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(AppLocalizations.of(context)!.cancel)
+                    ),
+                    const Spacer(),
+                    CupertinoButton(
+                        onPressed: (){
+                          cnScreenStatistics.selectedExerciseName = selectedExerciseName;
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(AppLocalizations.of(context)!.save)
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
-    if(initExercise != cnScreenStatistics.selectedExerciseName){
+    if(initExercise != selectedExerciseName){
       cnScreenStatistics.calcMinMaxDates(context);
       cnScreenStatistics.refresh();
       cnScreenStatistics.cache();
@@ -56,43 +80,74 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
     return CupertinoButton(
       padding: EdgeInsets.zero,
       onPressed: () => _showDialog(
-        CupertinoPicker(
-            magnification: 1.22,
-            squeeze: 1.2,
-            useMagnifier: true,
-            itemExtent: 32,
-            scrollController: FixedExtentScrollController(
-              initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
-            ),
-            onSelectedItemChanged: (int index) {
-              cnScreenStatistics.selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
-              if(Platform.isAndroid){
-                HapticFeedback.selectionClick();
-              }
-            },
-            children: cnScreenStatistics.allExerciseNames.map((String exName) {
-              Widget child = SizedBox(
-                  width: cnScreenStatistics.width-150,
-                  child: Center(
-                      child: OverflowSafeText(
-                          exName,
-                          maxLines: 1,
-                          minFontSize: 12
-                      )
-                  )
-              );
-              if (exName == AppLocalizations.of(context)!.statisticsWeight){
-                child = Column(
-                  children: [
-                    const Spacer(),
-                    child,
-                    const Spacer(),
-                    Container(color: Colors.grey.withOpacity(0.2), height: 1.5, width: cnScreenStatistics.width-150,)
-                  ],
-                );
-              }
-              return child;
-            }).toList()
+        Padding(
+          padding: const EdgeInsets.only(top: 0),
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              CupertinoPicker(
+                  magnification: 1.4,
+                  squeeze: 1.2,
+                  useMagnifier: true,
+                  itemExtent: 32,
+                  scrollController: FixedExtentScrollController(
+                    initialItem: cnScreenStatistics.allExerciseNames.indexOf(cnScreenStatistics.selectedExerciseName!),
+                  ),
+                  onSelectedItemChanged: (int index) {
+                    selectedExerciseName = cnScreenStatistics.allExerciseNames[index];
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                  },
+                  children: cnScreenStatistics.allExerciseNames.map((String exName) {
+                    Widget child = SizedBox(
+                        width: cnScreenStatistics.width-150,
+                        child: Center(
+                            child: OverflowSafeText(
+                                exName,
+                                maxLines: 1,
+                                minFontSize: 12
+                            )
+                        )
+                    );
+                    if (exName == AppLocalizations.of(context)!.statisticsWeight){
+                      child = Column(
+                        children: [
+                          const Spacer(),
+                          child,
+                          const Spacer(),
+                          Container(color: Colors.grey.withOpacity(0.2), height: 1.5, width: cnScreenStatistics.width-150,)
+                        ],
+                      );
+                    }
+                    return child;
+                  }).toList()
+              ),
+              // Positioned(
+              //   left: 0,
+              //   right: 0,
+              //   top: -35,
+              //   child: Row(
+              //     children: [
+              //       CupertinoButton(
+              //           onPressed: (){
+              //             Navigator.of(context).pop();
+              //           },
+              //           child: Text(AppLocalizations.of(context)!.cancel)
+              //       ),
+              //       const Spacer(),
+              //       CupertinoButton(
+              //           onPressed: (){
+              //             cnScreenStatistics.selectedExerciseName = selectedExerciseName;
+              //             Navigator.of(context).pop();
+              //           },
+              //           child: Text(AppLocalizations.of(context)!.save)
+              //       ),
+              //     ],
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
       child: Row(

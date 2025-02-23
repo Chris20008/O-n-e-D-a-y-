@@ -1222,53 +1222,50 @@ Future showDialogMinuteSecondPicker({
   Duration newDuration = const Duration();
   return showCupertinoModalPopup<void>(
     context: context,
-    builder: (BuildContext context) => Container(
-      height: onConfirm != null? 270 : 222,
-      padding: const EdgeInsets.only(top: 6.0),
-      // The bottom margin is provided to align the popup above the system
-      // navigation bar.
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      // Provide a background color for the popup.
-      color: CupertinoColors.systemBackground.resolveFrom(context),
-      // Use a SafeArea widget to avoid system overlaps.
-      child: SafeArea(
-        bottom: false,
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CupertinoTimerPicker(
-              mode: CupertinoTimerPickerMode.ms,
-              initialTimerDuration: initialTimeDuration,
-              onTimerDurationChanged: (Duration duration) {
-                HapticFeedback.selectionClick();
-                newDuration = duration;
-              },
-            ),
-            if(onConfirm != null)
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
+    builder: (BuildContext context) => ClipRRect(
+      borderRadius: const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
+      child: Container(
+        height: onConfirm != null? 275 : 222,
+        padding: const EdgeInsets.only(top: 0.0),
+        margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          bottom: true,
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if(onConfirm != null)
+                Row(
+                  children: [
+                    CupertinoButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(AppLocalizations.of(context)!.cancel)
+                    ),
+                    const Spacer(),
+                    CupertinoButton(
                         onPressed: (){
                           Navigator.of(context).pop();
                           onConfirm(newDuration);
                         },
-                        style: ButtonStyle(
-                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                        ),
-                        child: Text(AppLocalizations.of(context)!.ok)
+                        child: Text(AppLocalizations.of(context)!.save)
                     ),
-                  ),
-                ],
+                  ],
+                ),
+              CupertinoTimerPicker(
+                mode: CupertinoTimerPickerMode.ms,
+                initialTimerDuration: initialTimeDuration,
+                onTimerDurationChanged: (Duration duration) {
+                  HapticFeedback.selectionClick();
+                  newDuration = duration;
+                },
               ),
-          ],
+            ],
+          ),
         ),
       ),
     ),

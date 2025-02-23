@@ -1,4 +1,5 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -100,40 +101,40 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                 child: cnStandardPopUp.child
                             ),
                           ),
-                          horizontalGreySpacer,
+                          // horizontalGreySpacer,
                           SizedBox(
-                            height: 40,
+                            height: 50,
                             child: Row(
                               children: [
-                                Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: cnStandardPopUp.confirm,
-                                        style: ButtonStyle(
-                                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                            // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        ),
-                                        child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
-                                    )
-                                ),
-                                if(cnStandardPopUp.showCancel)
-                                  verticalGreySpacer,
                                 if(cnStandardPopUp.showCancel)
                                   Expanded(
-                                      child: ElevatedButton(
+                                      child: CupertinoButton(
                                           onPressed: cnStandardPopUp.cancel,
-                                          style: ButtonStyle(
-                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                              // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                          ),
+                                          // style: ButtonStyle(
+                                          //     shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                          //     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                          //     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                          //     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                          //     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                          // ),
                                           child: Text(cnStandardPopUp.cancelText)
                                       )
                                   ),
+                                // if(cnStandardPopUp.showCancel)
+                                //   verticalGreySpacer,
+                                Expanded(
+                                    child: CupertinoButton(
+                                        onPressed: cnStandardPopUp.confirm,
+                                        // style: ButtonStyle(
+                                        //     shadowColor: MaterialStateProperty.all(Colors.transparent),
+                                        //     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
+                                        //     backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                        //     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
+                                        //     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
+                                        // ),
+                                        child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
+                                    )
+                                ),
                               ],
                             ),
                           ),

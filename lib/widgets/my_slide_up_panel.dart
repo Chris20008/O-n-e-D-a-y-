@@ -458,7 +458,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
           animation: animationController,
           builder: (context, child){
             double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.2));
-            double topPadding = animationController.value*maxTopPadding*2;
+            double topPadding = animationController.value*(maxTopPadding*2 + 10);
             topPadding = topPadding > 0 ? 0 : topPadding;
             if(topPadding < maxTopPadding){
               topPadding = maxTopPadding - (topPadding - maxTopPadding);
@@ -471,6 +471,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
             /// with backdrop AND this AnimatedBuilder together
             opacity = opacity > 0.5 ? 1 - opacity : opacity;
             opacity = opacity * 0.5;
+
+            // /// Transform y position
+            // double y = animationController.value * 10;
+
             return Stack(
               children: [
                 AnimatedContainer(

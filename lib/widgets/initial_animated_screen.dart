@@ -56,7 +56,7 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
       animation: animationController,
       builder: (context, child) {
 
-        // Scale
+        /// Scale
         const iOSValue = 0.245;
         const androidValue = 0.15;
         final platformValue = animationController.value * (Platform.isAndroid? androidValue : iOSValue);
@@ -67,35 +67,47 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
         final double maxBorderRadius = Platform.isAndroid? 30 : 50;
         final double multiplier = (maxBorderRadius - minBorderRadius) / 0.5;
         double borderRadius = (maxBorderRadius - multiplier * animationController.value).clamp(minBorderRadius, maxBorderRadius);
+        if (borderRadius == maxBorderRadius){
+          borderRadius = 0;
+        }
 
         /// Opacity
         double opacity = (animationController.value * 1.1).clamp(0, 1);
         if(!widget.backDropEnabled){
           opacity = 0;
         }
-        return Transform.scale(
-          scale: scale,
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(borderRadius),
-              child: Container(
-                decoration: widget.decoration,
-                child: Stack(
-                  children: [
-                    child?? const SizedBox(),
-                    IgnorePointer(
-                        ignoring: opacity > 0 ? false : true,
-                        child: Container(
-                          color: Colors.black.withOpacity(opacity),
-                          // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
-                        )
-                    )
-                  ],
-                ),
-                // child: Container(
-                //     color: Colors.blue.withOpacity((animationController.value * 1.1).clamp(0, 1)),
-                //     child: child
-                // ),
-              )
+
+        /// Transform y position
+        double y = animationController.value * 10;
+
+        return Transform(
+          transform: Matrix4.translationValues(
+            ///x
+            0,
+            ///y
+            y,
+            ///z
+            0),
+          child: Transform.scale(
+            scale: scale,
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(borderRadius),
+                child: Container(
+                  decoration: widget.decoration,
+                  child: Stack(
+                    children: [
+                      child?? const SizedBox(),
+                      IgnorePointer(
+                          ignoring: opacity > 0 ? false : true,
+                          child: Container(
+                            color: Colors.black.withOpacity(opacity),
+                            // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
+                          )
+                      )
+                    ],
+                  ),
+                )
+            ),
           ),
         );
       },

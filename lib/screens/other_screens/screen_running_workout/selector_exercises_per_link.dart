@@ -171,10 +171,11 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                     color: Theme.of(context).primaryColor,
                     child: Column(
                       children: [
-                        Padding(
-                            padding: const EdgeInsets.only(top:10, bottom: 10),
-                            child: panelTopBar
-                        ),
+                        // Padding(
+                        //     padding: const EdgeInsets.only(top:10, bottom: 10),
+                        //     child: panelTopBar
+                        // ),
+                        const SizedBox(height: 20,),
                         Center(
                             child: OverflowSafeText(
                               AppLocalizations.of(context)!.runningWorkoutSelectGroup,

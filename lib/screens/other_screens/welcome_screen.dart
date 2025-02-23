@@ -75,7 +75,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             return Column(
               children: [
                 const SizedBox(height: 10,),
-                panelTopBar,
+                // panelTopBar,
                 const SizedBox(height: 10,),
                 Expanded(
                   child: listView(

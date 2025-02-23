@@ -608,48 +608,57 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
             cnNewExercise.refresh();
           }
           else{
-            if(value == AppLocalizations.of(context)!.clear){
-              cnNewExercise.exercise.restInSeconds = 0;
-              cnNewExercise.restController.clear();
-              cnNewExercise.refresh();
-            }
-            else{
-              cnStandardPopUp.open(
+            showDialogMinuteSecondPicker(
                 context: context,
-                onConfirm: (){
-                  cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
-                  vibrateCancel();
-                  cnNewExercise.refresh();
-                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  });
-                },
-                onCancel: (){
-                  cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
-                  Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  });
-                },
-                child: TextField(
-                  keyboardAppearance: Brightness.dark,
-                  controller: cnNewExercise.restController,
-                  keyboardType: TextInputType.number,
-                  maxLength: 3,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    labelText: AppLocalizations.of(context)!.restInSeconds,
-                    counterText: "",
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-                  ),
-                  style: const TextStyle(
-                      fontSize: 18
-                  ),
-                  textAlign: TextAlign.center,
-                  onChanged: (value){},
-                ),
-              );
-            }
+                initialTimeDuration: Duration(minutes: cnNewExercise.exercise.restInSeconds~/60, seconds: cnNewExercise.exercise.restInSeconds%60),
+                onConfirm: (Duration newDuration){
+                  cnNewExercise.exercise.restInSeconds = newDuration.inSeconds;
+                }
+            ).then((value) => setState(() {}));
           }
+          // else{
+          //   if(value == AppLocalizations.of(context)!.clear){
+          //     cnNewExercise.exercise.restInSeconds = 0;
+          //     cnNewExercise.restController.clear();
+          //     cnNewExercise.refresh();
+          //   }
+          //   else{
+          //     cnStandardPopUp.open(
+          //       context: context,
+          //       onConfirm: (){
+          //         cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
+          //         vibrateCancel();
+          //         cnNewExercise.refresh();
+          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          //           FocusManager.instance.primaryFocus?.unfocus();
+          //         });
+          //       },
+          //       onCancel: (){
+          //         cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
+          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+          //           FocusManager.instance.primaryFocus?.unfocus();
+          //         });
+          //       },
+          //       child: TextField(
+          //         keyboardAppearance: Brightness.dark,
+          //         controller: cnNewExercise.restController,
+          //         keyboardType: TextInputType.number,
+          //         maxLength: 3,
+          //         decoration: InputDecoration(
+          //           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          //           labelText: AppLocalizations.of(context)!.restInSeconds,
+          //           counterText: "",
+          //           contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+          //         ),
+          //         style: const TextStyle(
+          //             fontSize: 18
+          //         ),
+          //         textAlign: TextAlign.center,
+          //         onChanged: (value){},
+          //       ),
+          //     );
+          //   }
+          // }
         }
     );
   }
@@ -973,6 +982,9 @@ class CnNewExercisePanel extends ChangeNotifier {
     this.workout = workout;
     this.onConfirm = onConfirm;
     HapticFeedback.selectionClick();
+    // if(scrollController.hasClients){
+    //   scrollController.jumpTo(0);
+    // }
     await panelController.animatePanelToPosition(
         1,
         duration: Duration(milliseconds: animationTime),
