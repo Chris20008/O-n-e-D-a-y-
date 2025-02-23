@@ -433,7 +433,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
         onTapOutside: (){
           cnNewWorkout.applyNameChanges = false;
         },
-        color: const Color(0xff2d2d2d)
     );
   }
 
@@ -544,17 +543,18 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                       suffixIcon: IconButton(
                                           onPressed: () async{
                                             HapticFeedback.selectionClick();
-                                            await showDialog(
-                                                context: context,
-                                                builder: (context){
-                                                  return Center(
-                                                      child: standardDialog(
-                                                          context: context,
-                                                          child: getExplainExerciseGroups(context)
-                                                      )
-                                                  );
-                                                }
-                                            );
+                                            await getExplainExerciseGroups(context);
+                                            // await showDialog(
+                                            //     context: context,
+                                            //     builder: (context){
+                                            //       return Center(
+                                            //           child: standardDialog(
+                                            //               context: context,
+                                            //               child: getExplainExerciseGroups(context)
+                                            //           )
+                                            //       );
+                                            //     }
+                                            // );
                                             HapticFeedback.selectionClick();
                                             FocusManager.instance.primaryFocus?.unfocus();
                                           },
@@ -577,7 +577,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                 FocusScope.of(context).unfocus();
                               });
                             },
-                            color: const Color(0xff2d2d2d)
                         );
                       },
                       style: ButtonStyle(

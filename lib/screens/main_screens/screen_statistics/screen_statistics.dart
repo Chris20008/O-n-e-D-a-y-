@@ -153,7 +153,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         onCancel: (){
           cnScreenStatistics.restoreLastFilterState();
         },
-        color: const Color(0xff2d2d2d)
     );
   }
 

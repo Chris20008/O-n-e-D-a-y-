@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:page_indicator_plus/page_indicator_plus.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
@@ -977,43 +978,94 @@ Widget getCalendarChild({
   );
 }
 
-Widget getExplainExerciseGroups(BuildContext context){
-  /// ToDo
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      Text(
-        "empty",
-        // AppLocalizations.of(context)!.t3Group,
-        style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20.0
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Text("empty",
-          // AppLocalizations.of(context)!.t3GroupExplanation,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      const SizedBox(height: 15),
-      Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: SizedBox(
-              width: 230,
-              child: Image.asset(
-                  scale: 0.6,
-                  "${pictureAssetPath}Excercise Groups.jpg"
-              )
-          ),
-        ),
-      ),
-    ],
+Future getExplainExerciseGroups(BuildContext context) async{
+
+  PageController pageViewControllerGroups = PageController();
+  TextStyle tStyle = const TextStyle(
+      color: Colors.white,
+      fontSize: 19.0
   );
+  await showCupertinoModalPopup(
+      context: context,
+      builder: (context){
+        List<Widget> pages = [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.t1GroupExplanation,
+                style: tStyle,
+              )
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.t1GroupExplanation2,
+                style: tStyle,
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  AppLocalizations.of(context)!.t1GroupExplanation3,
+                  style: tStyle
+              )
+            ],
+          ),
+        ];
+
+        final pageCountGroups = pages.length;
+
+        return ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.4,
+              maxWidth:MediaQuery.of(context).size.width,
+            ),
+            child: Scaffold(
+              body: Container(
+                color: Theme.of(context).primaryColor,
+                child: SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Stack(
+                      children: [
+                        PageView(
+                          controller: pageViewControllerGroups,
+                          children: pages,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: PageIndicator(
+                            controller: pageViewControllerGroups,
+                            count: pageCountGroups,
+                            size: 8,
+                            layout: PageIndicatorLayout.WARM,
+                            activeColor: const Color(0xFFC16A03),
+                            scale: 0.65,
+                            space: 10,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+  );
+
+  pageViewControllerGroups.dispose();
 }
 
 Widget iconSyncMultipleDevices = const Stack(

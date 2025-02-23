@@ -87,7 +87,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                 ),
                 child: Container(
                     width: size.width*cnStandardPopUp.widthFactor,
-                    color: cnStandardPopUp.color,
+                    color: Theme.of(context).primaryColor,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: Column(
@@ -165,7 +165,7 @@ class CnStandardPopUp extends ChangeNotifier {
   bool jump = true;
   bool showCancel = true;
   bool canConfirm = true;
-  Color color = Colors.black;
+  // Color color = Colors.black;
   int animationTime = 200;
   double widthFactor = 0.65;
   double maxHeight = 300;
@@ -179,7 +179,7 @@ class CnStandardPopUp extends ChangeNotifier {
     EdgeInsets padding = const EdgeInsets.all(20),
     String? confirmText,
     String? cancelText,
-    Color? color,
+    // Color? color,
     bool showCancel = true,
     bool canConfirm = true,
     TextStyle? confirmTextStyle,
@@ -197,7 +197,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.padding = padding;
     this.confirmText = confirmText?? AppLocalizations.of(context)!.ok;
     this.cancelText = cancelText?? AppLocalizations.of(context)!.cancel;
-    this.color = color?? Theme.of(context).primaryColor;
+    // this.color = color?? Theme.of(context).primaryColor;
     this.showCancel = showCancel;
     this.canConfirm = canConfirm;
     this.confirmTextStyle = confirmTextStyle;
