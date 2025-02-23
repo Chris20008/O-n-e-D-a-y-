@@ -642,22 +642,23 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
               ),
             ),
 
-          // if(!cnNewWorkout.isSickDays)
-          //   Container(
-          //     height: 15,
-          //     decoration: BoxDecoration(
-          //         gradient:  LinearGradient(
-          //             begin: Alignment.bottomCenter,
-          //             end: Alignment.topCenter,
-          //             colors: [
-          //               // Colors.transparent,
-          //               // Color(0xff0a0604),
-          //               _color.withOpacity(0.0),
-          //               _color
-          //             ]
-          //         )
-          //     ),
-          //   ),
+          if(cnNewWorkout.workout.isTemplate)
+            Container(
+              height: 25,
+              color: _color
+              // decoration: BoxDecoration(
+              //     gradient:  LinearGradient(
+              //         begin: Alignment.bottomCenter,
+              //         end: Alignment.topCenter,
+              //         colors: [
+              //           // Colors.transparent,
+              //           // Color(0xff0a0604),
+              //           _color.withOpacity(0.0),
+              //           _color
+              //         ]
+              //     )
+              // ),
+            ),
         ],
       ),
     );
