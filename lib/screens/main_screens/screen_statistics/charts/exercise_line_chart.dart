@@ -260,13 +260,81 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
-            const Spacer(),
-          ],
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(left: 5),
+        //   child: Column(
+        //     mainAxisSize: MainAxisSize.min,
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Row(
+        //         children: [
+        //           Container(
+        //             height: 8,
+        //             width: 12,
+        //             decoration: BoxDecoration(
+        //                 borderRadius: BorderRadius.circular(5),
+        //                 color: gradientColors.first
+        //             ),
+        //           ),
+        //           SizedBox(width: 10),
+        //           Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: TextScaler.linear(0.8))
+        //         ],
+        //       ),
+        //       if(cnScreenStatistics.showAvgWeightPerSetLine)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors2.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //       if(cnScreenStatistics.showOneRepMax)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors3.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text("1RM", textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //       if(cnScreenStatistics.showSickDays)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors4.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text(AppLocalizations.of(context)!.statisticsSick, textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //     ],
+        //   ),
+        // ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
+        //     const Spacer(),
+        //   ],
+        // ),
         const SizedBox(height: 10,),
         LayoutBuilder(
           builder: (context, constraints) {
@@ -393,6 +461,74 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               },
               child: Stack(
                 children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 60),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 8,
+                              width: 12,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: gradientColors.first
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: TextScaler.linear(0.8))
+                          ],
+                        ),
+                        if(cnScreenStatistics.showAvgWeightPerSetLine)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors2.first
+                                  ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: TextScaler.linear(0.8))
+                            ],
+                          ),
+                        if(cnScreenStatistics.showOneRepMax)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors3.first
+                                  ),
+                              ),
+                              SizedBox(width: 10),
+                              Text("1RM", textScaler: TextScaler.linear(0.8))
+                            ],
+                          ),
+                        if(cnScreenStatistics.showSickDays)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors4.first
+                                  ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.statisticsSick, textScaler: TextScaler.linear(0.8))
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
                   AspectRatio(
                     aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
                     child: Padding(
@@ -552,22 +688,23 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         )
       ),
       gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-        horizontalInterval: verticalStepSize.toDouble(),
-        verticalInterval: 30,
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: Colors.grey[700]!.withOpacity(0.7),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: Colors.grey[700]!.withOpacity(0.7),
-            strokeWidth: 1,
-          );
-        },
+        show: false,
+        // drawHorizontalLine: true,
+        // drawVerticalLine: true,
+        // horizontalInterval: verticalStepSize.toDouble(),
+        // verticalInterval: 30,
+        // getDrawingHorizontalLine: (value) {
+        //   return FlLine(
+        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     strokeWidth: 1,
+        //   );
+        // },
+        // getDrawingVerticalLine: (value) {
+        //   return FlLine(
+        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     strokeWidth: 1,
+        //   );
+        // },
       ),
       titlesData: FlTitlesData(
         show: true,
@@ -595,7 +732,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         ),
       ),
       borderData: FlBorderData(
-        show: true,
+        show: false,
         border: Border.all(color: const Color(0xff5e5e5e)),
       ),
       minX: 0,
@@ -606,8 +743,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
         /// Max weight
         LineChartBarData(
-          isCurved: false,
-          // curveSmoothness: 0.1,
+          isCurved: true,
+          curveSmoothness: 0.1,
           spots: spotsMaxWeight,
           gradient: LinearGradient(
             colors: gradientColors,
@@ -630,7 +767,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         /// Average Weight per set
         // if(cnScreenStatistics.showAvgWeightPerSetLine)
           LineChartBarData(
-            isCurved: false,
+            isCurved: true,
             curveSmoothness: 0.1,
             spots: spotsAvgWeightPerSet,
             gradient: LinearGradient(
@@ -645,7 +782,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
         /// One Rep Max
         LineChartBarData(
-          isCurved: false,
+          isCurved: true,
           curveSmoothness: 0.1,
           spots: spotsOneRepMax,
           gradient: LinearGradient(
