@@ -1293,46 +1293,48 @@ Future showDialogMinuteSecondPicker({
     builder: (BuildContext context) => ClipRRect(
       borderRadius: const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
       child: Container(
-        height: onConfirm != null? 275 : 222,
-        padding: const EdgeInsets.only(top: 0.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
         color: CupertinoColors.systemBackground.resolveFrom(context),
         child: SafeArea(
           bottom: true,
           top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if(onConfirm != null)
-                Row(
-                  children: [
-                    CupertinoButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.cancel)
-                    ),
-                    const Spacer(),
-                    CupertinoButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                          onConfirm(newDuration);
-                        },
-                        child: Text(AppLocalizations.of(context)!.save)
-                    ),
-                  ],
+          child: Container(
+            height: onConfirm != null? 275 : 222,
+            padding: const EdgeInsets.only(top: 0.0),
+            margin: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if(onConfirm != null)
+                  Row(
+                    children: [
+                      CupertinoButton(
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                          },
+                          child: Text(AppLocalizations.of(context)!.cancel)
+                      ),
+                      const Spacer(),
+                      CupertinoButton(
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                            onConfirm(newDuration);
+                          },
+                          child: Text(AppLocalizations.of(context)!.save)
+                      ),
+                    ],
+                  ),
+                CupertinoTimerPicker(
+                  mode: CupertinoTimerPickerMode.ms,
+                  initialTimerDuration: initialTimeDuration,
+                  onTimerDurationChanged: (Duration duration) {
+                    HapticFeedback.selectionClick();
+                    newDuration = duration;
+                  },
                 ),
-              CupertinoTimerPicker(
-                mode: CupertinoTimerPickerMode.ms,
-                initialTimerDuration: initialTimeDuration,
-                onTimerDurationChanged: (Duration duration) {
-                  HapticFeedback.selectionClick();
-                  newDuration = duration;
-                },
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
