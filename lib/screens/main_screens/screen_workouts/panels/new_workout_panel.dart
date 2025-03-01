@@ -84,10 +84,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   @override
   Widget build(BuildContext context) {
 
-    print("In Build New Workout");
-
-    print(cnNewWorkout.exercisesAndLinks.map((e) => e.name));
-
     return PopScope(
       canPop: false,
       onPopInvoked: (doPop){
@@ -182,16 +178,23 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                         });
                                       },
                                       children: getReorderableChildren(),
-                                      // children: [
-                                      //   for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1)
-                                      //     if(cnNewWorkout.exercisesAndLinks[index].isExercise)
-                                      //       getExerciseWithSlideActions(index)
-                                      //     else if(cnNewWorkout.exercisesAndLinks[index].isLink)
-                                      //       getLinkWithSlideActions(index),
-                                      // ]
                                   ),
                                   if(!cnNewWorkout.isSickDays)
-                                    getAddExerciseButton()
+                                    getAddExerciseButton(),
+
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 15,
+                                        bottom: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 80
+                                    ),
+                                    child: getRowButton(
+                                      context: context,
+                                      minusWidth: 0,
+                                      onPressed: askDeleteWorkout,
+                                      icon: Icons.delete,
+                                      color: CupertinoColors.destructiveRed
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -325,10 +328,10 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   Widget getAddExerciseButton(){
     return Padding(
       padding: EdgeInsets.only(
-          top: 15,
-          bottom: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 80
+          top: 10,
+          // bottom: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 80
       ),
-      child: getAddButton(
+      child: getRowButton(
         key: cnNewWorkout.keyAddExercise,
         context: context,
         minusWidth: 0,
@@ -930,15 +933,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                       : BorderRadius.circular(8),
                   child: Material(
                     color: Theme.of(context).cardColor,
-                    child: InkWell(
-                      focusColor: null,
-                      highlightColor: Colors.grey.withOpacity(0.2),
-                      hoverColor: null,
-                      // overlayColor: Colors.transparent,
-                      splashColor: null,
-                      splashFactory: NoSplash.splashFactory,
-                      hoverDuration: const Duration(milliseconds: 0),
-                      onTap: (){
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: (){
                         if(MediaQuery.of(context).viewInsets.bottom <= 0){
                           openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!);
                         } else{

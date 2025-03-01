@@ -29,7 +29,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       builder: (BuildContext context) => ClipRRect(
         borderRadius: const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
         child: Container(
-          height: 350,
+          height: 500,
           color: CupertinoColors.systemBackground.resolveFrom(context),
           child: SafeArea(
             top: false,
@@ -86,8 +86,9 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
             clipBehavior: Clip.none,
             children: [
               CupertinoPicker(
+                  diameterRatio: 2,
                   magnification: 1.4,
-                  squeeze: 1.2,
+                  squeeze: 1.1,
                   useMagnifier: true,
                   itemExtent: 32,
                   scrollController: FixedExtentScrollController(
@@ -123,29 +124,6 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                     return child;
                   }).toList()
               ),
-              // Positioned(
-              //   left: 0,
-              //   right: 0,
-              //   top: -35,
-              //   child: Row(
-              //     children: [
-              //       CupertinoButton(
-              //           onPressed: (){
-              //             Navigator.of(context).pop();
-              //           },
-              //           child: Text(AppLocalizations.of(context)!.cancel)
-              //       ),
-              //       const Spacer(),
-              //       CupertinoButton(
-              //           onPressed: (){
-              //             cnScreenStatistics.selectedExerciseName = selectedExerciseName;
-              //             Navigator.of(context).pop();
-              //           },
-              //           child: Text(AppLocalizations.of(context)!.save)
-              //       ),
-              //     ],
-              //   ),
-              // ),
             ],
           ),
         ),

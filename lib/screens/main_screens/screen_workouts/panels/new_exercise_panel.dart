@@ -2,7 +2,6 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/main.dart';
-import 'package:fitness_app/widgets/keyboard_top_bar.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,9 +33,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  double _iconSize = 25;
   final double _widthSetWeightAmount = 55;
-  late TextStyle _style = TextStyle(color: Colors.white, fontSize: 18 - shrinkOffset * 8);
   late final _color = Theme.of(context).primaryColor;
   double heightHeader = 120.0;
   final textDisappearOffset = 0.1;
@@ -55,13 +52,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cnNewExercise.initVsync(this);
     });
-  }
-
-  double get shrinkOffset {
-    final value = cnNewExercise.scrollController.hasClients
-        ? (cnNewExercise.scrollController.offset / 150.0).clamp(0.0, 1.0)
-        : 0.0;
-    return value;
   }
 
   @override
@@ -111,16 +101,34 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             backgroundColor: Colors.transparent,
                             children: [
                               /// Rest in Seconds Row and Selector
-                              getRestInSecondsSelector(),
+                              cnNewExercise.getRestInSecondsSelector(
+                                  context: context,
+                                  exercise: cnNewExercise.exercise,
+                                  refresh: cnNewExercise.refresh
+                              ),
 
                               /// Seat Level Row and Selector
-                              getSeatLevelSelector(),
+                              cnNewExercise.getSeatLevelSelector(
+                                  context: context,
+                                  exercise: cnNewExercise.exercise,
+                                  refresh: cnNewExercise.refresh
+                              ),
 
                               /// Exercise Category Selector
-                              getExerciseCategorySelector(isTemplate: cnNewExercise.exercise.isNewExercise()),
+                              cnNewExercise.getExerciseCategorySelector(
+                                  context: context,
+                                  isTemplate: cnNewExercise.exercise.isNewExercise(),
+                                  exercise: cnNewExercise.exercise,
+                                  refresh: cnNewExercise.refresh
+                              ),
 
                               /// Body Weight selector
-                              getBodyWeightPercentSelector(isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate),
+                              cnNewExercise.getBodyWeightPercentSelector(
+                                  context: context,
+                                  isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewExercise.workout.isTemplate,
+                                  exercise: cnNewExercise.exercise,
+                                  refresh: cnNewExercise.refresh
+                              ),
                             ],
                           ),
 
@@ -365,7 +373,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             children: [
                               const SizedBox(height: 15,),
 
-                              getAddButton(
+                              getRowButton(
                                   key: addSetKey,
                                   context: context,
                                   minusWidth: 20,
@@ -542,10 +550,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
         final double screenHeight = MediaQuery.of(context).size.height;
 
         final viewInsets = MediaQuery.of(context).viewInsets.bottom;
-        // print("Is Visible");
-        // print(widgetPosition.dy + widgetSize.height * 80);
-        // print(widgetPosition.dy + 80 + viewInsets);
-        // print(screenHeight);
         final isVisible = widgetPosition.dy + widgetSize.height * 80 > 0 && widgetPosition.dy + 80 + viewInsets < screenHeight;
         if(!isVisible){
           cnNewExercise.scrollController.jumpTo(cnNewExercise.scrollController.position.pixels+41);
@@ -554,228 +558,154 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     });
   }
 
-  // void closePanelAndSaveExercise(){
-  //   if (cnNewExercise.formKey.currentState!.validate() && cnNewExercise.exercise.name.isNotEmpty) {
-  //     final copy = Exercise.copy(cnNewExercise.exercise);
-  //     copy.removeEmptySets();
-  //
-  //     if(copy.sets.isNotEmpty){
-  //       vibrateConfirm();
-  //       cnNewExercise.exercise.removeEmptySets();
-  //       if(cnNewExercise.onConfirm != null){
-  //         cnNewExercise.onConfirm!(cnNewExercise.exercise);
+  // Widget getRestInSecondsSelector() {
+  //   return getSelectRestInSeconds(
+  //       currentTime: cnNewExercise.exercise.restInSeconds,
+  //       context: context,
+  //       child: CupertinoListTile(
+  //         leading: Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+  //         title: Row(
+  //           children: [
+  //             Text(AppLocalizations.of(context)!.restTime, style: _style),
+  //             const Spacer(),
+  //             Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
+  //             const SizedBox(width: 10),
+  //           ],
+  //         ),
+  //         trailing: trailingChoice(),
+  //       ),
+  //       onConfirm: (dynamic value){
+  //         if(value is int){
+  //           cnNewExercise.exercise.restInSeconds = value;
+  //           cnNewExercise.restController.text = value.toString();
+  //           cnNewExercise.refresh();
+  //         }
+  //         else{
+  //           showDialogMinuteSecondPicker(
+  //               context: context,
+  //               initialTimeDuration: Duration(minutes: cnNewExercise.exercise.restInSeconds~/60, seconds: cnNewExercise.exercise.restInSeconds%60),
+  //               onConfirm: (Duration newDuration){
+  //                 cnNewExercise.exercise.restInSeconds = newDuration.inSeconds;
+  //               }
+  //           ).then((value) => setState(() {}));
+  //         }
   //       }
-  //
-  //       cnNewExercise.closePanel(doClear: true, context: context);
-  //       cnNewExercise.formKey.currentState?.reset();
-  //     }
-  //     else{
-  //       setState(() {
-  //         Fluttertoast.showToast(
-  //             msg: "Add at least one Set",
-  //             toastLength: Toast.LENGTH_SHORT,
-  //             gravity: ToastGravity.SNACKBAR,
-  //             timeInSecForIosWeb: 1,
-  //             backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-  //             textColor: Colors.white,
-  //             fontSize: 16.0
-  //         );
-  //       });
-  //     }
-  //   }
+  //   );
   // }
 
-  Widget getRestInSecondsSelector() {
-    return getSelectRestInSeconds(
-        currentTime: cnNewExercise.exercise.restInSeconds,
-        context: context,
-        child: CupertinoListTile(
-          leading: Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-          title: Row(
-            children: [
-              Text(AppLocalizations.of(context)!.restTime, style: _style),
-              const Spacer(),
-              Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
-              const SizedBox(width: 10),
-            ],
-          ),
-          trailing: trailingChoice(),
-        ),
-        onConfirm: (dynamic value){
-          if(value is int){
-            cnNewExercise.exercise.restInSeconds = value;
-            cnNewExercise.restController.text = value.toString();
-            cnNewExercise.refresh();
-          }
-          else{
-            showDialogMinuteSecondPicker(
-                context: context,
-                initialTimeDuration: Duration(minutes: cnNewExercise.exercise.restInSeconds~/60, seconds: cnNewExercise.exercise.restInSeconds%60),
-                onConfirm: (Duration newDuration){
-                  cnNewExercise.exercise.restInSeconds = newDuration.inSeconds;
-                }
-            ).then((value) => setState(() {}));
-          }
-          // else{
-          //   if(value == AppLocalizations.of(context)!.clear){
-          //     cnNewExercise.exercise.restInSeconds = 0;
-          //     cnNewExercise.restController.clear();
-          //     cnNewExercise.refresh();
-          //   }
-          //   else{
-          //     cnStandardPopUp.open(
-          //       context: context,
-          //       onConfirm: (){
-          //         cnNewExercise.exercise.restInSeconds = int.tryParse(cnNewExercise.restController.text)?? 0;
-          //         vibrateCancel();
-          //         cnNewExercise.refresh();
-          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-          //           FocusManager.instance.primaryFocus?.unfocus();
-          //         });
-          //       },
-          //       onCancel: (){
-          //         cnNewExercise.restController.text = cnNewExercise.exercise.restInSeconds.toString();
-          //         Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-          //           FocusManager.instance.primaryFocus?.unfocus();
-          //         });
-          //       },
-          //       child: TextField(
-          //         keyboardAppearance: Brightness.dark,
-          //         controller: cnNewExercise.restController,
-          //         keyboardType: TextInputType.number,
-          //         maxLength: 3,
-          //         decoration: InputDecoration(
-          //           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          //           labelText: AppLocalizations.of(context)!.restInSeconds,
-          //           counterText: "",
-          //           contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-          //         ),
-          //         style: const TextStyle(
-          //             fontSize: 18
-          //         ),
-          //         textAlign: TextAlign.center,
-          //         onChanged: (value){},
-          //       ),
-          //     );
-          //   }
-          // }
-        }
-    );
-  }
+  // Widget getSeatLevelSelector() {
+  //   return getSelectSeatLevel(
+  //       currentSeatLevel: cnNewExercise.exercise.seatLevel,
+  //       context: context,
+  //       onConfirm: (dynamic value){
+  //         if(value is int){
+  //           cnNewExercise.exercise.seatLevel = value;
+  //           cnNewExercise.refresh();
+  //         }
+  //         else if(value == AppLocalizations.of(context)!.clear){
+  //           cnNewExercise.exercise.seatLevel = null;
+  //           cnNewExercise.refresh();
+  //         }
+  //       },
+  //       child: CupertinoListTile(
+  //         leading: Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+  //         trailing: trailingChoice(),
+  //           title: Row(
+  //           children: [
+  //             Text(AppLocalizations.of(context)!.seatLevel, style: _style),
+  //             const Spacer(),
+  //             Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
+  //             const SizedBox(width: 10)
+  //           ],
+  //         ),
+  //       )
+  //   );
+  // }
 
-  Widget getSeatLevelSelector() {
-    return getSelectSeatLevel(
-        currentSeatLevel: cnNewExercise.exercise.seatLevel,
-        context: context,
-        onConfirm: (dynamic value){
-          if(value is int){
-            cnNewExercise.exercise.seatLevel = value;
-            cnNewExercise.refresh();
-          }
-          else if(value == AppLocalizations.of(context)!.clear){
-            cnNewExercise.exercise.seatLevel = null;
-            cnNewExercise.refresh();
-          }
-        },
-        child: CupertinoListTile(
-          leading: Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-          trailing: trailingChoice(),
-            title: Row(
-            children: [
-              Text(AppLocalizations.of(context)!.seatLevel, style: _style),
-              const Spacer(),
-              Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
-              const SizedBox(width: 10)
-            ],
-          ),
-        )
-    );
-  }
+  // Widget getExerciseCategorySelector({
+  //   required bool isTemplate
+  // }) {
+  //   Widget child = CupertinoListTile(
+  //       leading: Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+  //       title: Row(
+  //         children: [
+  //           Text("Kategorie", style: _style),
+  //           const Spacer(),
+  //           Text(cnNewExercise.exercise.getCategoryName(), style: _style),
+  //           const SizedBox(width: 10)
+  //         ],
+  //       ),
+  //       trailing: isTemplate? trailingChoice() : null
+  //   );
+  //
+  //   if(isTemplate){
+  //     return getSelectCategory(
+  //         context: context,
+  //         currentCategory: cnNewExercise.exercise.category,
+  //         onConfirm: (int category){
+  //           cnNewExercise.exercise.category = category;
+  //           cnNewExercise.refresh();
+  //           cnNewExercise.clearTextControllers();
+  //         },
+  //         child: child
+  //     );
+  //   }
+  //
+  //   return CupertinoButton(
+  //     onPressed: (){
+  //       HapticFeedback.selectionClick();
+  //       notificationPopUp(
+  //           context: context,
+  //           title: 'Change category',
+  //           message: "You can't change the Category of an existing exercise"
+  //       );
+  //     },
+  //     padding: EdgeInsets.zero,
+  //     child: child
+  //   );
+  // }
 
-  Widget getExerciseCategorySelector({
-    required bool isTemplate
-  }) {
-    Widget child = CupertinoListTile(
-        leading: Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-        title: Row(
-          children: [
-            Text("Kategorie", style: _style),
-            const Spacer(),
-            Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-            const SizedBox(width: 10)
-          ],
-        ),
-        trailing: isTemplate? trailingChoice() : null
-    );
-
-    if(isTemplate){
-      return getSelectCategory(
-          context: context,
-          currentCategory: cnNewExercise.exercise.category,
-          onConfirm: (int category){
-            cnNewExercise.exercise.category = category;
-            cnNewExercise.refresh();
-            cnNewExercise.clearTextControllers();
-          },
-          child: child
-      );
-    }
-
-    return CupertinoButton(
-      onPressed: (){
-        HapticFeedback.selectionClick();
-        notificationPopUp(
-            context: context,
-            title: 'Change category',
-            message: "You can't change the Category of an existing exercise"
-        );
-      },
-      padding: EdgeInsets.zero,
-      child: child
-    );
-  }
-
-  Widget getBodyWeightPercentSelector({
-    required bool isTemplate
-  }) {
-    Widget child = CupertinoListTile(
-        leading: Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
-        title: Row(
-          children: [
-            Text("Körpergewicht", style: _style),
-            const Spacer(),
-            Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
-            const SizedBox(width: 10),
-          ],
-        ),
-        trailing: isTemplate? trailingChoice() : null
-    );
-
-    if(isTemplate){
-      return getSelectBodyWeightPercent(
-          context: context,
-          currentBodyWeightPercent: cnNewExercise.exercise.bodyWeightPercent,
-          onConfirm: (int bodyWeight){
-            cnNewExercise.exercise.bodyWeightPercent = bodyWeight/100;
-            cnNewExercise.refresh();
-          },
-          child: child
-      );
-    }
-
-    return CupertinoButton(
-        onPressed: (){
-          HapticFeedback.selectionClick();
-          notificationPopUp(
-              context: context,
-              title: "Bodyweight",
-              message: "You can change the bodyweight only in the exercise template. The changes will be applied to all exercises with the same name."
-          );
-        },
-        padding: EdgeInsets.zero,
-        child: child
-    );
-  }
+  // Widget getBodyWeightPercentSelector({
+  //   required bool isTemplate
+  // }) {
+  //   Widget child = CupertinoListTile(
+  //       leading: Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
+  //       title: Row(
+  //         children: [
+  //           Text("Körpergewicht", style: _style),
+  //           const Spacer(),
+  //           Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
+  //           const SizedBox(width: 10),
+  //         ],
+  //       ),
+  //       trailing: isTemplate? trailingChoice() : null
+  //   );
+  //
+  //   if(isTemplate){
+  //     return getSelectBodyWeightPercent(
+  //         context: context,
+  //         currentBodyWeightPercent: cnNewExercise.exercise.bodyWeightPercent,
+  //         onConfirm: (int bodyWeight){
+  //           cnNewExercise.exercise.bodyWeightPercent = bodyWeight/100;
+  //           cnNewExercise.refresh();
+  //         },
+  //         child: child
+  //     );
+  //   }
+  //
+  //   return CupertinoButton(
+  //       onPressed: (){
+  //         HapticFeedback.selectionClick();
+  //         notificationPopUp(
+  //             context: context,
+  //             title: "Bodyweight",
+  //             message: "You can change the bodyweight only in the exercise template. The changes will be applied to all exercises with the same name."
+  //         );
+  //       },
+  //       padding: EdgeInsets.zero,
+  //       child: child
+  //   );
+  // }
 
   Widget getHeader() {
 
@@ -810,7 +740,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               }
             },
             validator: (value) {
-              print("Run Validator");
               value = value?.trim();
               if (value == null || value.isEmpty) {
                 return AppLocalizations.of(context)!.panelExEnterName;
@@ -895,13 +824,15 @@ class CnNewExercisePanel extends ChangeNotifier {
   Exercise exercise = Exercise();
   Workout workout = Workout();
   TextEditingController exerciseNameController = TextEditingController();
-  TextEditingController restController = TextEditingController();
-  TextEditingController seatLevelController = TextEditingController();
+  // TextEditingController restController = TextEditingController();
+  // TextEditingController seatLevelController = TextEditingController();
   ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function? onConfirm;
   final int animationTime = 500;
   late TickerProvider vsync;
+  double iconSize = 25;
+  final TextStyle _style = const TextStyle(color: Colors.white, fontSize: 18);
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
@@ -922,8 +853,8 @@ class CnNewExercisePanel extends ChangeNotifier {
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     exerciseNameController = TextEditingController(text: ex.name);
-    restController = TextEditingController(text: ex.restInSeconds > 0? ex.restInSeconds.toString() : "");
-    seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
+    // restController = TextEditingController(text: ex.restInSeconds > 0? ex.restInSeconds.toString() : "");
+    // seatLevelController = TextEditingController(text: ex.seatLevel != null? ex.seatLevel.toString() : "");
   }
 
   void clearTextControllers(){
@@ -938,26 +869,16 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void closePanelAndSaveExercise(BuildContext context) async{
-    print("In Save with name: " +  exercise.name);
     if (formKey.currentState!.validate() && exercise.name.isNotEmpty) {
       final copy = Exercise.copy(exercise);
       copy.removeEmptySets();
 
       if(copy.sets.isNotEmpty){
-        // vibrateConfirm();
-        // exercise.removeEmptySets();
-        // if(onConfirm != null){
-        //   print("In Save with name: " +  exercise.name);
-        //   onConfirm!(exercise);
-        // }
-
         await closePanel(doClear: true, context: context);
         exercise.removeEmptySets();
         if(onConfirm != null){
-          print("In Save with name: " +  exercise.name);
           onConfirm!(exercise);
         }
-        // formKey.currentState?.reset();
       }
       else{
         Fluttertoast.showToast(
@@ -972,6 +893,172 @@ class CnNewExercisePanel extends ChangeNotifier {
       }
     }
   }
+
+  /// SELECTORS
+
+  Widget getRestInSecondsSelector({
+    required BuildContext context,
+    required Exercise exercise,
+    required Function refresh
+  }) {
+    return getSelectRestInSeconds(
+        currentTime: exercise.restInSeconds,
+        context: context,
+        child: CupertinoListTile(
+          leading: Icon(Icons.timer, size: iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+          title: Row(
+            children: [
+              Text(AppLocalizations.of(context)!.restTime, style: _style),
+              const Spacer(),
+              Text(mapRestInSecondsToString(restInSeconds: exercise.restInSeconds), style: _style),
+              const SizedBox(width: 10),
+            ],
+          ),
+          trailing: trailingChoice(),
+        ),
+        onConfirm: (dynamic value){
+          if(value is int){
+            exercise.restInSeconds = value;
+            refresh();
+          }
+          else{
+            showDialogMinuteSecondPicker(
+                context: context,
+                initialTimeDuration: Duration(minutes: exercise.restInSeconds~/60, seconds: exercise.restInSeconds%60),
+                onConfirm: (Duration newDuration){
+                  exercise.restInSeconds = newDuration.inSeconds;
+                }
+            ).then((value) => refresh());
+          }
+        }
+    );
+  }
+
+  Widget getSeatLevelSelector({
+    required BuildContext context,
+    required Exercise exercise,
+    required Function refresh
+  }) {
+    return getSelectSeatLevel(
+        currentSeatLevel: exercise.seatLevel,
+        context: context,
+        onConfirm: (dynamic value){
+          if(value is int){
+            exercise.seatLevel = value;
+            refresh();
+          }
+          else if(value == AppLocalizations.of(context)!.clear){
+            exercise.seatLevel = null;
+            refresh();
+          }
+        },
+        child: CupertinoListTile(
+          leading: Icon(Icons.airline_seat_recline_normal, size: iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+          trailing: trailingChoice(),
+          title: Row(
+            children: [
+              Text(AppLocalizations.of(context)!.seatLevel, style: _style),
+              const Spacer(),
+              Text(exercise.seatLevel == null? "-" : exercise.seatLevel.toString(), style: _style),
+              const SizedBox(width: 10)
+            ],
+          ),
+        )
+    );
+  }
+
+  Widget getExerciseCategorySelector({
+    required BuildContext context,
+    required bool isTemplate,
+    required Exercise exercise,
+    required Function refresh
+  }) {
+    Widget child = CupertinoListTile(
+        leading: Icon(MyIcons.tags, size: iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+        title: Row(
+          children: [
+            Text(AppLocalizations.of(context)!.category, style: _style),
+            const Spacer(),
+            Text(exercise.getCategoryName(), style: _style),
+            const SizedBox(width: 10)
+          ],
+        ),
+        trailing: isTemplate? trailingChoice() : null
+    );
+
+    if(isTemplate){
+      return getSelectCategory(
+          context: context,
+          currentCategory: exercise.category,
+          onConfirm: (int category){
+            exercise.category = category;
+            refresh();
+            clearTextControllers();
+          },
+          child: child
+      );
+    }
+
+    return CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          notificationPopUp(
+              context: context,
+              title: AppLocalizations.of(context)!.panelExChangeCategoryHeader,
+              message: AppLocalizations.of(context)!.panelExChangeCategoryText
+          );
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    );
+  }
+
+  Widget getBodyWeightPercentSelector({
+    required BuildContext context,
+    required bool isTemplate,
+    required Exercise exercise,
+    required Function refresh
+  }) {
+    Widget child = CupertinoListTile(
+        leading: Icon(MyIcons.weight, size: iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
+        title: Row(
+          children: [
+            Text(AppLocalizations.of(context)!.bodyweight, style: _style),
+            const Spacer(),
+            Text("${(exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
+            const SizedBox(width: 10),
+          ],
+        ),
+        trailing: isTemplate? trailingChoice() : null
+    );
+
+    if(isTemplate){
+      return getSelectBodyWeightPercent(
+          context: context,
+          currentBodyWeightPercent: exercise.bodyWeightPercent,
+          onConfirm: (int bodyWeight){
+            exercise.bodyWeightPercent = bodyWeight/100;
+            refresh();
+          },
+          child: child
+      );
+    }
+
+    return CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          notificationPopUp(
+              context: context,
+              title: AppLocalizations.of(context)!.panelExChangeBodyWeightHeader,
+              message: AppLocalizations.of(context)!.panelExChangeBodyWeightText
+          );
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    );
+  }
+
+  /// -------------------------
 
   Future openPanel({required Workout workout, Exercise? exercise, Function? onConfirm})async{
     formKey.currentState?.reset();
@@ -1012,8 +1099,8 @@ class CnNewExercisePanel extends ChangeNotifier {
     formKey.currentState?.reset();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
-    restController = TextEditingController();
-    seatLevelController = TextEditingController();
+    // restController = TextEditingController();
+    // seatLevelController = TextEditingController();
     ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     if(withRefresh){

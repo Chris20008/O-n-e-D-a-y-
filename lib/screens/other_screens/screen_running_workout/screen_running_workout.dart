@@ -9,7 +9,6 @@ import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
-import 'package:fitness_app/widgets/keyboard_top_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -81,17 +80,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   Widget build(BuildContext context) {
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
-    print("ViewInsets Bttom");
-    print(viewInsetsBottom);
-
-    // return Scaffold(
-    //   resizeToAvoidBottomInset: false,
-    //   body: ListView(
-    //     children: [
-    //       ...List.generate(20, (index) => TextField())
-    //     ],
-    //   )
-    // );
 
     return PopScope(
       canPop: !isSavingData,
@@ -255,7 +243,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                             onLongPress: (){},
                                             child: Column(
                                               children: [
-                                                getAddButton(
+                                                SizedBox(height: 10,),
+                                                getRowButton(
                                                     context: context,
                                                     minusWidth: 10,
                                                     onPressed: (){

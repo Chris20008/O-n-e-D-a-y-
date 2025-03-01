@@ -64,8 +64,8 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
               child: RichText(
                 text: TextSpan(
                   children: [
-                    TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: TextStyle(fontWeight: FontWeight.w500)),
-                    TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: TextStyle(fontSize: 8, fontWeight: FontWeight.w400))
+                    TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white)),
+                    TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w400, color: Colors.white))
                   ]
                 )
               ),
@@ -80,11 +80,26 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
         Expanded(
           child: Center(
             child: FittedBox(
-              child: Text(exercise.categoryIsReps()
-                  ? "${set.amount}"
-                  : (set.amountAsTime?? "").toString(),
-                style: const TextStyle(fontWeight: FontWeight.w500),
+              child: RichText(
+                  text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: exercise.categoryIsReps()
+                                ? "${set.amount}"
+                                : (set.amountAsTime?? "").toString(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                            )
+                        ),
+                      ]
+                  )
               ),
+              // child: Text(exercise.categoryIsReps()
+              //     ? "${set.amount}"
+              //     : (set.amountAsTime?? "").toString(),
+              //   style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+              // ),
             ),
           ),
         )
@@ -985,7 +1000,8 @@ Future getExplainExerciseGroups(BuildContext context) async{
       color: Colors.white,
       fontSize: 19.0
   );
-  await showCupertinoModalPopup(
+  await showModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (context){
         List<Widget> pages = [
@@ -1456,29 +1472,37 @@ Size getWidgetSize(GlobalKey key){
   return size;
 }
 
-Widget getAddButton({Key? key, required BuildContext context, required double minusWidth, required Function() onPressed}){
-  return Row(
-    children: [
-      SizedBox(width: minusWidth),
-      Expanded(
-        child: IconButton(
-            key: key,
-          // splashRadius: 0,
-            alignment: Alignment.center,
-            color: Colors.amber[800],
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Theme.of(context).cardColor),
-                shape: MaterialStateProperty.all(RoundedRectangleBorder( borderRadius: BorderRadius.circular(10)))
-            ),
-            onPressed: onPressed,
-            icon: const Icon(
-              Icons.add,
-              size: 20,
-            )
+Widget getRowButton({
+  Key? key,
+  required BuildContext context,
+  required double minusWidth,
+  required Function() onPressed,
+  IconData icon = Icons.add,
+  Color? color
+}){
+  color = color?? Colors.amber[800];
+  return SizedBox(
+    height: 35,
+    child: Row(
+      children: [
+        SizedBox(width: minusWidth),
+        Expanded(
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+              key: key,
+              alignment: Alignment.center,
+              color: Theme.of(context).cardColor,
+              onPressed: onPressed,
+              child: Icon(
+                icon,
+                size: 20,
+                color: color,
+              )
+          ),
         ),
-      ),
-      SizedBox(width: minusWidth)
-    ],
+        SizedBox(width: minusWidth)
+      ],
+    ),
   );
 }
 

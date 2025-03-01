@@ -10,6 +10,8 @@
   "restInSeconds": "Rest in Seconds",
   "restTime": "Rest Time",
   "seatLevel": "Seat Level",
+  "category": "Category",
+  "bodyweight": "Bodyweight",
   "set": "Set",
   "weight": "Weight",
   "amount": "Amount",
@@ -104,6 +106,10 @@
 
   "panelExAlreadyExists": "Exercise name already exists in current workout",
   "panelExEnterName": "Enter Exercise name",
+  "panelExChangeCategoryHeader": "Change category",
+  "panelExChangeCategoryText": "You can't change the Category of an existing exercise.",
+  "panelExChangeBodyWeightHeader": "Bodyweight",
+  "panelExChangeBodyWeightText": "You can change the bodyweight only in the exercise template. The changes will be applied to all exercises with the same name.",
 
   "historyFuture": "Future",
   "historyToday": "Today",
