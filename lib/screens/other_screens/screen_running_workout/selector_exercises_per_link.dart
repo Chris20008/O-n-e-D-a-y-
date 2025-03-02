@@ -11,6 +11,7 @@ import '../../../objects/exercise.dart';
 import '../../../util/constants.dart';
 import '../../../widgets/multiple_exercise_row.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 class SelectorExercisesPerLink extends StatefulWidget {
   final Map groupedExercises;
@@ -237,48 +238,51 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                   ),
                   /// bottom buttons
                   Positioned(
-                      bottom: 10,
+                      bottom: Platform.isAndroid? 10 : -5,
                       left: 0,
                       right: 0,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CupertinoButtonText(
-                              text: AppLocalizations.of(context)!.cancel,
-                              onPressed: () {
-                                HapticFeedback.selectionClick();
-                                widget.onCancel();
-                              },
+                      child: SafeArea(
+                        top: false,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CupertinoButtonText(
+                                text: AppLocalizations.of(context)!.cancel,
+                                onPressed: () {
+                                  HapticFeedback.selectionClick();
+                                  widget.onCancel();
+                                },
+                              ),
                             ),
-                          ),
 
-                          const Spacer(),
+                            const Spacer(),
 
-                          Expanded(
-                            child: CupertinoButtonText(
-                              text: AppLocalizations.of(context)!.confirm,
-                              onPressed: () {
-                                List<String> exToRemove = [];
-                                int index = 0;
-                                int indexJ = 0;
-                                for(List<bool> checks in isCheckedList){
-                                  for(bool check in checks){
-                                    if(check){
+                            Expanded(
+                              child: CupertinoButtonText(
+                                text: AppLocalizations.of(context)!.confirm,
+                                onPressed: () {
+                                  List<String> exToRemove = [];
+                                  int index = 0;
+                                  int indexJ = 0;
+                                  for(List<bool> checks in isCheckedList){
+                                    for(bool check in checks){
+                                      if(check){
+                                        indexJ += 1;
+                                        continue;
+                                      }
+                                      exToRemove.add(groupedExercises[linkNames[index]][indexJ].name);
                                       indexJ += 1;
-                                      continue;
                                     }
-                                    exToRemove.add(groupedExercises[linkNames[index]][indexJ].name);
-                                    indexJ += 1;
+                                    indexJ = 0;
+                                    index += 1;
                                   }
-                                  indexJ = 0;
-                                  index += 1;
-                                }
-                                HapticFeedback.selectionClick();
-                                widget.onConfirm(exToRemove: exToRemove);
-                              },
+                                  HapticFeedback.selectionClick();
+                                  widget.onConfirm(exToRemove: exToRemove);
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       )
                   )
                 ],

@@ -13,6 +13,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
 class SelectorExercisesToUpdate extends StatefulWidget {
 
@@ -236,51 +237,54 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                   ),
                   /// bottom buttons
                   Positioned(
-                      bottom: 10,
+                      bottom: Platform.isAndroid? 10 : -5,
                       left: 0,
                       right: 0,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: CupertinoButtonText(
-                              text: relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok,
-                              onPressed: () {
-                                HapticFeedback.selectionClick();
-                                widget.onCancel();
-                              },
-                            ),
-                          ),
-
-                          const Spacer(),
-
-                          if(relevantExercises.isNotEmpty)
+                      child: SafeArea(
+                        top: false,
+                        child: Row(
+                          children: [
                             Expanded(
                               child: CupertinoButtonText(
-                                text: AppLocalizations.of(context)!.confirm,
+                                text: relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok,
                                 onPressed: () {
-                                  bool doUpdate = isCheckedList.any((state) => state);
-                                  if(doUpdate){
-                                    List<int> indexesToRemove = [];
-                                    for (num index in range(isCheckedList.length)){
-                                      if(isCheckedList[index.toInt()] == false){
-                                        indexesToRemove.add(index.toInt());
-                                      }
-                                    }
-                                    for(int index in indexesToRemove.reversed){
-                                      relevantExercises.removeAt(index);
-                                    }
-                                  }
-                                  Future.delayed(const Duration(milliseconds: 200), (){
-                                    widget.onConfirm();
-                                    if(doUpdate){
-                                      workout.exercises = relevantExercises;
-                                      workout.updateTemplate();
-                                    }
-                                  });
+                                  HapticFeedback.selectionClick();
+                                  widget.onCancel();
                                 },
                               ),
                             ),
-                        ],
+
+                            const Spacer(),
+
+                            if(relevantExercises.isNotEmpty)
+                              Expanded(
+                                child: CupertinoButtonText(
+                                  text: AppLocalizations.of(context)!.confirm,
+                                  onPressed: () {
+                                    bool doUpdate = isCheckedList.any((state) => state);
+                                    if(doUpdate){
+                                      List<int> indexesToRemove = [];
+                                      for (num index in range(isCheckedList.length)){
+                                        if(isCheckedList[index.toInt()] == false){
+                                          indexesToRemove.add(index.toInt());
+                                        }
+                                      }
+                                      for(int index in indexesToRemove.reversed){
+                                        relevantExercises.removeAt(index);
+                                      }
+                                    }
+                                    Future.delayed(const Duration(milliseconds: 200), (){
+                                      widget.onConfirm();
+                                      if(doUpdate){
+                                        workout.exercises = relevantExercises;
+                                        workout.updateTemplate();
+                                      }
+                                    });
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
                       )
                   )
                 ],
