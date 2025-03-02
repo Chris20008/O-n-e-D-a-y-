@@ -369,7 +369,6 @@ class _MyHomePageState extends State<MyHomePage>{
                           ),
                         ),
 
-                      // if(!cnRunningWorkout.isVisible)
                       const NewWorkOutPanel(),
 
                       const NewExercisePanel(),

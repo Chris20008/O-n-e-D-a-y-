@@ -1448,15 +1448,15 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     refresh();
   }
 
-  void openPanelAsTemplate(){
+  Future openPanelAsTemplate() async{
     if(isUpdating){
       clear();
     }
     workout.isTemplate = true;
-    openPanelWithRefresh();
+    await openPanelWithRefresh();
   }
 
-  void openPanelWithRefresh() async{
+  Future openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
     minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -1591,17 +1591,16 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     cnWorkoutHistory.refresh();
   }
 
-  void editWorkout({
+  Future editWorkout({
     Workout? workout,
     ObSickDays? sickDays
-  }){
-
+  }) async{
     if (workout != null){
       isSickDays = false;
       Workout w = Workout.clone(workout);
       /// When same workout
       if(isUpdating && this.workout.id == w.id){
-        openPanelWithRefresh();
+        await openPanelWithRefresh();
       }
       /// When different workout
       else{
@@ -1611,7 +1610,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         updateExercisesAndLinksList();
         insertLinksAtPlace();
         orderExercises();
-        openPanelWithRefresh();
+        await openPanelWithRefresh();
       }
     }
     else if(sickDays != null){
@@ -1619,7 +1618,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       isSickDays = true;
       isUpdating = true;
       this.sickDays = sickDays;
-      openPanelWithRefresh();
+      await openPanelWithRefresh();
       minPanelHeight = keepShowingPanelHeightSickDays;
     }
 
