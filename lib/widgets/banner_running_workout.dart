@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:fitness_app/util/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
@@ -43,8 +44,9 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
               ),
               child: SafeArea(
                 bottom: false,
-                child: GestureDetector(
-                  onTap: () {
+                child: CupertinoButton(
+                  padding: EdgeInsets.zero,
+                  onPressed: () {
                     if(!cnRunningWorkout.isVisible){
                       cnRunningWorkout.reopenRunningWorkout(context);
                     }
@@ -56,7 +58,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Spacer(),
+                        const Spacer(),
                         Expanded(
                           flex: 4,
                           child: Center(

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,19 +40,19 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                 child,
                 Row(
                   children: [
-                    CupertinoButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                        },
-                        child: Text(AppLocalizations.of(context)!.cancel)
+                    CupertinoButtonText(
+                      onPressed: (){
+                        Navigator.of(context).pop();
+                      },
+                      text: AppLocalizations.of(context)!.cancel,
                     ),
                     const Spacer(),
-                    CupertinoButton(
+                    CupertinoButtonText(
                         onPressed: (){
                           cnScreenStatistics.selectedExerciseName = selectedExerciseName;
                           Navigator.of(context).pop();
                         },
-                        child: Text(AppLocalizations.of(context)!.save)
+                        text: AppLocalizations.of(context)!.save
                     ),
                   ],
                 ),

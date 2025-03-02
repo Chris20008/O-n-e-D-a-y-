@@ -5,7 +5,6 @@ import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -477,8 +476,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                                 color: gradientColors.first
                               ),
                             ),
-                            SizedBox(width: 10),
-                            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: TextScaler.linear(0.8))
+                            const SizedBox(width: 10),
+                            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(0.8))
                           ],
                         ),
                         if(cnScreenStatistics.showAvgWeightPerSetLine)
@@ -492,8 +491,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                                       color: gradientColors2.first
                                   ),
                               ),
-                              SizedBox(width: 10),
-                              Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: TextScaler.linear(0.8))
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: const TextScaler.linear(0.8))
                             ],
                           ),
                         if(cnScreenStatistics.showOneRepMax)
@@ -507,8 +506,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                                       color: gradientColors3.first
                                   ),
                               ),
-                              SizedBox(width: 10),
-                              Text("1RM", textScaler: TextScaler.linear(0.8))
+                              const SizedBox(width: 10),
+                              const Text("1RM", textScaler: TextScaler.linear(0.8))
                             ],
                           ),
                         if(cnScreenStatistics.showSickDays)
@@ -522,8 +521,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                                       color: gradientColors4.first
                                   ),
                               ),
-                              SizedBox(width: 10),
-                              Text(AppLocalizations.of(context)!.statisticsSick, textScaler: TextScaler.linear(0.8))
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.statisticsSick, textScaler: const TextScaler.linear(0.8))
                             ],
                           ),
                       ],
@@ -649,6 +648,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
+          maxContentWidth: 200,
           showOnTopOfTheChartBoxArea: true,
           fitInsideVertically: true,
           fitInsideHorizontally: true,

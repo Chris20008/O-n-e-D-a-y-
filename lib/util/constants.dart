@@ -5,6 +5,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -43,6 +44,10 @@ const List<int> predefinedTimes = [
 ];
 
 const int maxTutorialStep = 999999;
+
+TextStyle cupButtonTextStyle = TextStyle(color: Colors.amber[800]?? const Color(0xFFFF9A19));
+
+const Color activeColor = Color(0xffdb7b01);
 
 Widget backgroundSingleSet = Container(
   decoration: BoxDecoration(
@@ -638,7 +643,7 @@ void notificationPopUp({
             Navigator.pop(context);
           },
           isDefaultAction: true,
-          child: const Text('Ok'),
+          child: Text('Ok', style: cupButtonTextStyle),
         ),
       ],
     ),
@@ -926,7 +931,6 @@ Widget buildCalendarDialogButton({
       final values = await showCalendarDatePicker2Dialog(
         context: context,
         config: config,
-        // dialogSize: const Size(325, 400),
         dialogSize: const Size(325, 700),
         borderRadius: BorderRadius.circular(15),
         value: dateValues.isNotEmpty
@@ -934,8 +938,6 @@ Widget buildCalendarDialogButton({
           : calendarType == CalendarDatePicker2Type.single
             ? [DateTime.now()]
             : [DateTime.now(), DateTime.now()],
-        // dialogBackgroundColor: Theme.of(context).primaryColor
-        //   dialogBackgroundColor: Color(0xFF303030)
           dialogBackgroundColor: Theme.of(context).cardColor
       );
       if (values != null && onConfirm != null) {
@@ -1065,7 +1067,7 @@ Future getExplainExerciseGroups(BuildContext context) async{
                             count: pageCountGroups,
                             size: 8,
                             layout: PageIndicatorLayout.WARM,
-                            activeColor: const Color(0xFFC16A03),
+                            activeColor: activeColor,
                             scale: 0.65,
                             space: 10,
                           ),
@@ -1088,7 +1090,8 @@ Widget iconSyncMultipleDevices = const Stack(
     alignment: Alignment.center,
     children: [
       Icon(
-          Icons.cloud
+        Icons.cloud,
+        color: Colors.white,
       ),
       Padding(
         padding: EdgeInsets.only(top: 1),
@@ -1113,10 +1116,13 @@ Widget getCloudOptionsColumn({
       children: [
         /// Connect with Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_done),
+          leading: const Icon(
+            Icons.cloud_done,
+            color: Colors.white
+          ),
           trailing: CupertinoSwitch(
               value: cnConfig.connectWithCloud,
-              activeColor: const Color(0xFFC16A03),
+              activeColor: activeColor,
               onChanged: (value)async{
                 if(Platform.isAndroid){
                   HapticFeedback.selectionClick();
@@ -1182,10 +1188,13 @@ Widget getCloudOptionsColumn({
 
                 /// Save Backup in Cloud
                 CupertinoListTile(
-                  leading: const Icon(Icons.cloud_upload),
+                  leading: const Icon(
+                    Icons.cloud_upload,
+                    color: Colors.white,
+                  ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.saveBackupCloud,
-                      activeColor: const Color(0xFFC16A03),
+                      activeColor: activeColor,
                       onChanged: (value) async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1221,7 +1230,7 @@ Widget getCloudOptionsColumn({
                   leading: iconSyncMultipleDevices,
                   trailing: CupertinoSwitch(
                       value: cnConfig.syncMultipleDevices,
-                      activeColor: const Color(0xFFC16A03),
+                      activeColor: activeColor,
                       onChanged: (value)async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1276,7 +1285,7 @@ Widget getActionSheetCancelButton (BuildContext context, {String? text, Function
           onPressed!();
           Navigator.pop(context);
         },
-        child: Text(text?? AppLocalizations.of(context)!.cancel),
+        child: Text(text?? AppLocalizations.of(context)!.cancel, style: cupButtonTextStyle),
       ),
     ),
   );
@@ -1309,19 +1318,19 @@ Future showDialogMinuteSecondPicker({
                 if(onConfirm != null)
                   Row(
                     children: [
-                      CupertinoButton(
+                      CupertinoButtonText(
                           onPressed: (){
                             Navigator.of(context).pop();
                           },
-                          child: Text(AppLocalizations.of(context)!.cancel)
+                          text: AppLocalizations.of(context)!.cancel
                       ),
                       const Spacer(),
-                      CupertinoButton(
+                      CupertinoButtonText(
                           onPressed: (){
                             Navigator.of(context).pop();
                             onConfirm(newDuration);
                           },
-                          child: Text(AppLocalizations.of(context)!.save)
+                          text: AppLocalizations.of(context)!.save
                       ),
                     ],
                   ),
@@ -1360,7 +1369,10 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
 
         /// Save Backup Automatic
         CupertinoListTile(
-          leading: const Icon(Icons.sync),
+          leading: const Icon(
+            Icons.sync,
+            color: Colors.white
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -1372,7 +1384,10 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
 
         /// Connect with Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_done),
+          leading: const Icon(
+            Icons.cloud_done,
+            color: Colors.white,
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               Platform.isAndroid
@@ -1392,7 +1407,10 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
 
         /// Save Backups in Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_upload),
+          leading: const Icon(
+            Icons.cloud_upload,
+            color: Colors.white,
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               Platform.isAndroid
@@ -1480,11 +1498,12 @@ Widget getRowButton({
   required double minusWidth,
   required Function() onPressed,
   IconData icon = Icons.add,
-  Color? color
+  Color? color,
+  double height = 40
 }){
   color = color?? Colors.amber[800];
   return SizedBox(
-    height: 35,
+    height: height,
     child: Row(
       children: [
         SizedBox(width: minusWidth),

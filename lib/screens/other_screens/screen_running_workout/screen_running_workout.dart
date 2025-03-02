@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:ui';
 import 'package:collection/collection.dart';
+// import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/setRow.dart';
@@ -12,7 +13,6 @@ import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -49,6 +49,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
+  // late CnNewWorkOutPanel cnNewWorkOutPanel  = Provider.of<CnNewWorkOutPanel>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
@@ -93,6 +94,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         if(cnStandardPopUp.isVisible){
           cnStandardPopUp.clear();
         }
+        // cnNewWorkOutPanel.showHidedPanel(context);
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
@@ -120,12 +122,21 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                           sigmaY: 10.0,
                           tileMode: TileMode.mirror
                       ),
-                      child: GestureDetector(
-                        onTap: openPopUpFinishWorkout,
-                        child: Container(
-                          height: cnBottomMenu.height,
-                          color: Colors.black.withOpacity(0.5),
-                          child: Center(child: Text(AppLocalizations.of(context)!.finish, style: TextStyle(color: Colors.amber[800]), textScaler: const TextScaler.linear(1.4),)),
+                      child: Container(
+                        height: cnBottomMenu.height,
+                        color: Colors.black.withOpacity(0.5),
+                        child: CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: openPopUpFinishWorkout,
+                          child: Center(
+                              child: Text(
+                                AppLocalizations.of(context)!.finish,
+                                  style: TextStyle(
+                                      color: Colors.amber[800]
+                                  ),
+                                  textScaler: const TextScaler.linear(1.2)
+                              )
+                          ),
                         ),
                       ),
                     ),
@@ -243,10 +254,11 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                             onLongPress: (){},
                                             child: Column(
                                               children: [
-                                                SizedBox(height: 10,),
+                                                const SizedBox(height: 10,),
                                                 getRowButton(
                                                     context: context,
                                                     minusWidth: 10,
+                                                    height: 35,
                                                     onPressed: (){
                                                       addSet(ex, templateEx!);
                                                     }
@@ -397,7 +409,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                   mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     SizedBox(width: 100, child: getSeatLevelSelector(newEx)),
-                                                    Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                                                    Icon(MyIcons.tags, size: _iconSize-3),
                                                     const SizedBox(width: 8,),
                                                     Text(newEx.getCategoryName())
                                                   ]
@@ -620,50 +632,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               //     onPressedLeft: onPressedLeft,
               //     onPressedRight: onPressedRight
               //   ),
-
-              // Positioned(
-              //   left: 0,
-              //   right: 0,
-              //   bottom: MediaQuery.of(context).viewInsets.bottom,
-              //   child: GestureDetector(
-              //     onTap: (){}, /// Empty Gesture Detector to override higher Gesture Detector
-              //     child: Container(
-              //       height: 40,
-              //       color: const Color(0XFF333335),
-              //       child: Row(
-              //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //         children: [
-              //           CupertinoButton(
-              //               padding: const EdgeInsets.only(top: 5, bottom: 5, left: 23, right: 23),
-              //               onPressed: (){
-              //                 // if(widget.onPressedLeft != null){
-              //                 //   widget.onPressedLeft!();
-              //                 // }
-              //               },
-              //               child: Text(
-              //                   "Textleft",
-              //                   style: const TextStyle(fontWeight: FontWeight.w500),
-              //                   textScaler: const TextScaler.linear(1.1)
-              //               )
-              //           ),
-              //           CupertinoButton(
-              //               padding: const EdgeInsets.only(top: 5, bottom: 5, right: 23, left: 23),
-              //               onPressed: (){
-              //                 // if(widget.onPressedRight != null){
-              //                 //   widget.onPressedRight!();
-              //                 // }
-              //               },
-              //               child: Text(
-              //                   "Textright",
-              //                   style: const TextStyle(fontWeight: FontWeight.w500),
-              //                   textScaler: const TextScaler.linear(1.1)
-              //               )
-              //           )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
 
               const StandardPopUp(),
 
@@ -1003,7 +971,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 });
                 Navigator.pop(context);
               },
-              child: Text(AppLocalizations.of(context)!.finish),
+              child: Text(AppLocalizations.of(context)!.finish, style: cupButtonTextStyle),
             ),
         ],
       ),
@@ -1126,7 +1094,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                    Icon(Icons.airline_seat_recline_normal, size: _iconSize),
                     const SizedBox(width: 2,),
                     if (newEx.seatLevel == null)
                       Text("-", style: _style,)
@@ -1167,7 +1135,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   child: Row(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+                      Icon(CupertinoIcons.timer, size: _iconSize),
                       const SizedBox(width: 2,),
                       Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
                       const SizedBox(width: 10,)

@@ -395,19 +395,19 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                 child: SizedBox(
                   height: cnSpotifyBar.heightOfButton,
                   width: cnSpotifyBar.heightOfButton,
-                  child: IconButton(
-                      iconSize: 25,
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                        // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                      ),
+                  child: CupertinoButton(
+                      // iconSize: 25,
+                      // style: ButtonStyle(
+                      //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                      //   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                      // ),
                       onPressed: () async{
                         cnSpotifyBar.connectToSpotify(context);
                       },
-                      icon: const Icon(
+                      child: const Icon(
                         MyIcons.spotify,
-                        // color: Colors.amber[800],
-                        color: Color(0xff1ed560)
+                        color: Color(0xff1ed560),
+                        size: 25,
                       )
                   ),
                 ),

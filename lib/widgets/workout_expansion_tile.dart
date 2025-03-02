@@ -97,6 +97,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
                                   cnWorkouts.refresh();
                                   HapticFeedback.selectionClick();
+                                  // await cnNewWorkout.hidePanel(context);
                                   Future.delayed(const Duration(milliseconds: 300), (){
                                     cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                                   });
@@ -196,7 +197,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
             /// the action's text color to red.
             isDestructiveAction: true,
             onPressed: () {
-              Future.delayed(Duration(milliseconds: 200), (){
+              Future.delayed(const Duration(milliseconds: 200), (){
                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
               });
 

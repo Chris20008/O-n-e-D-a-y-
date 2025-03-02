@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
@@ -61,7 +62,11 @@ class MultipleExerciseRow extends StatelessWidget {
                                     flex: 4,
                                     child: Row(
                                       children: [
-                                        Icon(Icons.timer, size: _iconSize,),
+                                        Icon(
+                                          CupertinoIcons.timer,
+                                          size: _iconSize,
+                                          color: Colors.white,
+                                        ),
                                         const SizedBox(width: 2,),
                                         if (ex.restInSeconds == 0)
                                           const Text("-", textScaler: TextScaler.linear(0.9),)
@@ -87,7 +92,11 @@ class MultipleExerciseRow extends StatelessWidget {
                                     flex: 3,
                                     child: Row(
                                       children: [
-                                        Icon(Icons.airline_seat_recline_normal, size: _iconSize,),
+                                        Icon(
+                                          Icons.airline_seat_recline_normal,
+                                          size: _iconSize,
+                                          color: Colors.white,
+                                        ),
                                         const SizedBox(width: 2,),
                                         if (ex.seatLevel == null)
                                           const Text("-", textScaler: TextScaler.linear(0.9),)

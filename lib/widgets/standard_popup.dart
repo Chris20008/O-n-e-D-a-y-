@@ -1,5 +1,4 @@
-import 'package:fitness_app/util/constants.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -108,31 +107,15 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                               children: [
                                 if(cnStandardPopUp.showCancel)
                                   Expanded(
-                                      child: CupertinoButton(
+                                      child: CupertinoButtonText(
                                           onPressed: cnStandardPopUp.cancel,
-                                          // style: ButtonStyle(
-                                          //     shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                          //     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                          //     backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                          //     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                          //     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                          // ),
-                                          child: Text(cnStandardPopUp.cancelText)
+                                          text: cnStandardPopUp.cancelText
                                       )
                                   ),
-                                // if(cnStandardPopUp.showCancel)
-                                //   verticalGreySpacer,
                                 Expanded(
-                                    child: CupertinoButton(
+                                    child: CupertinoButtonText(
                                         onPressed: cnStandardPopUp.confirm,
-                                        // style: ButtonStyle(
-                                        //     shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                        //     surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                        //     backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                        //     // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                        //     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        // ),
-                                        child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
+                                        text: cnStandardPopUp.confirmText
                                     )
                                 ),
                               ],

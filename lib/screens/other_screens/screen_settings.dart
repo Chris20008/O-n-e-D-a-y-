@@ -117,7 +117,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 /// Language
                                 CupertinoListTile(
                                     leading:  const Icon(
-                                        Icons.language
+                                      Icons.language,
+                                      color: Colors.white,
                                     ),
                                     title: getSelectLanguageButton()
                                 ),
@@ -178,7 +179,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     }
                                   },
                                   leading: const Icon(
-                                      Icons.school
+                                    Icons.school,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
@@ -226,7 +228,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   trailing: CupertinoSwitch(
                                       value: cnConfig.useSpotify,
-                                      activeColor: const Color(0xFFC16A03),
+                                      activeColor: activeColor,
                                       onChanged: (value) async{
                                         setState(() {
                                           if(Platform.isAndroid){
@@ -303,7 +305,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   trailing: CupertinoSwitch(
                                       value: cnConfig.useHealthData,
-                                      activeColor: const Color(0xFFC16A03),
+                                      activeColor: activeColor,
                                       onChanged: (value) async{
                                         setState(() async{
                                           if(Platform.isAndroid){
@@ -363,7 +365,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.info, size:12),
+                                      const Icon(
+                                        Icons.info,
+                                        size:12,
+                                        color: Colors.white,
+                                      ),
                                       const SizedBox(width: 5,),
                                       Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
                                     ],
@@ -373,17 +379,26 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                               children: [
                                 /// Save Backup Manual
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.upload),
+                                  leading: const Icon(
+                                    Icons.upload,
+                                    color: Colors.white,
+                                  ),
                                   title:getSelectCreateBackup(),
                                 ),
                                 /// Load Backup
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.download),
+                                  leading: const Icon(
+                                    Icons.download,
+                                    color: Colors.white,
+                                  ),
                                   title: getSelectLoadBackupOption(),
                                 ),
                                 /// Save Backup Automatic
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.sync),
+                                  leading: const Icon(
+                                    Icons.sync,
+                                    color: Colors.white,
+                                  ),
                                   title: OverflowSafeText(
                                       maxLines: 1,
                                       AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -391,7 +406,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   trailing: CupertinoSwitch(
                                       value: cnConfig.automaticBackups,
-                                      activeColor: const Color(0xFFC16A03),
+                                      activeColor: activeColor,
                                       onChanged: (value){
                                         setState(() {
                                           if(Platform.isAndroid){
@@ -433,7 +448,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 /// Contact
                                 CupertinoListTile(
                                   leading: const Icon(
-                                      Icons.help_outline
+                                    Icons.help_outline,
+                                    color: Colors.white,
                                   ),
                                   title: getSelectContactButton(),
                                 ),
@@ -443,7 +459,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
                                   },
                                   leading: const Icon(
-                                      MyIcons.github_circled
+                                    MyIcons.github_circled,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
@@ -454,7 +471,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
                                   },
                                   leading: const Icon(
-                                      Icons.my_library_books_rounded
+                                    Icons.my_library_books_rounded,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
@@ -465,7 +483,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
                                   },
                                   leading: const Icon(
-                                      Icons.lock_outline
+                                    Icons.lock_outline,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
@@ -508,7 +527,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                           CupertinoListTile(
                             // onTap: getSelectCreateBackup,
                             leading: const Icon(
-                                Icons.upload,
+                              Icons.upload,
+                              color: Colors.white,
                             ),
                             title: OverflowSafeText(
                                 maxLines: 1,
@@ -522,7 +542,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                           /// Load Backup
                           CupertinoListTile(
                             leading: const Icon(
-                                Icons.download
+                              Icons.download,
+                              color: Colors.white,
                             ),
                             title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
                           ),

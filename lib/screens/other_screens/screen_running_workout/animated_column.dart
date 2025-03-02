@@ -2,6 +2,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
@@ -40,6 +41,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   UniqueKey newExerciseKey = UniqueKey();
   UniqueKey linkNameKey = UniqueKey();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -75,23 +77,20 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 ///z
                 0),
             child: Padding(
-              padding: const EdgeInsets.only(right: 5),
+              padding: const EdgeInsets.only(right: 10),
               child: SizedBox(
                 width: 54,
                 height: 54,
-                child: IconButton(
-                    iconSize: 30,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                    ),
+                child: CupertinoButton(
+                    // iconSize: 30,
+                    // style: ButtonStyle(
+                    //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                    // ),
                     onPressed: () {
                       cnAnimatedColumn.newEx = Exercise(blockLink: true);
                       showAddExercise(context);
                     },
-                    icon: Icon(
-                      Icons.add,
-                      color: Colors.amber[800],
-                    )
+                    child: const Icon(Icons.add, size: 30,)
                 ),
               ),
             ),
@@ -170,16 +169,16 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
 
   double getYPositionAddExercise(){
     if(!cnStopwatchWidget.isOpened){
-      return getYPositionStopwatch() - cnSpotifyBar.height;
+      return getYPositionStopwatch() - 3 - cnSpotifyBar.height;
     }
 
     if(cnSpotifyBar.isConnected){
-      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - 6;
+      return getYPositionStopwatch() - 3 - cnStopwatchWidget.heightOfTimer - 6;
     }
     else if(showSpotify){
-      return getYPositionSpotifyBar() - cnSpotifyBar.height - 3;
+      return getYPositionSpotifyBar() - 3 - cnSpotifyBar.height - 3;
     }
-    return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
+    return getYPositionStopwatch() - 3 - cnStopwatchWidget.heightOfTimer-6;
   }
 
   double getYPositionSpotifyBar(){
@@ -229,11 +228,12 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         flex: 10,
                                         child: Align(
                                             alignment: Alignment.centerLeft,
-                                            child: CupertinoButton(
+                                            child: CupertinoButtonText(
                                                 onPressed: (){
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)
+                                                text: AppLocalizations.of(context)!.cancel,
+                                                textAlign: TextAlign.left
                                             )
                                         )
                                     ),
@@ -251,23 +251,26 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         flex: 10,
                                         child: Align(
                                             alignment: Alignment.centerRight,
-                                            child: CupertinoButton(
+                                            child: CupertinoButtonText(
                                                 onPressed: () {
-                                                  if(_textController.text.isNotEmpty &&
-                                                      !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
-                                                  ){
-                                                    cnAnimatedColumn.newEx.name = _textController.text;
-                                                    double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
-                                                        + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
-                                                        + cnBottomMenu.height + 20;
-                                                    cnRunningWorkout.addExercise(cnAnimatedColumn.newEx, context, additionalScrollPosition: additionalScrollPosition);
-                                                    Navigator.of(context).pop();
-                                                    Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                                                      FocusScope.of(context).unfocus();
-                                                    });
+                                                  if(formKey.currentState!.validate()){
+                                                    if(_textController.text.isNotEmpty &&
+                                                        !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
+                                                    ){
+                                                      cnAnimatedColumn.newEx.name = _textController.text;
+                                                      double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
+                                                          + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
+                                                          + cnBottomMenu.height + 20;
+                                                      cnRunningWorkout.addExercise(cnAnimatedColumn.newEx, context, additionalScrollPosition: additionalScrollPosition);
+                                                      Navigator.of(context).pop();
+                                                      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                                        FocusScope.of(context).unfocus();
+                                                      });
+                                                    }
                                                   }
                                                 },
-                                                child: Text(AppLocalizations.of(context)!.save, textAlign: TextAlign.right)
+                                                text: AppLocalizations.of(context)!.save,
+                                                textAlign: TextAlign.right
                                             )
                                         )
                                     ),
@@ -278,34 +281,44 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                 padding: const EdgeInsets.all(15.0),
                                 child: Column(
                                   children: [
-                                    TextFormField(
-                                      onTapOutside: (event){
-                                        FocusManager.instance.primaryFocus?.unfocus();
-                                      },
-                                      keyboardAppearance: Brightness.dark,
-                                      controller: _textController,
-                                      maxLength: 40,
-                                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                                      validator: (value) {
-                                        value = value?.trim();
-                                        if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
-                                          canConfirm = false;
-                                          return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
-                                        }
-                                        canConfirm = true;
-                                        return null;
-                                      },
-                                      decoration: InputDecoration(
-                                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                                        labelText: AppLocalizations.of(context)!.newExerciseName,
-                                        counterText: "",
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                    Form(
+                                      key: formKey,
+                                      child: TextFormField(
+                                        onTapOutside: (event){
+                                          FocusManager.instance.primaryFocus?.unfocus();
+                                        },
+                                        keyboardAppearance: Brightness.dark,
+                                        controller: _textController,
+                                        maxLength: 40,
+                                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                                        validator: (value) {
+                                          value = value?.trim();
+                                          print(_textController.text);
+                                          if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
+                                            canConfirm = false;
+                                            return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
+                                          }
+                                          else if(_textController.text.isEmpty){
+                                            Future.delayed(const Duration(milliseconds: 1000), (){
+                                              formKey.currentState?.reset();
+                                            });
+                                            return AppLocalizations.of(context)!.panelExEnterName;
+                                          }
+                                          canConfirm = true;
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          labelText: AppLocalizations.of(context)!.newExerciseName,
+                                          counterText: "",
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                        ),
+                                        style: const TextStyle(
+                                            fontSize: 18
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        onChanged: (value){},
                                       ),
-                                      style: const TextStyle(
-                                          fontSize: 18
-                                      ),
-                                      textAlign: TextAlign.center,
-                                      onChanged: (value){},
                                     ),
                                     Stack(
                                       children: [
@@ -356,7 +369,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                                 currentLinkName: cnAnimatedColumn.newEx.linkName?? "-",
                                                 context: context,
                                                 child: CupertinoListTile(
-                                                  leading: Icon(Icons.link, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+                                                  leading: Icon(Icons.link, size: _iconSize-3),
                                                   title: Row(
                                                     children: [
                                                       Text(AppLocalizations.of(context)!.runningWorkoutGroup, style: _style),

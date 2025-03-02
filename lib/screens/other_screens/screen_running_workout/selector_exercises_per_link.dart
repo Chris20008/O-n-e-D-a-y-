@@ -1,5 +1,6 @@
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -212,12 +213,12 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                       right: 0,
                       child: Container(
                         color: Theme.of(context).primaryColor,
-                        height: cnBottomMenu.height-10,
+                        height: cnBottomMenu.height,
                       )
                   ),
                   /// bottom faded box
                   Positioned(
-                    bottom: cnBottomMenu.height - 10.5,
+                    bottom: cnBottomMenu.height - 0.5,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -236,17 +237,14 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                   ),
                   /// bottom buttons
                   Positioned(
-                      bottom: -10,
+                      bottom: 10,
                       left: 0,
                       right: 0,
                       child: Row(
                         children: [
                           Expanded(
-                            child: CupertinoButton(
-                              child: SizedBox(
-                                  height: cnBottomMenu.height-10,
-                                  child: Center(child: Text(AppLocalizations.of(context)!.cancel))
-                              ),
+                            child: CupertinoButtonText(
+                              text: AppLocalizations.of(context)!.cancel,
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 widget.onCancel();
@@ -257,11 +255,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                           const Spacer(),
 
                           Expanded(
-                            child: CupertinoButton(
-                              child: SizedBox(
-                                  height: cnBottomMenu.height-10,
-                                  child: Center(child: Text(AppLocalizations.of(context)!.confirm))
-                              ),
+                            child: CupertinoButtonText(
+                              text: AppLocalizations.of(context)!.confirm,
                               onPressed: () {
                                 List<String> exToRemove = [];
                                 int index = 0;

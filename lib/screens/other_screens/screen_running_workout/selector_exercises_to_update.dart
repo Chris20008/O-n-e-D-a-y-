@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
@@ -211,12 +212,12 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                       right: 0,
                       child: Container(
                         color: Theme.of(context).primaryColor,
-                        height: cnBottomMenu.height-10,
+                        height: cnBottomMenu.height,
                       )
                   ),
                   /// bottom faded box
                   Positioned(
-                    bottom: cnBottomMenu.height - 10.5,
+                    bottom: cnBottomMenu.height - 0.5,
                     left: 0,
                     right: 0,
                     child: Container(
@@ -235,17 +236,14 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                   ),
                   /// bottom buttons
                   Positioned(
-                      bottom: -10,
+                      bottom: 10,
                       left: 0,
                       right: 0,
                       child: Row(
                         children: [
                           Expanded(
-                            child: CupertinoButton(
-                              child: SizedBox(
-                                  height: cnBottomMenu.height-10,
-                                  child: Center(child: Text(relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok))
-                              ),
+                            child: CupertinoButtonText(
+                              text: relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok,
                               onPressed: () {
                                 HapticFeedback.selectionClick();
                                 widget.onCancel();
@@ -257,11 +255,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
                           if(relevantExercises.isNotEmpty)
                             Expanded(
-                              child: CupertinoButton(
-                                child: SizedBox(
-                                    height: cnBottomMenu.height-10,
-                                    child: Center(child: Text(AppLocalizations.of(context)!.confirm))
-                                ),
+                              child: CupertinoButtonText(
+                                text: AppLocalizations.of(context)!.confirm,
                                 onPressed: () {
                                   bool doUpdate = isCheckedList.any((state) => state);
                                   if(doUpdate){

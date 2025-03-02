@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -414,7 +415,14 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                       children: [
                         Expanded(
                             flex: 10,
-                            child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                            child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: CupertinoButtonText(
+                                    onPressed: onCancel,
+                                    text: AppLocalizations.of(context)!.cancel,
+                                    textAlign: TextAlign.left
+                                )
+                            )
                         ),
                         Expanded(
                             flex: 13,
@@ -431,11 +439,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             flex: 10,
                             child: Align(
                                 alignment: Alignment.centerRight,
-                                child: CupertinoButton(
+                                child: CupertinoButtonText(
                                     onPressed: () {
                                       cnNewExercise.closePanelAndSaveExercise(context);
                                     },
-                                    child: Text(AppLocalizations.of(context)!.save, textAlign: TextAlign.right)
+                                    text: AppLocalizations.of(context)!.save,
+                                    textAlign: TextAlign.right
                                 )
                             )
                         ),
@@ -558,155 +567,6 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
     });
   }
 
-  // Widget getRestInSecondsSelector() {
-  //   return getSelectRestInSeconds(
-  //       currentTime: cnNewExercise.exercise.restInSeconds,
-  //       context: context,
-  //       child: CupertinoListTile(
-  //         leading: Icon(Icons.timer, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-  //         title: Row(
-  //           children: [
-  //             Text(AppLocalizations.of(context)!.restTime, style: _style),
-  //             const Spacer(),
-  //             Text(mapRestInSecondsToString(restInSeconds: cnNewExercise.exercise.restInSeconds), style: _style),
-  //             const SizedBox(width: 10),
-  //           ],
-  //         ),
-  //         trailing: trailingChoice(),
-  //       ),
-  //       onConfirm: (dynamic value){
-  //         if(value is int){
-  //           cnNewExercise.exercise.restInSeconds = value;
-  //           cnNewExercise.restController.text = value.toString();
-  //           cnNewExercise.refresh();
-  //         }
-  //         else{
-  //           showDialogMinuteSecondPicker(
-  //               context: context,
-  //               initialTimeDuration: Duration(minutes: cnNewExercise.exercise.restInSeconds~/60, seconds: cnNewExercise.exercise.restInSeconds%60),
-  //               onConfirm: (Duration newDuration){
-  //                 cnNewExercise.exercise.restInSeconds = newDuration.inSeconds;
-  //               }
-  //           ).then((value) => setState(() {}));
-  //         }
-  //       }
-  //   );
-  // }
-
-  // Widget getSeatLevelSelector() {
-  //   return getSelectSeatLevel(
-  //       currentSeatLevel: cnNewExercise.exercise.seatLevel,
-  //       context: context,
-  //       onConfirm: (dynamic value){
-  //         if(value is int){
-  //           cnNewExercise.exercise.seatLevel = value;
-  //           cnNewExercise.refresh();
-  //         }
-  //         else if(value == AppLocalizations.of(context)!.clear){
-  //           cnNewExercise.exercise.seatLevel = null;
-  //           cnNewExercise.refresh();
-  //         }
-  //       },
-  //       child: CupertinoListTile(
-  //         leading: Icon(Icons.airline_seat_recline_normal, size: _iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
-  //         trailing: trailingChoice(),
-  //           title: Row(
-  //           children: [
-  //             Text(AppLocalizations.of(context)!.seatLevel, style: _style),
-  //             const Spacer(),
-  //             Text(cnNewExercise.exercise.seatLevel == null? "-" : cnNewExercise.exercise.seatLevel.toString(), style: _style),
-  //             const SizedBox(width: 10)
-  //           ],
-  //         ),
-  //       )
-  //   );
-  // }
-
-  // Widget getExerciseCategorySelector({
-  //   required bool isTemplate
-  // }) {
-  //   Widget child = CupertinoListTile(
-  //       leading: Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-  //       title: Row(
-  //         children: [
-  //           Text("Kategorie", style: _style),
-  //           const Spacer(),
-  //           Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-  //           const SizedBox(width: 10)
-  //         ],
-  //       ),
-  //       trailing: isTemplate? trailingChoice() : null
-  //   );
-  //
-  //   if(isTemplate){
-  //     return getSelectCategory(
-  //         context: context,
-  //         currentCategory: cnNewExercise.exercise.category,
-  //         onConfirm: (int category){
-  //           cnNewExercise.exercise.category = category;
-  //           cnNewExercise.refresh();
-  //           cnNewExercise.clearTextControllers();
-  //         },
-  //         child: child
-  //     );
-  //   }
-  //
-  //   return CupertinoButton(
-  //     onPressed: (){
-  //       HapticFeedback.selectionClick();
-  //       notificationPopUp(
-  //           context: context,
-  //           title: 'Change category',
-  //           message: "You can't change the Category of an existing exercise"
-  //       );
-  //     },
-  //     padding: EdgeInsets.zero,
-  //     child: child
-  //   );
-  // }
-
-  // Widget getBodyWeightPercentSelector({
-  //   required bool isTemplate
-  // }) {
-  //   Widget child = CupertinoListTile(
-  //       leading: Icon(MyIcons.weight, size: _iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
-  //       title: Row(
-  //         children: [
-  //           Text("Körpergewicht", style: _style),
-  //           const Spacer(),
-  //           Text("${(cnNewExercise.exercise.bodyWeightPercent * 100).toInt()} %", style: _style),
-  //           const SizedBox(width: 10),
-  //         ],
-  //       ),
-  //       trailing: isTemplate? trailingChoice() : null
-  //   );
-  //
-  //   if(isTemplate){
-  //     return getSelectBodyWeightPercent(
-  //         context: context,
-  //         currentBodyWeightPercent: cnNewExercise.exercise.bodyWeightPercent,
-  //         onConfirm: (int bodyWeight){
-  //           cnNewExercise.exercise.bodyWeightPercent = bodyWeight/100;
-  //           cnNewExercise.refresh();
-  //         },
-  //         child: child
-  //     );
-  //   }
-  //
-  //   return CupertinoButton(
-  //       onPressed: (){
-  //         HapticFeedback.selectionClick();
-  //         notificationPopUp(
-  //             context: context,
-  //             title: "Bodyweight",
-  //             message: "You can change the bodyweight only in the exercise template. The changes will be applied to all exercises with the same name."
-  //         );
-  //       },
-  //       padding: EdgeInsets.zero,
-  //       child: child
-  //   );
-  // }
-
   Widget getHeader() {
 
     return Column(
@@ -763,11 +623,8 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
               contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
             ),
             onChanged: (value){
-              print("On Changed");
               value = value.trim();
               cnNewExercise.exercise.name = value;
-
-              print("EX NAME: " + cnNewExercise.exercise.name);
             },
           ),
         ),
@@ -895,7 +752,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   /// SELECTORS
-
+  // Color(0xffdb7b01)
   Widget getRestInSecondsSelector({
     required BuildContext context,
     required Exercise exercise,
@@ -905,7 +762,7 @@ class CnNewExercisePanel extends ChangeNotifier {
         currentTime: exercise.restInSeconds,
         context: context,
         child: CupertinoListTile(
-          leading: Icon(Icons.timer, size: iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+          leading: Icon(CupertinoIcons.timer, size: iconSize),
           title: Row(
             children: [
               Text(AppLocalizations.of(context)!.restTime, style: _style),
@@ -953,7 +810,7 @@ class CnNewExercisePanel extends ChangeNotifier {
           }
         },
         child: CupertinoListTile(
-          leading: Icon(Icons.airline_seat_recline_normal, size: iconSize, color: Colors.amber[900]!.withOpacity(0.6),),
+          leading: Icon(Icons.airline_seat_recline_normal, size: iconSize),
           trailing: trailingChoice(),
           title: Row(
             children: [
@@ -974,7 +831,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     required Function refresh
   }) {
     Widget child = CupertinoListTile(
-        leading: Icon(MyIcons.tags, size: iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
+        leading: Icon(MyIcons.tags, size: iconSize-3),
         title: Row(
           children: [
             Text(AppLocalizations.of(context)!.category, style: _style),
@@ -1020,7 +877,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     required Function refresh
   }) {
     Widget child = CupertinoListTile(
-        leading: Icon(MyIcons.weight, size: iconSize-4, color: Colors.amber[900]!.withOpacity(0.6),),
+        leading: Icon(MyIcons.weight, size: iconSize-4),
         title: Row(
           children: [
             Text(AppLocalizations.of(context)!.bodyweight, style: _style),

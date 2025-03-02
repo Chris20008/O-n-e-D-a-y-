@@ -112,11 +112,16 @@ class MyAppState extends State<MyApp> {
             cardColor: Color(0xFF2C2C2E),
             primaryColor: Color(0xFF1C1C1E),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             // useMaterial3: true,
             splashFactory: InkSparkle.splashFactory,
             cupertinoOverrideTheme: const CupertinoThemeData(
-              brightness: Brightness.dark
-            )
+              brightness: Brightness.dark,
+              primaryColor: Color(0xffdb7b01),
+            ),
+            iconTheme: const IconThemeData(
+              color: Color(0xffdb7b01),
+            ),
         ),
         home: const MyHomePage(),
       ),
@@ -363,6 +368,8 @@ class _MyHomePageState extends State<MyHomePage>{
                             ),
                           ),
                         ),
+
+                      // if(!cnRunningWorkout.isVisible)
                       const NewWorkOutPanel(),
 
                       const NewExercisePanel(),

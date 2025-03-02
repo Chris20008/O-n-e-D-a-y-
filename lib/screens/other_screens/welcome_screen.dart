@@ -1,6 +1,7 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/language_config.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
@@ -126,8 +127,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       alignment: Alignment.bottomRight,
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: CupertinoButton(
-            child: Text(AppLocalizations.of(context)!.welcomeNext),
+        child: CupertinoButtonText(
+            text: AppLocalizations.of(context)!.welcomeNext,
             onPressed: (){
               setState(() {
                 if(screenIndex < maxIndex) {
@@ -145,8 +146,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       alignment: Alignment.bottomLeft,
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: CupertinoButton(
-            child: Text(AppLocalizations.of(context)!.welcomeBack),
+        child: CupertinoButtonText(
+            text: AppLocalizations.of(context)!.welcomeBack,
             onPressed: (){
               setState(() {
                 screenIndex -= 1;
@@ -198,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
             const SizedBox(width: 6,),
             trailingChoice(
-              color: const Color(0xFFC16A03)
+              color: activeColor
             )
           ],
         ),
@@ -330,7 +331,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   children: [
                     /// Save Backup Automatic
                     CupertinoListTile(
-                      leading: const Icon(Icons.sync),
+                      leading: const Icon(
+                        Icons.sync,
+                        color: Colors.white,
+                      ),
                       title: OverflowSafeText(
                           maxLines: 1,
                           AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -338,7 +342,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       trailing: CupertinoSwitch(
                           value: cnConfig.automaticBackups,
-                          activeColor: const Color(0xFFC16A03),
+                          activeColor: activeColor,
                           onChanged: (value){
                             setState(() {
                               if(Platform.isAndroid){
@@ -370,7 +374,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         padding: const EdgeInsets.only(left: 20),
                         child: Row(
                           children: [
-                            const Icon(Icons.info, size:12),
+                            const Icon(
+                              Icons.info,
+                              size:12,
+                              color: Colors.white,
+                            ),
                             const SizedBox(width: 5,),
                             Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
                           ],
@@ -484,7 +492,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.useSpotify,
-                      activeColor: const Color(0xFFC16A03),
+                      activeColor: activeColor,
                       onChanged: (value) async{
                         setState(() {
                           if(Platform.isAndroid){

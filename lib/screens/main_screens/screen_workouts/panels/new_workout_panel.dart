@@ -8,6 +8,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/spacer_list_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -210,7 +211,14 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                         children: [
                           Expanded(
                               flex: 10,
-                              child: Align(alignment: Alignment.centerLeft, child: CupertinoButton(onPressed: onCancel, child: Text(AppLocalizations.of(context)!.cancel, textAlign: TextAlign.left)))
+                              child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: CupertinoButtonText(
+                                      onPressed: onCancel,
+                                      text: AppLocalizations.of(context)!.cancel,
+                                      textAlign: TextAlign.left
+                                  )
+                              )
                           ),
                           Expanded(
                             flex: 13,
@@ -236,7 +244,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                             flex: 10,
                             child: Align(
                               alignment: Alignment.centerRight,
-                              child: CupertinoButton(
+                              child: CupertinoButtonText(
                                   onPressed: (){
                                     if(!hasChangedNames()){
                                       onConfirm();
@@ -245,7 +253,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                       openConfirmNameChangePopUp();
                                     }
                                   },
-                                  child: Text(AppLocalizations.of(context)!.save, textAlign: TextAlign.right)
+                                  text: AppLocalizations.of(context)!.save,
+                                  textAlign: TextAlign.right
                               ),
                             ),
                           ),
@@ -562,7 +571,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                             FocusManager.instance.primaryFocus?.unfocus();
                                           },
                                           icon: const Icon(
-                                              Icons.info_outline_rounded
+                                            Icons.info_outline_rounded,
+                                            color: Colors.white,
                                           )
                                       )
                                     ),
@@ -1431,25 +1441,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   }
 
   void confirmAddExercise(Exercise ex){
-    print("Alle exercises for funktion");
-    print(workout.exercises.map((e) => e.name));
     workout.addOrUpdateExercise(ex);
-    print("Alle exercises nach funktion");
-    print(workout.exercises.map((e) => e.name));
     refreshExercise(ex);
-    print("Alle exercises nach refresh Exercise");
-    print(workout.exercises.map((e) => e.name));
     updateExercisesAndLinksList();
-    print("Alle exercises nach update exercises an link list");
-    print(workout.exercises.map((e) => e.name));
     updateExercisesLinks();
-    print("Alle exercises nach update exercises");
-    print(workout.exercises.map((e) => e.name));
     refresh();
-
-    print("Alle exercises nach update exercises");
-    print(workout.exercises.map((e) => e.name));
-    print(exercisesAndLinks.map((e) => e.name));
   }
 
   void openPanelAsTemplate(){
@@ -1480,14 +1476,6 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         curve: Curves.fastEaseInToSlowEaseOut
     );
   }
-
-  // void addToExercisesAndLinksList(dynamic item){
-  //   exercisesAndLinks.add(item);
-  // }
-  //
-  // void deleteFromExercisesAndLinksList(dynamic item){
-  //   exercisesAndLinks.remove(item);
-  // }
 
   void updateExercisesAndLinksList(){
     /// Updates the exercisesAndLinksList which is responsible for showing the exercises and links together in new_workout_panel
@@ -1661,6 +1649,34 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       refresh();
     }
   }
+
+  // Future hidePanel(BuildContext context) async{
+  //   if(minPanelHeight > 50){
+  //     minPanelHeight = minPanelHeight * 0.95;
+  //     print("Min Panel height: $minPanelHeight");
+  //     refresh();
+  //     await Future.delayed(const Duration(milliseconds: 16), (){});
+  //     await hidePanel(context);
+  //     // final maxHeight = MediaQuery.of(context).size.height - (Platform.isAndroid? 50 : 70);
+  //     // minPanelHeight = 1;
+  //     // await panelController.animatePanelToPosition(keepShowingPanelHeight/maxHeight, duration: Duration(milliseconds: 0));
+  //     // refresh();
+  //     // await panelController.animatePanelToPosition(0, duration: Duration(milliseconds: 300));
+  //   }
+  // }
+  //
+  // Future showHidedPanel(BuildContext context) async{
+  //   if(minPanelHeight < keepShowingPanelHeight){
+  //     minPanelHeight = minPanelHeight + 5;
+  //     print("Min Panel height: $minPanelHeight");
+  //     refresh();
+  //     await Future.delayed(const Duration(milliseconds: 16), (){});
+  //     await showHidedPanel(context);
+  //   } else{
+  //     minPanelHeight = keepShowingPanelHeight;
+  //     refresh();
+  //   }
+  // }
 
   Future animateFirstExerciseSlide({int duration = 1500}) async{
     if(allowAnimateFirstExerciseSlide){

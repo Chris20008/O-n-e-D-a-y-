@@ -3,6 +3,7 @@ import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
@@ -185,8 +186,8 @@ initTutorialCreateWorkoutTemplate(BuildContext context){
                   ),
                   Align(
                     alignment: Alignment.centerRight,
-                    child: CupertinoButton(
-                        child: Text(AppLocalizations.of(context)!.welcomeNext),
+                    child: CupertinoButtonText(
+                        text: AppLocalizations.of(context)!.welcomeNext,
                         onPressed: (){
                           if(cnNewExercise.controllers[0][0].text.isEmpty){
                             FocusScope.of(context).requestFocus(cnNewExercise.focusNodes[0][0]);
@@ -400,7 +401,7 @@ Widget getChildExplainExerciseSetting(BuildContext context){
             count: pageCountExercises,
             size: 8,
             layout: PageIndicatorLayout.WARM,
-            activeColor: const Color(0xFFC16A03),
+            activeColor: activeColor,
             scale: 0.65,
             space: 10,
           ),
@@ -471,7 +472,7 @@ Widget getChildExplainGroups(BuildContext context){
             count: pageCountGroups,
             size: 8,
             layout: PageIndicatorLayout.WARM,
-            activeColor: const Color(0xFFC16A03),
+            activeColor: activeColor,
             scale: 0.65,
             space: 10,
           ),

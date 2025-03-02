@@ -258,7 +258,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         justShow: false,
                         buttonIsCalender: true,
                         dateValues: getCurrentDate(),
-                        // dateValues: [DateTime(2024, 12, 12)],
                         onConfirm: (List<DateTime?> values){
                           if(values.isNotEmpty){
                             int? index;

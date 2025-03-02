@@ -177,7 +177,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                 const Icon(
                   Icons.arrow_back_ios,
                   size: 15,
-                  color: Color(0xFFC16A03),
                 ),
                 Expanded(
                   child: VerticalScrollWheel(
@@ -202,7 +201,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                 const Icon(
                   Icons.arrow_forward_ios,
                   size: 15,
-                  color: Color(0xFFC16A03),
                 ),
               ],
             )
@@ -232,7 +230,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               const SizedBox(width: 30,),
               CupertinoSwitch(
                   value: cnScreenStatistics.showAvgWeightPerSetLine,
-                  activeColor: const Color(0xFFC16A03),
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
@@ -260,7 +258,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               const SizedBox(width: 30,),
               CupertinoSwitch(
                   value: cnScreenStatistics.showOneRepMax,
-                  activeColor: const Color(0xFFC16A03),
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
@@ -297,7 +295,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               const SizedBox(width: 30,),
               CupertinoSwitch(
                   value: cnScreenStatistics.onlyWorkingSets,
-                  activeColor: const Color(0xFFC16A03),
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
@@ -325,7 +323,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               const SizedBox(width: 30,),
               CupertinoSwitch(
                   value: cnScreenStatistics.showSickDays,
-                  activeColor: const Color(0xFFC16A03),
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
