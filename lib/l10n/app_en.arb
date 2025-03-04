@@ -4,6 +4,7 @@
   "yes": "Yes",
   "no": "No",
   "ok": "Ok",
+  "close": "Close",
   "name": "Name",
   "groupName": "Group Name",
   "exercise": "Exercise",
@@ -40,6 +41,8 @@
   "createdAutomaticBackup": "Created automatic Backup",
   "createdBackupFailed": "Could not create a Backup",
   "savedDataForSync": "Saved data for sync.",
+  "accessDenied": "Access denied",
+  "accessDeniedHealth": "Access to your health data was denied. You can enable it anytime in the device settings under Health.",
 
   "settings": "Settings",
   "settingsGeneral": "General",
@@ -128,6 +131,7 @@
   "statisticsWeight": "Weight",
   "statisticsSick": "Sick",
   "statisticsCurrentlyNotSupported": "The category of this exercise is currently not supported for statistics.",
+  "statisticsNoExercise": "No exercises completed yet",
 
   "runningWorkoutDeleteExercise": "Do you really want to delete this Exercise?",
   "runningWorkoutFinishWorkout": "Finish Workout?",
@@ -165,6 +169,9 @@
   "welcomeSetupCompletedHopIntoTutorial" : "Let's hop right into the tutorial to show you the functions inside the App",
   "welcomeButtonExploreMyself" : "I wanna explore the App myself",
   "welcomeButtonStartTutorial" : "Start Tutorial",
+  "welcomeHealth": "Connect with Health",
+  "welcomeHealth1": "You can connect with the Health app so OneDay can access your weight.",
+  "welcomeHealth2": "This is necessary to correctly calculate your One-Rep-Max for exercises where you move your body weight.",
 
   "t1CreateTemplate": "Create your first workout template",
   "t1EnterWoName": "What’s the name of your first workout?",
@@ -190,7 +197,22 @@
   "t1GroupExplanation4": "I've added 2 exercises and a group as an example. \n\nHave fun! \n\nAnd don’t forget to save when you’re done. 😉",
   "t1ExampleGroup": "Example Group",
   "t1ExampleGroupedExercise": "Grouped Exercise",
-  "t1ExampleGroupDisabledExercise": "Grouping Disabled"
+  "t1ExampleGroupDisabledExercise": "Grouping Disabled",
+
+  "newVersion": "New version",
+  "new1": "Performance improvements.",
+  "new2": "More intuitive navigation through the user interface.",
+  "new3": "Redesigned user interface for creating new workouts and exercises.",
+  "new4": "Reworked tutorial.",
+  "new5": "Swipe gestures have been adjusted for iOS. This means deleting an exercise or set is now a swipe from right to left, while additional options are accessed with a swipe from left to right.",
+  "new6": "You can now freely reorder exercises within a workout template. Exercises placed under a group but not meant to be part of it can be excluded from grouping by swiping right and tapping the grouping icon.",
+  "new7": "New statistic",
+  "new8": "One-rep max has been introduced in the statistics, calculated using the Epley formula.",
+  "new9": "To correctly calculate the one-rep max for exercises where you move your own body weight, you can specify the percentage of body weight moved for each exercise.",
+  "new10": "Body weight is only included in the calculation if you grant access to your body weight data from the Health app.",
+  "new11": "Ongoing workout",
+  "new12": "When adding an exercise during an ongoing workout, you can now directly assign it to a group. Additionally, you can set the rest time, seat height, category, and moved body weight immediately.",
+  "new13": "The prompts for updating the workout template and tracking within a group are no longer pop-ups but a new screen that slides up from the bottom. This provides more space and makes the selection clearer."
 }
 
 

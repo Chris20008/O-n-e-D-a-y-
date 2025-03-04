@@ -30,6 +30,10 @@ class ObSickDays{
     objectbox.sickDaysBox.remove(id);
   }
 
+  bool isNewSickDays(){
+    return id == 0;
+  }
+
   Map asMap(){
     final result = {
       "id": id,

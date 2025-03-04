@@ -716,9 +716,9 @@ class CnScreenStatistics extends ChangeNotifier {
         selectedExerciseName = data["selectedExerciseName"];
       }
     }
-    showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
+    showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? false;
     onlyWorkingSets = data["onlyWorkingSets"] ?? true;
-    showSickDays = data["showSickDays"] ?? true;
+    showSickDays = data["showSickDays"] ?? false;
     showOneRepMax = data["showOneRepMax"] ?? true;
   }
 

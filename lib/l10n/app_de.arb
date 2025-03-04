@@ -4,6 +4,7 @@
   "yes": "Ja",
   "no": "Nein",
   "ok": "Ok",
+  "close": "Schließen",
   "name": "Name",
   "groupName": "Gruppenname",
   "exercise": "Übung",
@@ -40,6 +41,8 @@
   "createdAutomaticBackup": "Automatisches Backup erstellt",
   "createdBackupFailed": "Es konnte kein Backup erstellt werden",
   "savedDataForSync": "Daten für sync. gesichert",
+  "accessDenied": "Zugriff verweigert",
+  "accessDeniedHealth": "Der Zugriff auf deine Gesundheitsdaten wurde verweigert. Du kannst ihn jederzeit in den Geräteeinstellungen unter Health aktivieren.",
 
   "settings": "Einstellungen",
   "settingsGeneral": "Generelles",
@@ -128,6 +131,7 @@
   "statisticsWeight": "Gewicht",
   "statisticsSick": "Krank",
   "statisticsCurrentlyNotSupported": "Die Kategorie dieser Übung wird aktuell nicht für Statistiken unterstützt",
+  "statisticsNoExercise": "Noch keine Übungen absolviert",
 
   "runningWorkoutDeleteExercise": "Möchtest du diese Übung wirklich löschen?",
   "runningWorkoutFinishWorkout": "Workout Beenden?",
@@ -165,6 +169,9 @@
   "welcomeSetupCompletedHopIntoTutorial": "Lass uns direkt mit dem Tutorial anfangen, um dir die Funktionen der App zu zeigen",
   "welcomeButtonExploreMyself": "Ich möchte die App selbst erkunden",
   "welcomeButtonStartTutorial": "Tutorial starten",
+  "welcomeHealth": "Mit Health Verbinden",
+  "welcomeHealth1": "Du kannst dich mit der Health App verbinden, damit O̶n̶e̶D̶a̶y̶ auf dein Gewicht zugreifen kann.",
+  "welcomeHealth2": "Das ist notwendig, um deinen One-Rep-Max für Übungen, bei denen du dein Körpergewicht mitbewegst, korrekt zu berechnen.",
 
   "t1CreateTemplate": "Erstelle dein erstes Workout Template",
   "t1EnterWoName": "Wie heißt dein erstes Workout?",
@@ -190,5 +197,20 @@
   "t1GroupExplanation4": "Ich habe dir 2 Übungen und eine Gruppe als Beispiel hinzugefügt, damit du dich damit vertraut machen kannst. \n\nViel Spaß! \n\nUnd vergiss nicht zu speichern, wenn du fertig bist.\uD83D\uDE09",
   "t1ExampleGroup": "Beispiel Gruppe",
   "t1ExampleGroupedExercise": "Gruppierte Übung",
-  "t1ExampleGroupDisabledExercise": "Gruppierung deaktiviert"
+  "t1ExampleGroupDisabledExercise": "Gruppierung deaktiviert",
+
+  "newVersion": "Neue Version",
+  "new1": "Performace Verbesserung.",
+  "new2": "Intuitivere Navigation durch das User Interface.",
+  "new3": "Überarbeitetes User Interface beim Erstellen von neuen Workouts und Übungen.",
+  "new4": "Überarbeitetes Tutorial.",
+  "new5": "Swipe Bewegungen wurden an iOS angepasst. Das bedeutet dass das Löschen einer Übung oder eines Satzes jetzt ein Swipe von rechts nach links ist und weitere Optionen ein Swipe von links nach rechts.",
+  "new6": "Innerhalb einer Workout Vorlage kannst Übungen jetzt beliebig sortieren. Übungen die du unterhalb einer Gruppe platzierst, die aber zu keiner Gruppe gehören sollen, kannst du durch einen Swipe nach rechts und klick auf das gruppieren Symbol von Gruppierungen ausschließen.",
+  "new7": "Neue Statistik",
+  "new8": "In der Statistik wurde der One-Rep-Max eingeführt, berechnet nach Epley.",
+  "new9": "Um den One-Rep-Max für Übungen bei denen du dein eigenes Körpergewicht bewegst korrekt zu berechnen, kannst du das bewegte Körpergewicht in % bei jeder Übung angeben.",
+  "new10": "Das Körpergewicht wird nur mit einbezogen, wenn du Zugriff auf dein Körpergewicht von der Health App zulässt.",
+  "new11": "Laufendes Workout",
+  "new12": "Du kannst eine Übung die du innerhalb eines laufenden Workouts hinzufügst jetzt auch direkt einer Gruppe hinzufügen. Außerdem kannst du direkt die Pausenzeit, die Sitzhöhe, die Kategorie und das bewegte Körpergewicht angeben.",
+  "new13": "Die Abfrage zum aktualisieren von der Workoutvorlage sowie des tracken innerhalb einer Gruppe sind keine PopUps mehr, sondern ein neuer Screen der sich von unten nach oben bewegt. Dadurch steht mehr Platz zur Verfügung und die Auswahl ist übersichtlicher."
 }

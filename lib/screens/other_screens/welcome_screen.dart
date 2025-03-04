@@ -1,4 +1,5 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
@@ -30,9 +31,10 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context);
   PanelController controllerExplainBackups = PanelController();
-  final maxIndex = 3;
+  final maxIndex = 4;
   int screenIndex = 0;
 
   @override
@@ -56,10 +58,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   animatedScreen(1, screenTwo()),
                   animatedScreen(2, screenThree()),
                   animatedScreen(3, screenFour()),
-                  if(screenIndex < maxIndex)
-                    nextButton(),
-                  if(screenIndex > 0)
-                    backButton(),
+                  animatedScreen(4, screenFive()),
+                  bottomBar(),
+                  // if(screenIndex < maxIndex)
+                  //   nextButton(),
+                  // if(screenIndex > 0)
+                  //   backButton(),
                   imprintButton(),
                 ]
             ),
@@ -118,6 +122,51 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget bottomBar(){
+    return Positioned(
+      left: 5,
+      right: 5,
+      bottom: Platform.isAndroid? 15 : 30,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+              flex: 10,
+              child: screenIndex > 0 ? Align(
+                  alignment: Alignment.centerLeft,
+                  child: CupertinoButtonText(
+                      text: AppLocalizations.of(context)!.welcomeBack,
+                      onPressed: (){
+                        setState(() {
+                          screenIndex -= 1;
+                          screenIndex = screenIndex <= 0? 0 : screenIndex;
+                        });
+                      }
+                  ),
+              ) : const SizedBox()
+          ),
+          const Spacer(flex: 13),
+          Expanded(
+            flex: 10,
+            child: screenIndex < maxIndex? Align(
+              alignment: Alignment.centerRight,
+              child: CupertinoButtonText(
+                  text: AppLocalizations.of(context)!.welcomeNext,
+                  onPressed: (){
+                    setState(() {
+                      if(screenIndex < maxIndex) {
+                        screenIndex += 1;
+                      }
+                    });
+                  }
+              ),
+            ) : const SizedBox(),
+          ),
+        ],
       ),
     );
   }
@@ -207,6 +256,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  /// Screen One
   Widget screenOne(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -261,6 +311,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  /// Screen Two
   Widget screenTwo(){
     return Stack(
       children: [
@@ -388,7 +439,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ],
                 )
               ),
-              SizedBox(height: 20,)
+              const SizedBox(height: 20,)
             ],
           ),
         ),
@@ -396,6 +447,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  /// Screen Three
   Widget screenThree(){
     return SafeArea(
       child: Column(
@@ -518,7 +570,192 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
+  /// Screen Four
   Widget screenFour(){
+    return SafeArea(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.welcomeHealth,
+                  textScaler: const TextScaler.linear(1.8),
+                ),
+                const SizedBox(width: 10,),
+                Stack(
+                  children: [
+                    Container(
+                      height: 25,
+                      width: 25,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: Colors.white,
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(6)
+                      ) ,
+                      child: const Padding(
+                        padding: EdgeInsets.all(2),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Icon(
+                            MyIcons.heart,
+                            color: Colors.red,
+                            size: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.welcomeHealth1,
+                  style: const TextStyle(fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 50),
+                Text(
+                  AppLocalizations.of(context)!.welcomeHealth2,
+                  style: const TextStyle(fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+
+          Expanded(
+            flex: 4,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+
+                /// Use Health Data
+                CupertinoListTile(
+                  leading: Stack(
+                    children: [
+                      Container(
+                        height: 25,
+                        width: 25,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(6)
+                        ) ,
+                        child: const Padding(
+                          padding: EdgeInsets.all(2),
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: Icon(
+                              MyIcons.heart,
+                              color: Colors.red,
+                              size: 15,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  title: Row(
+                    children: [
+                      Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
+                      const SizedBox(width: 5),
+                      if(cnConfig.useHealthData)
+                        FutureBuilder(
+                            future: cnConfig.isHealthDataAccessAllowed(cnScreenStatistics),
+                            builder: (context, connected){
+                              if(!connected.hasData){
+                                return Center(
+                                  child: SizedBox(
+                                    height: 15,
+                                    width: 15,
+                                    child: CupertinoActivityIndicator(
+                                        radius: 8.0,
+                                        color: Colors.amber[800]
+                                    ),
+                                    // child: CircularProgressIndicator(strokeWidth: 2,)
+                                  ),
+                                );
+                              }
+                              return Icon(
+                                connected.data == true
+                                    ? Icons.check_circle
+                                    : Icons.close,
+                                size: 15,
+                                color: connected.data == true
+                                    ? Colors.green
+                                    : Colors.red,
+                              );
+                            }
+                        )
+                    ],
+                  ),
+                  trailing: CupertinoSwitch(
+                      value: cnConfig.useHealthData,
+                      activeColor: activeColor,
+                      onChanged: (value) async{
+                        setState(() {
+                          if(Platform.isAndroid){
+                            HapticFeedback.selectionClick();
+                          }
+                          cnConfig.setHealth(value);
+                        });
+                        await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+                        if(!value){
+                          await Future.delayed(const Duration(milliseconds: 500), (){
+                            cnScreenStatistics.health.revokePermissions();
+                          });
+                        }
+                        else{
+                          await cnScreenStatistics.refreshHealthData().then((value) async{
+                            if(value){
+                              cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+                              setState(() {});
+                            }
+                            else{
+                              notificationPopUp(
+                                  context: context,
+                                  title: AppLocalizations.of(context)!.accessDenied,
+                                  message: AppLocalizations.of(context)!.accessDeniedHealth
+                              );
+                            }
+                          });
+                        }
+                          // cnScreenStatistics.refresh();
+                          // setState(() {});
+                      }
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Screen Five
+  Widget screenFive(){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,

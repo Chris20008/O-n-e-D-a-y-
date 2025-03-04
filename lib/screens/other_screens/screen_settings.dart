@@ -73,11 +73,13 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     return PopScope(
         canPop: true,
         onPopInvoked: (doPop){
-          cnScreenStatistics.panelControllerSettings.animatePanelToPosition(
-              0,
-              duration: const Duration(milliseconds: 350),
-              curve: Curves.decelerate
-          );
+          if(!_showLoadingIndicator){
+            cnScreenStatistics.panelControllerSettings.animatePanelToPosition(
+                0,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.decelerate
+            );
+          }
         },
         child: Stack(
           children: [
@@ -307,25 +309,56 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       value: cnConfig.useHealthData,
                                       activeColor: activeColor,
                                       onChanged: (value) async{
-                                        setState(() async{
+                                        setState(() {
                                           if(Platform.isAndroid){
                                             HapticFeedback.selectionClick();
                                           }
                                           cnConfig.setHealth(value);
-                                          if(!value){
-                                            Future.delayed(const Duration(milliseconds: 500), (){
-                                              cnScreenStatistics.health.revokePermissions();
-                                            });
-                                          }
+                                        });
+                                        await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+                                        if(!value){
+                                          await Future.delayed(const Duration(milliseconds: 500), (){
+                                            cnScreenStatistics.health.revokePermissions();
+                                            cnScreenStatistics.refreshData(context);
+                                            cnScreenStatistics.refresh();
+                                          });
+                                        }
+                                        else{
                                           await cnScreenStatistics.refreshHealthData().then((value){
                                             if(value){
                                               cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+                                              cnScreenStatistics.refreshData(context);
+                                              // cnScreenStatistics.calcMinMaxDates(context);
+                                              cnScreenStatistics.refresh();
+                                            }
+                                            else{
+                                              notificationPopUp(
+                                                  context: context,
+                                                  title: AppLocalizations.of(context)!.accessDenied,
+                                                  message: AppLocalizations.of(context)!.accessDeniedHealth
+                                              );
                                             }
                                           });
-                                          cnScreenStatistics.refreshData(context);
-                                          cnScreenStatistics.calcMinMaxDates(context);
-                                          cnScreenStatistics.refresh();
-                                        });
+                                        }
+                                        // setState(() async{
+                                        //   if(Platform.isAndroid){
+                                        //     HapticFeedback.selectionClick();
+                                        //   }
+                                        //   cnConfig.setHealth(value);
+                                        //   if(!value){
+                                        //     Future.delayed(const Duration(milliseconds: 500), (){
+                                        //       cnScreenStatistics.health.revokePermissions();
+                                        //     });
+                                        //   }
+                                        //   await cnScreenStatistics.refreshHealthData().then((value){
+                                        //     if(value){
+                                        //       cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+                                        //     }
+                                        //   });
+                                        //   cnScreenStatistics.refreshData(context);
+                                        //   cnScreenStatistics.calcMinMaxDates(context);
+                                        //   // cnScreenStatistics.refresh();
+                                        // });
                                       }
                                   ),
                                 ),
@@ -582,65 +615,66 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
       _showLoadingIndicator = false;
     });
     if(file != null){
-      cnStandardPopUp.open(
-          confirmText: AppLocalizations.of(context)!.yes,
-          cancelText: AppLocalizations.of(context)!.no,
-          widthFactor: 0.8,
-          context: context,
-          child: Column(
-            children: [
-              Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),),
-              const SizedBox(height: 5),
-              Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm, textAlign: TextAlign.center, textScaler: const TextScaler.linear(0.9),)
-            ],
-          ),
-          onConfirm: ()async{
-            setState(() {
-              _showLoadingIndicator = true;
-            });
-            bool resultLoadBackup = false;
-            try{
-              await loadBackupFromFile(file, cnHomepage: cnHomepage).then((result) => resultLoadBackup = result);
-              tutorialIsRunning = false;
-              currentTutorialStep = maxTutorialStep;
-              cnConfig.setCurrentTutorialStep(currentTutorialStep);
-              cnScreenStatistics.refreshData(context);
-              cnScreenStatistics.resetGraph();
-              cnScreenStatistics.refresh();
-              await cnConfig.config.save();
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!.backupLoadSuccess,
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                  textColor: Colors.white,
-                  fontSize: 16.0
-              );
-              setState(() {
-                _showLoadingIndicator = false;
-              });
-            }
-            catch (_){
-              setState(() {
-                _showLoadingIndicator = false;
-              });
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                  textColor: Colors.white,
-                  fontSize: 16.0
-              );
-            }
-            if(resultLoadBackup){
-              Future.delayed(const Duration(seconds: 5), (){
-                saveCurrentData(cnConfig);
-              });
-            }
-          }
+      showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) => CupertinoActionSheet(
+          cancelButton: getActionSheetCancelButton(context),
+          title: Text(AppLocalizations.of(context)!.settingsBackupLoad),
+          message: Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              /// This parameter indicates the action would perform
+              /// a destructive action such as delete or exit and turns
+              /// the action's text color to red.
+              isDestructiveAction: true,
+              onPressed: ()async{
+
+                Navigator.of(context).pop();
+                setState(() {
+                  _showLoadingIndicator = true;
+                });
+                try{
+                  await loadBackupFromFile(file, cnHomepage: cnHomepage);
+                  saveCurrentData(cnConfig);
+                  tutorialIsRunning = false;
+                  currentTutorialStep = maxTutorialStep;
+                  cnConfig.setCurrentTutorialStep(currentTutorialStep);
+                  cnScreenStatistics.refreshData(context);
+                  cnScreenStatistics.resetGraph();
+                  cnScreenStatistics.refresh();
+                  await cnConfig.config.save();
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!.backupLoadSuccess,
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                  setState(() {
+                    _showLoadingIndicator = true;
+                  });
+                }
+                catch (_){
+                  setState(() {
+                    _showLoadingIndicator = false;
+                  });
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.yes),
+            ),
+          ],
+        ),
       );
     }
   }

@@ -622,12 +622,12 @@ Widget getSet({
   );
 }
 
-void notificationPopUp({
+Future notificationPopUp({
   required BuildContext context,
   required String title,
   required String message
-}) {
-  showCupertinoModalPopup<void>(
+}) async {
+  await showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) => CupertinoActionSheet(
       title: Column(
@@ -869,7 +869,6 @@ Widget buildCalendarDialogButton({
       if (exists) {
         if(cnNewWorkout.allWorkoutDates[relevantDate] is List && cnNewWorkout.allWorkoutDates[relevantDate].contains("Sick")){
           cnNewWorkout.allWorkoutDates[relevantDate] = (cnNewWorkout.allWorkoutDates[relevantDate] as List).map((e) => !e.contains("Sick")? e : translatedSickText).toList();
-          print(cnNewWorkout.allWorkoutDates[relevantDate]);
         } else if(cnNewWorkout.allWorkoutDates[relevantDate] == "Sick"){
           cnNewWorkout.allWorkoutDates[relevantDate] = translatedSickText;
         }

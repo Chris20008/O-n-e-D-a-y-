@@ -35,13 +35,13 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context);
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
-  bool canConfirm = true;
   late bool showSpotify = cnConfig.useSpotify;
   final double _iconSize = 25;
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   UniqueKey newExerciseKey = UniqueKey();
   UniqueKey linkNameKey = UniqueKey();
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool allowFormCheck = true;
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +189,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   }
 
   Future showAddExercise(BuildContext context) async{
+    _textController.clear();
+    allowFormCheck = true;
     await showModalBottomSheet(
         backgroundColor: Colors.transparent,
         context: context,
@@ -197,11 +199,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
             builder: (context, setModalState) {
               return PopScope(
                 canPop: MediaQuery.of(context).viewInsets.bottom == 0,
-                onPopInvoked: (doPop){
-                  if(doPop){
-                    _textController.clear();
-                  }
-                },
+                // onPopInvoked: (doPop){},
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                   child: ConstrainedBox(
@@ -238,7 +236,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         )
                                     ),
                                     Expanded(
-                                        flex: 13,
+                                        flex: 11,
                                         child: Center(
                                           child: Text(
                                             AppLocalizations.of(context)!.exercise,
@@ -257,6 +255,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                                     if(_textController.text.isNotEmpty &&
                                                         !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
                                                     ){
+                                                      allowFormCheck = false;
                                                       cnAnimatedColumn.newEx.name = _textController.text;
                                                       double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
                                                           + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
@@ -292,10 +291,11 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         maxLength: 40,
                                         autovalidateMode: AutovalidateMode.onUserInteraction,
                                         validator: (value) {
+                                          if(!allowFormCheck){
+                                            return null;
+                                          }
                                           value = value?.trim();
-                                          print(_textController.text);
                                           if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
-                                            canConfirm = false;
                                             return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
                                           }
                                           else if(_textController.text.isEmpty){
@@ -304,7 +304,6 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                             });
                                             return AppLocalizations.of(context)!.panelExEnterName;
                                           }
-                                          canConfirm = true;
                                           return null;
                                         },
                                         decoration: InputDecoration(

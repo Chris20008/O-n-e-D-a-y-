@@ -425,7 +425,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                             )
                         ),
                         Expanded(
-                            flex: 13,
+                            flex: 11,
                             child: Center(
                               child: Text(
                               AppLocalizations.of(context)!.exercise,

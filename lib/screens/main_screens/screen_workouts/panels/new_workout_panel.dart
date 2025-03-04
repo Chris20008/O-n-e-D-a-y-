@@ -188,14 +188,15 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                         top: 15,
                                         bottom: MediaQuery.of(context).viewInsets.bottom > 0? MediaQuery.of(context).viewInsets.bottom : 80
                                     ),
-                                    child: getRowButton(
-                                      context: context,
-                                      minusWidth: 0,
-                                      onPressed: askDeleteWorkout,
-                                      icon: Icons.delete,
-                                      color: CupertinoColors.destructiveRed
-                                    ),
+                                    child: !cnNewWorkout.workout.isNewWorkout() || !cnNewWorkout.sickDays.isNewSickDays()? getRowButton(
+                                        context: context,
+                                        minusWidth: 0,
+                                        onPressed: askDeleteWorkout,
+                                        icon: Icons.delete,
+                                        color: CupertinoColors.destructiveRed
+                                    ) : const SizedBox(),
                                   ),
+
                                 ],
                               ),
                             ),
@@ -221,7 +222,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                               )
                           ),
                           Expanded(
-                            flex: 13,
+                            flex: 11,
                             child: Align(
                               alignment: Alignment.center,
                               child: FittedBox(
@@ -570,9 +571,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                                             HapticFeedback.selectionClick();
                                             FocusManager.instance.primaryFocus?.unfocus();
                                           },
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.info_outline_rounded,
-                                            color: Colors.white,
+                                            color: Colors.white54,
                                           )
                                       )
                                     ),

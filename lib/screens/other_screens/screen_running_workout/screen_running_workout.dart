@@ -676,22 +676,16 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   }
 
   bool showAnimatedColumn(){
-    print("In Function");
-    print(viewInsetsBottom);
-    print(isShowingAnimatedColumn);
     if(100 > viewInsetsBottom && !isShowingAnimatedColumn){
-      print("First if");
       isShowingAnimatedColumn = true;
       timeAnimatedColumn = 1000;
       return true;
     }
     else if(viewInsetsBottom > 0 && isShowingAnimatedColumn){
-      print("Second if");
       isShowingAnimatedColumn = false;
       timeAnimatedColumn = 0;
       return false;
     }
-    print("Default return");
     return isShowingAnimatedColumn;
   }
 

@@ -93,16 +93,28 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     List<FlSpot> tempSickDaysSpots = [];
 
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
-    if(t == null && cnScreenStatistics.selectedExerciseName != null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
-      return SizedBox(
-        height: 200,
-        child: Center(
-          child: Text(
-            AppLocalizations.of(context)!.statisticsCurrentlyNotSupported,
-            textAlign: TextAlign.center,
+    if(t == null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
+      if(cnScreenStatistics.selectedExerciseName != null){
+        return SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context)!.statisticsCurrentlyNotSupported,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      );
+        );
+      } else{
+        return SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context)!.statisticsNoExercise,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
     }
 
     width = MediaQuery.of(context).size.width;

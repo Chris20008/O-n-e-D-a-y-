@@ -224,7 +224,7 @@ class CnConfig extends ChangeNotifier {
       }
     });
     isWaitingForHealthResponse = false;
-    return Platform.isIOS? gotData : !(result?? false) || !(permission?? false);
+    return Platform.isIOS? gotData : (result?? false) || (permission?? false);
   }
 
   Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context}) async{
@@ -271,11 +271,17 @@ class CnConfig extends ChangeNotifier {
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
   bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
-  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? false) && connectWithCloud;
+  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
   bool get useHealthData => config.settings["useHealthData"]?? false;
   int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
+  String get version => config.settings["version"]?? "";
+
+  Future setVersion(String version) async{
+    config.settings["version"] = version;
+    await config.save();
+  }
 
   Future setCurrentTutorialStep(int? step) async{
     config.settings["currentTutorialStep"] = step;
