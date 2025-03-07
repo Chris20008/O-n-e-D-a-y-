@@ -165,8 +165,8 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
 
       existingWorkout = wo;
 
-      objectbox.workoutBox.put(wo);
-      objectbox.exerciseBox.putMany(wo.exercises);
+      await objectbox.workoutBox.putAsync(wo);
+      await objectbox.exerciseBox.putManyAsync(wo.exercises);
       hadDifferences = true;
       // continue;
     }
@@ -188,8 +188,8 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
       if(existingWorkout == null){
         hadDifferences = true;
         wo.id = 0;
-        objectbox.workoutBox.putAsync(wo);
-        objectbox.exerciseBox.putManyAsync(wo.exercises);
+        await objectbox.workoutBox.putAsync(wo);
+        await objectbox.exerciseBox.putManyAsync(wo.exercises);
         /// Add it to the HashMap in case there is an exact same workout
         hashMapBig[woHashBig] = wo;
       }
@@ -308,18 +308,32 @@ Future<List<FileSystemEntity>> getLocalBackupFiles() async{
 
   /// Compute [FileStat] results for each file.  Use [Future.wait] to do it
   /// efficiently without needing to wait for each I/O operation sequentially.
-  var statResults = await Future.wait([
-    for (var file in localFiles) FileStat.stat(file.path),
-  ]);
+  // var statResults = await Future.wait([
+  //   for (var file in localFiles) FileStat.stat(file.path),
+  // ]);
 
   /// Map file paths to modification times.
-  var mtimes = <String, DateTime>{
-    for (var i = 0; i < localFiles.length; i += 1)
-      localFiles[i].path: statResults[i].changed,
-  };
+  // var mtimes = <String, DateTime>{
+  //   for (var i = 0; i < localFiles.length; i += 1)
+  //     localFiles[i].path: statResults[i].changed,
+  // };
+
+  // var mtimes = <String, DateTime>{
+  //   for (var i = 0; i < localFiles.length; i += 1)
+  //     String timeString = localFiles[i].path.split("_");
+  //     localFiles[i].path: statResults[i].changed,
+  // };
 
   /// Sort [fileList] by modification times, from oldest to newest.
-  localFiles.sort((a, b) => mtimes[b.path]!.compareTo(mtimes[a.path]!));
+  // localFiles.sort((a, b) => mtimes[b.path]!.compareTo(mtimes[a.path]!));
+  // localFiles.forEach((element) {
+  //   print(element.path.split("_").last);
+  // });
+  localFiles.sort((a, b) => b.path.split("_").last.compareTo(a.path.split("_").last));
+  // print("");
+  // localFiles.forEach((element) {
+  //   print(element.path.split("_").last);
+  // });
   return localFiles;
 }
 

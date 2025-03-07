@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -32,6 +32,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   ];
 
   List<Color> gradientColors3 = [
+    const Color(0xffffa3a3),
+    const Color(0xffa66161),
+  ];
+
+  List<Color> gradientColors4 = [
     const Color(0xff147e88),
     const Color(0xff147e88),
   ];
@@ -52,6 +57,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   double width = 0;
   List<FlSpot> spotsMaxWeight = [];
   List<FlSpot> spotsAvgWeightPerSet = [];
+  List<FlSpot> spotsOneRepMax = [];
   List<FlSpot> sickDaysSpots = [];
   Offset? pointerA;
   Offset? pointerAPreviousPos;
@@ -65,31 +71,50 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   late final int _totalPadding = _leftPadding * 2;
   Map<DateTime, double>? maxWeights;
   Map<DateTime, double>? avgWeights;
+  Map<DateTime, double>? oneRepMaxPerDate;
   int animationTime = 500;
   bool firstLoad = true;
   bool graphLocked = false;
   int countSteps = 0;
   double percent = 0.7;
-  int? startTimePointerDown;
-  int allowedMovementForGraphLock = 3;
+  int allowedMovementForGraphLock = 4;
+  Timer? lockGraphTimer;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     List<FlSpot> tempSpotsMaxWeight = [];
     List<FlSpot> tempSpotsAvgWeightPerSet = [];
+    List<FlSpot> tempSpotsOneRepMax = [];
     List<FlSpot> tempSickDaysSpots = [];
 
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
-    if(t == null && cnScreenStatistics.selectedExerciseName != null){
-      return const SizedBox(
-        height: 200,
-        child: Center(
-          child: Text(
-            "The Category of this Exercise is currently not supported for statistics",
-            textAlign: TextAlign.center,
+    if(t == null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
+      if(cnScreenStatistics.selectedExerciseName != null){
+        return SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context)!.statisticsCurrentlyNotSupported,
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-      );
+        );
+      } else{
+        return SizedBox(
+          height: 200,
+          child: Center(
+            child: Text(
+              AppLocalizations.of(context)!.statisticsNoExercise,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
     }
 
     width = MediaQuery.of(context).size.width;
@@ -108,8 +133,9 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       cnScreenStatistics.currentVisibleDays = tempMaxX;
     }
 
-    maxWeights = cnScreenStatistics.getMaxWeightsPerDate();
+    maxWeights = cnScreenStatistics.getMaxWeightsPerDate(context);
     avgWeights = cnScreenStatistics.getAvgMovedWeightPerSet();
+    oneRepMaxPerDate = cnScreenStatistics.getOneRepMaxPerDate();
 
     minWeight = 10000;
     maxWeight = 0;
@@ -117,6 +143,13 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       minWeight = minWeight < value? minWeight : value;
       maxWeight = maxWeight < value? value : maxWeight;
     });
+
+    if(cnScreenStatistics.showOneRepMax){
+      oneRepMaxPerDate?.forEach((key, value) {
+        // minWeight = minWeight < value? minWeight : value;
+        maxWeight = maxWeight < value? value : maxWeight;
+      });
+    }
     minPercent = minWeight / maxWeight;
     maxPercent = 1;
 
@@ -157,6 +190,17 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       tempSpotsAvgWeightPerSet.add(FlSpot(xCoordinate, maxWeight * percent));
     });
 
+    if(!cnScreenStatistics.showAvgWeightPerSetLine){
+      minPercent = minWeight / maxWeight;
+      maxPercent = 1;
+    }
+
+    /// Set Spots One Rep Max
+    oneRepMaxPerDate?.forEach((date, weight) {
+      final xCoordinate = date.toDate().difference(minDate.toDate()).inDays.toDouble() - cnScreenStatistics.offsetMinX + _leftPadding;
+      tempSpotsOneRepMax.add(FlSpot(xCoordinate, weight.toDouble()));
+    });
+
     minY = maxWeight * minPercent - 10 < 0? 0 : maxWeight * minPercent - 5;
     minY = minY.isNaN? -4 : minY;
     maxY = maxWeight*maxPercent + 5;
@@ -185,9 +229,15 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       tempSickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
 
+    // oneRepMaxPerDate?.forEach((key, value) {
+    //   // minTotalWeight = minTotalWeight < value? minTotalWeight : value;
+    //   maxTotalWeight = maxTotalWeight < value? value : maxTotalWeight;
+    // });
+
     if(firstLoad){
       tempSpotsMaxWeight = List.generate(tempSpotsMaxWeight.length, (index) => FlSpot(tempSpotsMaxWeight[index].x, minY));
       tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, minY));
+      tempSpotsOneRepMax = List.generate(tempSpotsOneRepMax.length, (index) => FlSpot(tempSpotsOneRepMax[index].x, minY));
       Future.delayed(const Duration(milliseconds: 100), (){
         setState(() {
           firstLoad = false;
@@ -201,6 +251,12 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       tempSpotsAvgWeightPerSet = List.generate(tempSpotsAvgWeightPerSet.length, (index) => FlSpot(tempSpotsAvgWeightPerSet[index].x, tempSpotsAvgWeightPerSet[index].y));
     }
 
+    if(!cnScreenStatistics.showOneRepMax){
+      tempSpotsOneRepMax = List.generate(tempSpotsOneRepMax.length, (index) => FlSpot(tempSpotsOneRepMax[index].x, minY-5));
+    } else{
+      tempSpotsOneRepMax = List.generate(tempSpotsOneRepMax.length, (index) => FlSpot(tempSpotsOneRepMax[index].x, tempSpotsOneRepMax[index].y));
+    }
+
     if(!cnScreenStatistics.showSickDays){
       tempSickDaysSpots = List.generate(tempSickDaysSpots.length, (index) => FlSpot(tempSickDaysSpots[index].x, -5));
     } else{
@@ -209,34 +265,109 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
     spotsMaxWeight = tempSpotsMaxWeight;
     spotsAvgWeightPerSet = tempSpotsAvgWeightPerSet;
+    spotsOneRepMax = tempSpotsOneRepMax;
     sickDaysSpots = tempSickDaysSpots;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
-            const Spacer(),
-          ],
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(left: 5),
+        //   child: Column(
+        //     mainAxisSize: MainAxisSize.min,
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Row(
+        //         children: [
+        //           Container(
+        //             height: 8,
+        //             width: 12,
+        //             decoration: BoxDecoration(
+        //                 borderRadius: BorderRadius.circular(5),
+        //                 color: gradientColors.first
+        //             ),
+        //           ),
+        //           SizedBox(width: 10),
+        //           Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: TextScaler.linear(0.8))
+        //         ],
+        //       ),
+        //       if(cnScreenStatistics.showAvgWeightPerSetLine)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors2.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //       if(cnScreenStatistics.showOneRepMax)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors3.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text("1RM", textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //       if(cnScreenStatistics.showSickDays)
+        //         Row(
+        //           children: [
+        //             Container(
+        //               height: 8,
+        //               width: 12,
+        //               decoration: BoxDecoration(
+        //                   borderRadius: BorderRadius.circular(5),
+        //                   color: gradientColors4.first
+        //               ),
+        //             ),
+        //             SizedBox(width: 10),
+        //             Text(AppLocalizations.of(context)!.statisticsSick, textScaler: TextScaler.linear(0.8))
+        //           ],
+        //         ),
+        //     ],
+        //   ),
+        // ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //   children: [
+        //     Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: gradientColors[0]),),
+        //     const Spacer(),
+        //   ],
+        // ),
         const SizedBox(height: 10,),
         LayoutBuilder(
           builder: (context, constraints) {
             return Listener(
               behavior: HitTestBehavior.translucent,
               onPointerDown: (PointerDownEvent details){
+                if(cnScreenStatistics.offsetMinX != 0 || cnScreenStatistics.offsetMaxX != 0){
+                  lockGraphTimer ??= Timer(const Duration(milliseconds: 250), (){
+                    graphLocked = true;
+                    HapticFeedback.selectionClick();
+                  });
+                }
+
                 animationTime = 0;
                 if(pointerAIdentifier == null){
-                  startTimePointerDown = DateTime.now().millisecondsSinceEpoch;
                   pointerAIdentifier = details.pointer;
                   pointerA = details.position;
                   pointerAStartPositionForGraphLock = details.position;
                   pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
                 }
                 else if (pointerBIdentifier == null && details.pointer != pointerAIdentifier && !graphLocked){
-                  startTimePointerDown = null;
+                  lockGraphTimer?.cancel();
                   pointerBIdentifier = details.pointer;
                   pointerB = details.position;
                   lastPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
@@ -290,16 +421,10 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                   sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
                   final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
 
-                  if(pointerAStartPositionForGraphLock != null && (pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() < allowedMovementForGraphLock){
-                    if(startTimePointerDown != null && (DateTime.now().millisecondsSinceEpoch - startTimePointerDown! > 200)){
-                      graphLocked = true;
-                      HapticFeedback.selectionClick();
-                      return;
-                    }
-                  }
-                  else{
-                    pointerAStartPositionForGraphLock = null;
-                    startTimePointerDown = null;
+                  if((pointerAStartPositionForGraphLock!.dx - pointerA!.dx).abs() > allowedMovementForGraphLock){
+                    lockGraphTimer?.cancel();
+                    lockGraphTimer = null;
+                    graphLocked = false;
                   }
 
                   double newOffsetMinX;
@@ -316,7 +441,8 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
               },
               onPointerUp: (PointerUpEvent details){
-                startTimePointerDown = null;
+                lockGraphTimer?.cancel();
+                lockGraphTimer = null;
                 graphLocked = false;
                 // if(details.pointer == pointerAIdentifier){
                   pointerA = null;
@@ -346,6 +472,74 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               },
               child: Stack(
                 children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 60),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              height: 8,
+                              width: 12,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5),
+                                color: gradientColors.first
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(0.8))
+                          ],
+                        ),
+                        if(cnScreenStatistics.showAvgWeightPerSetLine)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors2.first
+                                  ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.filterAvgMovWeightHead, textScaler: const TextScaler.linear(0.8))
+                            ],
+                          ),
+                        if(cnScreenStatistics.showOneRepMax)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors3.first
+                                  ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text("1RM", textScaler: TextScaler.linear(0.8))
+                            ],
+                          ),
+                        if(cnScreenStatistics.showSickDays)
+                          Row(
+                            children: [
+                              Container(
+                                  height: 8,
+                                  width: 12,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: gradientColors4.first
+                                  ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text(AppLocalizations.of(context)!.statisticsSick, textScaler: const TextScaler.linear(0.8))
+                            ],
+                          ),
+                      ],
+                    ),
+                  ),
                   AspectRatio(
                     aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
                     child: Padding(
@@ -466,22 +660,39 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       lineTouchData: LineTouchData(
         enabled: true,
         touchTooltipData: LineTouchTooltipData(
-          // showOnTopOfTheChartBoxArea: true,
+          maxContentWidth: 200,
+          showOnTopOfTheChartBoxArea: true,
           fitInsideVertically: true,
           fitInsideHorizontally: true,
           getTooltipItems: (List<LineBarSpot> spots){
             return spots.asMap().entries.map((e) {
               int index = e.value.barIndex;
-              if (index == 2 || (!cnScreenStatistics.showAvgWeightPerSetLine && index == 1)) {
+              /// return null when bar index is from sickDays
+              /// or one of the other lines is disabled
+              if (index == 3
+                  || (!cnScreenStatistics.showAvgWeightPerSetLine && index == 1)
+                  || (!cnScreenStatistics.showOneRepMax && index == 2)
+              ) {
                 return null;
               }
               LineBarSpot spot = e.value;
+              late Color color;
+              switch(spot.barIndex){
+                case 0:
+                  color = gradientColors[0];
+                case 1:
+                  color = gradientColors2[0];
+                case 2:
+                  color = gradientColors3[0];
+                default:
+                  color = Colors.white;
+              }
               return LineTooltipItem(
                   textAlign: TextAlign.left,
                   getSpotData(spot),
                   TextStyle(
                       fontSize: 14,
-                      color: spot.barIndex == 0? gradientColors[0] : gradientColors2[0]
+                      color: color
                   )
               );
             }).toList();
@@ -489,22 +700,23 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         )
       ),
       gridData: FlGridData(
-        show: true,
-        drawVerticalLine: true,
-        horizontalInterval: verticalStepSize.toDouble(),
-        verticalInterval: 30,
-        getDrawingHorizontalLine: (value) {
-          return FlLine(
-            color: Colors.grey[700]!.withOpacity(0.7),
-            strokeWidth: 1,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return FlLine(
-            color: Colors.grey[700]!.withOpacity(0.7),
-            strokeWidth: 1,
-          );
-        },
+        show: false,
+        // drawHorizontalLine: true,
+        // drawVerticalLine: true,
+        // horizontalInterval: verticalStepSize.toDouble(),
+        // verticalInterval: 30,
+        // getDrawingHorizontalLine: (value) {
+        //   return FlLine(
+        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     strokeWidth: 1,
+        //   );
+        // },
+        // getDrawingVerticalLine: (value) {
+        //   return FlLine(
+        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     strokeWidth: 1,
+        //   );
+        // },
       ),
       titlesData: FlTitlesData(
         show: true,
@@ -532,7 +744,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         ),
       ),
       borderData: FlBorderData(
-        show: true,
+        show: false,
         border: Border.all(color: const Color(0xff5e5e5e)),
       ),
       minX: 0,
@@ -540,9 +752,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       minY: minY,
       maxY: maxY,
       lineBarsData: [
+
+        /// Max weight
         LineChartBarData(
-          isCurved: false,
-          // curveSmoothness: 0.1,
+          isCurved: true,
+          curveSmoothness: 0.1,
           spots: spotsMaxWeight,
           gradient: LinearGradient(
             colors: gradientColors,
@@ -561,9 +775,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             ),
           ),
         ),
+
+        /// Average Weight per set
         // if(cnScreenStatistics.showAvgWeightPerSetLine)
           LineChartBarData(
-            isCurved: false,
+            isCurved: true,
             curveSmoothness: 0.1,
             spots: spotsAvgWeightPerSet,
             gradient: LinearGradient(
@@ -575,13 +791,30 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               show: true,
             ),
           ),
+
+        /// One Rep Max
+        LineChartBarData(
+          isCurved: true,
+          curveSmoothness: 0.1,
+          spots: spotsOneRepMax,
+          gradient: LinearGradient(
+            colors: gradientColors3,
+          ),
+          barWidth: 3,
+          isStrokeCapRound: true,
+          dotData: const FlDotData(
+            show: true,
+          ),
+        ),
+
+        /// Sick Days
         if(cnScreenStatistics.showSickDays)
           LineChartBarData(
             isCurved: false,
             curveSmoothness: 0.1,
             spots: sickDaysSpots,
             gradient: LinearGradient(
-              colors: gradientColors3,
+              colors: gradientColors4,
             ),
             barWidth: 1,
             isStrokeCapRound: true,
@@ -591,7 +824,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
-                colors: gradientColors3
+                colors: gradientColors4
                     .map((color) => color.withOpacity(0.3))
                     .toList(),
               ),
@@ -607,10 +840,18 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       data = maxWeights!;
     } else if(spot.barIndex == 1){
       data = avgWeights!;
+    } else if(spot.barIndex == 2){
+      data = oneRepMaxPerDate!;
     }
     else{
-      return "Krank";
+      return AppLocalizations.of(context)!.statisticsSick;
     }
-    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${data.values.toList()[spot.spotIndex].toInt()} kg";
+    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
   }
+}
+
+String formatNumber(double value) {
+  return value % 1 == 0
+      ? value.toInt().toString() // Ganze Zahl ohne Nachkommastellen
+      : value.toStringAsFixed(value * 10 % 1 == 0 ? 1 : 2); // Eine oder zwei Nachkommastellen
 }

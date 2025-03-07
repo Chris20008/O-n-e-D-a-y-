@@ -173,23 +173,18 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                       ),
                       Align(
                         alignment: Alignment.topRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 2.5),
-                          child: IconButton(
-                              iconSize: 30,
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
-                              ),
-                              onPressed: () {
-                                cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
-                                cnRunningWorkout.refresh();
-                              },
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                                color: Colors.amber[800],
-                              )
-                          ),
+                        child: CupertinoButton(
+                          padding: EdgeInsets.only(right: 9),
+                            // iconSize: 30,
+                            // style: ButtonStyle(
+                            //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                            //   // shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                            // ),
+                            onPressed: () {
+                              cnStopwatchWidget.close(scrollController: cnRunningWorkout.scrollController);
+                              cnRunningWorkout.refresh();
+                            },
+                            child: Icon(Icons.keyboard_arrow_down, size: 30,)
                         ),
                       ),
                       Align(
@@ -218,10 +213,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                                 ).then((value) => setState(() {}));
                               }
                             },
-                            child: Icon(
-                              Icons.timelapse_rounded,
-                              color: Colors.amber[800],
-                            )
+                            child: Icon(CupertinoIcons.timer)
                         ),
                       )
                     ],
@@ -232,19 +224,16 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
             secondChild: SizedBox(
               height: cnSpotifyBar.heightOfButton,
               width: cnSpotifyBar.heightOfButton,
-              child: IconButton(
-                  iconSize: 28,
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  ),
+              child: CupertinoButton(
+                  // iconSize: 28,
+                  // style: ButtonStyle(
+                  //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                  // ),
                   onPressed: () {
                     cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
                     cnRunningWorkout.refresh();
                   },
-                  icon: Icon(
-                    Icons.timer,
-                    color: Colors.amber[800],
-                  )
+                  child: const Icon(CupertinoIcons.timer_fill, size: 26)
               ),
             ),
             crossFadeState: cnStopwatchWidget.isOpened?
@@ -274,11 +263,6 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   }
 
   String getTimeString() {
-    // String elapsedMinutes = (cnStopwatchWidget.stopwatch.elapsed.inMinutes%60).toString();
-    // elapsedMinutes = elapsedMinutes.length==1? "0$elapsedMinutes" : elapsedMinutes;
-    //
-    // String elapsedSeconds = (cnStopwatchWidget.stopwatch.elapsed.inSeconds%60).toString();
-    // elapsedSeconds = elapsedSeconds.length==1? "0$elapsedSeconds" : elapsedSeconds;
     int restCountdownSeconds;
     if(cnStopwatchWidget.countdownTime != null){
       restCountdownSeconds = cnStopwatchWidget.countdownTime! - cnStopwatchWidget.stopwatch.elapsed.inSeconds;

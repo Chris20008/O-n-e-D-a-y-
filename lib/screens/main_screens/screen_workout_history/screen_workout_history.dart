@@ -114,7 +114,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
                   if(cnWorkoutHistory.workoutsAndSickDays[index] is Workout){
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].date;
-                    // print("");
                     child = WorkoutExpansionTile(
                       workout: cnWorkoutHistory.workoutsAndSickDays[index],
                       padding: EdgeInsets.zero,
@@ -259,7 +258,6 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                         justShow: false,
                         buttonIsCalender: true,
                         dateValues: getCurrentDate(),
-                        // dateValues: [DateTime(2024, 12, 12)],
                         onConfirm: (List<DateTime?> values){
                           if(values.isNotEmpty){
                             int? index;
@@ -398,8 +396,8 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                       fontWeight: FontWeight.w200
                   ),
                 ),
-                const Text(
-                  "Krank",
+                Text(
+                  AppLocalizations.of(context)!.statisticsSick,
                   style: TextStyle(fontSize: 26),
                 )
               ],
@@ -455,8 +453,8 @@ class CnWorkoutHistory extends ChangeNotifier {
     MonthSummary initSummary(DateTime date, List<DateTime> cachedSickDates) {
       while(true){
         if(tempMonthSummaries.keys.contains(cachedSickDates.lastOrNull?? "")){
-          tempMonthSummaries[cachedSickDates.last]?.differentDaysWithWorkoutOrSick["Krank"]?.addAll(cachedSickDates.where((element) => element.isSameMonth(cachedSickDates.last)));
-          tempMonthSummaries[cachedSickDates.last]?.uniqueWorkouts.add("Krank");
+          tempMonthSummaries[cachedSickDates.last]?.differentDaysWithWorkoutOrSick["Sick"]?.addAll(cachedSickDates.where((element) => element.isSameMonth(cachedSickDates.last)));
+          tempMonthSummaries[cachedSickDates.last]?.uniqueWorkouts.add("Sick");
           cachedSickDates = cachedSickDates.where((d) => !d.isSameMonth(cachedSickDates.last)).toList();
         } else{
           break;
@@ -465,10 +463,10 @@ class CnWorkoutHistory extends ChangeNotifier {
       MonthSummary summ = tempMonthSummaries[DateTime(date.year, date.month+1, 0).toDate()]?? MonthSummary(DateTime(date.year, date.month+1, 0));
       List<DateTime> tempDates = cachedSickDates.where((d) => d.isSameMonth(date)).toList();
       if (cachedSickDates.isNotEmpty) {
-        summ.uniqueWorkouts.add("Krank");
-        summ.workoutCounts["Krank"] = tempDates.length;
+        summ.uniqueWorkouts.add("Sick");
+        summ.workoutCounts["Sick"] = tempDates.length;
       }
-      summ.differentDaysWithWorkoutOrSick["Krank"]?.addAll(tempDates);
+      summ.differentDaysWithWorkoutOrSick["Sick"]?.addAll(tempDates);
       cachedSickDates = cachedSickDates.where((d) => !d.isSameMonth(date)).toList();
       return summ;
     }
@@ -526,28 +524,28 @@ class CnWorkoutHistory extends ChangeNotifier {
             tempMonthSummaries[summary.date] = summary;
           }
           summary = initSummary(item.endDate, cachedSickDates);
-          summary.uniqueWorkouts.add("Krank");
+          summary.uniqueWorkouts.add("Sick");
           if(!item.startDate.isSameMonth(item.endDate)){
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
+            summary.workoutCounts["Sick"] = (summary.workoutCounts["Sick"]?? 0) + item.endDate.day;
           }
           else{
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
+            summary.workoutCounts["Sick"] = (summary.workoutCounts["Sick"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
           }
         }
         else{
-          summary.uniqueWorkouts.add("Krank");
+          summary.uniqueWorkouts.add("Sick");
           if(!item.startDate.isSameMonth(item.endDate)){
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.day;
+            summary.workoutCounts["Sick"] = (summary.workoutCounts["Sick"]?? 0) + item.endDate.day;
           }
           else{
-            summary.workoutCounts["Krank"] = (summary.workoutCounts["Krank"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
+            summary.workoutCounts["Sick"] = (summary.workoutCounts["Sick"]?? 0) + item.endDate.difference(item.startDate).inDays + 1;
           }
         }
         if(!item.startDate.isSameMonth(item.endDate)){
           cachedSickDates.addAll(item.startDate.getDatesBetween(item.endDate, onlySameMonth: false));
         }
         final dates = item.endDate.getDatesBetween(item.startDate, onlySameMonth: true);
-        summary.differentDaysWithWorkoutOrSick["Krank"]?.addAll(dates);
+        summary.differentDaysWithWorkoutOrSick["Sick"]?.addAll(dates);
       }
     }
     if(summary != null){
@@ -578,7 +576,7 @@ class MonthSummary{
   Map<String, int> workoutCounts = {};
 
   Map<String, Set<DateTime>> differentDaysWithWorkoutOrSick = {
-    "Krank": {},
+    "Sick": {},
     "Workouts": {}
   };
 }

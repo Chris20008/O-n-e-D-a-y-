@@ -1,4 +1,4 @@
-import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +86,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                 ),
                 child: Container(
                     width: size.width*cnStandardPopUp.widthFactor,
-                    color: cnStandardPopUp.color,
+                    color: Theme.of(context).primaryColor,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: Column(
@@ -100,40 +100,24 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                                 child: cnStandardPopUp.child
                             ),
                           ),
-                          horizontalGreySpacer,
+                          // horizontalGreySpacer,
                           SizedBox(
-                            height: 40,
+                            height: 50,
                             child: Row(
                               children: [
-                                Expanded(
-                                    child: ElevatedButton(
-                                        onPressed: cnStandardPopUp.confirm,
-                                        style: ButtonStyle(
-                                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                            // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                        ),
-                                        child: Text(cnStandardPopUp.confirmText, style: cnStandardPopUp.confirmTextStyle)
-                                    )
-                                ),
-                                if(cnStandardPopUp.showCancel)
-                                  verticalGreySpacer,
                                 if(cnStandardPopUp.showCancel)
                                   Expanded(
-                                      child: ElevatedButton(
+                                      child: CupertinoButtonText(
                                           onPressed: cnStandardPopUp.cancel,
-                                          style: ButtonStyle(
-                                              shadowColor: MaterialStateProperty.all(Colors.transparent),
-                                              surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                                              backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                                              // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                                              shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                                          ),
-                                          child: Text(cnStandardPopUp.cancelText)
+                                          text: cnStandardPopUp.cancelText
                                       )
                                   ),
+                                Expanded(
+                                    child: CupertinoButtonText(
+                                        onPressed: cnStandardPopUp.confirm,
+                                        text: cnStandardPopUp.confirmText
+                                    )
+                                ),
                               ],
                             ),
                           ),
@@ -164,7 +148,7 @@ class CnStandardPopUp extends ChangeNotifier {
   bool jump = true;
   bool showCancel = true;
   bool canConfirm = true;
-  Color color = Colors.black;
+  // Color color = Colors.black;
   int animationTime = 200;
   double widthFactor = 0.65;
   double maxHeight = 300;
@@ -178,7 +162,7 @@ class CnStandardPopUp extends ChangeNotifier {
     EdgeInsets padding = const EdgeInsets.all(20),
     String? confirmText,
     String? cancelText,
-    Color? color,
+    // Color? color,
     bool showCancel = true,
     bool canConfirm = true,
     TextStyle? confirmTextStyle,
@@ -196,7 +180,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.padding = padding;
     this.confirmText = confirmText?? AppLocalizations.of(context)!.ok;
     this.cancelText = cancelText?? AppLocalizations.of(context)!.cancel;
-    this.color = color?? Theme.of(context).primaryColor;
+    // this.color = color?? Theme.of(context).primaryColor;
     this.showCancel = showCancel;
     this.canConfirm = canConfirm;
     this.confirmTextStyle = confirmTextStyle;

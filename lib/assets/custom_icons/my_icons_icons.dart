@@ -16,6 +16,10 @@
 ///         Author:    Daniel Bruce
 ///         License:   SIL (http://scripts.sil.org/OFL)
 ///         Homepage:  http://www.entypo.com
+/// * Elusive, Copyright (C) 2013 by Aristeides Stathopoulos
+///         Author:    Aristeides Stathopoulos
+///         License:   SIL (http://scripts.sil.org/OFL)
+///         Homepage:  http://aristeides.com/
 /// * Font Awesome 4, Copyright (C) 2016 by Dave Gandy
 ///         Author:    Dave Gandy
 ///         License:   SIL ()
@@ -38,6 +42,7 @@ class MyIcons {
   static const String? _kFontPkg = null;
 
   static const IconData chart_line = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData heart = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData tag = IconData(0xe827, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData tags = IconData(0xe828, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData github_circled = IconData(0xf09b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
@@ -45,4 +50,5 @@ class MyIcons {
   static const IconData database = IconData(0xf1c0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData graph = IconData(0xf35a, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData dumbbell = IconData(0xf44b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData weight = IconData(0xf496, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

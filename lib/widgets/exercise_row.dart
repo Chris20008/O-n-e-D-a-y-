@@ -9,6 +9,9 @@ class ExerciseRow extends StatelessWidget {
   final Widget? child;
   final int flexLeft;
   final int flexRight;
+  final TextStyle? style;
+  final EdgeInsetsGeometry? margin;
+  final BorderRadius? borderRadius;
 
   const ExerciseRow({
     super.key,
@@ -17,56 +20,71 @@ class ExerciseRow extends StatelessWidget {
     this.padding,
     this.child,
     this.flexLeft = 3,
-    this.flexRight = 7
+    this.flexRight = 7,
+    this.style,
+    this.margin,
+    this.borderRadius
   });
 
   final double _widthOfField = 44;
-  final double _height = 60;
+  final double _height = 40;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return AnimatedContainer(
+      height: double.maxFinite,
+      decoration: BoxDecoration(
+        // color: Theme.of(context).cardColor,
+        // color: Color(0x921c1001),
+        borderRadius: borderRadius?? BorderRadius.circular(8)
+      ),
+      margin: margin,
       padding: padding?? const EdgeInsets.all(0),
-      child: Row(
+      duration: const Duration(milliseconds: 300),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-              flex:flexLeft,
-              child: child?? OverflowSafeText(exercise.name)
+          child?? OverflowSafeText(
+            exercise.name,
+            textAlign: TextAlign.center,
+            // fontSize: 12,
+            style: style,
+            minFontSize: 12,
+            maxLines: 1,
           ),
-          Expanded(
-            flex: flexRight,
-            child: SizedBox(
-              height: _height,
-              child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (var set in exercise.sets)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(5),
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 3, right: 3),
-                          child: SizedBox(
-                            width: _widthOfField,
-                            height: _height,
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
+          const SizedBox(height: 2),
+          SizedBox(
+            height: _height,
+            child: ListView(
+                physics: const BouncingScrollPhysics(),
+                scrollDirection: Axis.horizontal,
+                children: [
+                  for (var set in exercise.sets)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 3, right: 3),
+                        child: SizedBox(
+                          width: _widthOfField,
+                          height: _height,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
 
-                                /// Background of single set
-                                backgroundSingleSet,
+                              /// Background of single set
+                              backgroundSingleSet,
 
-                                /// One Column for each set (weight / amount)
-                                dataSingleSet(set, exercise)
-                              ],
-                            ),
+                              /// One Column for each set (weight / amount)
+                              dataSingleSet(set, exercise)
+                            ],
                           ),
                         ),
                       ),
-                  ]
-              ),
+                    ),
+                ]
             ),
-          )
+          ),
         ],
       ),
     );

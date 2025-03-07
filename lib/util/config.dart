@@ -1,3 +1,4 @@
+import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
@@ -45,12 +46,9 @@ class Config{
   Future<bool> save() async{
     try{
       final json = toJson();
-      // print("JASON TO CACHE");
-      // print(json);
       await cache.saveData(json, "config");
       return true;
     } catch (e){
-      // print("Exception while saving: ${e.toString()}");
       return false;
     }
   }
@@ -63,6 +61,7 @@ class CnConfig extends ChangeNotifier {
   bool isInitialized = false;
   bool isWaitingForCloudResponse = false;
   bool isWaitingForSpotifyResponse = false;
+  bool isWaitingForHealthResponse = false;
   bool failedSpotifyConnection = false;
   bool showMoreSettingCloud = false;
   bool? isICloudAvailable;
@@ -74,9 +73,6 @@ class CnConfig extends ChangeNotifier {
     cache = CustomCacheManager();
 
     final Map<String, dynamic>? tempConfigData = await cache.readData(fileName: "config");
-
-    // print("Received Temp Config Data");
-    // print(tempConfigData);
 
     try{
       if(tempConfigData != null){
@@ -93,41 +89,6 @@ class CnConfig extends ChangeNotifier {
 
     refresh();
   }
-
-  // Future<bool> checkIfICloudAvailable() async {
-  //   if(!connectWithCloud){
-  //     return false;
-  //   }
-  //
-  //   if(isICloudAvailable == null){
-  //     isWaitingForCloudResponse = true;
-  //     final res = await ICloudService.isICloudAvailable();
-  //     await Future.delayed(const Duration(milliseconds: 1000), (){});
-  //     isICloudAvailable = res;
-  //     showMoreSettingCloud = isICloudAvailable!;
-  //     if(!isICloudAvailable!){
-  //       await setConnectWithCloud(false);
-  //     }
-  //     isWaitingForCloudResponse = false;
-  //     refresh();
-  //   } else {
-  //     await Future.delayed(const Duration(milliseconds: 1000), (){});
-  //     showMoreSettingCloud = isICloudAvailable!;
-  //     if(!isICloudAvailable!){
-  //       await setConnectWithCloud(false);
-  //     }
-  //   }
-  //
-  //   // while(isWaitingForCloudResponse){
-  //   //   await Future.delayed(const Duration(milliseconds: 200));
-  //   //   if(!isWaitingForCloudResponse){
-  //   //     return isICloudAvailable?? false;
-  //   //   }
-  //   // }
-  //
-  //
-  //   return isICloudAvailable ?? false;
-  // }
 
   Future signInCloud() async{
     await Future.delayed(const Duration(milliseconds: 200), () async {
@@ -220,7 +181,53 @@ class CnConfig extends ChangeNotifier {
     showMoreSettingCloud = false;
   }
 
-  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondsDelayMilliseconds = 1500, BuildContext? context}) async{
+  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics)async{
+    bool? result = false;
+    bool? permission = false;
+    bool hadToWait = false;
+    bool gotData = false;
+    while(isWaitingForHealthResponse){
+      await Future.delayed(const Duration(milliseconds: 100));
+      hadToWait = true;
+    }
+    if(hadToWait){
+      if(Platform.isIOS){
+        return cnScreenStatistics.healthData.isNotEmpty;
+      }
+      return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
+    }
+    isWaitingForHealthResponse = true;
+    await Future.delayed(const Duration(milliseconds: 500), ()async{
+      permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+      if(permission != true){
+        result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
+        permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
+      }
+      if(Platform.isIOS){
+        gotData = await cnScreenStatistics.refreshHealthData();
+        if(!gotData){
+          await setHealth(false);
+          cnScreenStatistics.health.revokePermissions();
+          Future.delayed(const Duration(milliseconds: 500), (){
+            refresh();
+          });
+        }
+      }
+      else{
+        if(!(permission?? false) && !(result?? false)){
+          await setHealth(false);
+          cnScreenStatistics.health.revokePermissions();
+          Future.delayed(const Duration(milliseconds: 500), (){
+            refresh();
+          });
+        }
+      }
+    });
+    isWaitingForHealthResponse = false;
+    return Platform.isIOS? gotData : (result?? false) || (permission?? false);
+  }
+
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context}) async{
     isWaitingForSpotifyResponse = true;
     await Future.delayed(Duration(milliseconds: delayMilliseconds));
     final result = await canLaunchUrl(Uri.parse("spotify:"));
@@ -231,7 +238,7 @@ class CnConfig extends ChangeNotifier {
       failedSpotifyConnection = true;
       Fluttertoast.cancel();
       Fluttertoast.showToast(
-          msg: context != null? AppLocalizations.of(context)!.spotifyPleaseInstall : "Please install Spotify to use this function",
+          msg: context.mounted? AppLocalizations.of(context)!.spotifyPleaseInstall : "Please install Spotify to use this function",
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
@@ -240,7 +247,7 @@ class CnConfig extends ChangeNotifier {
           fontSize: 16.0
       );
       await setSpotify(false);
-      Future.delayed(Duration(milliseconds: secondsDelayMilliseconds), ()async{
+      Future.delayed(Duration(milliseconds: secondDelayMilliseconds), ()async{
         refresh();
       });
     } else if(failedSpotifyConnection){
@@ -264,10 +271,17 @@ class CnConfig extends ChangeNotifier {
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
   bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
-  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? false) && connectWithCloud;
+  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
+  bool get useHealthData => config.settings["useHealthData"]?? false;
   int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
+  String get version => config.settings["version"]?? "";
+
+  Future setVersion(String version) async{
+    config.settings["version"] = version;
+    await config.save();
+  }
 
   Future setCurrentTutorialStep(int? step) async{
     config.settings["currentTutorialStep"] = step;
@@ -281,6 +295,11 @@ class CnConfig extends ChangeNotifier {
 
   Future setSpotify(bool value) async{
     config.settings["useSpotify"] = value;
+    await config.save();
+  }
+
+  Future setHealth(bool value) async{
+    config.settings["useHealthData"] = value;
     await config.save();
   }
 

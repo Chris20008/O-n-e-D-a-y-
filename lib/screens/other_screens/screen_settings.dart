@@ -42,6 +42,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   bool setOrientation = false;
   bool _showLoadingIndicator = false;
   PanelController controllerExplainBackups = PanelController();
+  ScrollController scrollControllerSetting = ScrollController();
+  ScrollController scrollControllerBackups = ScrollController();
 
   @override
   void initState() {
@@ -56,7 +58,12 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state){
+  void didChangeAppLifecycleState(AppLifecycleState state)async{
+    Future.delayed(const Duration(milliseconds: 500), ()async{
+      await cnScreenStatistics.refreshHealthData();
+      cnScreenStatistics.calcMinMaxDates(context);
+      cnScreenStatistics.refresh();
+    });
     setState(() {});
   }
 
@@ -66,11 +73,13 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     return PopScope(
         canPop: true,
         onPopInvoked: (doPop){
-          cnScreenStatistics.panelControllerSettings.animatePanelToPosition(
-              0,
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.decelerate
-          );
+          if(!_showLoadingIndicator){
+            cnScreenStatistics.panelControllerSettings.animatePanelToPosition(
+                0,
+                duration: const Duration(milliseconds: 350),
+                curve: Curves.decelerate
+            );
+          }
         },
         child: Stack(
           children: [
@@ -82,24 +91,24 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               // animationController: cnScreenStatistics.animationControllerStatisticsScreen,
               /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
               /// when swiping down in  ListView
-              panelBuilder: (ScrollController sc){
+              panelBuilder: (context, listView){
                 return Column(
                   children: [
-                    const SizedBox(height: 10,),
-                    panelTopBar,
+                    // const SizedBox(height: 10,),
+                    // panelTopBar,
                     const SizedBox(height: 10,),
                     Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
                     const SizedBox(height: 10),
                     Expanded(
-                      child: SingleChildScrollView(
+                      child: listView(
                         physics: const BouncingScrollPhysics(),
-                        controller: sc,
+                        controller: scrollControllerSetting,
                         child: Column(
                           children: [
                             /// General
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(
@@ -110,7 +119,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 /// Language
                                 CupertinoListTile(
                                     leading:  const Icon(
-                                        Icons.language
+                                      Icons.language,
+                                      color: Colors.white,
                                     ),
                                     title: getSelectLanguageButton()
                                 ),
@@ -118,22 +128,61 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 CupertinoListTile(
                                   onTap: (){
                                     if(currentTutorialStep != 0){
-                                      cnConfig.setCurrentTutorialStep(0);
-                                      currentTutorialStep = 0;
-                                      tutorialIsRunning = false;
-                                      Fluttertoast.showToast(
-                                          msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
-                                          toastLength: Toast.LENGTH_LONG,
-                                          gravity: ToastGravity.SNACKBAR,
-                                          timeInSecForIosWeb: 1,
-                                          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                                          textColor: Colors.white,
-                                          fontSize: 16.0
+                                      showCupertinoModalPopup<void>(
+                                        context: context,
+                                        builder: (BuildContext context) => CupertinoActionSheet(
+                                          cancelButton: getActionSheetCancelButton(
+                                            context,
+                                            text: AppLocalizations.of(context)!.yes,
+                                            onPressed: (){
+                                              cnConfig.setCurrentTutorialStep(0);
+                                              currentTutorialStep = 0;
+                                              tutorialIsRunning = false;
+                                              Fluttertoast.showToast(
+                                                  msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                                  toastLength: Toast.LENGTH_LONG,
+                                                  gravity: ToastGravity.SNACKBAR,
+                                                  timeInSecForIosWeb: 1,
+                                                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                                                  textColor: Colors.white,
+                                                  fontSize: 16.0
+                                              );
+                                            }
+                                          ),
+                                          title: Column(
+                                            children: [
+                                              Text("${AppLocalizations.of(context)!.settingsTutorialReset}?", textScaler: const TextScaler.linear(1.2)),
+                                            ],
+                                          ),
+                                          // message: Text(message, textScaler: const TextScaler.linear(1.2)),
+                                          actions: <CupertinoActionSheetAction>[
+                                            CupertinoActionSheetAction(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              isDefaultAction: false,
+                                              child: Text(AppLocalizations.of(context)!.no),
+                                            ),
+                                          ],
+                                        ),
                                       );
+                                      // cnConfig.setCurrentTutorialStep(0);
+                                      // currentTutorialStep = 0;
+                                      // tutorialIsRunning = false;
+                                      // Fluttertoast.showToast(
+                                      //     msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+                                      //     toastLength: Toast.LENGTH_LONG,
+                                      //     gravity: ToastGravity.SNACKBAR,
+                                      //     timeInSecForIosWeb: 1,
+                                      //     backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                                      //     textColor: Colors.white,
+                                      //     fontSize: 16.0
+                                      // );
                                     }
                                   },
                                   leading: const Icon(
-                                      Icons.school
+                                    Icons.school,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
@@ -181,7 +230,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   trailing: CupertinoSwitch(
                                       value: cnConfig.useSpotify,
-                                      activeColor: const Color(0xFFC16A03),
+                                      activeColor: activeColor,
                                       onChanged: (value) async{
                                         setState(() {
                                           if(Platform.isAndroid){
@@ -192,13 +241,134 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                       }
                                   ),
                                 ),
+
+                                /// Use Health Data
+                                CupertinoListTile(
+                                  leading: Stack(
+                                    children: [
+                                      Container(
+                                        height: 25,
+                                        width: 25,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(6)
+                                        ) ,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(2),
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Icon(
+                                              MyIcons.heart,
+                                              color: Colors.black.withOpacity(0.8),
+                                              size: 15,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  title: Row(
+                                    children: [
+                                      Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
+                                      const SizedBox(width: 5),
+                                      if(cnConfig.useHealthData)
+                                        FutureBuilder(
+                                            future: cnConfig.isHealthDataAccessAllowed(cnScreenStatistics),
+                                            builder: (context, connected){
+                                              if(!connected.hasData){
+                                                return Center(
+                                                  child: SizedBox(
+                                                    height: 15,
+                                                    width: 15,
+                                                    child: CupertinoActivityIndicator(
+                                                        radius: 8.0,
+                                                        color: Colors.amber[800]
+                                                    ),
+                                                    // child: CircularProgressIndicator(strokeWidth: 2,)
+                                                  ),
+                                                );
+                                              }
+                                              return Icon(
+                                                connected.data == true
+                                                    ? Icons.check_circle
+                                                    : Icons.close,
+                                                size: 15,
+                                                color: connected.data == true
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                              );
+                                            }
+                                        )
+                                    ],
+                                  ),
+                                  trailing: CupertinoSwitch(
+                                      value: cnConfig.useHealthData,
+                                      activeColor: activeColor,
+                                      onChanged: (value) async{
+                                        setState(() {
+                                          if(Platform.isAndroid){
+                                            HapticFeedback.selectionClick();
+                                          }
+                                          cnConfig.setHealth(value);
+                                        });
+                                        await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+                                        if(!value){
+                                          await Future.delayed(const Duration(milliseconds: 500), (){
+                                            cnScreenStatistics.health.revokePermissions();
+                                            cnScreenStatistics.refreshData(context);
+                                            cnScreenStatistics.refresh();
+                                          });
+                                        }
+                                        else{
+                                          await cnScreenStatistics.refreshHealthData().then((value){
+                                            if(value){
+                                              cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+                                              cnScreenStatistics.refreshData(context);
+                                              // cnScreenStatistics.calcMinMaxDates(context);
+                                              cnScreenStatistics.refresh();
+                                            }
+                                            else{
+                                              notificationPopUp(
+                                                  context: context,
+                                                  title: AppLocalizations.of(context)!.accessDenied,
+                                                  message: AppLocalizations.of(context)!.accessDeniedHealth
+                                              );
+                                            }
+                                          });
+                                        }
+                                        // setState(() async{
+                                        //   if(Platform.isAndroid){
+                                        //     HapticFeedback.selectionClick();
+                                        //   }
+                                        //   cnConfig.setHealth(value);
+                                        //   if(!value){
+                                        //     Future.delayed(const Duration(milliseconds: 500), (){
+                                        //       cnScreenStatistics.health.revokePermissions();
+                                        //     });
+                                        //   }
+                                        //   await cnScreenStatistics.refreshHealthData().then((value){
+                                        //     if(value){
+                                        //       cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+                                        //     }
+                                        //   });
+                                        //   cnScreenStatistics.refreshData(context);
+                                        //   cnScreenStatistics.calcMinMaxDates(context);
+                                        //   // cnScreenStatistics.refresh();
+                                        // });
+                                      }
+                                  ),
+                                ),
                               ],
                             ),
 
                             /// Backup
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(
@@ -209,7 +379,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                               footer: GestureDetector(
                                 onTap: () async{
                                   HapticFeedback.selectionClick();
-                                  controllerExplainBackups.open();
+                                  controllerExplainBackups.animatePanelToPosition(
+                                      1,
+                                      duration: const Duration(milliseconds: 500),
+                                      curve: Curves.fastEaseInToSlowEaseOut
+                                  );
                                   // await showDialog(
                                   //     context: context,
                                   //     builder: (context){
@@ -224,7 +398,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   padding: const EdgeInsets.only(left: 10),
                                   child: Row(
                                     children: [
-                                      const Icon(Icons.info, size:12),
+                                      const Icon(
+                                        Icons.info,
+                                        size:12,
+                                        color: Colors.white,
+                                      ),
                                       const SizedBox(width: 5,),
                                       Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
                                     ],
@@ -234,17 +412,26 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                               children: [
                                 /// Save Backup Manual
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.upload),
+                                  leading: const Icon(
+                                    Icons.upload,
+                                    color: Colors.white,
+                                  ),
                                   title:getSelectCreateBackup(),
                                 ),
                                 /// Load Backup
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.download),
+                                  leading: const Icon(
+                                    Icons.download,
+                                    color: Colors.white,
+                                  ),
                                   title: getSelectLoadBackupOption(),
                                 ),
                                 /// Save Backup Automatic
                                 CupertinoListTile(
-                                  leading: const Icon(Icons.sync),
+                                  leading: const Icon(
+                                    Icons.sync,
+                                    color: Colors.white,
+                                  ),
                                   title: OverflowSafeText(
                                       maxLines: 1,
                                       AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -252,7 +439,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                   ),
                                   trailing: CupertinoSwitch(
                                       value: cnConfig.automaticBackups,
-                                      activeColor: const Color(0xFFC16A03),
+                                      activeColor: activeColor,
                                       onChanged: (value){
                                         setState(() {
                                           if(Platform.isAndroid){
@@ -283,7 +470,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                             /// About
                             CupertinoListSection.insetGrouped(
                               decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1)
+                                  color: Theme.of(context).cardColor
                               ),
                               backgroundColor: Colors.transparent,
                               header: Padding(
@@ -294,7 +481,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 /// Contact
                                 CupertinoListTile(
                                   leading: const Icon(
-                                      Icons.help_outline
+                                    Icons.help_outline,
+                                    color: Colors.white,
                                   ),
                                   title: getSelectContactButton(),
                                 ),
@@ -304,7 +492,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
                                   },
                                   leading: const Icon(
-                                      MyIcons.github_circled
+                                    MyIcons.github_circled,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
@@ -315,7 +504,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
                                   },
                                   leading: const Icon(
-                                      Icons.my_library_books_rounded
+                                    Icons.my_library_books_rounded,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
@@ -326,7 +516,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
                                   },
                                   leading: const Icon(
-                                      Icons.lock_outline
+                                    Icons.lock_outline,
+                                    color: Colors.white,
                                   ),
                                   trailing: trailingArrow,
                                   title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
@@ -355,21 +546,22 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
               controller: controllerExplainBackups,
               animationControllerName: "ExplainBackups",
               descendantAnimationControllerName: "ScreenSettings",
-              panelBuilder: (sc){
+              panelBuilder: (context, listView){
                 return Column(
                   children: [
                     const SizedBox(height: 10,),
-                    panelTopBar,
+                    // panelTopBar,
                     const SizedBox(height: 10,),
                     Expanded(
-                      child: ListView(
+                      child: listView(
                         padding: EdgeInsets.zero,
-                        controller: sc,
+                        controller: scrollControllerBackups,
                         children: [
                           CupertinoListTile(
                             // onTap: getSelectCreateBackup,
                             leading: const Icon(
-                                Icons.upload
+                              Icons.upload,
+                              color: Colors.white,
                             ),
                             title: OverflowSafeText(
                                 maxLines: 1,
@@ -383,7 +575,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                           /// Load Backup
                           CupertinoListTile(
                             leading: const Icon(
-                                Icons.download
+                              Icons.download,
+                              color: Colors.white,
                             ),
                             title: Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(color: Colors.white)),
                           ),
@@ -422,65 +615,66 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
       _showLoadingIndicator = false;
     });
     if(file != null){
-      cnStandardPopUp.open(
-          confirmText: AppLocalizations.of(context)!.yes,
-          cancelText: AppLocalizations.of(context)!.no,
-          widthFactor: 0.8,
-          context: context,
-          child: Column(
-            children: [
-              Text(AppLocalizations.of(context)!.settingsBackupLoad, style: const TextStyle(fontWeight: FontWeight.w600,fontSize: 18),),
-              const SizedBox(height: 5),
-              Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm, textAlign: TextAlign.center, textScaler: const TextScaler.linear(0.9),)
-            ],
-          ),
-          onConfirm: ()async{
-            setState(() {
-              _showLoadingIndicator = true;
-            });
-            bool resultLoadBackup = false;
-            try{
-              await loadBackupFromFile(file, cnHomepage: cnHomepage).then((result) => resultLoadBackup = result);
-              tutorialIsRunning = false;
-              currentTutorialStep = maxTutorialStep;
-              cnConfig.setCurrentTutorialStep(currentTutorialStep);
-              cnScreenStatistics.refreshData();
-              cnScreenStatistics.resetGraph();
-              cnScreenStatistics.refresh();
-              await cnConfig.config.save();
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!.backupLoadSuccess,
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                  textColor: Colors.white,
-                  fontSize: 16.0
-              );
-              setState(() {
-                _showLoadingIndicator = false;
-              });
-            }
-            catch (_){
-              setState(() {
-                _showLoadingIndicator = false;
-              });
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
-                  toastLength: Toast.LENGTH_LONG,
-                  gravity: ToastGravity.CENTER,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.grey[800]?.withOpacity(0.9),
-                  textColor: Colors.white,
-                  fontSize: 16.0
-              );
-            }
-            if(resultLoadBackup){
-              Future.delayed(const Duration(seconds: 5), (){
-                saveCurrentData(cnConfig);
-              });
-            }
-          }
+      showCupertinoModalPopup<void>(
+        context: context,
+        builder: (BuildContext context) => CupertinoActionSheet(
+          cancelButton: getActionSheetCancelButton(context),
+          title: Text(AppLocalizations.of(context)!.settingsBackupLoad),
+          message: Text(AppLocalizations.of(context)!.settingsBackupLoadTextToConfirm),
+          actions: <Widget>[
+            CupertinoActionSheetAction(
+              /// This parameter indicates the action would perform
+              /// a destructive action such as delete or exit and turns
+              /// the action's text color to red.
+              isDestructiveAction: true,
+              onPressed: ()async{
+
+                Navigator.of(context).pop();
+                setState(() {
+                  _showLoadingIndicator = true;
+                });
+                try{
+                  await loadBackupFromFile(file, cnHomepage: cnHomepage);
+                  saveCurrentData(cnConfig);
+                  tutorialIsRunning = false;
+                  currentTutorialStep = maxTutorialStep;
+                  cnConfig.setCurrentTutorialStep(currentTutorialStep);
+                  cnScreenStatistics.refreshData(context);
+                  cnScreenStatistics.resetGraph();
+                  cnScreenStatistics.refresh();
+                  await cnConfig.config.save();
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!.backupLoadSuccess,
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                  setState(() {
+                    _showLoadingIndicator = true;
+                  });
+                }
+                catch (_){
+                  setState(() {
+                    _showLoadingIndicator = false;
+                  });
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!.backupLoadNotSuccess,
+                      toastLength: Toast.LENGTH_LONG,
+                      gravity: ToastGravity.CENTER,
+                      timeInSecForIosWeb: 1,
+                      backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+                      textColor: Colors.white,
+                      fontSize: 16.0
+                  );
+                }
+              },
+              child: Text(AppLocalizations.of(context)!.yes),
+            ),
+          ],
+        ),
       );
     }
   }

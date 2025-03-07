@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -11,6 +12,7 @@ import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -55,11 +57,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     /// WidgetsBindings.instance.addPostFrameCallback() inside it
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       setState(() {
-        // setBottomMenuHeight();
         handleOrientation();
-        // _height = orientation == Orientation.portrait? (Platform.isAndroid? 60 : 50) : (Platform.isAndroid? 35 : 30);
-        // final double paddingBottom = MediaQuery.of(context).padding.bottom;
-        // cnBottomMenu.height = paddingBottom + _height;
       });
     });
   }
@@ -144,9 +142,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         maxWidth: 350,
         padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
         context: context,
-        child: getPopUpChild(cnScreenStatistics, context),
+        child: getPopUpChild(context),
         onConfirm: (){
-          cnScreenStatistics.refreshData();
+          cnScreenStatistics.refreshData(context);
           Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
             cnScreenStatistics.refresh();
             cnScreenStatistics.cache();
@@ -155,11 +153,10 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
         onCancel: (){
           cnScreenStatistics.restoreLastFilterState();
         },
-        color: const Color(0xff2d2d2d)
     );
   }
 
-  Widget getPopUpChild(CnScreenStatistics provider, BuildContext context){
+  Widget getPopUpChild(BuildContext context){
     List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
     /// Replace the "ALL Workouts" name in correct language
     workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
@@ -180,7 +177,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                 const Icon(
                   Icons.arrow_back_ios,
                   size: 15,
-                  color: Color(0xFFC16A03),
                 ),
                 Expanded(
                   child: VerticalScrollWheel(
@@ -205,7 +201,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                 const Icon(
                   Icons.arrow_forward_ios,
                   size: 15,
-                  color: Color(0xFFC16A03),
                 ),
               ],
             )
@@ -234,14 +229,42 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.showAvgWeightPerSetLine,
-                  activeColor: const Color(0xFFC16A03),
+                  value: cnScreenStatistics.showAvgWeightPerSetLine,
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showAvgWeightPerSetLine = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
+                    cnStandardPopUp.refresh();
+                  }
+              ),
+            ]
+        ),
+        const SizedBox(height: 15,),
+        Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilter1RM, maxLines: 1),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 30,),
+              CupertinoSwitch(
+                  value: cnScreenStatistics.showOneRepMax,
+                  activeColor: activeColor,
+                  onChanged: (value){
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                    cnScreenStatistics.showOneRepMax = value;
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -271,14 +294,14 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.onlyWorkingSets,
-                  activeColor: const Color(0xFFC16A03),
+                  value: cnScreenStatistics.onlyWorkingSets,
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.onlyWorkingSets = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -293,29 +316,20 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    OverflowSafeText("Krankheitstage anzeigen", maxLines: 1),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 15),
-                    //   child: OverflowSafeText(
-                    //     AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
-                    //     minFontSize: 9,
-                    //     maxLines: 4,
-                    //     style: const TextStyle(color: Colors.grey, fontSize: 12),
-                    //   ),
-                    // ),
+                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilterSickDays, maxLines: 1),
                   ],
                 ),
               ),
               const SizedBox(width: 30,),
               CupertinoSwitch(
-                  value: provider.showSickDays,
-                  activeColor: const Color(0xFFC16A03),
+                  value: cnScreenStatistics.showSickDays,
+                  activeColor: activeColor,
                   onChanged: (value){
                     if(Platform.isAndroid){
                       HapticFeedback.selectionClick();
                     }
                     cnScreenStatistics.showSickDays = value;
-                    cnStandardPopUp.child = getPopUpChild(cnScreenStatistics, context);
+                    cnStandardPopUp.child = getPopUpChild(context);
                     cnStandardPopUp.refresh();
                   }
               )
@@ -336,22 +350,34 @@ class CnScreenStatistics extends ChangeNotifier {
   DateTime minDate = DateTime.now();
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   late List<String> allWorkoutNames = getAllWorkoutNames();
-  late List<String> allExerciseNames = getAllExerciseNames();
+  late List<String> allExerciseNames;
   List<ObSickDays> allSickDays = [];
+
+  Exercise selectedExerciseFirst = Exercise();
+  Exercise selectedExerciseLast = Exercise();
+  Exercise? selectedExerciseTemplate;
   String? selectedExerciseName;
   String? selectedWorkoutName;
   int selectedWorkoutIndex = 0;
   bool showAvgWeightPerSetLine = true;
+  bool onlyWorkingSets = false;
+  bool showOneRepMax = false;
+  bool showSickDays = false;
+
   String? selectedWorkoutNameLast;
   int selectedWorkoutIndexLast = 0;
   bool showAvgWeightPerSetLineLast = true;
-  bool onlyWorkingSets = false;
-  bool showSickDays = false;
+  bool onlyWorkingSetsLast = true;
+  bool showOneRepMaxLast = true;
+  bool showSickDaysLast = false;
+
   double currentVisibleDays = 0;
   double maxVisibleDays = 1900;
   double offsetMinX = 0;
   double offsetMaxX = 0;
   late CnConfig cnConfig;
+  final health = Health();
+  List<HealthDataPointWrapper> healthData = [];
 
   /// Settings variables
   // late final AnimationController animationControllerStatisticsScreen;
@@ -360,13 +386,44 @@ class CnScreenStatistics extends ChangeNotifier {
   CnScreenStatistics(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
   }
+  final types = [
+    HealthDataType.WEIGHT
+  ];
 
-
-  void init(Map? data) async{
+  void init(Map? data, BuildContext context) async{
     isInitialized = true;
-    calcMinMaxDates();
+    await health.configure();
+    await refreshHealthData();
+    allExerciseNames = getAllExerciseNames(context);
+    calcMinMaxDates(context);
     if(data != null){
-      initCachedData(data);
+      initCachedData(data, context);
+    }
+  }
+
+  Future<bool> refreshHealthData() async{
+    if(!cnConfig.useHealthData){
+      healthData.clear();
+      return false;
+    }
+    var now = DateTime.now();
+    DateTime startTime = DateTime(2000, 1, 1);
+    try{
+      healthData = await health.getHealthDataFromTypes(
+          startTime: startTime,
+          endTime: now,
+          types: types
+      ).then((value) => value.map((hdp) => HealthDataPointWrapper(hdp: hdp)).toList());
+      if(Platform.isAndroid){
+        healthData = healthData.reversed.toList();
+      }
+      if(healthData.isEmpty){
+        return false;
+      }
+      return true;
+    }
+    catch (_){
+      return false;
     }
   }
 
@@ -379,7 +436,27 @@ class CnScreenStatistics extends ChangeNotifier {
     return res;
   }
   
-  List<String> getAllExerciseNames(){
+  // void setSelectedExercise({required String exName}){
+  //   selectedExerciseName = exName;
+  //   if(Platform.isAndroid){
+  //     HapticFeedback.selectionClick();
+  //   }
+  //   final builder = objectbox.exerciseBox.query(ObExercise_.name.equals(exName));
+  //   builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
+  //   ObExercise? exTemplate = builder.build().findFirst();
+  //
+  //   if(exTemplate != null){
+  //     selectedExercise = Exercise.fromObExercise(exTemplate);
+  //     return;
+  //   }
+  //
+  //   final builder2 = objectbox.workoutBox.query().order(ObWorkout_.date, flags: Order.descending).linkMany(ObExercise_.);
+  //   // builder2.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
+  //   // ObExercise? exNonTemplate = builder2.build().findFirst();
+  //
+  // }
+  
+  List<String> getAllExerciseNames(BuildContext context){
     final builder = objectbox.exerciseBox.query();
     builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
     if(selectedWorkoutName != null && selectedWorkoutName != "All Workouts") {
@@ -389,7 +466,7 @@ class CnScreenStatistics extends ChangeNotifier {
     query.distinct = true;
     final res = query.find();
     res.sort();
-    if(selectedExerciseName == null || !res.contains(selectedExerciseName)){
+    if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && (selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight || !cnConfig.useHealthData)){
       selectedExerciseName = res.firstOrNull;
     }
     return res;
@@ -414,17 +491,20 @@ class CnScreenStatistics extends ChangeNotifier {
 
   }
 
-   List<double?>? getMinMaxWeights(){
-    final exercises = getSelectedExerciseHistory();
-    if(exercises == null){
-      return null;
-    }
-    double minWeight = exercises.values.map((e) => e.weights.min).min;
-    double maxWeight = exercises.values.map((e) => e.weights.max).max;
-    return [minWeight, maxWeight];
-  }
+  //  List<double?>? getMinMaxWeights(){
+  //   final exercises = getSelectedExerciseHistory();
+  //   if(exercises == null){
+  //     return null;
+  //   }
+  //   double minWeight = exercises.values.map((e) => e.weights.min).min;
+  //   double maxWeight = exercises.values.map((e) => e.weights.max).max;
+  //   return [minWeight, maxWeight];
+  // }
 
-  Map<DateTime, double>? getMaxWeightsPerDate(){
+  Map<DateTime, double>? getMaxWeightsPerDate(BuildContext context){
+    if(selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      return { for (var e in healthData) e.dateFrom : e.weight };
+    }
     final Map<DateTime, ObExercise>? obExercises = getSelectedExerciseHistory();
     if(obExercises == null){
       return null;
@@ -474,7 +554,56 @@ class CnScreenStatistics extends ChangeNotifier {
       return summedWeights;
     }
 
-  void calcMinMaxDates()async{
+  Map<DateTime, double>? getOneRepMaxPerDate(){
+    double bodyWeight = 0;
+    // if(["Dips Max", "Dips Reps", "Klimmzüge Hypertrophie", "Klimmzüge Maximalkraft", "Squat Langhantel"].contains(selectedExerciseName)){
+    //   bodyWeight = 82;
+    // }
+    final exercises = getSelectedExerciseHistory();
+    if(exercises == null){
+      return null;
+    }
+    Map<DateTime, double> oneRepMaxPerDate = {};
+    for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
+      double oneRepMax = 0;
+      if(healthData.isNotEmpty && (
+          (selectedExerciseTemplate != null && selectedExerciseTemplate!.bodyWeightPercent > 0.0) ||
+          (selectedExerciseTemplate == null && selectedExerciseLast.bodyWeightPercent > 0)
+      )){
+        HealthDataPointWrapper datesBodyWeight = healthData.firstWhereOrNull((hdp) => hdp.dateFrom.isBefore(entry.key) | hdp.dateFrom.isSameDate(entry.key))??
+            healthData.reversed.firstWhere((hdp) => hdp.dateFrom.isAfter(entry.key));
+        double bodyWeightPercent = selectedExerciseTemplate?.bodyWeightPercent?? selectedExerciseLast.bodyWeightPercent;
+        bodyWeight = datesBodyWeight.weight * bodyWeightPercent;
+      }
+      for(List set in zip([entry.value.weights, entry.value.amounts, entry.value.setTypes])){
+        if(onlyWorkingSets && set[2] == 1){
+          continue;
+        }
+        final tempOneRepMax = calcEpley(weight: set[0], reps: set[1], bodyWeight: bodyWeight);
+        if(tempOneRepMax > oneRepMax){
+          oneRepMax = tempOneRepMax;
+        }
+      }
+      oneRepMaxPerDate[entry.key] = oneRepMax;
+    }
+    return oneRepMaxPerDate;
+  }
+
+  void calcMinMaxDates(BuildContext context)async{
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      minDate = healthData.last.dateFrom;
+      maxDate = healthData.first.dateFrom;
+      return;
+    }
+    setExerciseTemplate(context);
+    setExerciseFirst(context);
+    setExerciseLast(context);
+  }
+
+  void setExerciseFirst(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      return;
+    }
     ObWorkout? firstWorkout;
     final firstBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
     if(selectedExerciseName != null) {
@@ -483,8 +612,14 @@ class CnScreenStatistics extends ChangeNotifier {
     firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
     if(firstWorkout != null){
       minDate = firstWorkout.date;
+      selectedExerciseFirst = Exercise.fromObExercise(firstWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
     }
+  }
 
+  void setExerciseLast(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      return;
+    }
     ObWorkout? lastWorkout;
     final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(false));
     if(selectedExerciseName != null) {
@@ -493,7 +628,28 @@ class CnScreenStatistics extends ChangeNotifier {
     lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
     if(lastWorkout != null){
       maxDate = lastWorkout.date;
+      selectedExerciseLast = Exercise.fromObExercise(lastWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
     }
+  }
+
+  void setExerciseTemplate(BuildContext context){
+    if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      return;
+    }
+    ObWorkout? templateWorkout;
+    final lastBuilder = objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true));
+    if(selectedExerciseName != null) {
+      lastBuilder.linkMany(ObWorkout_.exercises, ObExercise_.name.equals(selectedExerciseName!));
+      templateWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
+      if(templateWorkout != null){
+        selectedExerciseTemplate = Exercise.fromObExercise(templateWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
+      }
+      else{
+        selectedExerciseTemplate = null;
+      }
+      return;
+    }
+    selectedExerciseTemplate = null;
   }
 
   // final weekdayMapping = {
@@ -506,23 +662,23 @@ class CnScreenStatistics extends ChangeNotifier {
   //   "Sun": 7,
   // };
 
-  int getMaxDaysOfMonths(DateTime date){
-    switch (date.month){
-      case 4 || 6 || 9 || 11:
-        return 30;
-      case 2:
-        return date.isLeapYear()? 29: 28;
-      default:
-        return 31;
-    }
-  }
+  // int getMaxDaysOfMonths(DateTime date){
+  //   switch (date.month){
+  //     case 4 || 6 || 9 || 11:
+  //       return 30;
+  //     case 2:
+  //       return date.isLeapYear()? 29: 28;
+  //     default:
+  //       return 31;
+  //   }
+  // }
 
   void openSettingsPanel(){
     HapticFeedback.selectionClick();
     panelControllerSettings.animatePanelToPosition(
         1,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.decelerate
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastEaseInToSlowEaseOut
     );
   }
 
@@ -530,30 +686,40 @@ class CnScreenStatistics extends ChangeNotifier {
     selectedWorkoutNameLast = selectedWorkoutName;
     selectedWorkoutIndexLast = selectedWorkoutIndex;
     showAvgWeightPerSetLineLast = showAvgWeightPerSetLine;
+    onlyWorkingSetsLast = onlyWorkingSets;
+    showOneRepMaxLast = showOneRepMax;
+    showSickDaysLast = showSickDays;
   }
 
   void restoreLastFilterState(){
     selectedWorkoutName = selectedWorkoutNameLast;
     selectedWorkoutIndex = selectedWorkoutIndexLast;
     showAvgWeightPerSetLine = showAvgWeightPerSetLineLast;
+    onlyWorkingSets = onlyWorkingSetsLast;
+    showOneRepMax = showOneRepMaxLast;
+    showSickDays = showSickDaysLast;
   }
 
-  void refreshData(){
+  void refreshData(BuildContext context){
     allWorkoutNames = getAllWorkoutNames();
-    allExerciseNames = getAllExerciseNames();
-    calcMinMaxDates();
+    allExerciseNames = getAllExerciseNames(context);
+    if(cnConfig.useHealthData){
+      allExerciseNames.insert(0, AppLocalizations.of(context)!.statisticsWeight);
+    }
+    calcMinMaxDates(context);
     allSickDays = objectbox.sickDaysBox.getAll();
   }
 
-  void initCachedData(Map data){
+  void initCachedData(Map data, BuildContext context){
     if(data.containsKey("selectedExerciseName")){
-      if(allExerciseNames.contains(data["selectedExerciseName"])){
+      if((allExerciseNames.contains(data["selectedExerciseName"])) | (data["selectedExerciseName"] == AppLocalizations.of(context)!.statisticsWeight && cnConfig.useHealthData)){
         selectedExerciseName = data["selectedExerciseName"];
       }
     }
-    showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? true;
-    onlyWorkingSets = data["onlyWorkingSets"] ?? false;
-    showSickDays = data["showSickDays"] ?? true;
+    showAvgWeightPerSetLine = data["showAvgWeightPerSetLine"] ?? false;
+    onlyWorkingSets = data["onlyWorkingSets"] ?? true;
+    showSickDays = data["showSickDays"] ?? false;
+    showOneRepMax = data["showOneRepMax"] ?? true;
   }
 
   void resetGraph({bool withKeyReset = true}){
@@ -571,6 +737,7 @@ class CnScreenStatistics extends ChangeNotifier {
       "showAvgWeightPerSetLine": showAvgWeightPerSetLine,
       "onlyWorkingSets": onlyWorkingSets,
       "showSickDays": showSickDays,
+      "showOneRepMax": showOneRepMax,
     };
     cnConfig.config.cnScreenStatistics = data;
     await cnConfig.config.save();
@@ -579,4 +746,19 @@ class CnScreenStatistics extends ChangeNotifier {
   void refresh(){
     notifyListeners();
   }
+}
+
+class HealthDataPointWrapper{
+  final HealthDataPoint hdp;
+  late final Map<String, dynamic> json;
+
+  HealthDataPointWrapper({
+    required this.hdp
+  }){
+   json = hdp.toJson();
+  }
+
+  DateTime get dateFrom => hdp.dateFrom;
+  DateTime get dateTo => hdp.dateTo;
+  double get weight => json['value']['numericValue'];
 }

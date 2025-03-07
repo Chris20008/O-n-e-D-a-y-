@@ -21,6 +21,7 @@ class Exercise{
   String? linkName;
   int category;
   bool blockLink;
+  double bodyWeightPercent;
 
 
   Exercise({
@@ -32,7 +33,8 @@ class Exercise{
     this.originalName,
     this.linkName,
     this.category = 1,
-    this.blockLink = false
+    this.blockLink = false,
+    this.bodyWeightPercent = 0.0
   }){
     if (sets.isEmpty){
       sets = [];
@@ -48,7 +50,8 @@ class Exercise{
       seatLevel: e.seatLevel,
       linkName: e.linkName,
       category: e.category,
-      blockLink: e.blockLink
+      blockLink: e.blockLink,
+      bodyWeightPercent: e.bodyWeightPercent
   );
 
   /// Don't clone the original name
@@ -59,7 +62,8 @@ class Exercise{
       seatLevel: ex.seatLevel,
       linkName: ex.linkName,
       category: ex.category,
-      blockLink: ex.blockLink
+      blockLink: ex.blockLink,
+      bodyWeightPercent: ex.bodyWeightPercent
   );
 
   Exercise.clone(Exercise ex): this(
@@ -70,7 +74,8 @@ class Exercise{
       seatLevel: ex.seatLevel,
       linkName: ex.linkName,
       category: ex.category,
-      blockLink: ex.blockLink
+      blockLink: ex.blockLink,
+      bodyWeightPercent: ex.bodyWeightPercent
   );
 
   ObExercise toObExercise(){
@@ -92,7 +97,8 @@ class Exercise{
         seatLevel: seatLevel,
         linkName: linkName,
         category: category,
-        blockLink: blockLink
+        blockLink: blockLink,
+        bodyWeightPercent: bodyWeightPercent
     );
   }
 
@@ -126,7 +132,8 @@ class Exercise{
       "originalName": originalName,
       "linkName": linkName,
       "category": category,
-      "blockLink": blockLink
+      "blockLink": blockLink,
+      "bodyWeightPercent": bodyWeightPercent
     };
   }
 
@@ -163,7 +170,8 @@ class Exercise{
       originalName: data["originalName"],
       linkName: data["linkName"],
       category: data["category"]?? 1,
-      blockLink: data['blockLink']?? false
+      blockLink: data['blockLink']?? false,
+      bodyWeightPercent: data["bodyWeightPercent"]?? 0.0
     );
   }
 
@@ -172,7 +180,9 @@ class Exercise{
         seatLevel != ex.seatLevel ||
         restInSeconds != ex.restInSeconds ||
         ex.sets.length != sets.length ||
-        ex.category != category
+        ex.category != category ||
+        ex.blockLink != blockLink ||
+        ex.bodyWeightPercent != bodyWeightPercent
     ){
       return false;
     }
@@ -214,18 +224,18 @@ class Exercise{
     return "Zeit";
   }
 
-  String getSelectorText(BuildContext context){
-    if (categoryIsReps()){
-      return "Wiederholungen";
-    } else if(categoryIsCardio()){
-      return "Cardio";
-    } else if(categoryIsCardio()){
-      return "Static Hold";
-    }else {
-      category = 1;
-      return "Wiederholungen";
-    }
-  }
+  // String getSelectorText(BuildContext context){
+  //   if (categoryIsReps()){
+  //     return "Wiederholungen";
+  //   } else if(categoryIsCardio()){
+  //     return "Cardio";
+  //   } else if(categoryIsCardio()){
+  //     return "Static Hold";
+  //   }else {
+  //     category = 1;
+  //     return "Wiederholungen";
+  //   }
+  // }
 
   bool isNewExercise(){
     return id == -100;

@@ -83,7 +83,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
         // color: Colors.black.withOpacity(0.4),
-        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? const Color(0xff1c1001) : Colors.black.withOpacity(0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? Theme.of(context).primaryColor : Colors.black.withOpacity(0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(
@@ -153,7 +153,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       cnWorkouts.refreshAllWorkouts();
     }
     else if(index == 2) {
-      cnScreenStatistics.refreshData();
+      cnScreenStatistics.refreshData(context);
       if(lastIndex == 2){
         cnScreenStatistics.resetGraph(withKeyReset: false);
         cnScreenStatistics.refresh();

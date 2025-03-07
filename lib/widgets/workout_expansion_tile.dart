@@ -38,7 +38,6 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  // late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -98,6 +97,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
                                   cnWorkouts.refresh();
                                   HapticFeedback.selectionClick();
+                                  // await cnNewWorkout.hidePanel(context);
                                   Future.delayed(const Duration(milliseconds: 300), (){
                                     cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
                                   });
@@ -156,7 +156,6 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           fontSize: 15,
                                           minFontSize: 15,
                                           style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
-                                          // style: TextStyle(color: Colors.white.withOpacity(0.7), fontWeight: FontWeight.w400)
                                       )
                                 ],
                               ),
@@ -172,20 +171,10 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   ],
                 ),
                 children: [
-                  // Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     LimitedBox(
-                  //         maxHeight: 1000,
-                  //         child:
                   MultipleExerciseRow(
                     exercises: widget.workout.exercises,
-                    // textScaler: TextScaler.linear()1.3,
                     padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
                   )
-                      // )
-                    // ],
-                  // ),
                 ]
             ),
           ),
@@ -208,7 +197,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
             /// the action's text color to red.
             isDestructiveAction: true,
             onPressed: () {
-              Future.delayed(Duration(milliseconds: 200), (){
+              Future.delayed(const Duration(milliseconds: 200), (){
                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
               });
 
@@ -219,39 +208,5 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
         ],
       ),
     );
-    // cnStandardPopUp.open(
-    //   context: context,
-    //   color: const Color(0xff2d2d2d),
-    //   confirmText: AppLocalizations.of(context)!.yes,
-    //   cancelText: AppLocalizations.of(context)!.no,
-    //   onConfirm: () {
-    //     Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-    //       cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
-    //     });
-    //   },
-    //   padding: const EdgeInsets.only(top: 20),
-    //   child: Padding(
-    //     padding: const EdgeInsets.symmetric(horizontal: 5),
-    //     child: Column(
-    //       children: [
-    //         OverflowSafeText(
-    //           AppLocalizations.of(context)!.woAlreadyRunning(cnRunningWorkout.workout.name),
-    //           textAlign: TextAlign.center
-    //         ),
-    //         const SizedBox(height: 10,),
-    //         OverflowSafeText(
-    //           AppLocalizations.of(context)!.woAlreadyRunningDelete(nameNewWorkout),
-    //           maxLines: 6,
-    //           textAlign: TextAlign.center,
-    //           fontSize: 14
-    //           // fontSize:
-    //         ),
-    //         const SizedBox(
-    //           height: 20,
-    //         )
-    //       ],
-    //     ),
-    //   ),
-    // );
   }
 }

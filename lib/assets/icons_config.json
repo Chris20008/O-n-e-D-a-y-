@@ -53,6 +53,18 @@
       "css": "dumbbell",
       "code": 62539,
       "src": "fontawesome5"
+    },
+    {
+      "uid": "628e5fc59fc5965a6b91189467b037d5",
+      "css": "heart",
+      "code": 59393,
+      "src": "elusive"
+    },
+    {
+      "uid": "2169861329c13fef61a01e4cf0575997",
+      "css": "weight",
+      "code": 62614,
+      "src": "fontawesome5"
     }
   ]
 }

@@ -16,9 +16,10 @@ import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/show_new_features_pop_up.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
-import 'package:fitness_app/widgets/tutorials/tutorial_add_workout.dart';
+import 'package:fitness_app/widgets/tutorials/tutorial_create_workout_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -30,6 +31,8 @@ import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
@@ -73,7 +76,6 @@ class MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // setIntlLanguage(countryCode: _language.countryCode);
     setIntlLanguage();
   }
 
@@ -108,12 +110,19 @@ class MyAppState extends State<MyApp> {
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
+            cardColor: Color(0xFF2C2C2E),
+            primaryColor: Color(0xFF1C1C1E),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             // useMaterial3: true,
             splashFactory: InkSparkle.splashFactory,
             cupertinoOverrideTheme: const CupertinoThemeData(
-              brightness: Brightness.dark
-            )
+              brightness: Brightness.dark,
+              primaryColor: Color(0xffdb7b01),
+            ),
+            iconTheme: const IconThemeData(
+              color: Color(0xffdb7b01),
+            ),
         ),
         home: const MyHomePage(),
       ),
@@ -142,14 +151,6 @@ class _MyHomePageState extends State<MyHomePage>{
   late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnHomepage cnHomepage;
-  // late final AnimationController _animationControllerWorkoutsScreen = AnimationController(
-  //   vsync: this,
-  //   duration: const Duration(milliseconds: 300),
-  // );
-  // late final AnimationController _animationControllerStatisticsScreen = AnimationController(
-  //   vsync: this,
-  //   duration: const Duration(milliseconds: 300),
-  // );
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
   bool mainIsInitialized = false;
@@ -158,13 +159,6 @@ class _MyHomePageState extends State<MyHomePage>{
   void initState() {
     initMain();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    // _animationControllerWorkoutsScreen.dispose();
-    // _animationControllerStatisticsScreen.dispose();
-    super.dispose();
   }
 
   void setIntroScreen(){
@@ -189,8 +183,8 @@ class _MyHomePageState extends State<MyHomePage>{
     await cnConfig.initData();
     await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
+      final res = await findSystemLocale();
       if(context.mounted){
-        final res = await findSystemLocale();
         MyApp.of(context)?.setLocale(languageCode: res);
       }
     }
@@ -200,11 +194,7 @@ class _MyHomePageState extends State<MyHomePage>{
     cnRunningWorkout.initCachedData(cnConfig.config.cnRunningWorkout);
     cnWorkouts.refreshAllWorkouts();
     cnWorkoutHistory.refreshAllWorkouts();
-    cnScreenStatistics.init(cnConfig.config.cnScreenStatistics);
-    // cnWorkouts.animationControllerWorkoutsScreen = _animationControllerWorkoutsScreen;
-    // cnHomepage.animationControllers["ScreenWorkouts"] = _animationControllerWorkoutsScreen;
-    // cnScreenStatistics.animationControllerStatisticsScreen = _animationControllerStatisticsScreen;
-    // cnHomepage.animationControllers["ScreenStatistics"] = _animationControllerStatisticsScreen;
+    cnScreenStatistics.init(cnConfig.config.cnScreenStatistics, context);
     cnBottomMenu.setBottomMenuHeight(context);
     cnBottomMenu.refresh();
 
@@ -230,23 +220,26 @@ class _MyHomePageState extends State<MyHomePage>{
       trySyncWithCloud();
     }
 
-    // await Future.delayed(const Duration(milliseconds: 200), () async {
-    //   if(cnConfig.connectWithCloud){
-    //     if(Platform.isAndroid){
-    //       await cnConfig.signInGoogleDrive(delayMilliseconds: 0);
-    //     }
-    //     if(Platform.isIOS){
-    //       await cnConfig.checkIfICloudAvailable(delayMilliseconds: 0);
-    //     }
-    //     print("SHOULD SYNC? ${cnConfig.syncMultipleDevices}");
-    //     if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
-    //       trySyncWithCloud();
-    //     }
-    //   }
-    // });
     setState(() {
       mainIsInitialized = true;
     });
+
+    final String version = (await PackageInfo.fromPlatform()).version;
+    if(!showWelcomeScreen){
+      if(version != cnConfig.version){
+        await Future.delayed(const Duration(milliseconds: 500), (){});
+        await showNewFeaturesPopUp(
+          context: context,
+          cnScreenStatistics: cnScreenStatistics,
+          cnConfig: cnConfig
+        );
+        await cnConfig.setVersion(version);
+      }
+    } else{
+      if(version != cnConfig.version){
+        await cnConfig.setVersion(version);
+      }
+    }
   }
 
   @override
@@ -321,12 +314,16 @@ class _MyHomePageState extends State<MyHomePage>{
       );
     }
 
-    if(cnConfig.currentTutorialStep == 0 && showWelcomeScreen == false && closeWelcomeScreen == true && !tutorialIsRunning){
+    if(cnConfig.currentTutorialStep == 0
+        && showWelcomeScreen == false
+        && closeWelcomeScreen == true
+        && !tutorialIsRunning
+        && cnBottomMenu.index == 1
+    ){
       tutorialIsRunning = true;
-      initTutorialAddWorkout(context);
-      showTutorialAddWorkout(context);
+      initTutorialCreateWorkoutTemplate(context);
+      cnHomepage.tutorial = showTutorialCreateWorkoutTemplate(context);
     }
-    // print("is running $tutorialIsRunning");
 
     return Scaffold(
       extendBody: true,
@@ -335,16 +332,17 @@ class _MyHomePageState extends State<MyHomePage>{
       body: PopScope(
         canPop: false,
         child: Container(
-            decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    colors: [
-                      Color(0xffc26a0e),
-                      Color(0xbb110a02)
-                    ]
-                )
-            ),
+          color: Colors.black,
+            // decoration: const BoxDecoration(
+            //     gradient: LinearGradient(
+            //         begin: Alignment.topRight,
+            //         end: Alignment.bottomLeft,
+            //         colors: [
+            //           Color(0xffc26a0e),
+            //           Color(0xbb110a02)
+            //         ]
+            //     )
+            // ),
           // decoration: const BoxDecoration(
           //     gradient: LinearGradient(
           //         begin: Alignment.topRight,
@@ -358,48 +356,10 @@ class _MyHomePageState extends State<MyHomePage>{
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
-                if(cnBottomMenu.index != 2)
+
+                if(cnBottomMenu.index != 2 && !showWelcomeScreen)
                   Stack(
                     children: [
-                      /// Animated Builder to Reduce Size of left and middle screen when workout panel is opened
-                      // AnimatedBuilder(
-                      //   animation: _animationControllerWorkoutsScreen,
-                      //   builder: (context, child) {
-                      //     double scale = 1.0 - (_animationControllerWorkoutsScreen.value * (Platform.isAndroid? 0.15 : 0.2));
-                      //     double borderRadius = 26 - (scale*10-9)*20;
-                      //     borderRadius = borderRadius > 25 ? 25 : borderRadius;
-                      //     return Transform.scale(
-                      //       scale: scale,
-                      //       child: ClipRRect(
-                      //         borderRadius: BorderRadius.circular(borderRadius),
-                      //           child: Container(
-                      //             decoration: const BoxDecoration(
-                      //                   gradient: LinearGradient(
-                      //                       begin: Alignment.topRight,
-                      //                       end: Alignment.bottomLeft,
-                      //                       colors: [
-                      //                         Color(0xffc26a0e),
-                      //                         Color(0xbb110a02)
-                      //                       ]
-                      //                   )
-                      //               ),
-                      //             child: Container(
-                      //                 color: Colors.black.withOpacity((_animationControllerWorkoutsScreen.value * 1.1).clamp(0, 1)),
-                      //                 child: child
-                      //             ),
-                      //           )
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: AnimatedCrossFade(
-                      //       firstChild: const ScreenWorkoutHistory(),
-                      //       secondChild: const ScreenWorkout(),
-                      //       crossFadeState: cnBottomMenu.index == 0?
-                      //       CrossFadeState.showFirst:
-                      //       CrossFadeState.showSecond,
-                      //       duration: const Duration(milliseconds: 100)
-                      //   ),
-                      // ),
                       InitialAnimatedScreen(
                           animationControllerName: "ScreenWorkouts",
                           child: AnimatedCrossFade(
@@ -426,17 +386,18 @@ class _MyHomePageState extends State<MyHomePage>{
                             ),
                           ),
                         ),
+
                       const NewWorkOutPanel(),
+
                       const NewExercisePanel(),
                     ],
                   )
-                else
+
+                else if(!showWelcomeScreen)
                   const ScreenStatistics(),
-                // const Align(
-                //     alignment: Alignment.bottomCenter,
-                //     child: BottomMenu()
-                // ),
+
                 const StandardPopUp(),
+
                 if(showWelcomeScreen)
                   AnimatedCrossFade(
                     duration: const Duration(milliseconds: 500),
@@ -525,9 +486,16 @@ class _MyHomePageState extends State<MyHomePage>{
                 //   child: ElevatedButton(
                 //     child: Text("Test"),
                 //     onPressed: ()async{
-                //       print("Presses Center button");
-                //       final res = await ICloudService.isICloudAvailable();
-                //       print("RESULT res: $res");
+                //       WidgetsFlutterBinding.ensureInitialized();
+                //       final String version = (await PackageInfo.fromPlatform()).version;
+                //
+                //       // String appName = packageInfo.appName;
+                //       // String packageName = packageInfo.packageName;
+                //       // String version = packageInfo.version;
+                //       // String buildNumber = packageInfo.buildNumber;
+                //       // print(version);
+                //       // print(buildNumber);
+                //       // print(packageInfo);
                 //     },
                 //   ),
                 // )
@@ -599,8 +567,8 @@ class _MyHomePageState extends State<MyHomePage>{
       setState(() {
         cnBottomMenu.showBottomMenuAnimated();
         if(doShowTutorial && currentTutorialStep == 0) {
-          initTutorialAddWorkout(context);
-          showTutorialAddWorkout(context);
+          initTutorialCreateWorkoutTemplate(context);
+          cnHomepage.tutorial = showTutorialCreateWorkoutTemplate(context);
         } else if(!doShowTutorial){
           currentTutorialStep = maxTutorialStep;
           cnConfig.setCurrentTutorialStep(currentTutorialStep);
@@ -613,6 +581,272 @@ class _MyHomePageState extends State<MyHomePage>{
       }
     });
   }
+
+  // Future showNewFeaturesPopUp() async{
+  //   await showModalBottomSheet(
+  //       constraints: null,
+  //       isScrollControlled: true,
+  //       backgroundColor: Colors.transparent,
+  //       context: context,
+  //       isDismissible: false,
+  //       enableDrag: false,
+  //       builder: (context){
+  //         return StatefulBuilder(
+  //             builder: (context, setModalState) {
+  //               return ClipRRect(
+  //                 borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+  //                 child: Container(
+  //                     width: double.maxFinite,
+  //                     height: MediaQuery.of(context).size.height - (Platform.isAndroid? 50 : 70),
+  //                     color: Theme.of(context).primaryColor,
+  //                     child: Stack(
+  //                       children: [
+  //                         ListView(
+  //                             shrinkWrap: true,
+  //                             physics: const BouncingScrollPhysics(),
+  //                             children:[
+  //                               const SizedBox(height: 40),
+  //                               CupertinoListSection.insetGrouped(
+  //                                 decoration: BoxDecoration(
+  //                                     color: Theme.of(context).cardColor
+  //                                 ),
+  //                                 backgroundColor: Colors.transparent,
+  //                                 header: Padding(
+  //                                   padding: const EdgeInsets.only(left: 10),
+  //                                   child: Text(AppLocalizations.of(context)!.settingsGeneral, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+  //                                 ),
+  //                                 children: [
+  //                                   Container(
+  //                                     width: double.maxFinite,
+  //                                     padding: const EdgeInsets.all(10),
+  //                                     child: Column(
+  //                                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                                       children: [
+  //                                         listSection(AppLocalizations.of(context)!.new1),
+  //                                         listSection(AppLocalizations.of(context)!.new2),
+  //                                         listSection(AppLocalizations.of(context)!.new3),
+  //                                         listSection(AppLocalizations.of(context)!.new4),
+  //                                         listSection(AppLocalizations.of(context)!.new5),
+  //                                         listSection(AppLocalizations.of(context)!.new6),
+  //                                       ],
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //
+  //                               CupertinoListSection.insetGrouped(
+  //                                 decoration: BoxDecoration(
+  //                                     color: Theme.of(context).cardColor
+  //                                 ),
+  //                                 backgroundColor: Colors.transparent,
+  //                                 header: Padding(
+  //                                   padding: const EdgeInsets.only(left: 10),
+  //                                   child: Text(AppLocalizations.of(context)!.new7, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+  //                                 ),
+  //                                 children: [
+  //                                   Container(
+  //                                     width: double.maxFinite,
+  //                                     padding: const EdgeInsets.all(10),
+  //                                     child: Column(
+  //                                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                                       children: [
+  //                                         listSection(AppLocalizations.of(context)!.new8),
+  //                                         listSection(AppLocalizations.of(context)!.new9),
+  //                                         listSection(AppLocalizations.of(context)!.new10),
+  //                                         /// Use Health Data
+  //                                         CupertinoListTile(
+  //                                           padding: EdgeInsets.zero,
+  //                                           leading: Stack(
+  //                                             children: [
+  //                                               Container(
+  //                                                 height: 25,
+  //                                                 width: 25,
+  //                                                 decoration: BoxDecoration(
+  //                                                     color: Colors.white,
+  //                                                     border: Border.all(
+  //                                                       color: Colors.white,
+  //                                                       width: 1,
+  //                                                     ),
+  //                                                     borderRadius: BorderRadius.circular(6)
+  //                                                 ) ,
+  //                                                 child: const Padding(
+  //                                                   padding: EdgeInsets.all(2),
+  //                                                   child: Align(
+  //                                                     alignment: Alignment.topRight,
+  //                                                     child: Icon(
+  //                                                       MyIcons.heart,
+  //                                                       color: Colors.red,
+  //                                                       size: 15,
+  //                                                     ),
+  //                                                   ),
+  //                                                 ),
+  //                                               ),
+  //                                             ],
+  //                                           ),
+  //                                           title: Row(
+  //                                             children: [
+  //                                               Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
+  //                                               const SizedBox(width: 5),
+  //                                               if(cnConfig.useHealthData)
+  //                                                 FutureBuilder(
+  //                                                     future: cnConfig.isHealthDataAccessAllowed(cnScreenStatistics),
+  //                                                     builder: (context, connected){
+  //                                                       if(!connected.hasData){
+  //                                                         return Center(
+  //                                                           child: SizedBox(
+  //                                                             height: 15,
+  //                                                             width: 15,
+  //                                                             child: CupertinoActivityIndicator(
+  //                                                                 radius: 8.0,
+  //                                                                 color: Colors.amber[800]
+  //                                                             ),
+  //                                                             // child: CircularProgressIndicator(strokeWidth: 2,)
+  //                                                           ),
+  //                                                         );
+  //                                                       }
+  //                                                       return Icon(
+  //                                                         connected.data == true
+  //                                                             ? Icons.check_circle
+  //                                                             : Icons.close,
+  //                                                         size: 15,
+  //                                                         color: connected.data == true
+  //                                                             ? Colors.green
+  //                                                             : Colors.red,
+  //                                                       );
+  //                                                     }
+  //                                                 )
+  //                                             ],
+  //                                           ),
+  //                                           trailing: CupertinoSwitch(
+  //                                               value: cnConfig.useHealthData,
+  //                                               activeColor: activeColor,
+  //                                               onChanged: (value) async{
+  //                                                 setModalState(() {
+  //                                                   if(Platform.isAndroid){
+  //                                                     HapticFeedback.selectionClick();
+  //                                                   }
+  //                                                   cnConfig.setHealth(value);
+  //                                                 });
+  //                                                 await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+  //                                                 if(!value){
+  //                                                   await Future.delayed(const Duration(milliseconds: 500), (){
+  //                                                     cnScreenStatistics.health.revokePermissions();
+  //                                                     setModalState(() {});
+  //                                                   });
+  //                                                 }
+  //                                                 else{
+  //                                                   await cnScreenStatistics.refreshHealthData().then((value){
+  //                                                     setModalState(() {
+  //                                                       if(value){
+  //                                                         cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+  //                                                       }
+  //                                                       else{
+  //                                                         notificationPopUp(
+  //                                                             context: context,
+  //                                                             title: AppLocalizations.of(context)!.accessDenied,
+  //                                                             message: AppLocalizations.of(context)!.accessDeniedHealth
+  //                                                         );
+  //                                                       }
+  //                                                     });
+  //                                                   });
+  //                                                 }
+  //                                               }
+  //                                           ),
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //
+  //                               CupertinoListSection.insetGrouped(
+  //                                 decoration: BoxDecoration(
+  //                                     color: Theme.of(context).cardColor
+  //                                 ),
+  //                                 backgroundColor: Colors.transparent,
+  //                                 header: Padding(
+  //                                   padding: const EdgeInsets.only(left: 10),
+  //                                   child: Text(AppLocalizations.of(context)!.new11, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+  //                                 ),
+  //                                 children: [
+  //                                   Container(
+  //                                     width: double.maxFinite,
+  //                                     padding: const EdgeInsets.all(10),
+  //                                     child: Column(
+  //                                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                                       children: [
+  //                                         listSection(AppLocalizations.of(context)!.new12),
+  //                                         listSection(AppLocalizations.of(context)!.new13),
+  //                                       ],
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //
+  //                               const SizedBox(height: 30,)
+  //                             ]
+  //                         ),
+  //                         Container(
+  //                           margin: const EdgeInsets.symmetric(horizontal: 15),
+  //                           width: double.maxFinite,
+  //                           height: 50,
+  //                           color: Theme.of(context).primaryColor,
+  //                           child: Center(child: Text(AppLocalizations.of(context)!.newVersion, textScaler: const TextScaler.linear(1.3),)),
+  //                         ),
+  //                       ],
+  //                     )
+  //                 ),
+  //               );
+  //             }
+  //         );
+  //       }
+  //   );
+  // }
+  //
+  // Widget listSection(String text){
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 8),
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: <Widget>[
+  //         const Text("• "),
+  //         Expanded(
+  //           child: Text(text, textScaler: const TextScaler.linear(1.15),),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // void tryHealthData()async{
+  //   // Global Health instance
+  //   final health = Health();
+  //
+  //   // configure the health plugin before use.
+  //   await health.configure();
+  //   var types = [
+  //     HealthDataType.WEIGHT
+  //   ];
+  //   bool requested = await health.requestAuthorization(types);
+  //   print("REQUESTED: $requested");
+  //   final result = await cnScreenStatistics.refreshHealthData();
+  //   print("Result $result");
+  //   var now = DateTime.now();
+  //   DateTime startTime = DateTime(2000, 1, 1);
+  //   List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
+  //       startTime: startTime, endTime: now, types: types);
+  //
+  //   // print("");
+  //   // print("ALL_VALUES");
+  //   // for(HealthDataPoint h in healthData){
+  //   //   final test = HealthDataPointWrapper(hdp: h);
+  //   //   print(test.dateFrom);
+  //   //   print(test.weight);
+  //   //   print("");
+  //   // }
+  //   // print(healthData.length);
+  //   // print(healthData);
+  // }
 }
 
 class CnHomepage extends ChangeNotifier {
@@ -622,6 +856,8 @@ class CnHomepage extends ChangeNotifier {
   double? percent;
   String msg = "";
   Map<String, AnimationController> animationControllers = {};
+  TutorialCoachMark? tutorial;
+  GlobalKey keyKeyboardTopBar = GlobalKey();
 
   updateSyncStatus(double percent){
     this.percent = percent;

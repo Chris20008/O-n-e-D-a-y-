@@ -1,7 +1,8 @@
-import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,14 +32,16 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context);
+  late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context);
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
-  bool canConfirm = true;
   late bool showSpotify = cnConfig.useSpotify;
   final double _iconSize = 25;
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   UniqueKey newExerciseKey = UniqueKey();
   UniqueKey linkNameKey = UniqueKey();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  bool allowFormCheck = true;
 
   @override
   Widget build(BuildContext context) {
@@ -74,49 +77,20 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 ///z
                 0),
             child: Padding(
-              padding: const EdgeInsets.only(right: 5),
+              padding: const EdgeInsets.only(right: 10),
               child: SizedBox(
                 width: 54,
                 height: 54,
-                child: IconButton(
-                    iconSize: 30,
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                    ),
+                child: CupertinoButton(
+                    // iconSize: 30,
+                    // style: ButtonStyle(
+                    //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                    // ),
                     onPressed: () {
                       cnAnimatedColumn.newEx = Exercise(blockLink: true);
-                      cnStandardPopUp.open(
-                        padding: const EdgeInsets.only(top: 20, left: 20, right: 20, bottom: 5),
-                          context: context,
-                          onCancel: (){
-                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                              FocusScope.of(context).unfocus();
-                              _textController.clear();
-                            });
-                          },
-                          child: getPopUpChild(),
-                          canConfirm: canConfirm,
-                          onConfirm: (){
-                            if(_textController.text.isNotEmpty &&
-                                !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
-                            ){
-                              cnAnimatedColumn.newEx.name = _textController.text;
-                              double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
-                                  + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
-                                  + cnBottomMenu.height + 20;
-                              cnRunningWorkout.addExercise(cnAnimatedColumn.newEx, context, additionalScrollPosition: additionalScrollPosition);
-                            }
-                            Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                              FocusScope.of(context).unfocus();
-                              _textController.clear();
-                            });
-                          }
-                      );
+                      showAddExercise(context);
                     },
-                    icon: Icon(
-                      Icons.add,
-                      color: Colors.amber[800],
-                    )
+                    child: const Icon(Icons.add, size: 30,)
                 ),
               ),
             ),
@@ -141,100 +115,6 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
             ),
         ],
       ),
-    );
-  }
-
-  Widget getPopUpChild(){
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        TextFormField(
-          onTapOutside: (event){
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          keyboardAppearance: Brightness.dark,
-          controller: _textController,
-          maxLength: 40,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          validator: (value) {
-            value = value?.trim();
-            if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
-              canConfirm = false;
-              return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
-            }
-            canConfirm = true;
-            return null;
-          },
-          decoration: InputDecoration(
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-            labelText: AppLocalizations.of(context)!.newExerciseName,
-            counterText: "",
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-          ),
-          style: const TextStyle(
-              fontSize: 18
-          ),
-          textAlign: TextAlign.center,
-          onChanged: (value){},
-        ),
-        const SizedBox(height: 10,),
-        getSelectCategory(
-            key: newExerciseKey,
-            onConfirm: (int category){
-              cnAnimatedColumn.newEx.category = category;
-              cnStandardPopUp.child = getPopUpChild();
-              cnStandardPopUp.refresh();
-            },
-            currentCategory: cnAnimatedColumn.newEx.category,
-            context: context,
-            child: SizedBox(
-              height: 35,
-              child: Row(
-                children: [
-                  Icon(MyIcons.tags, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-                  const SizedBox(width: 8,),
-                  Text(cnAnimatedColumn.newEx.getCategoryName(), style: _style),
-                  const Spacer(),
-                  const Spacer(flex: 4,),
-                  // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-                  const SizedBox(width: 10),
-                  trailingChoice()
-                ],
-              ),
-            )
-        ),
-
-        if(cnRunningWorkout.workout.linkedExercises.isNotEmpty)
-          const SizedBox(height: 10,),
-        if(cnRunningWorkout.workout.linkedExercises.isNotEmpty)
-          getSelectLink(
-              key: linkNameKey,
-              onConfirm: (String linkName){
-                cnAnimatedColumn.newEx.linkName = linkName == "-"? null : linkName;
-                cnAnimatedColumn.newEx.blockLink = linkName == "-";
-                cnStandardPopUp.child = getPopUpChild();
-                cnStandardPopUp.refresh();
-              },
-              currentLinkName: cnAnimatedColumn.newEx.linkName?? "-",
-              context: context,
-              child: SizedBox(
-                height: 35,
-                child: Row(
-                  children: [
-                    Icon(Icons.link, size: _iconSize-3, color: Colors.amber[900]!.withOpacity(0.6),),
-                    const SizedBox(width: 8,),
-                    Text(cnAnimatedColumn.newEx.linkName?? "-", style: _style),
-                    const Spacer(),
-                    const Spacer(flex: 4,),
-                    // Text(cnNewExercise.exercise.getCategoryName(), style: _style),
-                    const SizedBox(width: 10),
-                    trailingChoice()
-                  ],
-                ),
-              )
-          ),
-      ],
     );
   }
 
@@ -276,14 +156,6 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
     );
   }
 
-  void rebuildAllChildren(BuildContext context) {
-    void rebuild(Element el) {
-      el.markNeedsBuild();
-      el.visitChildren(rebuild);
-    }
-    (context as Element).visitChildren(rebuild);
-  }
-
   double getYPositionStopwatch(){
     final heightSpotifyBar = showSpotify? cnSpotifyBar.height + 1 : 0.0;
     if(cnStopwatchWidget.isOpened && !cnSpotifyBar.isConnected){
@@ -297,16 +169,16 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
 
   double getYPositionAddExercise(){
     if(!cnStopwatchWidget.isOpened){
-      return getYPositionStopwatch() - cnSpotifyBar.height;
+      return getYPositionStopwatch() - 3 - cnSpotifyBar.height;
     }
 
     if(cnSpotifyBar.isConnected){
-      return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer - 6;
+      return getYPositionStopwatch() - 3 - cnStopwatchWidget.heightOfTimer - 6;
     }
     else if(showSpotify){
-      return getYPositionSpotifyBar() - cnSpotifyBar.height - 3;
+      return getYPositionSpotifyBar() - 3 - cnSpotifyBar.height - 3;
     }
-    return getYPositionStopwatch() - cnStopwatchWidget.heightOfTimer-6;
+    return getYPositionStopwatch() - 3 - cnStopwatchWidget.heightOfTimer-6;
   }
 
   double getYPositionSpotifyBar(){
@@ -315,6 +187,229 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
     }
     return 0;
   }
+
+  Future showAddExercise(BuildContext context) async{
+    _textController.clear();
+    allowFormCheck = true;
+    await showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context){
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              return PopScope(
+                canPop: MediaQuery.of(context).viewInsets.bottom == 0,
+                // onPopInvoked: (doPop){},
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxHeight: MediaQuery.of(context).size.height * 0.45 + 50 + MediaQuery.of(context).viewInsets.bottom,
+                      maxWidth:MediaQuery.of(context).size.width,
+                    ),
+                    child: Scaffold(
+                      resizeToAvoidBottomInset: false,
+                      body: Container(
+                        color: Theme.of(context).primaryColor,
+                        child: SafeArea(
+                          top: false,
+                          left: false,
+                          right: false,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 50,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                        flex: 10,
+                                        child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: CupertinoButtonText(
+                                                onPressed: (){
+                                                  Navigator.of(context).pop();
+                                                },
+                                                text: AppLocalizations.of(context)!.cancel,
+                                                textAlign: TextAlign.left
+                                            )
+                                        )
+                                    ),
+                                    Expanded(
+                                        flex: 11,
+                                        child: Center(
+                                          child: Text(
+                                            AppLocalizations.of(context)!.exercise,
+                                            textScaler: const TextScaler.linear(1.3),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                    ),
+                                    Expanded(
+                                        flex: 10,
+                                        child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: CupertinoButtonText(
+                                                onPressed: () {
+                                                  if(formKey.currentState!.validate()){
+                                                    if(_textController.text.isNotEmpty &&
+                                                        !exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)
+                                                    ){
+                                                      allowFormCheck = false;
+                                                      cnAnimatedColumn.newEx.name = _textController.text;
+                                                      double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
+                                                          + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
+                                                          + cnBottomMenu.height + 20;
+                                                      cnRunningWorkout.addExercise(cnAnimatedColumn.newEx, context, additionalScrollPosition: additionalScrollPosition);
+                                                      Navigator.of(context).pop();
+                                                      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+                                                        FocusScope.of(context).unfocus();
+                                                      });
+                                                    }
+                                                  }
+                                                },
+                                                text: AppLocalizations.of(context)!.save,
+                                                textAlign: TextAlign.right
+                                            )
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Column(
+                                  children: [
+                                    Form(
+                                      key: formKey,
+                                      child: TextFormField(
+                                        onTapOutside: (event){
+                                          FocusManager.instance.primaryFocus?.unfocus();
+                                        },
+                                        keyboardAppearance: Brightness.dark,
+                                        controller: _textController,
+                                        maxLength: 40,
+                                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                                        validator: (value) {
+                                          if(!allowFormCheck){
+                                            return null;
+                                          }
+                                          value = value?.trim();
+                                          if(exerciseNameExistsInWorkout(workout: cnRunningWorkout.workout, exerciseName: _textController.text)){
+                                            return AppLocalizations.of(context)!.runningWorkoutAlreadyExists;
+                                          }
+                                          else if(_textController.text.isEmpty){
+                                            Future.delayed(const Duration(milliseconds: 1000), (){
+                                              formKey.currentState?.reset();
+                                            });
+                                            return AppLocalizations.of(context)!.panelExEnterName;
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                          labelText: AppLocalizations.of(context)!.newExerciseName,
+                                          counterText: "",
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+                                        ),
+                                        style: const TextStyle(
+                                            fontSize: 18
+                                        ),
+                                        textAlign: TextAlign.center,
+                                        onChanged: (value){},
+                                      ),
+                                    ),
+                                    Stack(
+                                      children: [
+                                        CupertinoListSection.insetGrouped(
+                                          margin: const EdgeInsets.only(top: 15),
+                                          decoration: BoxDecoration(
+                                              color: Theme.of(context).cardColor
+                                          ),
+                                          backgroundColor: Colors.transparent,
+                                          children: [
+                                            cnNewExercise.getRestInSecondsSelector(
+                                                context: context,
+                                                exercise: cnAnimatedColumn.newEx,
+                                                refresh: (){
+                                                  setModalState(() {});
+                                                }
+                                            ),
+                                            cnNewExercise.getSeatLevelSelector(
+                                                context: context,
+                                                exercise: cnAnimatedColumn.newEx,
+                                                refresh: (){
+                                                  setModalState(() {});
+                                                }
+                                            ),
+                                            cnNewExercise.getExerciseCategorySelector(
+                                                context: context,
+                                                isTemplate: true,
+                                                exercise: cnAnimatedColumn.newEx,
+                                                refresh: (){
+                                                  setModalState(() {});
+                                                }
+                                            ),
+                                            cnNewExercise.getBodyWeightPercentSelector(
+                                                context: context,
+                                                isTemplate: true,
+                                                exercise: cnAnimatedColumn.newEx,
+                                                refresh: (){
+                                                  setModalState(() {});
+                                                }
+                                            ),
+                                            getSelectLink(
+                                                key: linkNameKey,
+                                                onConfirm: (String linkName){
+                                                  cnAnimatedColumn.newEx.linkName = linkName == "-"? null : linkName;
+                                                  cnAnimatedColumn.newEx.blockLink = linkName == "-";
+                                                  setModalState(() {});
+                                                },
+                                                currentLinkName: cnAnimatedColumn.newEx.linkName?? "-",
+                                                context: context,
+                                                child: CupertinoListTile(
+                                                  leading: Icon(Icons.link, size: _iconSize-3),
+                                                  title: Row(
+                                                    children: [
+                                                      Text(AppLocalizations.of(context)!.runningWorkoutGroup, style: _style),
+                                                      const Spacer(),
+                                                      Text(cnAnimatedColumn.newEx.linkName?? "-", style: _style),
+                                                      const SizedBox(width: 10),
+                                                    ],
+                                                  ),
+                                                  trailing: trailingChoice(),
+                                                )
+                                            ),
+                                          ],
+                                        ),
+                                        if(MediaQuery.of(context).viewInsets.bottom > 0)
+                                          Align(
+                                            alignment: Alignment.topCenter,
+                                            child: Container(
+                                              color: Colors.transparent,
+                                              height: 200,
+                                              width: double.maxFinite,
+                                            ),
+                                          )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+          );
+        }
+    );
+  }
+
 }
 
 class CnAnimatedColumn extends ChangeNotifier {

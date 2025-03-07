@@ -5,12 +5,14 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:page_indicator_plus/page_indicator_plus.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
@@ -43,9 +45,14 @@ const List<int> predefinedTimes = [
 
 const int maxTutorialStep = 999999;
 
+TextStyle cupButtonTextStyle = TextStyle(color: Colors.amber[800]?? const Color(0xFFFF9A19));
+
+const Color activeColor = Color(0xffdb7b01);
+
 Widget backgroundSingleSet = Container(
   decoration: BoxDecoration(
-    color: Colors.grey[500]!.withOpacity(0.2),
+    // color: Colors.grey[500]!.withOpacity(0.2),
+    color: Colors.white.withOpacity(0.15),
     borderRadius: BorderRadius.circular(5),
   ),
 );
@@ -56,31 +63,17 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
     child: Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        // Row(
-        //   mainAxisSize: MainAxisSize.min,
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     Expanded(
-        //       child: OverflowSafeText(
-        //           (set.weightAsTrimmedDouble?? " ").toString(),
-        //           maxLines: 1,
-        //           fontSize: 14,
-        //           minFontSize: 9,
-        //         textAlign: TextAlign.right
-        //       ),
-        //     ),
-        //     Text(exercise.categoryIsCardio()? "km":"kg", textScaler: TextScaler.linear(0.6),)
-        //   ],
-        // ),
         Expanded(
           child: Center(
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: getTextStyleForSetView((set.weightAsTrimmedDouble?? " ").toString())),
-                  TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: TextStyle(fontSize: 8))
-                ]
-              )
+            child: FittedBox(
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(text: (set.weightAsTrimmedDouble?? "").toString(), style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white)),
+                    TextSpan(text: exercise.categoryIsCardio()? " km":" kg", style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w400, color: Colors.white))
+                  ]
+                )
+              ),
             ),
           ),
         ),
@@ -89,23 +82,29 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
           height: 1,
           width: 20,
         ),
-        // Text(
-        //     exercise.categoryIsReps()
-        //         ? "${set.amount}"
-        //         : (set.amountAsTime?? "").toString(),
-        //     style: (getTextStyleForSetView(exercise.categoryIsReps()
-        //       ? "${set.amount}"
-        //       : (set.amountAsTime?? "").toString()))
-        // ),
         Expanded(
           child: Center(
-            child: OverflowSafeText(
-              exercise.categoryIsReps()
-                ? "${set.amount}"
-                  : (set.amountAsTime?? "").toString(),
-              maxLines: 1,
-              fontSize: 15,
-              minFontSize: 9,
+            child: FittedBox(
+              child: RichText(
+                  text: TextSpan(
+                      children: [
+                        TextSpan(
+                            text: exercise.categoryIsReps()
+                                ? "${set.amount}"
+                                : (set.amountAsTime?? "").toString(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white
+                            )
+                        ),
+                      ]
+                  )
+              ),
+              // child: Text(exercise.categoryIsReps()
+              //     ? "${set.amount}"
+              //     : (set.amountAsTime?? "").toString(),
+              //   style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
+              // ),
             ),
           ),
         )
@@ -143,11 +142,11 @@ const routeTheme = PullDownMenuRouteTheme(
 
 const trailingArrow = Icon(
   Icons.arrow_forward_ios,
-  size: 12,
+  size: 14,
   color: Colors.grey,
 );
 
-Widget trailingChoice({double size = 14, Color color = Colors.grey}){
+Widget trailingChoice({double size = 16, Color color = Colors.grey}){
  return Stack(
    alignment: Alignment.center,
    children: [
@@ -171,19 +170,30 @@ Color? getLinkColor({required String linkName, required Workout workout}){
   return null;
 }
 
-Widget mySeparator({double heightTop = 20, double heightBottom = 20, double minusWidth = 50, double opacity = 0.4, Color? color, Key? key, bool ignoring= true}){
+Widget mySeparator({
+  Key? key,
+  double heightTop = 20,
+  double heightBottom = 20,
+  double minusWidth = 50,
+  double opacity = 0.4,
+  Color? color,
+  bool ignoring= true,
+  double height = 1,
+  CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
+  double width = double.maxFinite
+}){
   return IgnorePointer(
     key: key,
     ignoring: ignoring,
     child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: crossAxisAlignment,
       children: [
         Container(height: heightTop, color: Colors.transparent,),
         Container(
-          height: 1,
-          width: double.maxFinite - minusWidth,
-          // color: const Color(0xFFC16A03).withOpacity(opacity),
+          height: height,
+          width: width - minusWidth,
             color: (color?? Colors.amber[900])!.withOpacity(opacity)
-          // color: Colors.amber[900]!.withOpacity(0.6),
         ),
         Container(height: heightTop, color: Colors.transparent,),
       ],
@@ -289,12 +299,13 @@ TextStyle getTextStyleForTextField(String text, {Color? color, bool sizeSmall = 
 
 TextStyle getTextStyleForSetView(String text){
   return TextStyle(
-    fontSize: text.length < 4
-        ? 15
-        : text.length < 5
-        ? 13
-        : text.length < 6
-        ? 11 : 9,
+    // fontSize: text.length < 3
+    //     ? 15
+    //     : text.length < 4
+    //     ? 13
+    //     : text.length < 6
+    //     ? 11 : 9,
+    fontSize: 15,
     fontWeight: text.length > 4? FontWeight.w500 : FontWeight.w400
   );
 }
@@ -311,12 +322,6 @@ List<dynamic> parseTextControllerAmountToTime(dynamic amount){
   String hours = timeAsString.substring(0, 1);
   String minutes = timeAsString.substring(1, 3);
   String seconds = timeAsString.substring(3, 5);
-  // if((int.tryParse(minutes)??60) > 59){
-  //   minutes = "59";
-  // }
-  // if((int.tryParse(seconds)??60) > 59){
-  //   seconds = "59";
-  // }
   if(timeAsString.substring(0, 1) == "0"){
     timeAsString = "$minutes:$seconds";
   }
@@ -435,6 +440,44 @@ Widget getSelectCategory({
           })
       );
       return categoryWidgets;
+    },
+    onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+    buttonBuilder: (context, showMenu) => CupertinoButton(
+        onPressed: (){
+          HapticFeedback.selectionClick();
+          showMenu();
+        },
+        padding: EdgeInsets.zero,
+        child: child
+    ),
+  );
+}
+
+Widget getSelectBodyWeightPercent({
+  Key? key,
+  required Widget child,
+  required Function(int bodyWeight) onConfirm,
+  required BuildContext context,
+  required double currentBodyWeightPercent
+}) {
+  return PullDownButton(
+    key: key,
+    buttonAnchor: PullDownMenuAnchor.start,
+    routeTheme: routeTheme,
+    itemBuilder: (context) {
+      List percents = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+      List<PullDownMenuItem> percentWidgets = List.generate(percents.length, (index) => PullDownMenuItem.selectable(
+          selected: currentBodyWeightPercent == percents[index]/100,
+          title: "${percents[index]} %",
+          onTap: () {
+            HapticFeedback.selectionClick();
+            FocusManager.instance.primaryFocus?.unfocus();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              onConfirm(percents[index]);
+            });
+          })
+      );
+      return percentWidgets;
     },
     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
     buttonBuilder: (context, showMenu) => CupertinoButton(
@@ -579,6 +622,34 @@ Widget getSet({
   );
 }
 
+Future notificationPopUp({
+  required BuildContext context,
+  required String title,
+  required String message
+}) async {
+  await showCupertinoModalPopup<void>(
+    context: context,
+    builder: (BuildContext context) => CupertinoActionSheet(
+      title: Column(
+        children: [
+          Text(title, textScaler: const TextScaler.linear(1.2)),
+          const SizedBox(height: 15,)
+        ],
+      ),
+      message: Text(message, textScaler: const TextScaler.linear(1.2)),
+      actions: <CupertinoActionSheetAction>[
+        CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          isDefaultAction: true,
+          child: Text('Ok', style: cupButtonTextStyle),
+        ),
+      ],
+    ),
+  );
+}
+
 String intToLexicographic(int value){
   String result = List.generate(value~/26, (index) => "Z").join();
   result = result + String.fromCharCode(65 + value%26);
@@ -587,6 +658,14 @@ String intToLexicographic(int value){
 
 String getSetKeyName(String exName, int index){
   return "${exName}_${intToLexicographic(index)}";
+}
+
+double calcEpley({
+  required double weight,
+  required int reps,
+  double bodyWeight = 0
+}){
+  return double.parse((((weight+bodyWeight) * (1 + 0.0333 * reps)) - bodyWeight).toStringAsFixed(1));
 }
 
 String validateDoubleTextInput(String text){
@@ -632,15 +711,6 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
     ),
   );
 }
-
-// enum TimeInterval {
-//   // monthly ("Monthly"),
-//   // quarterly ("Quarterly"),
-//   yearly ("Yearly");
-//
-//   const TimeInterval(this.value);
-//   final String value;
-// }
 
 Widget OverflowSafeText(
     String name,
@@ -721,10 +791,12 @@ Widget buildCalendarDialogButton({
 }) {
   dateValues = List.from(dateValues.map((e) => e.toDate()));
   const colorAmber = Color(0xFFC16A03);
-  const colorAmberDark = Color(0xFF583305);
+  // const colorAmberDark = Color(0xFF583305);
+  const colorAmberDark = Color(0xFF6D4919);
   const arrowSize = 15.0;
   const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
   final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
+  String translatedSickText = AppLocalizations.of(context)!.statisticsSick;
   final config = CalendarDatePicker2WithActionButtonsConfig(
     // cancelButton: justShow? Container() : null,
     // okButton: justShow? Container() : null,
@@ -795,9 +867,14 @@ Widget buildCalendarDialogButton({
         }
       }
       if (exists) {
+        if(cnNewWorkout.allWorkoutDates[relevantDate] is List && cnNewWorkout.allWorkoutDates[relevantDate].contains("Sick")){
+          cnNewWorkout.allWorkoutDates[relevantDate] = (cnNewWorkout.allWorkoutDates[relevantDate] as List).map((e) => !e.contains("Sick")? e : translatedSickText).toList();
+        } else if(cnNewWorkout.allWorkoutDates[relevantDate] == "Sick"){
+          cnNewWorkout.allWorkoutDates[relevantDate] = translatedSickText;
+        }
         String dayText = cnNewWorkout.allWorkoutDates[relevantDate] is List
-            ? cnNewWorkout.allWorkoutDates[relevantDate].contains("Krank")
-              ?"Krank + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
+            ? cnNewWorkout.allWorkoutDates[relevantDate].contains(translatedSickText)
+              ?"$translatedSickText + ${cnNewWorkout.allWorkoutDates[relevantDate].length - 1}"
               :"${cnNewWorkout.allWorkoutDates[relevantDate].length} workouts"
             : cnNewWorkout.allWorkoutDates[relevantDate];
         dayWidget = Container(
@@ -831,7 +908,7 @@ Widget buildCalendarDialogButton({
                         style: TextStyle(
                             color: ((isSelected?? false) || (dateValues.contains(date.toDate())))
                                 ? Colors.white
-                                : dayText.contains("Krank")
+                                : dayText.contains(translatedSickText)
                                 ? colorAmberDark
                                 : colorAmber,
                           fontWeight: FontWeight.w600
@@ -853,7 +930,6 @@ Widget buildCalendarDialogButton({
       final values = await showCalendarDatePicker2Dialog(
         context: context,
         config: config,
-        // dialogSize: const Size(325, 400),
         dialogSize: const Size(325, 700),
         borderRadius: BorderRadius.circular(15),
         value: dateValues.isNotEmpty
@@ -861,7 +937,7 @@ Widget buildCalendarDialogButton({
           : calendarType == CalendarDatePicker2Type.single
             ? [DateTime.now()]
             : [DateTime.now(), DateTime.now()],
-        dialogBackgroundColor: Theme.of(context).primaryColor
+          dialogBackgroundColor: Theme.of(context).cardColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
@@ -918,48 +994,103 @@ Widget getCalendarChild({
   );
 }
 
-Widget getExplainExerciseGroups(BuildContext context){
-  return Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: <Widget>[
-      Text(
-        AppLocalizations.of(context)!.t3Group,
-        style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            fontSize: 20.0
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 10.0),
-        child: Text(
-          AppLocalizations.of(context)!.t3GroupExplanation,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      const SizedBox(height: 15),
-      Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: SizedBox(
-              width: 230,
-              child: Image.asset(
-                  scale: 0.6,
-                  "${pictureAssetPath}Excercise Groups.jpg"
-              )
-          ),
-        ),
-      ),
-    ],
+Future getExplainExerciseGroups(BuildContext context) async{
+
+  PageController pageViewControllerGroups = PageController();
+  TextStyle tStyle = const TextStyle(
+      color: Colors.white,
+      fontSize: 19.0
   );
+  await showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context){
+        List<Widget> pages = [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.t1GroupExplanation,
+                style: tStyle,
+              )
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.t1GroupExplanation2,
+                style: tStyle,
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  AppLocalizations.of(context)!.t1GroupExplanation3,
+                  style: tStyle
+              )
+            ],
+          ),
+        ];
+
+        final pageCountGroups = pages.length;
+
+        return ClipRRect(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.4,
+              maxWidth:MediaQuery.of(context).size.width,
+            ),
+            child: Scaffold(
+              body: Container(
+                color: Theme.of(context).primaryColor,
+                child: SafeArea(
+                  top: false,
+                  left: false,
+                  right: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Stack(
+                      children: [
+                        PageView(
+                          controller: pageViewControllerGroups,
+                          children: pages,
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: PageIndicator(
+                            controller: pageViewControllerGroups,
+                            count: pageCountGroups,
+                            size: 8,
+                            layout: PageIndicatorLayout.WARM,
+                            activeColor: activeColor,
+                            scale: 0.65,
+                            space: 10,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+  );
+
+  pageViewControllerGroups.dispose();
 }
 
 Widget iconSyncMultipleDevices = const Stack(
     alignment: Alignment.center,
     children: [
       Icon(
-          Icons.cloud
+        Icons.cloud,
+        color: Colors.white,
       ),
       Padding(
         padding: EdgeInsets.only(top: 1),
@@ -984,10 +1115,13 @@ Widget getCloudOptionsColumn({
       children: [
         /// Connect with Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_done),
+          leading: const Icon(
+            Icons.cloud_done,
+            color: Colors.white
+          ),
           trailing: CupertinoSwitch(
               value: cnConfig.connectWithCloud,
-              activeColor: const Color(0xFFC16A03),
+              activeColor: activeColor,
               onChanged: (value)async{
                 if(Platform.isAndroid){
                   HapticFeedback.selectionClick();
@@ -1014,10 +1148,7 @@ Widget getCloudOptionsColumn({
                   ),
                 ),
                 if(!cnConfig.connectWithCloud)
-                  SizedBox(width: 15),
-                /// The future "cnConfig.signInGoogleDrive()" is currently not configured for IOS
-                /// so calling it will lead to an crash
-                /// We have to make sure it is only called on Android!
+                  const SizedBox(width: 15),
                 if(cnConfig.connectWithCloud)
                   FutureBuilder(
                       future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
@@ -1056,10 +1187,13 @@ Widget getCloudOptionsColumn({
 
                 /// Save Backup in Cloud
                 CupertinoListTile(
-                  leading: const Icon(Icons.cloud_upload),
+                  leading: const Icon(
+                    Icons.cloud_upload,
+                    color: Colors.white,
+                  ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.saveBackupCloud,
-                      activeColor: const Color(0xFFC16A03),
+                      activeColor: activeColor,
                       onChanged: (value) async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1095,7 +1229,7 @@ Widget getCloudOptionsColumn({
                   leading: iconSyncMultipleDevices,
                   trailing: CupertinoSwitch(
                       value: cnConfig.syncMultipleDevices,
-                      activeColor: const Color(0xFFC16A03),
+                      activeColor: activeColor,
                       onChanged: (value)async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1132,7 +1266,8 @@ Widget getCloudOptionsColumn({
     );
 }
 
-Widget getActionSheetCancelButton (BuildContext context, {String? text}){
+Widget getActionSheetCancelButton (BuildContext context, {String? text, Function? onPressed}){
+  onPressed = onPressed?? (){};
   const Color kDialogColor = CupertinoDynamicColor.withBrightness(
     color: Color(0xCCF2F2F2),
     darkColor: Color(0xBF1E1E1E),
@@ -1146,9 +1281,10 @@ Widget getActionSheetCancelButton (BuildContext context, {String? text}){
         /// default behavior, turns the action's text to bold text.
         isDefaultAction: true,
         onPressed: () {
+          onPressed!();
           Navigator.pop(context);
         },
-        child: Text(text?? AppLocalizations.of(context)!.cancel),
+        child: Text(text?? AppLocalizations.of(context)!.cancel, style: cupButtonTextStyle),
       ),
     ),
   );
@@ -1162,53 +1298,52 @@ Future showDialogMinuteSecondPicker({
   Duration newDuration = const Duration();
   return showCupertinoModalPopup<void>(
     context: context,
-    builder: (BuildContext context) => Container(
-      height: onConfirm != null? 270 : 222,
-      padding: const EdgeInsets.only(top: 6.0),
-      // The bottom margin is provided to align the popup above the system
-      // navigation bar.
-      margin: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-      ),
-      // Provide a background color for the popup.
-      color: CupertinoColors.systemBackground.resolveFrom(context),
-      // Use a SafeArea widget to avoid system overlaps.
-      child: SafeArea(
-        bottom: false,
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CupertinoTimerPicker(
-              mode: CupertinoTimerPickerMode.ms,
-              initialTimerDuration: initialTimeDuration,
-              onTimerDurationChanged: (Duration duration) {
-                HapticFeedback.selectionClick();
-                newDuration = duration;
-              },
+    builder: (BuildContext context) => ClipRRect(
+      borderRadius: const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15)),
+      child: Container(
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: SafeArea(
+          bottom: true,
+          top: false,
+          child: Container(
+            height: onConfirm != null? 275 : 222,
+            padding: const EdgeInsets.only(top: 0.0),
+            margin: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            if(onConfirm != null)
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                        onPressed: (){
-                          Navigator.of(context).pop();
-                          onConfirm(newDuration);
-                        },
-                        style: ButtonStyle(
-                            shadowColor: MaterialStateProperty.all(Colors.transparent),
-                            surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                            // backgroundColor: MaterialStateProperty.all(Colors.grey[800]!.withOpacity(0.6)),
-                            shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)))
-                        ),
-                        child: Text(AppLocalizations.of(context)!.ok)
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if(onConfirm != null)
+                  Row(
+                    children: [
+                      CupertinoButtonText(
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                          },
+                          text: AppLocalizations.of(context)!.cancel
+                      ),
+                      const Spacer(),
+                      CupertinoButtonText(
+                          onPressed: (){
+                            Navigator.of(context).pop();
+                            onConfirm(newDuration);
+                          },
+                          text: AppLocalizations.of(context)!.save
+                      ),
+                    ],
                   ),
-                ],
-              ),
-          ],
+                CupertinoTimerPicker(
+                  mode: CupertinoTimerPickerMode.ms,
+                  initialTimerDuration: initialTimeDuration,
+                  onTimerDurationChanged: (Duration duration) {
+                    HapticFeedback.selectionClick();
+                    newDuration = duration;
+                  },
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     ),
@@ -1221,20 +1356,22 @@ Widget getDialogCantChangeCategory(BuildContext context){
     maxWidth: 400,
     widthFactor: 0.6,
     maxHeight: 680,
-    child: Center(child: Text("You can't change the Category of an existing exercise\nPlease create an new exercise with another name", textAlign: TextAlign.center,)),
+    child: Center(child: Text(AppLocalizations.of(context)!.panelWoChangeExerciseCategory, textAlign: TextAlign.center,)),
   );
 }
 
 Widget getBackupDialogWelcomeScreen({required BuildContext context}){
   return Padding(
-    padding: EdgeInsets.only(right: 15),
+    padding: const EdgeInsets.only(right: 15),
     child: Column(
       children: [
 
         /// Save Backup Automatic
         CupertinoListTile(
-          leading: const Icon(Icons.sync),
-          // title: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomatic, style: const TextStyle(color: Colors.white)),
+          leading: const Icon(
+            Icons.sync,
+            color: Colors.white
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
@@ -1246,7 +1383,10 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
 
         /// Connect with Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_done),
+          leading: const Icon(
+            Icons.cloud_done,
+            color: Colors.white,
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               Platform.isAndroid
@@ -1266,7 +1406,10 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
 
         /// Save Backups in Cloud
         CupertinoListTile(
-          leading: const Icon(Icons.cloud_upload),
+          leading: const Icon(
+            Icons.cloud_upload,
+            color: Colors.white,
+          ),
           title: OverflowSafeText(
               maxLines: 1,
               Platform.isAndroid
@@ -1304,4 +1447,99 @@ Widget getBackupDialogWelcomeScreen({required BuildContext context}){
       ],
     ),
   );
+}
+
+Offset getWidgetPosition(GlobalKey key) {
+  Offset position = const Offset(0, 0);
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+    final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      position = renderBox.localToGlobal(Offset.zero);
+    }
+  // });
+  return position;
+}
+
+// Offset getWidgetPosition(GlobalKey key) {
+//   Offset position = const Offset(0, 0);
+//   // // WidgetsBinding.instance.addPostFrameCallback((_) {
+//   // final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
+//   // if (renderBox != null) {
+//   //   position = renderBox.localToGlobal(Offset.zero);
+//   // }
+//   // // });
+//   // print(position);
+//   // return position;
+//   final renderObject = key.currentContext?.findRenderObject();
+//   final translation = renderObject?.getTransformTo(null).getTranslation();
+//   if(translation != null && renderObject?.paintBounds != null){
+//     position = Offset(translation.x, translation.y);
+//   }
+//   print(position);
+//   return position;
+// }
+
+Size getWidgetSize(GlobalKey key){
+  Size size = const Size(0, 0);
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+    final RenderBox? renderBox =
+    key.currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      size = renderBox.size;
+    }
+  // });
+  return size;
+}
+
+Widget getRowButton({
+  Key? key,
+  required BuildContext context,
+  required double minusWidth,
+  required Function() onPressed,
+  IconData icon = Icons.add,
+  Color? color,
+  double height = 40
+}){
+  color = color?? Colors.amber[800];
+  return SizedBox(
+    height: height,
+    child: Row(
+      children: [
+        SizedBox(width: minusWidth),
+        Expanded(
+          child: CupertinoButton(
+            padding: EdgeInsets.zero,
+              key: key,
+              alignment: Alignment.center,
+              color: Theme.of(context).cardColor,
+              onPressed: onPressed,
+              child: Icon(
+                icon,
+                size: 20,
+                color: color,
+              )
+          ),
+        ),
+        SizedBox(width: minusWidth)
+      ],
+    ),
+  );
+}
+
+void blockUserInput(BuildContext context, {int duration = 1000}) {
+  OverlayEntry overlayEntry = OverlayEntry(
+    builder: (context) => Positioned.fill(
+      child: AbsorbPointer(
+        child: Container(
+          color: Colors.black.withOpacity(0.0),
+        ),
+      ),
+    ),
+  );
+
+  Overlay.of(context).insert(overlayEntry);
+
+  Future.delayed(Duration(milliseconds: duration), () {
+    overlayEntry.remove();
+  });
 }
