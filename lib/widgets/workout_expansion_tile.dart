@@ -1,9 +1,11 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/TextScrollCustomized.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:text_scroll/text_scroll.dart';
 import '../main.dart';
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
@@ -56,7 +58,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
               dividerColor: Colors.transparent,
             ),
             child: ExpansionTile(
-                tilePadding: const EdgeInsets.only(left: 10, right: 20),
+                tilePadding: const EdgeInsets.only(left: 4, right: 20),
                 onExpansionChanged: (bool isOpen) {
                   setState(() {
                     if(widget.onExpansionChange != null){
@@ -70,23 +72,30 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if(!widget.workout.isTemplate)
-                      Text(
-                        DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(widget.workout.date!),
-                        textScaler: const TextScaler.linear(0.8),
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w200
+                      Padding(
+                        padding: EdgeInsets.only(left: 6),
+                        child: Text(
+                          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(widget.workout.date!),
+                          textScaler: const TextScaler.linear(0.8),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w200
+                          ),
                         ),
                       ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                            child: OverflowSafeText(
-                                widget.workout.name,
-                                maxLines: 1,
-                                fontSize: 26,
-                                minFontSize: 20
+                            child: TextScrollCustomized(
+                              text: widget.workout.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                              ),
+                              numberOfReps: null,
+                              pauseBetween: 4000,
+                              mode: TextScrollMode.endless,
                             )
                         ),
                         if(widget.workout.isTemplate)
@@ -174,6 +183,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   MultipleExerciseRow(
                     exercises: widget.workout.exercises,
                     padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                    fontSize: 15,
                   )
                 ]
             ),

@@ -174,7 +174,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                       Align(
                         alignment: Alignment.topRight,
                         child: CupertinoButton(
-                          padding: EdgeInsets.only(right: 9),
+                          padding: EdgeInsets.only(right: 11),
                             // iconSize: 30,
                             // style: ButtonStyle(
                             //   backgroundColor: MaterialStateProperty.all(Colors.transparent),

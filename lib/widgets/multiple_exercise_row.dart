@@ -49,7 +49,7 @@ class MultipleExerciseRow extends StatelessWidget {
                     SizedBox(
                         height: _height + (2*_topBottomPadding),
                         child: Padding(
-                          padding: EdgeInsets.only(top: _topBottomPadding, bottom: _topBottomPadding),
+                          padding: EdgeInsets.only(top: _topBottomPadding, bottom: _topBottomPadding-2),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -109,16 +109,17 @@ class MultipleExerciseRow extends StatelessWidget {
                               ),
                               Expanded(
                                 child: Align(
-                                    alignment: Alignment.centerLeft,
+                                    alignment: Alignment.topLeft,
                                     child: OverflowSafeText(
                                         ex.name,
                                         fontSize: fontSize,
-                                        minFontSize: 13,
-                                        maxLines: 2
+                                        minFontSize: fontSize,
+                                        // minFontSize: 13,
+                                        maxLines: 2,
                                     )
                                 ),
                               ),
-                              const SizedBox(height: 5,),
+                              const SizedBox(height: 3,),
                             ],
                           ),
                         )

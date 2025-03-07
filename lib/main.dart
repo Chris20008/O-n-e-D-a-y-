@@ -30,6 +30,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:text_scroll/text_scroll.dart';
 import 'dart:io';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:package_info_plus/package_info_plus.dart';

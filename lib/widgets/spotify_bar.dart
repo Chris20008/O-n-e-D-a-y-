@@ -3,6 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/config.dart';
+import 'package:fitness_app/widgets/TextScrollCustomized.dart';
 import 'package:fitness_app/widgets/spotify_progress_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
+import 'package:text_scroll/text_scroll.dart';
 import '../main.dart';
 import '../screens/other_screens/screen_running_workout/animated_column.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -41,6 +43,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
   Color colorSpotifyButton = Colors.white.withOpacity(0.12);
   double paddingLeftRight = 5;
+  String? lastSongName;
   Map<String, double> widths = {
     "portrait": 0,
     "landscape": 0
@@ -162,17 +165,15 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                           Align(
                                             alignment: Alignment.topLeft,
                                             child: Container(
-                                                padding: const EdgeInsets.only(left:12, top:2),
+                                                padding: const EdgeInsets.only(left:8, top:2),
                                                 height: cnSpotifyBar.height/2,
                                                 child: Row(
                                                   children: [
                                                     Expanded(
-                                                      child: AutoSizeText(
-                                                        cnSpotifyBar.data!.track?.name ?? "",
-                                                        maxLines: 1,
+                                                      child: TextScrollCustomized(
+                                                        key: cnSpotifyBar.keySongName,
+                                                        text: cnSpotifyBar.data!.track?.name ?? "",
                                                         style: Theme.of(context).textTheme.titleMedium,
-                                                        minFontSize: 13,
-                                                        overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
                                                     const SizedBox(width: 5),
@@ -208,23 +209,23 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         ),
                                                         child: Row(
                                                           children: [
-                                                            SizedBox(width: 2,),
+                                                            SizedBox(width: 4,),
                                                             Text(
                                                                 "Open Spotify",
-                                                                textScaler: TextScaler.linear(0.8),
+                                                                textScaler: const TextScaler.linear(0.8),
                                                                 style: Theme.of(context).textTheme.titleSmall
                                                             ),
-                                                            Icon(
+                                                            const Icon(
                                                                 MyIcons.spotify,
                                                                 size: 14,
                                                                 color: Color(0xff1ed560)
                                                             ),
-                                                            SizedBox(width: 2,),
+                                                            const SizedBox(width: 4,),
                                                           ],
                                                         ),
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 44,)
+                                                    const SizedBox(width: 38,)
                                                   ],
                                                 )
                                             ),
@@ -261,7 +262,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                           backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
-                                                          cnSpotifyBar.skipPrevious();
+                                                          await cnSpotifyBar.skipPrevious();
                                                         },
                                                         icon: Icon(
                                                           Icons.skip_previous,
@@ -295,7 +296,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                           backgroundColor: MaterialStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
-                                                          cnSpotifyBar.skipNext();
+                                                          await cnSpotifyBar.skipNext();
                                                         },
                                                         icon: Icon(
                                                           Icons.skip_next,
@@ -320,18 +321,15 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         )
                                                     ),
                                                     Expanded(
-                                                      child: AutoSizeText(
-                                                        textAlign: MediaQuery.of(context).orientation == Orientation.portrait? TextAlign.start : TextAlign.center,
-                                                        cnSpotifyBar.data!.track?.artist.name ?? "",
-                                                        maxLines: 1,
+                                                      child: TextScrollCustomized(
+                                                        key: cnSpotifyBar.keySongName,
+                                                        text: cnSpotifyBar.data!.track?.artist.name ?? "",
                                                         style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                                             color: Colors.grey[400]
                                                         ),
-                                                        minFontSize: 10,
-                                                        overflow: TextOverflow.ellipsis,
                                                       ),
                                                     ),
-                                                    const SizedBox(width: 30,)
+                                                    const SizedBox(width: 32,)
                                                   ]
                                               ),
                                             ),
@@ -460,6 +458,8 @@ class CnSpotifyBar extends ChangeNotifier {
   bool justClosed = false;
   bool isHandlingControlAction = false;
   String currentTrackName = "";
+  UniqueKey keySongName = UniqueKey();
+  UniqueKey keyArtistName = UniqueKey();
 
   late StreamSubscription<PlayerState> _subscription;
   late StreamSubscription<ConnectionStatus> _subscriptionConnectionStatus;
@@ -629,11 +629,16 @@ class CnSpotifyBar extends ChangeNotifier {
     isHandlingControlAction = true;
 
     try {
+      String? currentName = data?.track?.name;
       await SpotifySdk.skipPrevious().then((value) => {
         // Future.delayed(const Duration(milliseconds: 150), (){
         //   refresh();
         // })
       });
+      await Future.delayed(const Duration(milliseconds: 100), (){});
+      if(currentName == data?.track?.name){
+        await resetTextScrollKeys();
+      }
       // await SpotifySdk.skipPrevious();
     } catch (_) {}
     isHandlingControlAction = false;
@@ -650,6 +655,7 @@ class CnSpotifyBar extends ChangeNotifier {
         //   refresh();
         // })
       });
+      // resetTextScrollKeys();
       // await SpotifySdk.skipNext();
     } catch (_) {}
     isHandlingControlAction = false;
@@ -698,6 +704,16 @@ class CnSpotifyBar extends ChangeNotifier {
       } on Exception catch (_) {
       }
     }
+  }
+
+  Future resetTextScrollKeys() async{
+    keySongName = UniqueKey();
+    keyArtistName = UniqueKey();
+    await Future.delayed(const Duration(milliseconds: 250), (){
+      keySongName = UniqueKey();
+      keyArtistName = UniqueKey();
+      refresh();
+    });
   }
 
   void close(){
