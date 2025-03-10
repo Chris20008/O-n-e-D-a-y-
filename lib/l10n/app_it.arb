@@ -126,8 +126,8 @@
 
   "statisticsMaxWeight": "Peso massimo",
   "statisticsFilter": "Filtro",
-  "statisticsFilter1RM": "Mostra 1RM",
-  "statisticsFilterSickDays": "Mostra giorni di malattia",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Giorni di malattia",
   "statisticsWeight": "Peso",
   "statisticsSick": "Malato",
   "statisticsCurrentlyNotSupported": "La categoria di questo esercizio non è attualmente supportata per le statistiche",

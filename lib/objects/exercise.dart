@@ -16,6 +16,7 @@ class Exercise{
   int restInSeconds;
   int? seatLevel;
   int id;
+  String description;
 
   String? originalName;
   String? linkName;
@@ -34,7 +35,8 @@ class Exercise{
     this.linkName,
     this.category = 1,
     this.blockLink = false,
-    this.bodyWeightPercent = 0.0
+    this.bodyWeightPercent = 0.0,
+    this.description = ""
   }){
     if (sets.isEmpty){
       sets = [];
@@ -63,7 +65,8 @@ class Exercise{
       linkName: ex.linkName,
       category: ex.category,
       blockLink: ex.blockLink,
-      bodyWeightPercent: ex.bodyWeightPercent
+      bodyWeightPercent: ex.bodyWeightPercent,
+      description: ex.description
   );
 
   Exercise.clone(Exercise ex): this(
@@ -75,7 +78,8 @@ class Exercise{
       linkName: ex.linkName,
       category: ex.category,
       blockLink: ex.blockLink,
-      bodyWeightPercent: ex.bodyWeightPercent
+      bodyWeightPercent: ex.bodyWeightPercent,
+      description: ex.description
   );
 
   ObExercise toObExercise(){

@@ -61,7 +61,7 @@ class MySlideUpPanel extends StatefulWidget {
     // this.scrollControllerInnerList,
     this.isTouchingListView = false,
     this.panelBuilder,
-    this.bounce = true
+    this.bounce = true,
   });
 
   @override
@@ -436,6 +436,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 // isDraggable: widget.isDraggable, /// && !panelDragRunning,
                 borderRadius: widget.borderRadius,
                 color: color,
+                isDraggable: widget.isDraggable,
                 parallaxOffset: 0.9,
                 onPanelSlide: (value){
                   onPanelSlide(value);
@@ -443,7 +444,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                     widget.onPanelSlide!(value);
                   }
                 },
-                panel: widget.panel?? widget.panelBuilder!(context, myListView),
+                panel: ClipRRect(
+                  borderRadius: widget.borderRadius,
+                  child: widget.panel?? widget.panelBuilder!(context, myListView),
+                ),
                 // panelBuilder: widget.panelBuilder,
                 backdropEnabled: widget.backdropEnabled,
                 backdropColor: widget.backdropColor,

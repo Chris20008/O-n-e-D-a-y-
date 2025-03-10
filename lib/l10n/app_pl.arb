@@ -126,8 +126,8 @@
 
   "statisticsMaxWeight": "Max. waga",
   "statisticsFilter": "Filtr",
-  "statisticsFilter1RM": "Pokaż 1RM",
-  "statisticsFilterSickDays": "Pokaż dni choroby",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Dni choroby",
   "statisticsWeight": "Waga",
   "statisticsSick": "Chory",
   "statisticsCurrentlyNotSupported": "Kategoria tego ćwiczenia nie jest obecnie obsługiwana w statystykach",

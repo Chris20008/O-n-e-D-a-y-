@@ -13,6 +13,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
+import 'package:fitness_app/widgets/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
@@ -30,7 +31,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:text_scroll/text_scroll.dart';
 import 'dart:io';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -39,6 +39,7 @@ late ObjectBox objectbox;
 bool tutorialIsRunning = false;
 int currentTutorialStep = 0;
 String pictureAssetPath = "lib/assets/pictures/";
+Color buttonTextColor = const Color(0xffdb7b01);
 
 void main() {
 
@@ -92,6 +93,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnConfig()),
+        ChangeNotifierProvider(create: (context) => CnAllExercisesPanel()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
@@ -151,6 +153,7 @@ class _MyHomePageState extends State<MyHomePage>{
   late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context); /// should be true?
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
+  late CnAllExercisesPanel cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context, listen: false);
   late CnHomepage cnHomepage;
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
@@ -391,6 +394,8 @@ class _MyHomePageState extends State<MyHomePage>{
                       const NewWorkOutPanel(),
 
                       const NewExercisePanel(),
+
+                      const AllExercisesPanel(),
                     ],
                   )
 
@@ -487,16 +492,8 @@ class _MyHomePageState extends State<MyHomePage>{
                 //   child: ElevatedButton(
                 //     child: Text("Test"),
                 //     onPressed: ()async{
-                //       WidgetsFlutterBinding.ensureInitialized();
-                //       final String version = (await PackageInfo.fromPlatform()).version;
-                //
-                //       // String appName = packageInfo.appName;
-                //       // String packageName = packageInfo.packageName;
-                //       // String version = packageInfo.version;
-                //       // String buildNumber = packageInfo.buildNumber;
-                //       // print(version);
-                //       // print(buildNumber);
-                //       // print(packageInfo);
+                //       await cnAllExercisesPanel.initExercises();
+                //       cnAllExercisesPanel.openPanel();
                 //     },
                 //   ),
                 // )

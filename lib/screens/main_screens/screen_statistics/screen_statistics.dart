@@ -7,11 +7,13 @@ import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exe
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
+import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -136,207 +138,386 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     );
   }
 
-  void openFilterPopUp(BuildContext context) {
-    cnStandardPopUp.open(
-        widthFactor: 0.95,
-        maxWidth: 350,
-        padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
-        context: context,
-        child: getPopUpChild(context),
-        onConfirm: (){
-          cnScreenStatistics.refreshData(context);
-          Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-            cnScreenStatistics.refresh();
-            cnScreenStatistics.cache();
-          });
-        },
-        onCancel: (){
-          cnScreenStatistics.restoreLastFilterState();
-        },
+  void openFilterPopUp(BuildContext context) async{
+
+    // cnStandardPopUp.open(
+    //     widthFactor: 0.95,
+    //     maxWidth: 350,
+    //     padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
+    //     context: context,
+    //     child: getPopUpChild(context),
+    //     onConfirm: (){
+    //       cnScreenStatistics.refreshData(context);
+    //       Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+    //         cnScreenStatistics.refresh();
+    //         cnScreenStatistics.cache();
+    //       });
+    //     },
+    //     onCancel: (){
+    //       cnScreenStatistics.restoreLastFilterState();
+    //     },
+    // );
+
+    final result = await showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (context){
+        return getFilterWidget(context);
+      }
     );
+
+    print("RESULT $result");
+
+    if(result == true){
+      cnScreenStatistics.refreshData(context);
+      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
+        cnScreenStatistics.refresh();
+        cnScreenStatistics.cache();
+      });
+    } else{
+      cnScreenStatistics.restoreLastFilterState();
+    }
+
   }
 
-  Widget getPopUpChild(BuildContext context){
+  Widget getFilterWidget(BuildContext context){
     List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
     /// Replace the "ALL Workouts" name in correct language
     workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
 
-    return Column(
-      children: [
-        Text(
-          AppLocalizations.of(context)!.statisticsFilter,
-          textAlign: TextAlign.center,
-          textScaler: const TextScaler.linear(1.4),
-          style: const TextStyle(color: Colors.white),
-        ),
-        mySeparator(heightTop: 5, heightBottom: 10, minusWidth: 0),
-        SizedBox(
-            height:50,
-            child: Row(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        height: MediaQuery.of(context).size.height*0.6,
+        color: Theme.of(context).primaryColor,
+        child: StatefulBuilder(
+          builder: (context, setModalState){
+            return Stack(
               children: [
-                const Icon(
-                  Icons.arrow_back_ios,
-                  size: 15,
-                ),
-                Expanded(
-                  child: VerticalScrollWheel(
-                    key: UniqueKey(),
-                    widthOfChildren: 100,
-                    heightOfChildren: 30,
-                    onTap: (int index){
-                      cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
-                      cnScreenStatistics.selectedWorkoutIndex = index;
-                      HapticFeedback.selectionClick();
-                    },
-                    selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
-                    children: List<Widget>.generate(
-                        workoutNames.length, (index) =>
-                        OverflowSafeText(
-                            workoutNames[index],
-                            maxLines: 1
-                        )
+                ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    const SizedBox(height: 50,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: SizedBox(
+                          height:50,
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.arrow_back_ios,
+                                size: 15,
+                              ),
+                              Expanded(
+                                child: VerticalScrollWheel(
+                                  // key: UniqueKey(),
+                                  widthOfChildren: 100,
+                                  heightOfChildren: 30,
+                                  onTap: (int index){
+                                    cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
+                                    cnScreenStatistics.selectedWorkoutIndex = index;
+                                    HapticFeedback.selectionClick();
+                                  },
+                                  selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
+                                  children: List<Widget>.generate(
+                                      workoutNames.length, (index) =>
+                                      OverflowSafeText(
+                                          workoutNames[index],
+                                          maxLines: 1
+                                      )
+                                  ),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 15,
+                              ),
+                            ],
+                          )
+                      ),
                     ),
+                    CupertinoListSection.insetGrouped(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).cardColor
+                      ),
+                      backgroundColor: Colors.transparent,
+                      header: const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text("Graph", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                      ),
+                      footer: GestureDetector(
+                        onTap: () async{
+                          HapticFeedback.selectionClick();
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.info,
+                                size:12,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 5,),
+                              Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                            ],
+                          ),
+                        ),
+                      ),
+                      children: [
+                        // const SizedBox(height: 50,),
+                        // SizedBox(
+                        //     height:50,
+                        //     child: Row(
+                        //       children: [
+                        //         const Icon(
+                        //           Icons.arrow_back_ios,
+                        //           size: 15,
+                        //         ),
+                        //         Expanded(
+                        //           child: VerticalScrollWheel(
+                        //             key: UniqueKey(),
+                        //             widthOfChildren: 100,
+                        //             heightOfChildren: 30,
+                        //             onTap: (int index){
+                        //               cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
+                        //               cnScreenStatistics.selectedWorkoutIndex = index;
+                        //               HapticFeedback.selectionClick();
+                        //             },
+                        //             selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
+                        //             children: List<Widget>.generate(
+                        //                 workoutNames.length, (index) =>
+                        //                 OverflowSafeText(
+                        //                     workoutNames[index],
+                        //                     maxLines: 1
+                        //                 )
+                        //             ),
+                        //           ),
+                        //         ),
+                        //         const Icon(
+                        //           Icons.arrow_forward_ios,
+                        //           size: 15,
+                        //         ),
+                        //       ],
+                        //     )
+                        // ),
+                        // const SizedBox(height: 15,),
+                        // Row(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       Expanded(
+                        //         child: Column(
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           mainAxisSize: MainAxisSize.min,
+                        //           children: [
+                        //             OverflowSafeText(AppLocalizations.of(context)!.filterAvgMovWeightHead, maxLines: 2),
+                        //             Padding(
+                        //               padding: const EdgeInsets.only(left: 15),
+                        //               child: OverflowSafeText(
+                        //                 AppLocalizations.of(context)!.filterAvgMovWeightText,
+                        //                 minFontSize: 9,
+                        //                 maxLines: 3,
+                        //                 style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //       const SizedBox(width: 30,),
+                        //       CupertinoSwitch(
+                        //           value: cnScreenStatistics.showAvgWeightPerSetLine,
+                        //           activeColor: activeColor,
+                        //           onChanged: (value){
+                        //             setModalState(() {
+                        //               if(Platform.isAndroid){
+                        //                 HapticFeedback.selectionClick();
+                        //               }
+                        //               cnScreenStatistics.showAvgWeightPerSetLine = value;
+                        //             });
+                        //           }
+                        //       ),
+                        //     ]
+                        // ),
+                        CupertinoListTile(
+                          title: OverflowSafeText(
+                              maxLines: 1,
+                              AppLocalizations.of(context)!.statisticsFilter1RM,
+                              style: const TextStyle(color: Colors.white)
+                          ),
+                          trailing: CupertinoSwitch(
+                              value: cnScreenStatistics.showOneRepMax,
+                              activeColor: activeColor,
+                              onChanged: (value){
+                                setModalState(() {
+                                  if(Platform.isAndroid){
+                                    HapticFeedback.selectionClick();
+                                  }
+                                  cnScreenStatistics.showOneRepMax = value;
+                                });
+                              }
+                          ),
+                        ),
+
+                        CupertinoListTile(
+                          title: OverflowSafeText(
+                              maxLines: 2,
+                              AppLocalizations.of(context)!.filterAvgMovWeightHead,
+                              style: const TextStyle(color: Colors.white)
+                          ),
+                          trailing: CupertinoSwitch(
+                              value: cnScreenStatistics.showAvgWeightPerSetLine,
+                              activeColor: activeColor,
+                              onChanged: (value){
+                                setModalState(() {
+                                  if(Platform.isAndroid){
+                                    HapticFeedback.selectionClick();
+                                  }
+                                  cnScreenStatistics.showAvgWeightPerSetLine = value;
+                                });
+                              }
+                          ),
+                        ),
+                        // Row(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       Expanded(
+                        //         child: Column(
+                        //           crossAxisAlignment: CrossAxisAlignment.start,
+                        //           mainAxisSize: MainAxisSize.min,
+                        //           children: [
+                        //             OverflowSafeText(AppLocalizations.of(context)!.filterOnlyWorkingSets, maxLines: 1),
+                        //             Padding(
+                        //               padding: const EdgeInsets.only(left: 15),
+                        //               child: OverflowSafeText(
+                        //                 AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
+                        //                 minFontSize: 9,
+                        //                 maxLines: 4,
+                        //                 style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        //               ),
+                        //             ),
+                        //           ],
+                        //         ),
+                        //       ),
+                        //       const SizedBox(width: 30,),
+                        //       CupertinoSwitch(
+                        //           value: cnScreenStatistics.onlyWorkingSets,
+                        //           activeColor: activeColor,
+                        //           onChanged: (value){
+                        //             setModalState(() {
+                        //               if(Platform.isAndroid){
+                        //                 HapticFeedback.selectionClick();
+                        //               }
+                        //               cnScreenStatistics.onlyWorkingSets = value;
+                        //             });
+                        //           }
+                        //       )
+                        //     ]
+                        // ),
+                        CupertinoListTile(
+                            title: OverflowSafeText(
+                                maxLines: 1,
+                                AppLocalizations.of(context)!.statisticsFilterSickDays,
+                                style: const TextStyle(color: Colors.white)
+                            ),
+                            trailing: CupertinoSwitch(
+                                value: cnScreenStatistics.showSickDays,
+                                activeColor: activeColor,
+                                onChanged: (value){
+                                  setModalState(() {
+                                    if(Platform.isAndroid){
+                                      HapticFeedback.selectionClick();
+                                    }
+                                    cnScreenStatistics.showSickDays = value;
+                                  });
+                                }
+                            )
+                        ),
+                      ],
+                    ),
+
+                    CupertinoListSection.insetGrouped(
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).cardColor
+                      ),
+                      backgroundColor: Colors.transparent,
+                      header: const Padding(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Text("Graph", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                      ),
+                      children: [
+                        CupertinoListTile(
+                            title: OverflowSafeText(
+                                maxLines: 1,
+                                AppLocalizations.of(context)!.filterOnlyWorkingSets,
+                                style: const TextStyle(color: Colors.white)
+                            ),
+                            trailing: CupertinoSwitch(
+                                value: cnScreenStatistics.onlyWorkingSets,
+                                activeColor: activeColor,
+                                onChanged: (value){
+                                  setModalState(() {
+                                    if(Platform.isAndroid){
+                                      HapticFeedback.selectionClick();
+                                    }
+                                    cnScreenStatistics.onlyWorkingSets = value;
+                                  });
+                                }
+                            )
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 50,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                          flex: 10,
+                          child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: CupertinoButtonText(
+                                  onPressed: (){
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  text: AppLocalizations.of(context)!.cancel,
+                                  textAlign: TextAlign.left
+                              )
+                          )
+                      ),
+                      Expanded(
+                          flex: 11,
+                          child: Center(
+                            child: Text(
+                              AppLocalizations.of(context)!.statisticsFilter,
+                              textScaler: const TextScaler.linear(1.3),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                      ),
+                      Expanded(
+                          flex: 10,
+                          child: Align(
+                              alignment: Alignment.centerRight,
+                              child: CupertinoButtonText(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(true);
+                                  },
+                                  text: AppLocalizations.of(context)!.save,
+                                  textAlign: TextAlign.right
+                              )
+                          )
+                      ),
+                    ],
                   ),
                 ),
-                const Icon(
-                  Icons.arrow_forward_ios,
-                  size: 15,
-                ),
               ],
-            )
+            );
+          },
         ),
-        const SizedBox(height: 15,),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OverflowSafeText(AppLocalizations.of(context)!.filterAvgMovWeightHead, maxLines: 2),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: OverflowSafeText(
-                        AppLocalizations.of(context)!.filterAvgMovWeightText,
-                        minFontSize: 9,
-                        maxLines: 3,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 30,),
-              CupertinoSwitch(
-                  value: cnScreenStatistics.showAvgWeightPerSetLine,
-                  activeColor: activeColor,
-                  onChanged: (value){
-                    if(Platform.isAndroid){
-                      HapticFeedback.selectionClick();
-                    }
-                    cnScreenStatistics.showAvgWeightPerSetLine = value;
-                    cnStandardPopUp.child = getPopUpChild(context);
-                    cnStandardPopUp.refresh();
-                  }
-              ),
-            ]
-        ),
-        const SizedBox(height: 15,),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilter1RM, maxLines: 1),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 30,),
-              CupertinoSwitch(
-                  value: cnScreenStatistics.showOneRepMax,
-                  activeColor: activeColor,
-                  onChanged: (value){
-                    if(Platform.isAndroid){
-                      HapticFeedback.selectionClick();
-                    }
-                    cnScreenStatistics.showOneRepMax = value;
-                    cnStandardPopUp.child = getPopUpChild(context);
-                    cnStandardPopUp.refresh();
-                  }
-              )
-            ]
-        ),
-        const SizedBox(height: 15,),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OverflowSafeText(AppLocalizations.of(context)!.filterOnlyWorkingSets, maxLines: 1),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15),
-                      child: OverflowSafeText(
-                        AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
-                        minFontSize: 9,
-                        maxLines: 4,
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 30,),
-              CupertinoSwitch(
-                  value: cnScreenStatistics.onlyWorkingSets,
-                  activeColor: activeColor,
-                  onChanged: (value){
-                    if(Platform.isAndroid){
-                      HapticFeedback.selectionClick();
-                    }
-                    cnScreenStatistics.onlyWorkingSets = value;
-                    cnStandardPopUp.child = getPopUpChild(context);
-                    cnStandardPopUp.refresh();
-                  }
-              )
-            ]
-        ),
-        const SizedBox(height: 15,),
-        Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    OverflowSafeText(AppLocalizations.of(context)!.statisticsFilterSickDays, maxLines: 1),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 30,),
-              CupertinoSwitch(
-                  value: cnScreenStatistics.showSickDays,
-                  activeColor: activeColor,
-                  onChanged: (value){
-                    if(Platform.isAndroid){
-                      HapticFeedback.selectionClick();
-                    }
-                    cnScreenStatistics.showSickDays = value;
-                    cnStandardPopUp.child = getPopUpChild(context);
-                    cnStandardPopUp.refresh();
-                  }
-              )
-            ]
-        ),
-        const SizedBox(height: 10,)
-      ],
+      ),
     );
   }
 }
