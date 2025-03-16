@@ -53,7 +53,7 @@ Future<String> getLocalPath() async{
 
 Future<File?> getBackupFromFilePicker({CnHomepage? cnHomepage}) async{
   FilePickerResult? result = await FilePicker.platform.pickFiles(
-      initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files"
+      initialDirectory: "/storage/emulated/0/Android/data/christian.range.fitnessapp.fitness_app/files",
   );
 
   if (result != null) {

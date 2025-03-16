@@ -52,6 +52,7 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [redirectSchemeName: "spotify-sdk", redirectHostName: "auth"]
 //        manifestPlaceholders = [
 //                'appAuthRedirectScheme': 'fitness-app://' // Add this also using your application ID URI as the based for all your derived URi
 //        ]
