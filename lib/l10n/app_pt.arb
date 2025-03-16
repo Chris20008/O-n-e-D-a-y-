@@ -43,6 +43,7 @@
   "savedDataForSync": "Dados salvos para sync.",
   "accessDenied": "Acesso negado",
   "accessDeniedHealth": "O acesso aos seus dados de saúde foi negado. Você pode ativá-lo a qualquer momento nas configurações do dispositivo em Saúde.",
+  "other": "Outros",
 
   "settings": "Configurações",
   "settingsGeneral": "Geral",

@@ -43,6 +43,7 @@
   "savedDataForSync": "Dane do synchronizacji zapisane",
   "accessDenied": "Dostęp odmówiony",
   "accessDeniedHealth": "Dostęp do Twoich danych zdrowotnych został odmówiony. Możesz go włączyć w ustawieniach urządzenia w sekcji Zdrowie.",
+  "other": "Inne",
 
   "settings": "Ustawienia",
   "settingsGeneral": "Ogólne",

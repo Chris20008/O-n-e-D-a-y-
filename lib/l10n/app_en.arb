@@ -43,6 +43,7 @@
   "savedDataForSync": "Saved data for sync.",
   "accessDenied": "Access denied",
   "accessDeniedHealth": "Access to your health data was denied. You can enable it anytime in the device settings under Health.",
+  "other": "Other",
 
   "settings": "Settings",
   "settingsGeneral": "General",

@@ -43,6 +43,7 @@
   "savedDataForSync": "Gegevens voor sync opgeslagen",
   "accessDenied": "Toegang geweigerd",
   "accessDeniedHealth": "De toegang tot je gezondheidsgegevens is geweigerd. Je kunt deze op elk moment inschakelen in de apparaatinstellingen onder Gezondheid.",
+  "other": "Overige",
 
   "settings": "Instellingen",
   "settingsGeneral": "Algemeen",

@@ -43,6 +43,7 @@
   "savedDataForSync": "Données enregistrées pour la synchronisation",
   "accessDenied": "Accès refusé",
   "accessDeniedHealth": "L'accès à vos données de santé a été refusé. Vous pouvez l'activer à tout moment dans les paramètres de votre appareil sous Santé.",
+  "other": "Autre",
 
   "settings": "Paramètres",
   "settingsGeneral": "Général",

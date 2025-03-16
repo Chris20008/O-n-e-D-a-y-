@@ -140,24 +140,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   void openFilterPopUp(BuildContext context) async{
 
-    // cnStandardPopUp.open(
-    //     widthFactor: 0.95,
-    //     maxWidth: 350,
-    //     padding: const EdgeInsets.only(top: 15, left: 10, right: 10, bottom: 5),
-    //     context: context,
-    //     child: getPopUpChild(context),
-    //     onConfirm: (){
-    //       cnScreenStatistics.refreshData(context);
-    //       Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-    //         cnScreenStatistics.refresh();
-    //         cnScreenStatistics.cache();
-    //       });
-    //     },
-    //     onCancel: (){
-    //       cnScreenStatistics.restoreLastFilterState();
-    //     },
-    // );
-
     final result = await showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
@@ -211,7 +193,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                               ),
                               Expanded(
                                 child: VerticalScrollWheel(
-                                  // key: UniqueKey(),
                                   widthOfChildren: 100,
                                   heightOfChildren: 30,
                                   onTap: (int index){
@@ -246,99 +227,26 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                         padding: EdgeInsets.only(left: 10),
                         child: Text("Graph", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                       ),
-                      footer: GestureDetector(
-                        onTap: () async{
-                          HapticFeedback.selectionClick();
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.info,
-                                size:12,
-                                color: Colors.white,
-                              ),
-                              const SizedBox(width: 5,),
-                              Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // footer: GestureDetector(
+                      //   onTap: () async{
+                      //     HapticFeedback.selectionClick();
+                      //   },
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.only(left: 10),
+                      //     child: Row(
+                      //       children: [
+                      //         const Icon(
+                      //           Icons.info,
+                      //           size:12,
+                      //           color: Colors.white,
+                      //         ),
+                      //         const SizedBox(width: 5,),
+                      //         Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
+                      //       ],
+                      //     ),
+                      //   ),
+                      // ),
                       children: [
-                        // const SizedBox(height: 50,),
-                        // SizedBox(
-                        //     height:50,
-                        //     child: Row(
-                        //       children: [
-                        //         const Icon(
-                        //           Icons.arrow_back_ios,
-                        //           size: 15,
-                        //         ),
-                        //         Expanded(
-                        //           child: VerticalScrollWheel(
-                        //             key: UniqueKey(),
-                        //             widthOfChildren: 100,
-                        //             heightOfChildren: 30,
-                        //             onTap: (int index){
-                        //               cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
-                        //               cnScreenStatistics.selectedWorkoutIndex = index;
-                        //               HapticFeedback.selectionClick();
-                        //             },
-                        //             selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
-                        //             children: List<Widget>.generate(
-                        //                 workoutNames.length, (index) =>
-                        //                 OverflowSafeText(
-                        //                     workoutNames[index],
-                        //                     maxLines: 1
-                        //                 )
-                        //             ),
-                        //           ),
-                        //         ),
-                        //         const Icon(
-                        //           Icons.arrow_forward_ios,
-                        //           size: 15,
-                        //         ),
-                        //       ],
-                        //     )
-                        // ),
-                        // const SizedBox(height: 15,),
-                        // Row(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: [
-                        //       Expanded(
-                        //         child: Column(
-                        //           crossAxisAlignment: CrossAxisAlignment.start,
-                        //           mainAxisSize: MainAxisSize.min,
-                        //           children: [
-                        //             OverflowSafeText(AppLocalizations.of(context)!.filterAvgMovWeightHead, maxLines: 2),
-                        //             Padding(
-                        //               padding: const EdgeInsets.only(left: 15),
-                        //               child: OverflowSafeText(
-                        //                 AppLocalizations.of(context)!.filterAvgMovWeightText,
-                        //                 minFontSize: 9,
-                        //                 maxLines: 3,
-                        //                 style: const TextStyle(color: Colors.grey, fontSize: 12),
-                        //               ),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       ),
-                        //       const SizedBox(width: 30,),
-                        //       CupertinoSwitch(
-                        //           value: cnScreenStatistics.showAvgWeightPerSetLine,
-                        //           activeColor: activeColor,
-                        //           onChanged: (value){
-                        //             setModalState(() {
-                        //               if(Platform.isAndroid){
-                        //                 HapticFeedback.selectionClick();
-                        //               }
-                        //               cnScreenStatistics.showAvgWeightPerSetLine = value;
-                        //             });
-                        //           }
-                        //       ),
-                        //     ]
-                        // ),
                         CupertinoListTile(
                           title: OverflowSafeText(
                               maxLines: 1,
@@ -378,42 +286,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                               }
                           ),
                         ),
-                        // Row(
-                        //     crossAxisAlignment: CrossAxisAlignment.start,
-                        //     children: [
-                        //       Expanded(
-                        //         child: Column(
-                        //           crossAxisAlignment: CrossAxisAlignment.start,
-                        //           mainAxisSize: MainAxisSize.min,
-                        //           children: [
-                        //             OverflowSafeText(AppLocalizations.of(context)!.filterOnlyWorkingSets, maxLines: 1),
-                        //             Padding(
-                        //               padding: const EdgeInsets.only(left: 15),
-                        //               child: OverflowSafeText(
-                        //                 AppLocalizations.of(context)!.filterOnlyWorkingSetsText,
-                        //                 minFontSize: 9,
-                        //                 maxLines: 4,
-                        //                 style: const TextStyle(color: Colors.grey, fontSize: 12),
-                        //               ),
-                        //             ),
-                        //           ],
-                        //         ),
-                        //       ),
-                        //       const SizedBox(width: 30,),
-                        //       CupertinoSwitch(
-                        //           value: cnScreenStatistics.onlyWorkingSets,
-                        //           activeColor: activeColor,
-                        //           onChanged: (value){
-                        //             setModalState(() {
-                        //               if(Platform.isAndroid){
-                        //                 HapticFeedback.selectionClick();
-                        //               }
-                        //               cnScreenStatistics.onlyWorkingSets = value;
-                        //             });
-                        //           }
-                        //       )
-                        //     ]
-                        // ),
                         CupertinoListTile(
                             title: OverflowSafeText(
                                 maxLines: 1,
@@ -441,9 +313,9 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                           color: Theme.of(context).cardColor
                       ),
                       backgroundColor: Colors.transparent,
-                      header: const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text("Graph", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+                      header: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(AppLocalizations.of(context)!.other, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
                       ),
                       children: [
                         CupertinoListTile(
@@ -617,26 +489,6 @@ class CnScreenStatistics extends ChangeNotifier {
     return res;
   }
   
-  // void setSelectedExercise({required String exName}){
-  //   selectedExerciseName = exName;
-  //   if(Platform.isAndroid){
-  //     HapticFeedback.selectionClick();
-  //   }
-  //   final builder = objectbox.exerciseBox.query(ObExercise_.name.equals(exName));
-  //   builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
-  //   ObExercise? exTemplate = builder.build().findFirst();
-  //
-  //   if(exTemplate != null){
-  //     selectedExercise = Exercise.fromObExercise(exTemplate);
-  //     return;
-  //   }
-  //
-  //   final builder2 = objectbox.workoutBox.query().order(ObWorkout_.date, flags: Order.descending).linkMany(ObExercise_.);
-  //   // builder2.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
-  //   // ObExercise? exNonTemplate = builder2.build().findFirst();
-  //
-  // }
-  
   List<String> getAllExerciseNames(BuildContext context){
     final builder = objectbox.exerciseBox.query();
     builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(false));
@@ -671,16 +523,6 @@ class CnScreenStatistics extends ChangeNotifier {
     }
 
   }
-
-  //  List<double?>? getMinMaxWeights(){
-  //   final exercises = getSelectedExerciseHistory();
-  //   if(exercises == null){
-  //     return null;
-  //   }
-  //   double minWeight = exercises.values.map((e) => e.weights.min).min;
-  //   double maxWeight = exercises.values.map((e) => e.weights.max).max;
-  //   return [minWeight, maxWeight];
-  // }
 
   Map<DateTime, double>? getMaxWeightsPerDate(BuildContext context){
     if(selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
@@ -832,27 +674,6 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     selectedExerciseTemplate = null;
   }
-
-  // final weekdayMapping = {
-  //   "Mon": 1,
-  //   "Tue": 2,
-  //   "Wed": 3,
-  //   "Thu": 4,
-  //   "Fri": 5,
-  //   "Sat": 6,
-  //   "Sun": 7,
-  // };
-
-  // int getMaxDaysOfMonths(DateTime date){
-  //   switch (date.month){
-  //     case 4 || 6 || 9 || 11:
-  //       return 30;
-  //     case 2:
-  //       return date.isLeapYear()? 29: 28;
-  //     default:
-  //       return 31;
-  //   }
-  // }
 
   void openSettingsPanel(){
     HapticFeedback.selectionClick();
