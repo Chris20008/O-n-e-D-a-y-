@@ -25,12 +25,13 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
+  late CnStopwatchWidget cnStopwatchWidget;
 
   double paddingLeftRight = 5;
 
   @override
   Widget build(BuildContext context) {
+    cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
     double width = MediaQuery.of(context).size.width;
 
     return Align(

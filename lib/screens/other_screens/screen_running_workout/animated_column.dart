@@ -31,8 +31,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  late CnConfig cnConfig = Provider.of<CnConfig>(context);
-  late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+  late CnConfig cnConfig;
+  late CnNewExercisePanel cnNewExercise;
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
   late bool showSpotify = cnConfig.useSpotify;
@@ -46,6 +46,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   @override
   Widget build(BuildContext context) {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context);
+    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    cnConfig = Provider.of<CnConfig>(context);
     showSpotify = cnConfig.useSpotify;
 
     return SafeArea(

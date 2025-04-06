@@ -46,7 +46,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   ScrollController sc = ScrollController();
 
   /// listen to bottomMenu for height changes
-  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
+  late CnBottomMenu cnBottomMenu;
 
   @override
   void initState() {
@@ -69,6 +69,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
   @override
   Widget build(BuildContext context) {
+    cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     return MySlideUpPanel(
       animationControllerName: "SelectorExerciseToUpdate",

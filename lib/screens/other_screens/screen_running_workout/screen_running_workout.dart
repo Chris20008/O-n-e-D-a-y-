@@ -1,7 +1,6 @@
 import 'dart:collection';
 import 'dart:ui';
 import 'package:collection/collection.dart';
-// import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/setRow.dart';
@@ -49,15 +48,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  // late CnNewWorkOutPanel cnNewWorkOutPanel  = Provider.of<CnNewWorkOutPanel>(context, listen: false);
-  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+  late CnRunningWorkout cnRunningWorkout;
   /// listen to bottomMenu for height changes
-  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
+  late CnBottomMenu cnBottomMenu;
   final double _iconSize = 20;
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
-  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 90;
+  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 100;
   Key selectorExerciseToUpdateKey = UniqueKey();
   Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
@@ -72,13 +70,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   int timeAnimatedColumn = 1000;
   bool isShowingAnimatedColumn = true;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  // }
-
   @override
   Widget build(BuildContext context) {
+    cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+    cnBottomMenu = Provider.of<CnBottomMenu>(context);
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
 

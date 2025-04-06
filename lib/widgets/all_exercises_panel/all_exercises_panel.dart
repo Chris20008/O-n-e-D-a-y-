@@ -24,7 +24,7 @@ class AllExercisesPanel extends StatefulWidget {
 
 class _AllExercisesPanelState extends State<AllExercisesPanel> {
 
-  late CnAllExercisesPanel cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context);
+  late CnAllExercisesPanel cnAllExercisesPanel;
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   double sizeListTile = 0;
   double verticalPaddingSideBar = 0;
@@ -32,7 +32,7 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
 
   @override
   Widget build(BuildContext context) {
-
+    cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context);
     final List<TileItem> exs = cnAllExercisesPanel.filteredExercises;
 
     return PopScope(

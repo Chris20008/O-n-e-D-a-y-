@@ -25,11 +25,12 @@ class LocalFilePicker extends StatefulWidget {
 class _LocalFilePickerState extends State<LocalFilePicker> {
   late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
-  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context);
+  late CnHomepage cnHomepage;
   bool _isLoadingBackup = false;
   
   @override
   Widget build(BuildContext context) {
+    cnHomepage = Provider.of<CnHomepage>(context);
     return Scaffold(
         extendBody: true,
         body: PopScope(

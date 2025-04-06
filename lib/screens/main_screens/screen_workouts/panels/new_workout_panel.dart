@@ -43,7 +43,7 @@ class NewWorkOutPanel extends StatefulWidget {
 }
 
 class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderStateMixin{
-  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
+  late CnNewWorkOutPanel cnNewWorkout;
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
@@ -83,6 +83,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
     return PopScope(
       canPop: false,

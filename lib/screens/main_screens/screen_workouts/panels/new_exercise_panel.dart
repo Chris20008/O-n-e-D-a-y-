@@ -29,7 +29,7 @@ class NewExercisePanel extends StatefulWidget {
 }
 
 class _NewExercisePanelState extends State<NewExercisePanel> with TickerProviderStateMixin{
-  late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+  late CnNewExercisePanel cnNewExercise;
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
@@ -57,6 +57,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
+    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
     double insetsBottom = MediaQuery.of(context).viewInsets.bottom;
 
     return PopScope(
@@ -771,11 +772,12 @@ class CnNewExercisePanel extends ChangeNotifier {
           trailing: trailingChoice(),
         ),
         onConfirm: (dynamic value){
+          print(value);
           if(value is int){
             exercise.restInSeconds = value;
             refresh();
           }
-          else{
+          else if (value == AppLocalizations.of(context)!.custom){
             showDialogMinuteSecondPicker(
                 context: context,
                 initialTimeDuration: Duration(minutes: exercise.restInSeconds~/60, seconds: exercise.restInSeconds%60),
@@ -783,6 +785,10 @@ class CnNewExercisePanel extends ChangeNotifier {
                   exercise.restInSeconds = newDuration.inSeconds;
                 }
             ).then((value) => refresh());
+          }
+          else{
+            exercise.restInSeconds = 0;
+            refresh();
           }
         }
     );
