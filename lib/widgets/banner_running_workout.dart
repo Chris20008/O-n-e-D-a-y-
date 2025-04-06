@@ -26,7 +26,6 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
   @override
   Widget build(BuildContext context) {
     cnWorkouts = Provider.of<CnWorkouts>(context);
-    // print("REBUILD BANNER RUNNING WORKOUT");
 
     return AnimatedCrossFade(
         firstChild: const SizedBox(width: double.maxFinite),

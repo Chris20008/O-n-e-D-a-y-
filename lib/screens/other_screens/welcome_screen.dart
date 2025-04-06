@@ -31,8 +31,8 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context);
+  late CnScreenStatistics cnScreenStatistics;
+  late CnConfig cnConfig;
   PanelController controllerExplainBackups = PanelController();
   final maxIndex = 4;
   int screenIndex = 0;
@@ -45,6 +45,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    cnConfig  = Provider.of<CnConfig>(context);
+    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+
     return Stack(
       children: [
         InitialAnimatedScreen(

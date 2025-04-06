@@ -26,13 +26,15 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnConfig cnConfig = Provider.of<CnConfig>(context);
-  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context);
+  late CnConfig cnConfig;
+  late CnWorkouts cnWorkouts;
 
   bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
+    cnConfig = Provider.of<CnConfig>(context);
+    cnWorkouts = Provider.of<CnWorkouts>(context);
     final size = MediaQuery.of(context).size;
 
     return SafeArea(

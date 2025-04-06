@@ -16,7 +16,7 @@ class ExerciseSelector extends StatefulWidget {
 }
 
 class _ExerciseSelectorState extends State<ExerciseSelector> {
-  late CnScreenStatistics cnScreenStatistics  = Provider.of<CnScreenStatistics>(context);
+  late CnScreenStatistics cnScreenStatistics;
   late String? selectedExerciseName = cnScreenStatistics.selectedExerciseName;
 
   Future _showDialog(Widget child) async{
@@ -63,6 +63,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       ),
     );
     if(initExercise != selectedExerciseName){
+      print("Refresh After Selector");
       cnScreenStatistics.calcMinMaxDates(context);
       cnScreenStatistics.refresh();
       cnScreenStatistics.cache();
@@ -71,6 +72,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
   @override
   Widget build(BuildContext context) {
+    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
     cnScreenStatistics.selectedExerciseName ??= cnScreenStatistics.allExerciseNames.firstOrNull;
 

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/config.dart';
@@ -16,7 +15,6 @@ import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'dart:io' show Platform;
 import 'package:fitness_app/util/constants.dart';
-import 'package:text_scroll/text_scroll.dart';
 import '../main.dart';
 import '../screens/other_screens/screen_running_workout/animated_column.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -34,7 +32,7 @@ class SpotifyBar extends StatefulWidget {
 }
 
 class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
-  late CnSpotifyBar cnSpotifyBar = cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
+  late CnSpotifyBar cnSpotifyBar;
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnBackgroundColor cnBackgroundColor = Provider.of<CnBackgroundColor>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
@@ -106,6 +104,8 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    cnSpotifyBar = cnSpotifyBar = Provider.of<CnSpotifyBar>(context);
+
     if(cnSpotifyBar.width == 0){
       initWidths();
     }

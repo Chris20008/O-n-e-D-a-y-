@@ -20,7 +20,7 @@ class ExerciseLineChart extends StatefulWidget {
 }
 
 class _ExerciseLineChartState extends State<ExerciseLineChart> {
-  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+  late CnScreenStatistics cnScreenStatistics;
   List<Color> gradientColors = [
     Colors.amber[200]!,
     Colors.amber[800]!,
@@ -87,6 +87,9 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
   @override
   Widget build(BuildContext context) {
+    print("Refresh Line Chart");
+    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+
     List<FlSpot> tempSpotsMaxWeight = [];
     List<FlSpot> tempSpotsAvgWeightPerSet = [];
     List<FlSpot> tempSpotsOneRepMax = [];
