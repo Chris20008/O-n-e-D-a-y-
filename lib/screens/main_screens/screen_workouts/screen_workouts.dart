@@ -155,7 +155,7 @@ class CnWorkouts extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
   // late final AnimationController animationControllerWorkoutsScreen;
 
-  void refreshAllWorkouts() async{
+  Future refreshAllWorkouts() async{
     List<ObWorkout> obWorkouts = await objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).order(ObWorkout_.name).build().findAsync();
     workouts.clear();
 

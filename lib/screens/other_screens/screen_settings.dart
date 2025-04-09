@@ -655,7 +655,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                       fontSize: 16.0
                   );
                   setState(() {
-                    _showLoadingIndicator = true;
+                    _showLoadingIndicator = false;
                   });
                 }
                 catch (_){
