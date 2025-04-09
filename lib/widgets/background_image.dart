@@ -20,11 +20,6 @@ class _BackgroundColorState extends State<BackgroundColor> {
   @override
   Widget build(BuildContext context) {
 
-    // print("--------- REBUILD ---------");
-    // print(cnBackgroundColor.colorFirstChild);
-    // print(cnBackgroundColor.colorSecondChild);
-    // print(cnBackgroundColor.firstChild);
-
     cnBackgroundColor = Provider.of<CnBackgroundColor>(context);
 
     return Container(

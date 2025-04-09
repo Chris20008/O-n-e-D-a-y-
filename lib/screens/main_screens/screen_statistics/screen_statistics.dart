@@ -34,7 +34,7 @@ class ScreenStatistics extends StatefulWidget {
 }
 
 class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBindingObserver {
-  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+  late CnScreenStatistics cnScreenStatistics;
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   bool initOrientation = true;
 
@@ -72,6 +72,8 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
+    print("Refresh Screen statistics");
+    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
     if(cnScreenStatistics.width == 0 || cnScreenStatistics.height == 0 || initOrientation){
       initOrientation = false;
@@ -746,6 +748,7 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void refresh(){
+    print("Should notify Listeners");
     notifyListeners();
   }
 }

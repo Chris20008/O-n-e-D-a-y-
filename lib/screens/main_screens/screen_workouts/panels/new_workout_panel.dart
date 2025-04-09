@@ -43,7 +43,7 @@ class NewWorkOutPanel extends StatefulWidget {
 }
 
 class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderStateMixin{
-  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
+  late CnNewWorkOutPanel cnNewWorkout;
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
@@ -83,6 +83,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
     return PopScope(
       canPop: false,
@@ -1178,7 +1179,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
     }
     else if (cnNewWorkout.formKey.currentState!.validate()){
       vibrateConfirm();
-      Workout woToSave = Workout.clone(cnNewWorkout.workout);
+      // Workout woToSave = Workout.clone(cnNewWorkout.workout);
       // _formKey.currentState?.reset();
       cnNewWorkout.updateExercisesOrderInWorkoutObject();
       if(!cnNewWorkout.isUpdating){
@@ -1212,10 +1213,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           }
         }
       }
-      await cnNewWorkout.closePanel(doClear: true, context: context);
+      Workout woToSave = Workout.clone(cnNewWorkout.workout);
       woToSave.saveToDatabase();
-      cnWorkouts.refreshAllWorkouts();
+      await cnWorkouts.refreshAllWorkouts();
       await cnWorkoutHistory.refreshAllWorkouts();
+      await cnNewWorkout.closePanel(doClear: true, context: context);
+
       cnNewExercisePanel.clear();
       saveCurrentData(cnConfig);
     }
@@ -1754,13 +1757,13 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         return 1;
       }
 
-      if(a.isLink && b.isLink){
-        // print((a.linkName??"") + " " + a.isExercise.toString());
-        // print((b.linkName??"") + " " + b.isExercise.toString());
-        // print("0");
-        // print("");
-        return 0;
-      }
+      // if(a.isLink && b.isLink){
+      //   // print((a.linkName??"") + " " + a.isExercise.toString());
+      //   // print((b.linkName??"") + " " + b.isExercise.toString());
+      //   // print("0");
+      //   // print("");
+      //   return 0;
+      // }
 
       if(a.isExercise && b.isLink){
         // print((a.linkName??"") + " " + a.isExercise.toString());
@@ -1773,6 +1776,15 @@ class CnNewWorkOutPanel extends ChangeNotifier{
           // print("-1");
           // print("");
           return -1;
+        }
+      }
+
+      if(a.isExercise && b.isExercise){
+        if(a.linkName == b.linkName){
+          return 0;
+        }
+        else if(a.linkName != b.linkName && !a.exercise!.blockLink && !b.exercise!.blockLink){
+          return 1;
         }
       }
 

@@ -37,8 +37,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
-  late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
-  late CnConfig cnConfig = Provider.of<CnConfig>(context);
+  late CnScreenStatistics cnScreenStatistics;
+  late CnConfig cnConfig;
   bool setOrientation = false;
   bool _showLoadingIndicator = false;
   PanelController controllerExplainBackups = PanelController();
@@ -69,6 +69,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
 
   @override
   Widget build(BuildContext context) {
+    cnConfig = Provider.of<CnConfig>(context);
+    cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
     return PopScope(
         canPop: true,
@@ -653,7 +655,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                       fontSize: 16.0
                   );
                   setState(() {
-                    _showLoadingIndicator = true;
+                    _showLoadingIndicator = false;
                   });
                 }
                 catch (_){

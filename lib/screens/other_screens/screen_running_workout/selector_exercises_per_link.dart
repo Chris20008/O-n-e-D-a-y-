@@ -36,7 +36,7 @@ class SelectorExercisesPerLink extends StatefulWidget {
 class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
 
   /// listen to bottomMenu for height changes
-  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context);
+  late CnBottomMenu cnBottomMenu;
   late List<List<bool>> isCheckedList;
   Map groupedExercises = {};
   ScrollController sc = ScrollController();
@@ -58,6 +58,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
 
   @override
   Widget build(BuildContext context) {
+    cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
     final linkNames = groupedExercises.keys.toList();
 
