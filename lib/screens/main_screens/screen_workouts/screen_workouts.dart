@@ -1,5 +1,5 @@
 import 'package:fitness_app/main.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';

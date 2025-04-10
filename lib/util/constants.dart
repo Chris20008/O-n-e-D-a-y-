@@ -17,7 +17,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
-import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 List<Color> linkColors = [

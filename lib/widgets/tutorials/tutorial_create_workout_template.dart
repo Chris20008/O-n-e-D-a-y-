@@ -6,7 +6,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
