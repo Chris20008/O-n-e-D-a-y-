@@ -5,6 +5,7 @@ import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/selectors/select_language_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -211,53 +212,52 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  Widget getSelectLanguageButton() {
-    return PullDownButton(
-      buttonAnchor: PullDownMenuAnchor.start,
-      routeTheme: routeTheme,
-      itemBuilder: (context) {
-        final currentLanguage = getLanguageAsString(context);
-        final List<String> lanAsStrings = languagesAsString.keys.toList();
-        List<PullDownMenuItem> buttons = List.generate(lanAsStrings.length, (index) {
-          return PullDownMenuItem.selectable(
-            selected: currentLanguage == lanAsStrings[index],
-            title: lanAsStrings[index],
-            onTap: () {
-              HapticFeedback.selectionClick();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                MyApp.of(context)?.setLocale(languageCode: languagesAsString[lanAsStrings[index]], config: cnConfig);
-              });
-            },
-          );
-        });
-        return buttons;
-      },
-      buttonBuilder: (context, showMenu) => CupertinoButton(
-        onPressed: (){
-          HapticFeedback.selectionClick();
-          showMenu();
-        },
-        padding: EdgeInsets.zero,
-        child: Row(
-          // mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              getLanguageAsString(context),
-              style: const TextStyle(
-                  color: Color(0xFFC16A03),
-                  fontSize: 16
-              ),
-            ),
-            const SizedBox(width: 6,),
-            trailingChoice(
-              color: activeColor
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget getSelectLanguageButton() {
+  //   return PullDownButton(
+  //     buttonAnchor: PullDownMenuAnchor.start,
+  //     routeTheme: routeTheme,
+  //     itemBuilder: (context) {
+  //       final currentLanguage = getLanguageAsString(context);
+  //       final List<String> lanAsStrings = languagesAsString.keys.toList();
+  //       List<PullDownMenuItem> buttons = List.generate(lanAsStrings.length, (index) {
+  //         return PullDownMenuItem.selectable(
+  //           selected: currentLanguage == lanAsStrings[index],
+  //           title: lanAsStrings[index],
+  //           onTap: () {
+  //             HapticFeedback.selectionClick();
+  //             Future.delayed(const Duration(milliseconds: 200), (){
+  //               MyApp.of(context)?.setLocale(languageCode: languagesAsString[lanAsStrings[index]], config: cnConfig);
+  //             });
+  //           },
+  //         );
+  //       });
+  //       return buttons;
+  //     },
+  //     buttonBuilder: (context, showMenu) => CupertinoButton(
+  //       onPressed: (){
+  //         HapticFeedback.selectionClick();
+  //         showMenu();
+  //       },
+  //       padding: EdgeInsets.zero,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             getLanguageAsString(context),
+  //             style: const TextStyle(
+  //                 color: Color(0xFFC16A03),
+  //                 fontSize: 16
+  //             ),
+  //           ),
+  //           const SizedBox(width: 6,),
+  //           trailingChoice(
+  //             color: activeColor
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   /// Screen One
   Widget screenOne(){
@@ -304,7 +304,26 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 AppLocalizations.of(context)!.welcomeSelectLanguage,
                 textScaler: const TextScaler.linear(1.1),
               ),
-              getSelectLanguageButton(),
+              SelectLanguageButton(
+                  cnConfig: cnConfig,
+                  buttonAnchor: PullDownMenuAnchor.start,
+                  buttonChild: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text(
+                        getLanguageAsString(context),
+                        style: const TextStyle(
+                            color: Color(0xFFC16A03),
+                            fontSize: 16
+                        ),
+                      ),
+                      const SizedBox(width: 6,),
+                      trailingChoice(
+                          color: activeColor
+                      )
+                    ],
+                  )
+              ),
             ],
           ),
         ),

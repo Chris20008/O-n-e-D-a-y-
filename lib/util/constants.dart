@@ -208,18 +208,6 @@ Future openUrl(String url)async{
   }
 }
 
-Future<void> sendMail({required String subject}) async {
-  const email = "OneDayApp@icloud.com";
-  final String emailSubject = subject;
-  final Uri parsedMailto = Uri.parse("mailto:<$email>?subject=$emailSubject");
-  if (!await launchUrl(
-    parsedMailto,
-    mode: LaunchMode.externalApplication,
-  )) {
-    throw Exception('Could not send Mail');
-  }
-}
-
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,
   width: 0.5,

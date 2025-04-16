@@ -5,7 +5,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/selecto
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/setRow.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
-import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/initial_animated_screen.dart';

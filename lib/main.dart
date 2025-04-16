@@ -8,7 +8,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/animate
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
-import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/language_config.dart';

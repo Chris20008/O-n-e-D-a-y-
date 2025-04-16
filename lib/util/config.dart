@@ -1,5 +1,5 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/util/backup_functions.dart';
+import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
