@@ -23,14 +23,19 @@ class WorkoutDatePicker extends StatelessWidget {
             Text(AppLocalizations.of(context)!.panelWoDate, textScaler: const TextScaler.linear(1.3),),
             const Spacer(),
             if(cnNewWorkout.workout.date != null)
-              buildCalendarDialogButton(
-                  context: context,
-                  dateValues: [cnNewWorkout.workout.date?? DateTime.now()],
-                  cnNewWorkout: cnNewWorkout,
-                  onConfirm: (List<DateTime?>? values){
-                    cnNewWorkout.workout.date = values?[0]?? cnNewWorkout.workout.date;
-                    cnNewWorkout.refresh();
-                  }
+              StatefulBuilder(
+                  builder: (context, setModalState) {
+                  return buildCalendarDialogButton(
+                      context: context,
+                      dateValues: [cnNewWorkout.workout.date?? DateTime.now()],
+                      cnNewWorkout: cnNewWorkout,
+                      onConfirm: (List<DateTime?>? values){
+                        cnNewWorkout.workout.date = values?[0]?? cnNewWorkout.workout.date;
+                        // cnNewWorkout.refresh();
+                        setModalState((){});
+                      }
+                  );
+                }
               )
           ],
         ),

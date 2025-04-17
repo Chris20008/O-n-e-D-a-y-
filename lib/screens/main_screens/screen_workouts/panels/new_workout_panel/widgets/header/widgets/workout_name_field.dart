@@ -18,16 +18,18 @@ class WorkoutNameField extends StatelessWidget {
     BuildContext context
     ) {
     value = value?.trim();
-    final nameExists = workoutNameExistsInTemplates(workoutName: cnNewWorkout.workout.name);
-    final isTemplate = cnNewWorkout.workout.isTemplate;
-    final nameHasChanged = cnNewWorkout.workout.name.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase();
-    
+
     if (value == null || value.isEmpty) {
       return AppLocalizations.of(context)!.panelWoEnterName;
     }
+
+    final nameExists = workoutNameExistsInTemplates(workoutName: value);
+    final isTemplate = cnNewWorkout.workout.isTemplate;
+    final nameHasChanged = value.toLowerCase() != cnNewWorkout.originalWorkout.name.toLowerCase();
+
     /// Check if the workout name already exists, but only when the current name is different from the
     /// initializing name. Otherwise editing an existing workout could lead to error
-    else if(isTemplate   &&           /// only check if template
+    if(isTemplate   &&           /// only check if template
             nameHasChanged &&         /// Name is not equal to initial name when opening editing
             nameExists                /// Name exists in database
     ){
@@ -57,32 +59,36 @@ class WorkoutNameField extends StatelessWidget {
 
     return Form(
       key: cnNewWorkout.formKey,
-      child: TextFormField(
-        focusNode: cnNewWorkout.focusNodeTextFieldWorkoutName,
-        textInputAction: tutorialIsRunning ? TextInputAction.next : TextInputAction.done,
-        onFieldSubmitted: tutorialIsRunning ? (value){
-          if(tutorialIsRunning && value.isNotEmpty){
-            cnHomepage.tutorial?.next();
-            blockUserInput(context, duration: 1500);
-            FocusManager.instance.primaryFocus?.unfocus();
-          }
-        } : null,
-        key: cnNewWorkout.keyTextFieldWorkoutName,
-        keyboardAppearance: Brightness.dark,
-        autovalidateMode: AutovalidateMode.onUserInteraction,
-        validator: (value) => validateTextInput(value, cnNewWorkout, context),
-        onTap: () => onTap(cnNewWorkout),
-        style: const TextStyle(
-          fontSize: 20
-        ),
-        controller: cnNewWorkout.workoutNameController,
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-          labelText: AppLocalizations.of(context)!.name,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
-        ),
-        onChanged: (value){
-          cnNewWorkout.workout.name = value;
+      child: Consumer<CnNewWorkOutPanel>(
+        builder: (BuildContext context, value, Widget? child) {
+          return TextFormField(
+            focusNode: cnNewWorkout.focusNodeTextFieldWorkoutName,
+            textInputAction: tutorialIsRunning ? TextInputAction.next : TextInputAction.done,
+            onFieldSubmitted: tutorialIsRunning ? (value){
+              if(tutorialIsRunning && value.isNotEmpty){
+                cnHomepage.tutorial?.next();
+                blockUserInput(context, duration: 1500);
+                FocusManager.instance.primaryFocus?.unfocus();
+              }
+            } : null,
+            key: cnNewWorkout.keyTextFieldWorkoutName,
+            keyboardAppearance: Brightness.dark,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) => validateTextInput(value, cnNewWorkout, context),
+            onTap: () => onTap(cnNewWorkout),
+            style: const TextStyle(
+                fontSize: 20
+            ),
+            controller: cnNewWorkout.workoutNameController,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              labelText: AppLocalizations.of(context)!.name,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8 ,vertical: 0.0),
+            ),
+            onChanged: (value){
+              cnNewWorkout.workout.name = value;
+            },
+          );
         },
       ),
     );

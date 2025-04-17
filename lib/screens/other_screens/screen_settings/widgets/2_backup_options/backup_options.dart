@@ -1,3 +1,5 @@
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/2_backup_options/widgets/selector_create_backup.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/2_backup_options/widgets/selector_load_backup.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
 import 'package:fitness_app/main.dart';
@@ -8,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'components/selector_create_backup.dart';
-import 'components/selector_load_backup.dart';
 
 class BackupOptions extends StatelessWidget {
 

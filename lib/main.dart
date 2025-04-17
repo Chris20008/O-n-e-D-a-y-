@@ -395,7 +395,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
                       const NewExercisePanel(),
 
-                      const AllExercisesPanel(),
+                      // const AllExercisesPanel(),
                     ],
                   )
 
