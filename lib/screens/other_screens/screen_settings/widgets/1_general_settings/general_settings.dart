@@ -103,7 +103,7 @@ class GeneralSettings extends StatelessWidget {
                         Navigator.pop(context);
                       },
                       isDefaultAction: false,
-                      child: Text(AppLocalizations.of(context)!.no),
+                      child: Text(AppLocalizations.of(context)!.no, style: cupButtonTextStyleOnlyFontSize),
                     ),
                   ],
                 ),

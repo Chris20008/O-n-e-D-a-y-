@@ -8,7 +8,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwat
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
-import 'package:fitness_app/widgets/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -928,7 +928,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 openPopUpConfirmCancelWorkout();
               });
             },
-            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout),
+            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
           ),
           if(canFinish)
             CupertinoActionSheetAction(
@@ -984,7 +984,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               stopWorkout();
               Navigator.pop(context);
             },
-            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout),
+            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
           ),
         ],
       ),

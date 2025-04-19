@@ -7,7 +7,8 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
-import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -19,12 +20,10 @@ import '../../../../../objects/workout.dart';
 import '../../../../../util/constants.dart';
 import '../../../../../util/objectbox/ob_workout.dart';
 import '../../../../../widgets/bottom_menu.dart';
-import '../../../../../widgets/spotify_bar.dart';
 import '../../../../../widgets/standard_popup.dart';
-import '../../../../other_screens/screen_running_workout/screen_running_workout.dart';
 import '../../../screen_workout_history/screen_workout_history.dart';
 import '../../screen_workouts.dart';
-import '../new_exercise_panel.dart';
+import '../new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/header/header.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
@@ -38,23 +37,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   late CnNewWorkOutPanel cnNewWorkout;
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
-  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  late CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
-  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
-  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
-  late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
-  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  // late final _color = Theme.of(context).primaryColor;
-  // final _color = const Color(0xff120a01);
-  // final _color = const Color(0xff221b14);
-  // final _color = const Color(0xff231b13);
-  // Color _color = const Color(0xff663a0b);
-  // final _color = const Color(0xff1c1001);
-  late final _color = Theme.of(context).primaryColor;
-  // bool blockUi = false;
-  // double heightSpacerExerciseRow = 8;
-  // Offset lastPointerPosition = const Offset(0, 0);
 
   @override
   void initState() {
@@ -96,7 +78,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           backdropEnabled: false,
           animationControllerName: "NewWorkoutPanel",
           descendantAnimationControllerName: "ScreenWorkouts",
-          color: _color,
+          color: Theme.of(context).primaryColor,
           onPanelSlide: onPanelSlide,
           panelBuilder: (context, listView){
             return GestureDetector(
@@ -139,9 +121,9 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   void onPanelSlide(value){
     if(value == 0){
-      if(cnNewWorkout.minPanelHeight == 0){
-        cnNewWorkout.clear(doRefresh: true);
-      }
+      // if(cnNewWorkout.minPanelHeight == 0){
+      //   cnNewWorkout.clear(doRefresh: true);
+      // }
       cnNewWorkout.refresh();
     }
     else if(value == 1){
@@ -321,16 +303,16 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
     if(panelController.isPanelOpen){
       cnNewExercisePanel.openPanel(workout: workout, exercise: exToEdit, onConfirm: confirmAddExercise);
-      cnNewExercisePanel.refresh();
     }
   }
 
   Future openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
-    minPanelHeight = keepShowingPanelHeight;
+    // minPanelHeight = keepShowingPanelHeight;
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     refresh();
     await openPanel();
+    minPanelHeight = keepShowingPanelHeight;
     /// is needed to move spotifyBar higher when panel is opened
     cnHomepage.refresh();
     /// is needed to move addWorkout button higher when panel is opened
@@ -442,6 +424,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     if(!workout.isTemplate){
       return false;
     }
+    exerciseNewNameMapping.clear();
 
     /// calculate Exercises that have had a name change
     final changedExercises = originalWorkout.exercises.where(

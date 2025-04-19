@@ -1,0 +1,96 @@
+import 'package:fitness_app/main.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/functions/on_reorder.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/footer.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/slidable_single_set_proxy_decorator.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/exercise_options_selectors.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/slidable_single_set/slidable_single_set.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/standard_popup.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+class SetListView extends StatefulWidget {
+  final PanelListViewBuilder listView;
+
+  const SetListView({
+    super.key,
+    required this.listView
+  });
+
+  @override
+  State<SetListView> createState() => _SetListViewState();
+}
+
+class _SetListViewState extends State<SetListView> {
+
+  late CnNewExercisePanel cnNewExercise;
+  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
+  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+
+  @override
+  Widget build(BuildContext context) {
+
+    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    double insetsBottom = MediaQuery.of(context).viewInsets.bottom;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    return SlidableAutoCloseBehavior(
+      child: widget.listView(
+        padding: EdgeInsets.only(top: cnNewExercise.heightHeader),
+        controller: cnNewExercise.scrollController,
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: true,
+        children: [
+
+          const ExerciseOptionsSelectors(),
+
+          const SizedBox(height: 15,),
+
+          Row(
+            children: [
+              Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+            ],
+          ),
+
+          ReorderableListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(top: 10),
+            shrinkWrap: true,
+            itemCount: cnNewExercise.exercise.sets.length,
+            itemBuilder: (BuildContext context, int index) {
+              return SlidableSingleSet(
+                  key: tutorialIsRunning && index == 0 && cnNewExercise.useTutorialKey? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
+                  index: index,
+                  insetsBottom: insetsBottom,
+                  screenHeight: screenHeight,
+                  cnHomepage: cnHomepage,
+                  cnNewExercise: cnNewExercise
+              );
+            },
+            proxyDecorator: (Widget child, int index, Animation<double> animation) =>
+                SlidableSingleSetProxyDecorator(
+                    index: index,
+                    animation: animation,
+                    child: child
+                ),
+            onReorder: (int oldIndex, int newIndex) => onReorder(oldIndex, newIndex, setState, cnNewExercise),
+          ),
+
+          const Footer()
+        ],
+      ),
+    );
+  }
+}
+
+

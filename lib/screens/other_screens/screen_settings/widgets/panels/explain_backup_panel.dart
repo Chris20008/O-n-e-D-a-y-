@@ -1,4 +1,4 @@
-import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';

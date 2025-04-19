@@ -2,6 +2,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/set_type_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -74,8 +75,7 @@ class SetRow extends StatelessWidget {
           children: [
 
             /// Set
-            getSet(
-                context: context,
+            SetTypeSelector(
                 index: set.index,
                 newEx: set.ex,
                 width: _widthOfTextField,

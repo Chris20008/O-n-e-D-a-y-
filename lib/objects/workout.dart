@@ -160,6 +160,7 @@ class Workout{
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       final index = existingExercises.indexOf(exercise.originalName!);
       exercises[index] = exercise;
+      List<String> existingExercises2 = exercises.map((e) => e.name).toList();
     }
     else{
       exercises.add(

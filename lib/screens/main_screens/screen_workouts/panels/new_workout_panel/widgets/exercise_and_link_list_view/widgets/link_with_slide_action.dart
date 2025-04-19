@@ -1,6 +1,6 @@
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/config.dart';

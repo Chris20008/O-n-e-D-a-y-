@@ -1,4 +1,4 @@
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/util/config.dart';

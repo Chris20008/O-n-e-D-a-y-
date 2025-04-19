@@ -6,7 +6,7 @@ import 'package:fitness_app/screens/other_screens/screen_settings/widgets/2_back
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/3_about_section/about_section.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/panels/explain_backup_panel.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
-import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

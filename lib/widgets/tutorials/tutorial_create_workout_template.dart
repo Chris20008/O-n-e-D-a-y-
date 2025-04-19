@@ -1,6 +1,6 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';

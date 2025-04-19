@@ -55,7 +55,7 @@ class LinkButton extends StatelessWidget {
                               HapticFeedback.selectionClick();
                               FocusManager.instance.primaryFocus?.unfocus();
                             },
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.info_outline_rounded,
                               color: Colors.white54,
                             )

@@ -1,9 +1,9 @@
 import 'dart:ui';
-
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/add_exercise_button.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -13,7 +13,7 @@ import 'functions/ask_delete_workout.dart';
 import 'functions/get_reorderable_exercises_and_links.dart';
 
 class ExerciseAndLinkListView extends StatefulWidget {
-  final Function listView;
+  final PanelListViewBuilder listView;
 
   const ExerciseAndLinkListView({
     super.key,
@@ -32,7 +32,6 @@ class _ExerciseAndLinkListViewState extends State<ExerciseAndLinkListView> {
   Widget build(BuildContext context) {
 
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
-    // print("REBUILD");
 
     return SlidableAutoCloseBehavior(
       child: widget.listView(
@@ -81,7 +80,7 @@ class _ExerciseAndLinkListViewState extends State<ExerciseAndLinkListView> {
                 cnNewWorkout.updateExercisesLinks();
               });
             },
-            children: getReorderableExercisesAndLinks(context: context),
+            children: getReorderableExercisesAndLinks(cnNewWorkout: cnNewWorkout),
           ),
           if(!cnNewWorkout.isSickDays)
             AddExerciseButton(

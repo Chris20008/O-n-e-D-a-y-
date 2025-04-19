@@ -117,7 +117,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                                             );
                                           }
                                         },
-                                        child: Text(AppLocalizations.of(context)!.yes),
+                                        child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
                                       ),
                                     ],
                                   ),

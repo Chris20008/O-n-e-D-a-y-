@@ -3,8 +3,8 @@ import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statis
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
-import 'package:fitness_app/widgets/initial_animated_screen.dart';
-import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/selectors/select_language_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/functions/add_exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:provider/provider.dart';
 

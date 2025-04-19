@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
@@ -16,7 +16,7 @@ import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
-import 'package:fitness_app/widgets/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/show_new_features_pop_up.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';

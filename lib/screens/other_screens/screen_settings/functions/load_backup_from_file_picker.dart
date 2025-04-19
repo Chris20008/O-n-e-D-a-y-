@@ -81,7 +81,7 @@ Future loadBackupFromFilePicker({
                 );
               }
             },
-            child: Text(AppLocalizations.of(context)!.yes),
+            child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
           ),
         ],
       ),

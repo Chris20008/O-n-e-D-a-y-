@@ -1,7 +1,7 @@
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
-import 'package:fitness_app/widgets/my_slide_up_panel.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

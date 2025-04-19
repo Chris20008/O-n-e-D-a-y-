@@ -8,7 +8,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
-import 'package:fitness_app/widgets/initial_animated_screen.dart';
+import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -435,7 +435,6 @@ class CnScreenStatistics extends ChangeNotifier {
   List<HealthDataPointWrapper> healthData = [];
 
   /// Settings variables
-  // late final AnimationController animationControllerStatisticsScreen;
   final PanelController panelControllerSettings = PanelController();
 
   CnScreenStatistics(BuildContext context){

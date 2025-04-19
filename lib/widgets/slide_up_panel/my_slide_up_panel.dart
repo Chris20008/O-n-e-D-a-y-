@@ -27,18 +27,7 @@ class MySlideUpPanel extends StatefulWidget {
   final bool bounce;
   final Widget Function(
       BuildContext context,
-      Widget Function({
-        ScrollPhysics physics,
-        EdgeInsets padding,
-        bool shrinkWrap,
-        bool autoScroll,
-        Widget? child,
-        List<Widget>? children,
-        required ScrollController controller,
-        Widget? Function(BuildContext context, int index)? itemBuilder,
-        Widget Function(BuildContext context, int index)? separatorBuilder,
-        int? itemCount
-      })
+      PanelListViewBuilder listView
       )? panelBuilder;
 
   const MySlideUpPanel({
@@ -54,11 +43,9 @@ class MySlideUpPanel extends StatefulWidget {
     this.panel,
     this.backdropEnabled = false,
     this.backdropColor = Colors.black,
-    // this.panelBuilder,
     this.backdropOpacity = 0.5,
     this.animationControllerName,
     this.descendantAnimationControllerName,
-    // this.scrollControllerInnerList,
     this.isTouchingListView = false,
     this.panelBuilder,
     this.bounce = true,
@@ -98,6 +85,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   bool bounceAllowed = false;
   bool recognizedLongPress = false;
   bool? isDraggingVertical;
+
+  late Widget Function(BuildContext, PanelListViewBuilder)? currentBuilder = widget.panelBuilder;
+  late Widget Function(BuildContext, PanelListViewBuilder)? lastBuilder = null;
 
   @override
   void initState() {
@@ -147,6 +137,10 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   }
 
   onPanelSlide(double value){
+    if(currentBuilder != lastBuilder){
+      print("New Key");
+      lastBuilder = currentBuilder;
+    }
     if(descendantAnimationController != null){
       descendantAnimationController!.value = value*0.5;
     }
@@ -313,21 +307,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
         longPressTimer?.cancel();
       },
       child: getDynamicListView()
-      // child: children != null
-      //     ? ListView(
-      //         controller: controller,
-      //         physics: physics,
-      //         shrinkWrap: shrinkWrap,
-      //         padding: padding,
-      //         children: children,
-      //       )
-      //     : SingleChildScrollView(
-      //       controller: controller,
-      //       physics: physics,
-      //       // shrinkWrap: shrinkWrap,
-      //       padding: padding,
-      //       child: child,
-      //     ),
     );
   }
 
@@ -433,7 +412,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 defaultPanelState: widget.defaultPanelState,
                 maxHeight: panelHeight,
                 minHeight: widget.minHeight?? 0,
-                // isDraggable: widget.isDraggable, /// && !panelDragRunning,
                 borderRadius: widget.borderRadius,
                 color: color,
                 isDraggable: widget.isDraggable,
@@ -448,7 +426,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                   borderRadius: widget.borderRadius,
                   child: widget.panel?? widget.panelBuilder!(context, myListView),
                 ),
-                // panelBuilder: widget.panelBuilder,
                 backdropEnabled: widget.backdropEnabled,
                 backdropColor: widget.backdropColor,
                 backdropOpacity: widget.backdropOpacity
@@ -475,9 +452,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
             /// with backdrop AND this AnimatedBuilder together
             opacity = opacity > 0.5 ? 1 - opacity : opacity;
             opacity = opacity * 0.5;
-
-            // /// Transform y position
-            // double y = animationController.value * 10;
 
             return Stack(
               children: [
@@ -511,3 +485,16 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     return panel;
   }
 }
+
+typedef PanelListViewBuilder = Widget Function({
+  bool autoScroll,
+  Widget? child,
+  List<Widget>? children,
+  required ScrollController controller,
+  Widget? Function(BuildContext, int)? itemBuilder,
+  int? itemCount,
+  EdgeInsets padding,
+  ScrollPhysics physics,
+  Widget Function(BuildContext, int)? separatorBuilder,
+  bool shrinkWrap,
+});

@@ -213,7 +213,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
 
               Navigator.pop(context);
             },
-            child: Text(AppLocalizations.of(context)!.yes),
+            child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
           ),
         ],
       ),

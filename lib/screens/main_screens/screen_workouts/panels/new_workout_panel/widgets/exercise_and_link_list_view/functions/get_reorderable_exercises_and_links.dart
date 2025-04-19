@@ -3,13 +3,12 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/exercise_with_slide_action/exercise_with_slide_action.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/link_with_slide_action.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:provider/provider.dart';
 
 List<Widget> getReorderableExercisesAndLinks({
-  required BuildContext context,
+  required CnNewWorkOutPanel cnNewWorkout,
 }){
 
-  CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  // CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
 
   List <Widget> children = [];
   for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1) {

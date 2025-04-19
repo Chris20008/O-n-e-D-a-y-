@@ -20,7 +20,7 @@ Future askDeleteWorkout(BuildContext context) async {
             deleteWorkout(context: context);
             Navigator.pop(context);
           },
-          child: Text(AppLocalizations.of(context)!.delete),
+          child: Text(AppLocalizations.of(context)!.delete, style: cupButtonTextStyleOnlyFontSize),
         ),
       ],
     ),
