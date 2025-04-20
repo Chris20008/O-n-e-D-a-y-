@@ -31,7 +31,6 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
   Widget build(BuildContext context) {
 
     if(!widget.withSlideActions){
-      // return SizedBox();
       return Container(
         decoration: BoxDecoration(
             color: Theme.of(context).cardColor,

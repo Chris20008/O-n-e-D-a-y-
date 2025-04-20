@@ -127,19 +127,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       cnNewWorkout.refresh();
     }
     else if(value == 1){
-      if(!cnNewWorkout.panelHasFullyOpened){
-        Future.delayed(const Duration(milliseconds: 500), (){
-          if(cnNewWorkout.panelController.panelPosition == 1){
-            cnNewWorkout.panelHasFullyOpened = true;
-            cnNewWorkout.refresh();
-          }
-        });
-      }
-      else{
-        cnNewWorkout.refresh();
-      }
-      // cnNewWorkout.panelHasFullyOpened = true;
-      // cnNewWorkout.refresh();
+      cnNewWorkout.panelHasFullyOpened = true;
+      cnNewWorkout.refresh();
     }
     cnBottomMenu.adjustHeight(value);
   }
@@ -325,10 +314,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     refresh();
     await openPanel();
-    if(panelController.panelPosition < 0.5){
-      return;
-    }
-    // minPanelHeight = keepShowingPanelHeight;
+    minPanelHeight = keepShowingPanelHeight;
     /// is needed to move spotifyBar higher when panel is opened
     cnHomepage.refresh();
     /// is needed to move addWorkout button higher when panel is opened
@@ -342,9 +328,6 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         duration: const Duration(milliseconds: 500),
         curve: Curves.fastEaseInToSlowEaseOut
     );
-    minPanelHeight = keepShowingPanelHeight;
-    refresh();
-    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   void dismissExercise(SlidableExerciseOrLink ex){
