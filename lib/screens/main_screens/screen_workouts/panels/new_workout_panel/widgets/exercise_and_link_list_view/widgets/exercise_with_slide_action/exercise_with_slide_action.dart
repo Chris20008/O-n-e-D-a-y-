@@ -60,6 +60,7 @@ class ExerciseWithSlideAction extends StatelessWidget {
     );
 
     if(!withSlideActions){
+      // return SizedBox();
       return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
