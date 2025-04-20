@@ -1,40 +1,96 @@
-import 'package:fitness_app/objects/exercise.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/exercise_with_slide_action/functions/end_action_pane.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/functions/end_action_pane.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/exercise_with_slide_action/widgets/exercise_row_with_link_icon.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/slidable_exercise_or_link.dart';
 import 'package:fitness_app/widgets/spacer_list_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
 import 'functions/start_action_pane.dart';
 
 class ExerciseWithSlideAction extends StatelessWidget {
-  final int index;
-  final CnNewWorkOutPanel cnNewWorkout;
+  // final int index;
+  final SlidableExerciseOrLink exercise;
+  final bool withSpacer;
+  final bool isTotalLastItem;
+  final bool isLastItemInGroup;
+  final double heightSpacerExerciseRow;
+  final Function onDismissed;
+  final Function onTap;
+  final Function onTapCopy;
+  final Function onTapChangeLinkState;
+  final bool withSlideActions;
 
   const ExerciseWithSlideAction({
     super.key,
-    required this.index,
-    required this.cnNewWorkout
+    // required this.index,
+    required this.exercise,
+    required this.withSpacer,
+    required this.isTotalLastItem,
+    required this.isLastItemInGroup,
+    required this.heightSpacerExerciseRow,
+    required this.onDismissed,
+    required this.onTap,
+    required this.onTapCopy,
+    required this.onTapChangeLinkState,
+    required this.withSlideActions,
   });
 
   @override
   Widget build(BuildContext context) {
 
-    final bool hasLink = (cnNewWorkout.exercisesAndLinks[index].exercise as Exercise).linkName != null;
-    Exercise? nextExercise =  cnNewWorkout.exercisesAndLinks.length > index+1
-        && cnNewWorkout.exercisesAndLinks[index+1].isExercise
-        ? cnNewWorkout.exercisesAndLinks[index+1].exercise!
-        : null;
-    bool withSpacer = nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName
-        || (nextExercise?.blockLink?? false)
-        || (nextExercise?.linkName == null);
+    final Widget exerciseRow = CupertinoButton(
+      pressedOpacity: MediaQuery.of(context).viewInsets.bottom <= 0? 0.4 : 1,
+      padding: EdgeInsets.zero,
+      onPressed: (){
+        if(MediaQuery.of(context).viewInsets.bottom <= 0){
+          onTap();
+        } else{
+          FocusScope.of(context).unfocus();
+        }
+      },
+      child: ExerciseRowWithLinkIcon(
+        exercise: exercise.exercise!,
+        borderRadius: getBorderRadius(
+            hasLink: exercise.hasLink,
+            isTotalLastItem: isTotalLastItem,
+            isLastItemInGroup: isLastItemInGroup
+        ),
+        hasLink: exercise.hasLink,
+      ),
+    );
+
+    if(!withSlideActions){
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (exercise.hasLink)
+            SpaceFixerHorizontalLine(
+              context: context,
+              overflowHeight: 2,
+              width: MediaQuery.of(context).size.width - 40,
+              overflowColor: Theme.of(context).cardColor,
+            ),
+          Container(
+              height: exercise.hasLink? 70 : 75,
+              decoration: BoxDecoration(
+                borderRadius: getBorderRadius(
+                    hasLink: exercise.hasLink,
+                    isTotalLastItem: isTotalLastItem,
+                    isLastItemInGroup: isLastItemInGroup
+                ),
+                color: Theme.of(context).cardColor,
+              ),
+              margin: EdgeInsets.only(bottom: withSpacer? heightSpacerExerciseRow : 0),
+              child: exerciseRow
+          )
+        ],
+      );
+    }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (hasLink)
+        if (exercise.hasLink)
           SpaceFixerHorizontalLine(
             context: context,
             overflowHeight: 2,
@@ -42,50 +98,45 @@ class ExerciseWithSlideAction extends StatelessWidget {
             overflowColor: Theme.of(context).cardColor,
           ),
         Slidable(
-            key: cnNewWorkout.exercisesAndLinks[index].key,
-            controller: cnNewWorkout.exercisesAndLinks[index].slidableController,
+            key: exercise.key,
+            controller: exercise.slidableController,
             closeOnScroll: false,
             groupTag: 1,
-            endActionPane: buildExerciseEndActionPane(index: index, cnNewWorkout: cnNewWorkout),
-            startActionPane: buildExerciseStartActionPane(index: index, cnNewWorkout: cnNewWorkout),
+            endActionPane: buildEndActionPane(onDismissed: onDismissed),
+            startActionPane: buildExerciseStartActionPane(
+                exercise: exercise.exercise!,
+                onTapCopy: onTapCopy,
+                onTapChangeLinkState: onTapChangeLinkState
+            ),
             child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                height: hasLink? 70 : 75,
-                child: ClipRRect(
-                  borderRadius: getBorderRadius(hasLink, nextExercise),
-                  child: Material(
-                    color: Theme.of(context).cardColor,
-                    child: CupertinoButton(
-                      pressedOpacity: MediaQuery.of(context).viewInsets.bottom <= 0? 0.4 : 1,
-                      padding: EdgeInsets.zero,
-                      onPressed: (){
-                        if(MediaQuery.of(context).viewInsets.bottom <= 0){
-                          cnNewWorkout.openExercise(cnNewWorkout.exercisesAndLinks[index].exercise!, context: context);
-                        } else{
-                          FocusScope.of(context).unfocus();
-                        }
-                      },
-                      child: ExerciseRowWithLinkIcon(
-                          exercise: cnNewWorkout.exercisesAndLinks[index].exercise!,
-                          borderRadius: getBorderRadius(hasLink, nextExercise),
-                          hasLink: hasLink,
-                      ),
-                    ),
+                height: exercise.hasLink? 70 : 75,
+                decoration: BoxDecoration(
+                  borderRadius: getBorderRadius(
+                      hasLink: exercise.hasLink,
+                      isTotalLastItem: isTotalLastItem,
+                      isLastItemInGroup: isLastItemInGroup
                   ),
-                )
+                  color: Theme.of(context).cardColor,
+                ),
+                child: exerciseRow
             )
         ),
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
-          height: withSpacer? cnNewWorkout.heightSpacerExerciseRow : 0,
+          height: withSpacer? heightSpacerExerciseRow : 0,
         )
       ],
     );
   }
 
-  BorderRadius getBorderRadius(bool hasLink, Exercise? nextExercise){
+  BorderRadius getBorderRadius({
+    required bool hasLink,
+    required bool isTotalLastItem,
+    required bool isLastItemInGroup
+  }){
     if (hasLink){
-      if(nextExercise?.linkName != cnNewWorkout.exercisesAndLinks[index].linkName || nextExercise == null){
+      if(isTotalLastItem || isLastItemInGroup){
         return const BorderRadius.only(bottomLeft: Radius.circular(8), bottomRight: Radius.circular(8));
       }
       return BorderRadius.zero;

@@ -1,15 +1,13 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
-import 'package:provider/provider.dart';
 
 Future moveTile({
   required double startY,
   required double endY,
-  required BuildContext context
+  required CnNewWorkOutPanel cnNewWorkout
 }) async{
-  CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
-
+  // CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+  print("move Tiel");
   cnNewWorkout.blockUi = true;
   cnNewWorkout.refresh();
 

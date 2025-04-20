@@ -138,7 +138,6 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
   onPanelSlide(double value){
     if(currentBuilder != lastBuilder){
-      print("New Key");
       lastBuilder = currentBuilder;
     }
     if(descendantAnimationController != null){

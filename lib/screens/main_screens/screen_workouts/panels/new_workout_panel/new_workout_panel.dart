@@ -104,7 +104,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                           child: ExerciseAndLinkListView(listView: listView),
                         ),
                         NewWorkoutHeader(
-                          tutorialIsRunning: tutorialIsRunning, 
+                          tutorialIsRunning: tutorialIsRunning,
                           currentTutorialStep: currentTutorialStep
                         ),
                       ],
@@ -127,6 +127,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
       cnNewWorkout.refresh();
     }
     else if(value == 1){
+      cnNewWorkout.panelHasFullyOpened = true;
       cnNewWorkout.refresh();
     }
     cnBottomMenu.adjustHeight(value);
@@ -157,6 +158,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   bool allowAnimateFirstExerciseSlide = true;
   bool allowAnimateFirstExerciseDrag = true;
   bool blockUi = false;
+  bool panelHasFullyOpened = false;
   double keepShowingPanelHeight = Platform.isAndroid? 180 : 212;
   double keepShowingPanelHeightSickDays = Platform.isAndroid? 210 : 242;
   Offset lastPointerPosition = const Offset(0, 0);
@@ -280,8 +282,8 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     await openPanelWithRefresh();
   }
 
-  void openExercise(Exercise ex, {bool copied = false, required BuildContext context}){
-    CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
+  void openExercise(Exercise ex, {bool copied = false, required CnNewExercisePanel cnNewExercisePanel}){
+    // CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
 
     /// Clone exercise to prevent directly change settings in original exercise before saving
     /// f.e. when user goes back or just slides down panel
@@ -662,6 +664,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
   void clear({bool doRefresh = true}){
     isSickDays = false;
+    panelHasFullyOpened = false;
     formKey.currentState?.reset();
     workout = Workout();
     originalWorkout = Workout();

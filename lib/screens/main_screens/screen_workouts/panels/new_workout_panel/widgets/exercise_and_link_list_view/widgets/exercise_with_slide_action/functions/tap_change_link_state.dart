@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,26 +8,26 @@ import 'move_tile.dart';
 
 const int delayChangeBlockLinkState = 200;
 
-Future tapChangeLinkState(
-    int index,
-    BuildContext context,
-    CnNewWorkOutPanel cnNewWorkout
-    ) async{
+Future tapChangeLinkState({
+  required int index,
+  required Exercise exercise,
+  required bool isTotalLastItem,
+  required bool isLastItemInGroup,
+  required CnNewWorkOutPanel cnNewWorkout
+}) async{
 
   /// Exercise with currently link not blocked
   /// Either above all groups, so has no link or currently part of a group
-  if(!cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink){
+  if(!exercise.blockLink){
 
     /// Either has no link name          ->  no animated moving necessary
     /// or is absolut last item          ->  no animated moving necessary
     /// or is last item in link group    ->  no animated moving necessary
-    if(cnNewWorkout.exercisesAndLinks[index].exercise?.linkName == null   /// has no linkname
-        // || cnNewWorkout.exercisesAndLinks[index].exercise!.blockLink      /// link is blocked
-        || cnNewWorkout.exercisesAndLinks.length-1 == index               /// is last item
-        || cnNewWorkout.exercisesAndLinks[index].exercise!.linkName
-            != cnNewWorkout.exercisesAndLinks[index+1].linkName           /// is last item in link group
+    if(exercise.linkName == null                                /// has no linkname
+        || isTotalLastItem                                      /// is last item
+        || isLastItemInGroup                                    /// is last item in link group
     ){
-      await changeBlockLinkState(index, cnNewWorkout, delay: delayChangeBlockLinkState);
+      await changeBlockLinkState(exercise, cnNewWorkout, delay: delayChangeBlockLinkState);
       return;
     }
 
@@ -35,7 +36,6 @@ Future tapChangeLinkState(
     /// This new position is the last position of it's current link group
 
     final newIndex = cnNewWorkout.exercisesAndLinks.lastIndexWhere((element) => element.linkName == cnNewWorkout.exercisesAndLinks[index].linkName);
-
     /// return if no new Index was found
     if(newIndex == -1){
       return;
@@ -48,25 +48,26 @@ Future tapChangeLinkState(
       distance += getWidgetSize(cnNewWorkout.exercisesAndLinks[index].key).height;
     }
 
-    /// move the file from old to new position by starting at the lastPointerPosition
+    /// move the tile from old to new position by starting at the lastPointerPosition
     /// to the lastPointerPosition + the calculated distance
-    await moveTile(startY: cnNewWorkout.lastPointerPosition.dy, endY: cnNewWorkout.lastPointerPosition.dy + distance, context: context);
+    await moveTile(startY: cnNewWorkout.lastPointerPosition.dy, endY: cnNewWorkout.lastPointerPosition.dy + distance, cnNewWorkout: cnNewWorkout);
 
     /// After that change the block link state
     /// If the blocking was deactivated
-    await changeBlockLinkState(newIndex, cnNewWorkout);
+    await changeBlockLinkState(exercise, cnNewWorkout);
   }
 
   else{
     final element = cnNewWorkout.exercisesAndLinks.lastWhereIndexedOrNull((previousIndex, element) => previousIndex < index && element.linkName != null);
+
     if(element == null){
-      await changeBlockLinkState(index, cnNewWorkout, delay: delayChangeBlockLinkState);
+      await changeBlockLinkState(exercise, cnNewWorkout, delay: delayChangeBlockLinkState);
       return;
     }
 
     final newIndex = cnNewWorkout.exercisesAndLinks.indexOf(element);
     if(index - newIndex == 1){
-      await changeBlockLinkState(index, cnNewWorkout, delay: delayChangeBlockLinkState);
+      await changeBlockLinkState(exercise, cnNewWorkout, delay: delayChangeBlockLinkState);
       return;
     }
     else{
@@ -80,9 +81,9 @@ Future tapChangeLinkState(
           distance += cnNewWorkout.heightSpacerExerciseRow;
         }
       }
-      await moveTile(startY: widgetPosition.dy, endY: widgetPosition.dy - distance, context: context);
+      await moveTile(startY: widgetPosition.dy, endY: widgetPosition.dy - distance, cnNewWorkout: cnNewWorkout);
 
-      await changeBlockLinkState(newIndex+1, cnNewWorkout);
+      await changeBlockLinkState(exercise, cnNewWorkout);
     }
   }
 }

@@ -18,4 +18,5 @@ class SlidableExerciseOrLink{
   bool get isLink => !isExercise;
   String get name => exercise?.name?? "";
   String? get linkName => isLink? _linkName : exercise?.linkName;
+  bool get hasLink => linkName != null;
 }

@@ -1,31 +1,32 @@
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/objects/exercise.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/exercise_with_slide_action/exercise_with_slide_action.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/widgets/link_with_slide_action.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/functions/get_exercise_or_link_child.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/functions/get_next_exercise.dart';
 import 'package:flutter/cupertino.dart';
 
 List<Widget> getReorderableExercisesAndLinks({
   required CnNewWorkOutPanel cnNewWorkout,
+  required CnNewExercisePanel cnNewExercisePanel,
 }){
-
-  // CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
 
   List <Widget> children = [];
   for(int index = 0; index < cnNewWorkout.exercisesAndLinks.length; index+=1) {
-    Widget child = const SizedBox();
-    if(cnNewWorkout.exercisesAndLinks[index].isExercise) {
-      child = ExerciseWithSlideAction(
-        key: index == 0 && tutorialIsRunning? cnNewWorkout.keyFirstExercise : ValueKey(cnNewWorkout.exercisesAndLinks[index].exercise!.name),
+
+    Exercise? nextExercise = getNextItemIfExercise(
+        index: index,
+        items: cnNewWorkout.exercisesAndLinks
+    );
+
+    Widget child = getExerciseOrLinkChild(
+        item: cnNewWorkout.exercisesAndLinks[index],
         index: index,
         cnNewWorkout: cnNewWorkout,
-      );
-    }
-    else if(cnNewWorkout.exercisesAndLinks[index].isLink) {
-      child = LinkWithSlideAction(
-          key: ValueKey(cnNewWorkout.exercisesAndLinks[index].linkName),
-          index: index
-      );
-    }
+        cnNewExercisePanel: cnNewExercisePanel,
+        isTotalLastItem: index+1 == cnNewWorkout.exercisesAndLinks.length,
+        isLastItemInGroup: nextExercise == null || nextExercise.linkName != cnNewWorkout.exercisesAndLinks[index].linkName
+    );
 
     if(index == 0 && tutorialIsRunning){
       child = AnimatedBuilder(
