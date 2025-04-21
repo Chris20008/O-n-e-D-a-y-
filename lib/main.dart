@@ -23,6 +23,7 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_create_workout_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -43,6 +44,7 @@ Color buttonTextColor = const Color(0xffdb7b01);
 
 void main() {
 
+  // debugRepaintRainbowEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
