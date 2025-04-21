@@ -300,9 +300,13 @@ List getWorkoutsAsStringList(){
 }
 
 Future<List<FileSystemEntity>> getLocalBackupFiles({int delay = 0}) async{
+  if(delay > 0){
+    await Future.delayed(Duration(milliseconds: delay));
+  }
+
   final path = await getLocalPath();
 
-  List<FileSystemEntity> localFiles = Directory("$path/").listSync().where((element) => element.path.contains("_Backup")).toList();
+  List<FileSystemEntity> localFiles = await Directory("$path/").list().where((element) => element.path.contains("_Backup")).toList();
   /// Todo: order list, on IOS at least it is not ordered, on Android it seems to be ordered
   // localFiles = localFiles.where((element) => element.path.contains("_Backup")).toList().reversed.toList();
 
@@ -326,9 +330,6 @@ Future<List<FileSystemEntity>> getLocalBackupFiles({int delay = 0}) async{
 
   /// Sort [fileList] by modification times, from oldest to newest.
   localFiles.sort((a, b) => b.path.split("_").last.compareTo(a.path.split("_").last));
-  if(delay > 0){
-    await Future.delayed(Duration(milliseconds: delay));
-  }
   return localFiles;
 }
 
