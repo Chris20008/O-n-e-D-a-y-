@@ -97,13 +97,14 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
                   child: Stack(
                     children: [
                       child?? const SizedBox(),
-                      IgnorePointer(
-                          ignoring: opacity > 0 ? false : true,
-                          child: Container(
-                            color: Colors.black.withOpacity(opacity),
-                            // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
-                          )
-                      )
+                      if(opacity > 0)
+                        IgnorePointer(
+                            ignoring: opacity > 0 ? false : true,
+                            child: Container(
+                              color: Colors.black.withValues(alpha: opacity),
+                              // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
+                            )
+                        )
                     ],
                   ),
                 )

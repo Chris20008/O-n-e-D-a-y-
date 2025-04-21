@@ -88,6 +88,16 @@ extension DateOnlyCompare on DateTime {
     final result = List.generate(length.abs(), (index) => (DateTime(year, month, day).add(Duration(days: index * (length >= 0? 1 : -1), hours: 1)).toDate()));
     return result;
   }
+
+  String toStringDateTime(){
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    return "${twoDigits(day)}."
+        "${twoDigits(month)}."
+        "$year  "
+        "${twoDigits(hour)}:"
+        "${twoDigits(minute)}";
+  }
 }
 
 extension List_E on List {

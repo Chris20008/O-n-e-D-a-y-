@@ -1,6 +1,8 @@
+import 'dart:io';
+
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/screens/other_screens/local_file_picker.dart';
+import 'package:fitness_app/screens/other_screens/local_file_picker/local_file_picker.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/functions/load_backup_from_file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
@@ -37,9 +39,17 @@ class SelectorLoadBackup extends StatelessWidget {
             title: AppLocalizations.of(context)!.settingsBackupLoadExternal,
             onTap: () {
               HapticFeedback.selectionClick();
-              Future.delayed(const Duration(milliseconds: 200), (){
+              Future.delayed(const Duration(milliseconds: 200), () async {
                 if(context.mounted){
-                  loadBackupFromFilePicker(
+                  setLoadingIndicator(true);
+                  File? file = await getBackupFromFilePicker(cnHomepage: cnHomepage);
+                  setLoadingIndicator(false);
+
+                  if(!context.mounted || file == null){
+                    return;
+                  }
+
+                  await loadBackupFromFilePicker(
                     context: context,
                     setLoadingIndicator: (bool value) {
                       setLoadingIndicator(value);
@@ -47,6 +57,7 @@ class SelectorLoadBackup extends StatelessWidget {
                     cnHomepage: cnHomepage,
                     cnConfig: cnConfig,
                     cnScreenStatistics: cnScreenStatistics,
+                    file: file
                   );
                 }
               });
@@ -57,11 +68,11 @@ class SelectorLoadBackup extends StatelessWidget {
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), () async{
-                final localFiles = await getLocalBackupFiles();
+                // final localFiles = await getLocalBackupFiles();
                 Navigator.push(
                     context,
                     CupertinoPageRoute(
-                        builder: (context) => LocalFilePicker(localFiles: localFiles)
+                        builder: (context) => const LocalFilePicker()
                     ));
               });
             },

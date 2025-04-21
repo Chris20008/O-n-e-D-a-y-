@@ -299,7 +299,7 @@ List getWorkoutsAsStringList(){
   return allWorkouts + [workoutSickDaySeparator] + allSickDays;
 }
 
-Future<List<FileSystemEntity>> getLocalBackupFiles() async{
+Future<List<FileSystemEntity>> getLocalBackupFiles({int delay = 0}) async{
   final path = await getLocalPath();
 
   List<FileSystemEntity> localFiles = Directory("$path/").listSync().where((element) => element.path.contains("_Backup")).toList();
@@ -325,15 +325,10 @@ Future<List<FileSystemEntity>> getLocalBackupFiles() async{
   // };
 
   /// Sort [fileList] by modification times, from oldest to newest.
-  // localFiles.sort((a, b) => mtimes[b.path]!.compareTo(mtimes[a.path]!));
-  // localFiles.forEach((element) {
-  //   print(element.path.split("_").last);
-  // });
   localFiles.sort((a, b) => b.path.split("_").last.compareTo(a.path.split("_").last));
-  // print("");
-  // localFiles.forEach((element) {
-  //   print(element.path.split("_").last);
-  // });
+  if(delay > 0){
+    await Future.delayed(Duration(milliseconds: delay));
+  }
   return localFiles;
 }
 
