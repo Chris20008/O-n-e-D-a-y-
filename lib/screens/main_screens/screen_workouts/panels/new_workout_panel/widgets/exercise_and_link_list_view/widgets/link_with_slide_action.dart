@@ -1,6 +1,7 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/functions/end_action_pane.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/slidable_exercise_or_link.dart';
 import 'package:fitness_app/util/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
@@ -33,7 +34,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
     if(!widget.withSlideActions){
       return Container(
         decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
+            color: CupertinoTheme.of(context).barBackgroundColor,
             borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
         ),
         width: double.maxFinite,
@@ -60,7 +61,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
             //   key: UniqueKey(),
             //   duration: const Duration(milliseconds: 300),
             //   decoration: BoxDecoration(
-            //       color: Theme.of(context).cardColor,
+            //       color: CupertinoTheme.of(context).barBackgroundColor,
             //       borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
             //   ),
             //   width: double.maxFinite,
@@ -76,7 +77,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
-                  color: Theme.of(context).cardColor,
+                  color: CupertinoTheme.of(context).barBackgroundColor,
                   borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
               ),
               child: Row(

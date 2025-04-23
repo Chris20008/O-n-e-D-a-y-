@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/widgets/exercise_name_field/functions/exercise_name_field_validator.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/widgets/exercise_name_field/functions/on_exercise_name_field_submitted.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -23,7 +24,7 @@ class ExerciseNameField extends StatelessWidget {
       right: 0,
       child: Container(
           alignment: Alignment.bottomLeft,
-          color: Theme.of(context).primaryColor,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           child: Padding(
             padding: const EdgeInsets.only(bottom: 15, top: 67, left: 16, right: 16),
             child: Form(

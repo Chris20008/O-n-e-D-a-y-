@@ -102,7 +102,7 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
                             ignoring: opacity > 0 ? false : true,
                             child: Container(
                               color: Colors.black.withValues(alpha: opacity),
-                              // color: Color.alphaBlend(Colors.black.withOpacity(0.2), Theme.of(context).primaryColor).withOpacity(opacity),
+                              // color: Color.alphaBlend(Colors.black.withValues(alpha: 0.2), CupertinoTheme.of(context).scaffoldBackgroundColor).withValues(alpha: opacity),
                             )
                         )
                     ],

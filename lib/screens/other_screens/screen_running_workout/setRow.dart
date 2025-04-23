@@ -3,11 +3,8 @@ import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/set_type_selector.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'dart:io';
 
 class SetRow extends StatelessWidget {
   final CnRunningWorkout cnRunningWorkout;
@@ -126,7 +123,7 @@ class SetRow extends StatelessWidget {
                             hintText: (templateSet.weightAsTrimmedDouble?? "").toString(),
                             hintStyle: getTextStyleForTextField(
                                 templateSet.weightAsTrimmedDouble.toString(),
-                                color: Colors.white.withOpacity(0.15),
+                                color: Colors.white.withValues(alpha: 0.15),
                                 sizeSmall: false
                             )
                         ),
@@ -187,7 +184,7 @@ class SetRow extends StatelessWidget {
                             hintStyle: getTextStyleForTextField(
                                 templateEx.categoryIsReps()? "${templateSet.amount?? ""}" : templateSet.amountAsTime?? "",
                                 sizeSmall: false,
-                                color: Colors.white.withOpacity(0.15),
+                                color: Colors.white.withValues(alpha: 0.15),
                             )
                         ),
                         style: getTextStyleForTextField(amountController.text, sizeSmall: false),
@@ -344,10 +341,10 @@ class SetRow extends StatelessWidget {
             height: _heightOfSetRow,
             child: ElevatedButton(
               style: ButtonStyle(
-                  shadowColor: MaterialStateProperty.all(Colors.transparent),
-                  surfaceTintColor: MaterialStateProperty.all(Colors.transparent),
-                  backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
+                  shadowColor: WidgetStateProperty.all(Colors.transparent),
+                  surfaceTintColor: WidgetStateProperty.all(Colors.transparent),
+                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                  shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)))
               ),
               onPressed: (){
                 if(templateSet == null || templateEx == null){
@@ -382,7 +379,7 @@ class SetRow extends StatelessWidget {
                       color: (weightTextIsEmpty &&
                           amountTextIsEmpty)
                           ?Colors.white
-                          : Colors.white.withOpacity(0.2)
+                          : Colors.white.withValues(alpha: 0.2)
                   ),
                 ),
               ),

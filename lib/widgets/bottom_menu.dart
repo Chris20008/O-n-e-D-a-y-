@@ -82,8 +82,8 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
-        // color: Colors.black.withOpacity(0.4),
-        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? Theme.of(context).primaryColor : Colors.black.withOpacity(0.4),
+        // color: Colors.black.withValues(alpha: 0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? CupertinoTheme.of(context).scaffoldBackgroundColor : Colors.black.withValues(alpha: 0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(
@@ -96,7 +96,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
           ),
           child: Theme(
             data: Theme.of(context).copyWith(
-              splashColor: Colors.amber[800]!.withOpacity(0.25),
+              splashColor: Colors.amber[800]!.withValues(alpha: 0.25),
               // focusColor: Colors.transparent,
               // hoverColor: Colors.transparent,
               highlightColor: Colors.transparent,

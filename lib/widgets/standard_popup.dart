@@ -1,4 +1,5 @@
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +87,7 @@ class _StandardPopUpState extends State<StandardPopUp> with TickerProviderStateM
                 ),
                 child: Container(
                     width: size.width*cnStandardPopUp.widthFactor,
-                    color: Theme.of(context).primaryColor,
+                    color: CupertinoTheme.of(context).scaffoldBackgroundColor,
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: Column(
@@ -180,7 +181,7 @@ class CnStandardPopUp extends ChangeNotifier {
     this.padding = padding;
     this.confirmText = confirmText?? AppLocalizations.of(context)!.ok;
     this.cancelText = cancelText?? AppLocalizations.of(context)!.cancel;
-    // this.color = color?? Theme.of(context).primaryColor;
+    // this.color = color?? CupertinoTheme.of(context).scaffoldBackgroundColor;
     this.showCancel = showCancel;
     this.canConfirm = canConfirm;
     this.confirmTextStyle = confirmTextStyle;

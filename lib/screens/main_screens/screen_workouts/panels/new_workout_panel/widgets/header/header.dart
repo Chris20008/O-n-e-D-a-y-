@@ -1,4 +1,5 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/header/widgets/cancel_save_row.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +27,7 @@ class NewWorkoutHeader extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 7),
-          color: Theme.of(context).primaryColor,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -51,7 +52,7 @@ class NewWorkoutHeader extends StatelessWidget {
               if(cnNewWorkout.workout.isTemplate)
                 Container(
                   height: 25,
-                  color: Theme.of(context).primaryColor
+                  color: CupertinoTheme.of(context).scaffoldBackgroundColor
                 ),
             ],
           ),

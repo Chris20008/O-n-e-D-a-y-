@@ -59,9 +59,11 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
+    print("Workout Panel");
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (doPop){
+        onPopInvokedWithResult: (doPop, res){
         if (cnNewWorkout.panelController.isPanelOpen
             && !cnNewExercisePanel.panelController.isPanelOpen
             && !tutorialIsRunning
@@ -78,7 +80,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           backdropEnabled: false,
           animationControllerName: "NewWorkoutPanel",
           descendantAnimationControllerName: "ScreenWorkouts",
-          color: Theme.of(context).primaryColor,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           onPanelSlide: onPanelSlide,
           panelBuilder: (context, listView){
             return GestureDetector(

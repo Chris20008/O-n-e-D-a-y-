@@ -30,7 +30,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
         extendBody: true,
         body: PopScope(
           canPop: !_showLoadingIndicator,
@@ -55,7 +55,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
               ),
               if (_showLoadingIndicator)
                 Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   child: Center(
                     child: RepaintBoundary(
                       child: CupertinoActivityIndicator(

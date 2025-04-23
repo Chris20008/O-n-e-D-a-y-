@@ -242,7 +242,7 @@ class CnConfig extends ChangeNotifier {
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+          backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
           textColor: Colors.white,
           fontSize: 16.0
       );

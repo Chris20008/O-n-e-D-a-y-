@@ -318,7 +318,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: Colors.black.withOpacity(0.6),
+          color: Colors.black.withValues(alpha: 0.6),
         ),
         child: Text(
           "${AppLocalizations.of(context)!.historyWeek} $weekOfYear",
@@ -371,7 +371,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       borderRadius: BorderRadius.circular(15),
       child: Container(
         width: double.maxFinite,
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -409,7 +409,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     cnNewWorkout.editWorkout(sickDays: sickDay);
                   },
                   icon: Icon(Icons.edit,
-                    color: Colors.grey.withOpacity(0.4),
+                    color: Colors.grey.withValues(alpha: 0.4),
                   )
               ),
             ),

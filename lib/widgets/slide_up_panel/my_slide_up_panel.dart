@@ -64,7 +64,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   AnimationController? descendantAnimationController;
   AnimationController? descendantAnimationController2;
   final maxTopPadding = Platform.isAndroid? -45 : -52;
-  late Color color = widget.color?? Theme.of(context).primaryColor;
+  late Color color = widget.color?? CupertinoTheme.of(context).scaffoldBackgroundColor;
   double overScrollOffset = 0;
   late PanelController panelController = widget.controller?? PanelController();
   ScrollController? scrollController;
@@ -471,7 +471,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                   IgnorePointer(
                       ignoring: opacity > 0 ? false : true,
                       child: Container(
-                        color: Colors.black.withOpacity(opacity),
+                        color: Colors.black.withValues(alpha: opacity),
                       )
                   )
               ],

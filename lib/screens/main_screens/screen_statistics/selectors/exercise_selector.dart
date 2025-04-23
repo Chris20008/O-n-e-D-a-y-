@@ -120,7 +120,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                           const Spacer(),
                           child,
                           const Spacer(),
-                          Container(color: Colors.grey.withOpacity(0.2), height: 1.5, width: cnScreenStatistics.width-150,)
+                          Container(color: Colors.grey.withValues(alpha: 0.2), height: 1.5, width: cnScreenStatistics.width-150,)
                         ],
                       );
                     }

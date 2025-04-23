@@ -85,6 +85,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    print("Main");
     return MultiProvider(
       providers:[
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
@@ -103,8 +104,33 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
-      child: MaterialApp(
+      child: CupertinoApp(
         // showPerformanceOverlay: true,
+        // locale: _locale,
+        // supportedLocales: supportedLocales,
+        // localizationsDelegates: const [
+        //   AppLocalizations.delegate,
+        //   GlobalMaterialLocalizations.delegate,
+        //   GlobalWidgetsLocalizations.delegate,
+        //   GlobalCupertinoLocalizations.delegate,
+        // ],
+        // themeMode: ThemeMode.dark,
+        // darkTheme: ThemeData.dark().copyWith(
+        //     cardColor: Color(0xFF2C2C2E),
+        //     primaryColor: Color(0xFF1C1C1E),
+        //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+        //     // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        //     // useMaterial3: true,
+        //     splashFactory: InkSparkle.splashFactory,
+        //     cupertinoOverrideTheme: const CupertinoThemeData(
+        //       brightness: Brightness.dark,
+        //       primaryColor: Color(0xffdb7b01),
+        //     ),
+        //     iconTheme: const IconThemeData(
+        //       color: Color(0xffdb7b01),
+        //     ),
+        // ),
+        // Lokalisierung (funktioniert auch in CupertinoApp!)
         locale: _locale,
         supportedLocales: supportedLocales,
         localizationsDelegates: const [
@@ -113,21 +139,16 @@ class MyAppState extends State<MyApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        themeMode: ThemeMode.dark,
-        darkTheme: ThemeData.dark().copyWith(
-            cardColor: Color(0xFF2C2C2E),
-            primaryColor: Color(0xFF1C1C1E),
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-            // useMaterial3: true,
-            splashFactory: InkSparkle.splashFactory,
-            cupertinoOverrideTheme: const CupertinoThemeData(
-              brightness: Brightness.dark,
-              primaryColor: Color(0xffdb7b01),
-            ),
-            iconTheme: const IconThemeData(
-              color: Color(0xffdb7b01),
-            ),
+
+        // Theme
+        theme: const CupertinoThemeData(
+          brightness: Brightness.dark,
+          primaryColor: Color(0xffdb7b01),
+          barBackgroundColor: Color(0xFF2C2C2E),
+          scaffoldBackgroundColor: Color(0xFF1C1C1E),
+          textTheme: CupertinoTextThemeData(
+            primaryColor: Color(0xffdb7b01),
+          ),
         ),
         home: const MyHomePage(),
       ),
@@ -250,6 +271,9 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   Widget build(BuildContext context) {
+
+    print("Homepage");
+
     cnConfig  = Provider.of<CnConfig>(context);
     cnHomepage = Provider.of<CnHomepage>(context);
 
@@ -261,7 +285,7 @@ class _MyHomePageState extends State<MyHomePage>{
     if(!cnConfig.isInitialized || !mainIsInitialized){
       return Scaffold(
         body: Container(
-          // color: Theme.of(context).primaryColor,
+          // color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           height: double.maxFinite,
           width: double.maxFinite,
           decoration: const BoxDecoration(
@@ -451,7 +475,7 @@ class _MyHomePageState extends State<MyHomePage>{
                           Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
-                              color: Colors.black.withOpacity(0.4)
+                              color: Colors.black.withValues(alpha: 0.4)
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -494,8 +518,11 @@ class _MyHomePageState extends State<MyHomePage>{
                 //   child: ElevatedButton(
                 //     child: Text("Test"),
                 //     onPressed: ()async{
-                //       await cnAllExercisesPanel.initExercises();
-                //       cnAllExercisesPanel.openPanel();
+                //       Navigator.push(
+                //           context,
+                //           CupertinoPageRoute(
+                //               builder: (context) => const LocalFilePicker()
+                //           ));
                 //     },
                 //   ),
                 // )
@@ -530,7 +557,7 @@ class _MyHomePageState extends State<MyHomePage>{
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 2,
-            backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
             textColor: Colors.white,
             fontSize: 16.0
         );

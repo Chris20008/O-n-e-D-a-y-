@@ -710,13 +710,13 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         // verticalInterval: 30,
         // getDrawingHorizontalLine: (value) {
         //   return FlLine(
-        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     color: Colors.grey[700]!.withValues(alpha: 0.7),
         //     strokeWidth: 1,
         //   );
         // },
         // getDrawingVerticalLine: (value) {
         //   return FlLine(
-        //     color: Colors.grey[700]!.withOpacity(0.7),
+        //     color: Colors.grey[700]!.withValues(alpha: 0.7),
         //     strokeWidth: 1,
         //   );
         // },
@@ -773,7 +773,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             show: true,
             gradient: LinearGradient(
               colors: gradientColors
-                  .map((color) => color.withOpacity(0.3))
+                  .map((color) => color.withValues(alpha: 0.3))
                   .toList(),
             ),
           ),
@@ -828,7 +828,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               show: true,
               gradient: LinearGradient(
                 colors: gradientColors4
-                    .map((color) => color.withOpacity(0.3))
+                    .map((color) => color.withValues(alpha: 0.3))
                     .toList(),
               ),
             ),

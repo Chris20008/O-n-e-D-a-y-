@@ -39,7 +39,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             child: Container(
               width: double.maxFinite,
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.45),
+                color: Colors.black.withValues(alpha: 0.45),
               ),
               child: SafeArea(
                 bottom: false,
@@ -53,7 +53,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
                   child: Container(
                     height: _height,
                     width: double.maxFinite,
-                    color: Colors.black.withOpacity(0.0),
+                    color: Colors.black.withValues(alpha: 0.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -100,7 +100,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
     //     child: Container(
     //       width: double.maxFinite,
     //       decoration: BoxDecoration(
-    //           color: Colors.black.withOpacity(0.5),
+    //           color: Colors.black.withValues(alpha: 0.5),
     //       ),
     //       child: SafeArea(
     //         bottom: false,
@@ -113,7 +113,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
     //           child: Container(
     //             height: _height,
     //             width: double.maxFinite,
-    //             color: Colors.black.withOpacity(0.0),
+    //             color: Colors.black.withValues(alpha: 0.0),
     //             child: Row(
     //               mainAxisAlignment: MainAxisAlignment.center,
     //               children: [

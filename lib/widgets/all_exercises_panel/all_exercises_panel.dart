@@ -98,12 +98,12 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
                         child: Container(
                           height: 60,
                           width: double.maxFinite,
-                          color: Theme.of(context).primaryColor,
+                          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
                           padding: const EdgeInsets.all(10),
                           child: CupertinoSearchTextField(
                             controller: cnAllExercisesPanel.textController,
                             style: const TextStyle(color: Colors.white),
-                            backgroundColor: Theme.of(context).cardColor,
+                            backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
                             onChanged: (value){
                               cnAllExercisesPanel.scrollController.jumpTo(0);
                               cnAllExercisesPanel.filterExercises(value);
@@ -136,7 +136,7 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
                   },
                   child: Container(
                       key: cnAllExercisesPanel.keySideBar,
-                      color: Colors.red.withOpacity(0.0),
+                      color: Colors.red.withValues(alpha: 0.0),
                       height: 572 - MediaQuery.of(context).viewInsets.bottom*0.8,
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: Column(

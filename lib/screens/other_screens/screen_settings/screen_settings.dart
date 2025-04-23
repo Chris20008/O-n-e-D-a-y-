@@ -100,6 +100,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     cnConfig = Provider.of<CnConfig>(context);
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
+    print("Rebuild Screen Settings");
+
     return PopScope(
         canPop: true,
         onPopInvokedWithResult: onPopInvoked,

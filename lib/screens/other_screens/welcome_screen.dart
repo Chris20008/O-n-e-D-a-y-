@@ -13,7 +13,6 @@ import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import '../../main.dart';
 import '../../util/config.dart';
 import '../../util/constants.dart';
 import 'dart:io';
@@ -55,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           decoration: null,
           animationControllerName: "ScreenWelcome",
           child: Container(
-            color: Theme.of(context).primaryColor,
+            color: CupertinoTheme.of(context).scaffoldBackgroundColor,
             child: Stack(
                 children: [
                   animatedScreen(0, screenOne()),
@@ -415,7 +414,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       ),
                       trailing: CupertinoSwitch(
                           value: cnConfig.automaticBackups,
-                          activeColor: activeColor,
+                          activeTrackColor: activeColor,
                           onChanged: (value){
                             setState(() {
                               if(Platform.isAndroid){
@@ -566,7 +565,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.useSpotify,
-                      activeColor: activeColor,
+                      activeTrackColor: activeColor,
                       onChanged: (value) async{
                         setState(() {
                           if(Platform.isAndroid){
@@ -732,7 +731,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.useHealthData,
-                      activeColor: activeColor,
+                      activeTrackColor: activeColor,
                       onChanged: (value) async{
                         setState(() {
                           if(Platform.isAndroid){

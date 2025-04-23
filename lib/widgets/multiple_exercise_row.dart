@@ -158,7 +158,7 @@ class MultipleExerciseRow extends StatelessWidget {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                               colors: [
-                                colorFade!.withOpacity(0.0),
+                                colorFade!.withValues(alpha: 0.0),
                                 colorFade!,
                               ]
                           ),
@@ -179,7 +179,7 @@ class MultipleExerciseRow extends StatelessWidget {
                               end: Alignment.centerLeft,
                               begin: Alignment.centerRight,
                               colors: [
-                                colorFade!.withOpacity(0.0),
+                                colorFade!.withValues(alpha: 0.0),
                                 colorFade!,
                               ]
                           ),

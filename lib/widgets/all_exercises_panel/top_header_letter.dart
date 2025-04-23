@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/all_exercises_panel/all_exercises_panel.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -75,7 +76,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
           child: Container(
               height: 45,
               width: double.maxFinite,
-              color: Theme.of(context).primaryColor,
+              color: CupertinoTheme.of(context).scaffoldBackgroundColor,
               padding: const EdgeInsets.only(left: 30),
               child: text
           )

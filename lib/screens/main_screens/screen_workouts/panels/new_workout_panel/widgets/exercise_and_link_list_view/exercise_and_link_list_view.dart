@@ -101,7 +101,7 @@ class _ExerciseAndLinkListViewState extends State<ExerciseAndLinkListView> {
                       child: Material(
                         child: Container(
                             padding: const EdgeInsets.only(left: 2),
-                            color: Colors.grey.withOpacity(0.05),
+                            color: Colors.grey.withValues(alpha: 0.05),
                             child: child
                         ),
                       ),

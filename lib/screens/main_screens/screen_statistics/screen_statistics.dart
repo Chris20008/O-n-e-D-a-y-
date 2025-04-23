@@ -13,7 +13,6 @@ import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
@@ -174,7 +173,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       borderRadius: BorderRadius.circular(15),
       child: Container(
         height: MediaQuery.of(context).size.height*0.6,
-        color: Theme.of(context).primaryColor,
+        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
         child: StatefulBuilder(
           builder: (context, setModalState){
             return Stack(
@@ -222,7 +221,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     ),
                     CupertinoListSection.insetGrouped(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor
+                        color: CupertinoTheme.of(context).barBackgroundColor
                       ),
                       backgroundColor: Colors.transparent,
                       header: const Padding(
@@ -257,7 +256,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                           ),
                           trailing: CupertinoSwitch(
                               value: cnScreenStatistics.showOneRepMax,
-                              activeColor: activeColor,
+                              activeTrackColor: activeColor,
                               onChanged: (value){
                                 setModalState(() {
                                   if(Platform.isAndroid){
@@ -277,7 +276,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                           ),
                           trailing: CupertinoSwitch(
                               value: cnScreenStatistics.showAvgWeightPerSetLine,
-                              activeColor: activeColor,
+                              activeTrackColor: activeColor,
                               onChanged: (value){
                                 setModalState(() {
                                   if(Platform.isAndroid){
@@ -296,7 +295,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                             ),
                             trailing: CupertinoSwitch(
                                 value: cnScreenStatistics.showSickDays,
-                                activeColor: activeColor,
+                                activeTrackColor: activeColor,
                                 onChanged: (value){
                                   setModalState(() {
                                     if(Platform.isAndroid){
@@ -312,7 +311,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
                     CupertinoListSection.insetGrouped(
                       decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor
+                          color: CupertinoTheme.of(context).barBackgroundColor
                       ),
                       backgroundColor: Colors.transparent,
                       header: Padding(
@@ -328,7 +327,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                             ),
                             trailing: CupertinoSwitch(
                                 value: cnScreenStatistics.onlyWorkingSets,
-                                activeColor: activeColor,
+                                activeTrackColor: activeColor,
                                 onChanged: (value){
                                   setModalState(() {
                                     if(Platform.isAndroid){
@@ -407,6 +406,7 @@ class CnScreenStatistics extends ChangeNotifier {
   late List<String> allWorkoutNames = getAllWorkoutNames();
   late List<String> allExerciseNames;
   List<ObSickDays> allSickDays = [];
+  GlobalKey backupOptionsKey = GlobalKey();
 
   Exercise selectedExerciseFirst = Exercise();
   Exercise selectedExerciseLast = Exercise();

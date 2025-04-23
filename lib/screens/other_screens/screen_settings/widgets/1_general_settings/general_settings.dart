@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 
 class GeneralSettings extends StatelessWidget {
@@ -34,7 +33,7 @@ class GeneralSettings extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoListSection.insetGrouped(
       decoration: BoxDecoration(
-          color: Theme.of(context).cardColor
+          color: CupertinoTheme.of(context).barBackgroundColor
       ),
       backgroundColor: Colors.transparent,
       header: Padding(

@@ -36,9 +36,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   Widget build(BuildContext context) {
     cnNewExercise = Provider.of<CnNewExercisePanel>(context);
 
+    print("Exercise Panel");
+
     return PopScope(
       canPop: false,
-      onPopInvoked: (doPop){
+      onPopInvokedWithResult: (doPop, res){
         if (cnNewExercise.panelController.isPanelOpen){
           cnNewExercise.closePanel(doClear: false, context: context);
         }
@@ -51,7 +53,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           key: cnNewExercise.key,
           controller: cnNewExercise.panelController,
           backdropOpacity: 0.25,
-          color: Theme.of(context).primaryColor,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           animationControllerName: "NewExercisePanel",
           descendantAnimationControllerName: "NewWorkoutPanel",
           panelBuilder: (context, listView) {
@@ -194,7 +196,7 @@ class CnNewExercisePanel extends ChangeNotifier {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.SNACKBAR,
             timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
             textColor: Colors.white,
             fontSize: 16.0
         );

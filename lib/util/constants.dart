@@ -52,8 +52,8 @@ const Color activeColor = Color(0xffdb7b01);
 
 Widget backgroundSingleSet = Container(
   decoration: BoxDecoration(
-    // color: Colors.grey[500]!.withOpacity(0.2),
-    color: Colors.white.withOpacity(0.15),
+    // color: Colors.grey[500]!.withValues(alpha: 0.2),
+    color: Colors.white.withValues(alpha: 0.15),
     borderRadius: BorderRadius.circular(5),
   ),
 );
@@ -79,7 +79,7 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
           ),
         ),
         Container(
-          color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
+          color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withValues(alpha: 0.3),//Colors.grey[900],
           height: 1,
           width: 20,
         ),
@@ -194,7 +194,7 @@ Widget mySeparator({
         Container(
           height: height,
           width: width - minusWidth,
-            color: (color?? Colors.amber[900])!.withOpacity(opacity)
+            color: (color?? Colors.amber[900])!.withValues(alpha: opacity)
         ),
         Container(height: heightTop, color: Colors.transparent,),
       ],
@@ -212,20 +212,20 @@ Future openUrl(String url)async{
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,
   width: 0.5,
-  color: Colors.grey[700]!.withOpacity(0.5),
+  color: Colors.grey[700]!.withValues(alpha: 0.5),
 );
 
 Widget horizontalGreySpacer = Container(
   height: 0.5,
   width: double.maxFinite,
-  color: Colors.grey[700]!.withOpacity(0.5),
+  color: Colors.grey[700]!.withValues(alpha: 0.5),
 );
 
 Widget panelTopBar = Container(
   height: 2,
   width: 40,
   decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.5),
+      color: Colors.white.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(2)
   ),
 );
@@ -250,7 +250,7 @@ Widget standardDialog({
       ),
       child: Container(
           width: MediaQuery.of(context).size.width * widthFactor,
-          color: Theme.of(context).primaryColor,
+          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Padding(
@@ -695,7 +695,7 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
     child: SizedBox(
       height: 40,
       width: 40,
-      // color: Colors.grey.withOpacity(0.3),
+      // color: Colors.grey.withValues(alpha: 0.3),
       child: iconButton
     ),
   );
@@ -784,7 +784,7 @@ Widget buildCalendarDialogButton({
   const colorAmberDark = Color(0xFF6D4919);
   const arrowSize = 15.0;
   const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
-  final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
+  final weekendTextStyle = TextStyle(color: Colors.white.withValues(alpha: 0.6), fontWeight: FontWeight.w600);
   String translatedSickText = AppLocalizations.of(context)!.statisticsSick;
   final config = CalendarDatePicker2WithActionButtonsConfig(
     // cancelButton: justShow? Container() : null,
@@ -878,7 +878,7 @@ Widget buildCalendarDialogButton({
                     width: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: colorAmber.withOpacity(0.2)
+                      color: colorAmber.withValues(alpha: 0.2)
                     ),
                   ),
                 Text(
@@ -926,7 +926,7 @@ Widget buildCalendarDialogButton({
           : calendarType == CalendarDatePicker2Type.single
             ? [DateTime.now()]
             : [DateTime.now(), DateTime.now()],
-          dialogBackgroundColor: Theme.of(context).cardColor
+          dialogBackgroundColor: CupertinoTheme.of(context).barBackgroundColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
@@ -1035,7 +1035,7 @@ Future getExplainExerciseGroups(BuildContext context) async{
             ),
             child: Scaffold(
               body: Container(
-                color: Theme.of(context).primaryColor,
+                color: CupertinoTheme.of(context).scaffoldBackgroundColor,
                 child: SafeArea(
                   top: false,
                   left: false,
@@ -1110,7 +1110,7 @@ Widget getCloudOptionsColumn({
           ),
           trailing: CupertinoSwitch(
               value: cnConfig.connectWithCloud,
-              activeColor: activeColor,
+              activeTrackColor: activeColor,
               onChanged: (value)async{
                 if(Platform.isAndroid){
                   HapticFeedback.selectionClick();
@@ -1182,7 +1182,7 @@ Widget getCloudOptionsColumn({
                   ),
                   trailing: CupertinoSwitch(
                       value: cnConfig.saveBackupCloud,
-                      activeColor: activeColor,
+                      activeTrackColor: activeColor,
                       onChanged: (value) async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1215,7 +1215,7 @@ Widget getCloudOptionsColumn({
                   leading: iconSyncMultipleDevices,
                   trailing: CupertinoSwitch(
                       value: cnConfig.syncMultipleDevices,
-                      activeColor: activeColor,
+                      activeTrackColor: activeColor,
                       onChanged: (value)async{
                         if(Platform.isAndroid){
                           HapticFeedback.selectionClick();
@@ -1497,7 +1497,7 @@ Widget getRowButton({
             padding: EdgeInsets.zero,
               key: key,
               alignment: Alignment.center,
-              color: Theme.of(context).cardColor,
+              color: CupertinoTheme.of(context).barBackgroundColor,
               onPressed: onPressed,
               child: Icon(
                 icon,
@@ -1517,7 +1517,7 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
     builder: (context) => Positioned.fill(
       child: AbsorbPointer(
         child: Container(
-          color: Colors.black.withOpacity(0.0),
+          color: Colors.black.withValues(alpha: 0.0),
         ),
       ),
     ),

@@ -86,7 +86,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 child: CupertinoButton(
                     // iconSize: 30,
                     // style: ButtonStyle(
-                    //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                    //   backgroundColor: WidgetStateProperty.all(Colors.transparent),
                     // ),
                     onPressed: () {
                       cnAnimatedColumn.newEx = Exercise(blockLink: true);
@@ -212,7 +212,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                     child: Scaffold(
                       resizeToAvoidBottomInset: false,
                       body: Container(
-                        color: Theme.of(context).primaryColor,
+                        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
                         child: SafeArea(
                           top: false,
                           left: false,
@@ -326,7 +326,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         CupertinoListSection.insetGrouped(
                                           margin: const EdgeInsets.only(top: 15),
                                           decoration: BoxDecoration(
-                                              color: Theme.of(context).cardColor
+                                              color: CupertinoTheme.of(context).barBackgroundColor
                                           ),
                                           backgroundColor: Colors.transparent,
                                           children: [

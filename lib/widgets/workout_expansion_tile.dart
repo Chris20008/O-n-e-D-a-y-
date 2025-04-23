@@ -49,7 +49,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withValues(alpha: 0.5),
           // color: const Color(0x33939393),
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -122,10 +122,10 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                               },
                               icon: Icon(Icons.play_arrow,
                                 color: !cnRunningWorkout.isRunning
-                                    ? Colors.grey.withOpacity(0.4)
+                                    ? Colors.grey.withValues(alpha: 0.4)
                                     : cnRunningWorkout.workout.name == widget.workout.name
-                                      ? (Colors.amber[800]?? Colors.orange).withOpacity(0.8)
-                                      : Colors.grey.withOpacity(0.2)
+                                      ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
+                                      : Colors.grey.withValues(alpha: 0.2)
                               )
                           ),
                         IconButton(
@@ -133,7 +133,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                               cnNewWorkout.editWorkout(workout: widget.workout);
                             },
                             icon: Icon(Icons.edit,
-                              color: Colors.grey.withOpacity(0.4),
+                              color: Colors.grey.withValues(alpha: 0.4),
                             )
                         )
                       ],
@@ -155,8 +155,8 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
-                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withOpacity(0.7), fontWeight: FontWeight.w400)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
+                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withValues(alpha: 0.7), fontWeight: FontWeight.w400)
                                       )
                                     else
                                       OverflowSafeText(
@@ -164,7 +164,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
                                       )
                                 ],
                               ),

@@ -39,7 +39,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
   late CnAnimatedColumn cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
-  Color colorSpotifyButton = Colors.white.withOpacity(0.12);
+  Color colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
   double paddingLeftRight = 5;
   String? lastSongName;
   Map<String, double> widths = {
@@ -180,12 +180,12 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                     GestureDetector(
                                                       onTapDown: (details){
                                                         setState(() {
-                                                          colorSpotifyButton = Colors.white.withOpacity(0.25);
+                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.25);
                                                         });
                                                       },
                                                       onTapCancel: (){
                                                         setState(() {
-                                                          colorSpotifyButton = Colors.white.withOpacity(0.12);
+                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
                                                         });
                                                       },
                                                       onTap: (){
@@ -198,7 +198,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                           openUrl(uri);
                                                         });
                                                         setState(() {
-                                                          colorSpotifyButton = Colors.white.withOpacity(0.12);
+                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
                                                         });
                                                       },
                                                       child: Container(
@@ -242,7 +242,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.seekToRelative(-15000);
@@ -259,7 +259,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           await cnSpotifyBar.skipPrevious();
@@ -276,7 +276,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
@@ -293,7 +293,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 32,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           await cnSpotifyBar.skipNext();
@@ -310,7 +310,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         iconSize: 25,
                                                         style: ButtonStyle(
                                                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                                         ),
                                                         onPressed: () async{
                                                           cnSpotifyBar.seekToRelative(15000);
@@ -352,7 +352,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                   IconButton(
                                       iconSize: 30,
                                       style: ButtonStyle(
-                                        backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                                        backgroundColor: WidgetStateProperty.all(Colors.transparent),
                                       ),
                                       onPressed: () async{
                                         // cnSpotifyBar.disconnect();
@@ -396,8 +396,8 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                   child: CupertinoButton(
                       // iconSize: 25,
                       // style: ButtonStyle(
-                      //   backgroundColor: MaterialStateProperty.all(Colors.transparent),
-                      //   shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
+                      //   backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                      //   shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))
                       // ),
                       onPressed: () async{
                         cnSpotifyBar.connectToSpotify(context);
@@ -580,7 +580,7 @@ class CnSpotifyBar extends ChangeNotifier {
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+          backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
           textColor: Colors.white,
           fontSize: 16.0
       );
@@ -609,7 +609,7 @@ class CnSpotifyBar extends ChangeNotifier {
             toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.SNACKBAR,
             timeInSecForIosWeb: 1,
-            backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
             textColor: Colors.white,
             fontSize: 16.0
         );

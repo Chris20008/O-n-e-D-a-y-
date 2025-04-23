@@ -79,7 +79,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
     return PopScope(
       canPop: !isSavingData,
-      onPopInvoked: (doPop){
+      onPopInvokedWithResult: (doPop, res){
         if(cnRunningWorkout.isVisible){
           cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
           cnRunningWorkout.isVisible = false;
@@ -107,7 +107,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 backDropEnabled: true,
                 animationControllerName: "ScreenRunningWorkout",
                 child: Scaffold(
-                  backgroundColor: Theme.of(context).primaryColor,
+                  backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
                   extendBody: true,
                   resizeToAvoidBottomInset: false,
                   bottomNavigationBar: ClipRRect(
@@ -119,7 +119,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                       ),
                       child: Container(
                         height: cnBottomMenu.height,
-                        color: Colors.black.withOpacity(0.5),
+                        color: Colors.black.withValues(alpha: 0.5),
                         child: CupertinoButton(
                           padding: EdgeInsets.zero,
                           onPressed: openPopUpFinishWorkout,
@@ -213,7 +213,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                                                 child: Material(
                                                     child: Container(
                                                         padding: const EdgeInsets.only(left: 2),
-                                                        color: Colors.grey.withOpacity(0.1),
+                                                        color: Colors.grey.withValues(alpha: 0.1),
                                                         child: child
                                                     )
                                                 ),
@@ -655,7 +655,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
               if (isSavingData)
                 Container(
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withValues(alpha: 0.5),
                   child: Center(
                     child: CupertinoActivityIndicator(
                         radius: 20.0,
@@ -1057,7 +1057,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+          backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
           textColor: Colors.white,
           fontSize: 16.0
       );

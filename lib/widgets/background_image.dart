@@ -81,8 +81,8 @@ class _BackgroundColorState extends State<BackgroundColor> {
     //     //           begin: Alignment.topCenter,
     //     //           end: Alignment.bottomCenter,
     //     //           colors: [
-    //     //             Colors.black.withOpacity(0.3),
-    //     //             Colors.black.withOpacity(0.6),
+    //     //             Colors.black.withValues(alpha: 0.3),
+    //     //             Colors.black.withValues(alpha: 0.6),
     //     //           ]
     //     //       )
     //     //   ),
@@ -103,7 +103,7 @@ class _BackgroundColorState extends State<BackgroundColor> {
     //             // Container(
     //             //   height: double.maxFinite,
     //             //   width: double.maxFinite,
-    //             //   color: Colors.black.withOpacity(0.6),
+    //             //   color: Colors.black.withValues(alpha: 0.6),
     //             // )
     //           ]
     //       )
@@ -118,7 +118,7 @@ class _BackgroundColorState extends State<BackgroundColor> {
     //           end: Alignment.bottomLeft,
     //           colors: [
     //             const Color(0xff84490b),
-    //             Colors.black.withOpacity(0.9),
+    //             Colors.black.withValues(alpha: 0.9),
     //           ]
     //       )
     //   ),
@@ -139,7 +139,7 @@ class _BackgroundColorState extends State<BackgroundColor> {
     //                 end: Alignment.bottomLeft,
     //                 colors: [
     //                   const Color(0xff84490b),
-    //                   Colors.black.withOpacity(0.9),
+    //                   Colors.black.withValues(alpha: 0.9),
     //                 ]
     //             )
     //           ),
@@ -158,7 +158,7 @@ class _BackgroundColorState extends State<BackgroundColor> {
       //           // Container(
       //           //   height: double.maxFinite,
       //           //   width: double.maxFinite,
-      //           //   color: Colors.black.withOpacity(0.6),
+      //           //   color: Colors.black.withValues(alpha: 0.6),
       //           // )
       //         ]
       //     )
