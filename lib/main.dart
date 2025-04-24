@@ -105,7 +105,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
-        // showPerformanceOverlay: true,
+        showPerformanceOverlay: true,
         locale: _locale,
         supportedLocales: supportedLocales,
         localizationsDelegates: const [
@@ -116,8 +116,8 @@ class MyAppState extends State<MyApp> {
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
-            cardColor: Color(0xFF2C2C2E),
-            primaryColor: Color(0xFF1C1C1E),
+            cardColor: const Color(0xFF2C2C2E),
+            primaryColor: const Color(0xFF1C1C1E),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             // useMaterial3: true,

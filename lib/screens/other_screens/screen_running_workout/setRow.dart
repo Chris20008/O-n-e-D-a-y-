@@ -5,7 +5,7 @@ import 'package:fitness_app/widgets/set_type_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-class SetRow extends StatelessWidget {
+class SetRow extends StatefulWidget {
   final CnRunningWorkout cnRunningWorkout;
   final dynamic item;
   final dynamic groupedExerciseKey;
@@ -19,19 +19,31 @@ class SetRow extends StatelessWidget {
     required this.index,
   });
 
+  @override
+  State<SetRow> createState() => _SetRowState();
 
+}
+
+class _SetRowState extends State<SetRow> {
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
+  late final int index = widget.index;
+  late dynamic item = widget.item;
+  late dynamic groupedExerciseKey = widget.groupedExerciseKey;
+  late CnRunningWorkout cnRunningWorkout = widget.cnRunningWorkout;
+  bool showMask = true;
 
   @override
   Widget build(BuildContext context) {
     NamedSet? tempSet;
     Widget? child;
 
-    print("Set Row");
+    print("Set Row $index");
 
-    dynamic item = this.item;
+    // return SizedBox();
+
+
 
     if(item is NamedSet){
       tempSet = item;
@@ -96,7 +108,28 @@ class SetRow extends StatelessWidget {
                     width: _widthOfTextField,
                     height: _heightOfSetRow,
                     child: Center(
-                      child: TextField(
+                      child: showMask?
+                      GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            showMask = false;
+                          });
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            set.focusNodeWeight.requestFocus();
+                          });
+                        },
+                        child: Container(
+                          // color: Colors.blue,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: const Color(0xff848383),
+                                width: 1
+                            ),
+                          ),
+                        ),
+                      ) :
+                      TextField(
                         focusNode: set.focusNodeWeight,
                         key: set.weightKey,
                         keyboardAppearance: Brightness.dark,
@@ -157,7 +190,28 @@ class SetRow extends StatelessWidget {
                     width: _widthOfTextField,
                     height: _heightOfSetRow,
                     child: Center(
-                      child: TextField(
+                      child: showMask?
+                      GestureDetector(
+                        onTap: (){
+                          setState(() {
+                            showMask = false;
+                          });
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            set.focusNodeAmount.requestFocus();
+                          });
+                        },
+                        child: Container(
+                          // color: Colors.blue,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                                color: const Color(0xff848383),
+                                width: 1
+                            ),
+                          ),
+                        ),
+                      ) :
+                      TextField(
                         focusNode: set.focusNodeAmount,
                         key: set.amountKey,
                         keyboardAppearance: Brightness.dark,
@@ -259,6 +313,8 @@ class SetRow extends StatelessWidget {
           child: child
       );
     }
+
+    // return SizedBox();
 
     return child;
   }
