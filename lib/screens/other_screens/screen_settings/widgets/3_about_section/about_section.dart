@@ -12,7 +12,7 @@ class AboutSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoListSection.insetGrouped(
       decoration: BoxDecoration(
-          color: CupertinoTheme.of(context).barBackgroundColor
+          color: Theme.of(context).cardColor
       ),
       backgroundColor: Colors.transparent,
       header: Padding(

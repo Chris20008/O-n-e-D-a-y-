@@ -34,7 +34,7 @@ class BackupOptions extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoListSection.insetGrouped(
       decoration: BoxDecoration(
-          color: CupertinoTheme.of(context).barBackgroundColor
+          color: Theme.of(context).cardColor
       ),
       backgroundColor: Colors.transparent,
       header: Padding(
@@ -118,7 +118,7 @@ class BackupOptions extends StatelessWidget {
 
         AnimatedContainer(
           height: cnConfig.showMoreSettingCloud? 5 : 0,
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+          color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
           duration: const Duration(milliseconds: 300),
         ),
 

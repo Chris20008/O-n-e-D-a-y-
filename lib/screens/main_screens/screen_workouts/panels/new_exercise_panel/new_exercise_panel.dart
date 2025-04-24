@@ -53,7 +53,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           key: cnNewExercise.key,
           controller: cnNewExercise.panelController,
           backdropOpacity: 0.25,
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
           animationControllerName: "NewExercisePanel",
           descendantAnimationControllerName: "NewWorkoutPanel",
           panelBuilder: (context, listView) {

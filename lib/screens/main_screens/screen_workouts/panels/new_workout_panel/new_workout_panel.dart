@@ -80,7 +80,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           backdropEnabled: false,
           animationControllerName: "NewWorkoutPanel",
           descendantAnimationControllerName: "ScreenWorkouts",
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
           onPanelSlide: onPanelSlide,
           panelBuilder: (context, listView){
             return GestureDetector(

@@ -76,9 +76,14 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: cnRunningWorkout.isRunning? 250 : 0),
-                            height: cnRunningWorkout.isRunning? 75 : 25,
+                          Selector<CnBannerRunningWorkout, bool>(
+                              selector: (_, cn) => cn.showBanner,
+                              builder: (_, showBanner, __){
+                                return AnimatedContainer(
+                                  duration: Duration(milliseconds: showBanner? 250 : 0),
+                                  height: showBanner? 75 : 25,
+                                );
+                              }
                           ),
                           WorkoutExpansionTile(
                             workout: cnWorkouts.workouts[index],
@@ -141,71 +146,6 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 ),
               ),
             ),
-
-            // Center(
-            //   child: PullDownButton(
-            //     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-            //     routeTheme: routeTheme,
-            //     itemBuilder: (contextPopUp) {
-            //       return [
-            //         PullDownMenuItem(
-            //           title: AppLocalizations.of(context)!.settingsBackupLoadExternal,
-            //           onTap: () {
-            //             // HapticFeedback.selectionClick();
-            //             // Future.delayed(const Duration(milliseconds: 200), () async {
-            //             //   widget.setLoadingIndicator(true);
-            //             //   File? file = await getBackupFromFilePicker(cnHomepage: widget.cnHomepage);
-            //             //   widget.setLoadingIndicator(false);
-            //             //
-            //             //   if (!context.mounted || file == null) return;
-            //             //
-            //             //   await loadBackupFromFilePicker(
-            //             //     context: context,
-            //             //     setLoadingIndicator: widget.setLoadingIndicator,
-            //             //     cnHomepage: widget.cnHomepage,
-            //             //     cnConfig: widget.cnConfig,
-            //             //     cnScreenStatistics: widget.cnScreenStatistics,
-            //             //     file: file,
-            //             //   );
-            //             // });
-            //           },
-            //         ),
-            //         PullDownMenuItem(
-            //           title: AppLocalizations.of(contextPopUp)!.settingsBackupLoadLocal,
-            //           onTap: () {
-            //             Navigator.of(contextPopUp).pop();
-            //             pushRoute();
-            //             // HapticFeedback.selectionClick();
-            //             // Future.delayed(const Duration(milliseconds: 3000), () async {
-            //             //   if(context.mounted){
-            //             //     Navigator.of(context).push(
-            //             //       CupertinoPageRoute(builder: (context) => const LocalFilePicker()),
-            //             //     );
-            //             //   }
-            //             // });
-            //           },
-            //         ),
-            //       ];
-            //     },
-            //     buttonBuilder: (context, showMenu) => CupertinoButton(
-            //       onPressed: () {
-            //         HapticFeedback.selectionClick();
-            //         showMenu();
-            //       },
-            //       padding: EdgeInsets.zero,
-            //       child: Row(
-            //         children: [
-            //           Text(
-            //             AppLocalizations.of(context)!.settingsBackupLoad,
-            //             style: const TextStyle(color: Colors.white),
-            //           ),
-            //           const Spacer(),
-            //           trailingChoice(),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
 
             // Center(
             //   child: ElevatedButton(

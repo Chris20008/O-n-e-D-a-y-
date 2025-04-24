@@ -34,7 +34,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
     if(!widget.withSlideActions){
       return Container(
         decoration: BoxDecoration(
-            color: CupertinoTheme.of(context).barBackgroundColor,
+            color: Theme.of(context).cardColor,
             borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
         ),
         width: double.maxFinite,
@@ -61,7 +61,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
             //   key: UniqueKey(),
             //   duration: const Duration(milliseconds: 300),
             //   decoration: BoxDecoration(
-            //       color: CupertinoTheme.of(context).barBackgroundColor,
+            //       color: Theme.of(context).cardColor,
             //       borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
             //   ),
             //   width: double.maxFinite,
@@ -77,7 +77,7 @@ class _LinkWithSlideActionState extends State<LinkWithSlideAction> {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               decoration: BoxDecoration(
-                  color: CupertinoTheme.of(context).barBackgroundColor,
+                  color: Theme.of(context).cardColor,
                   borderRadius: widget.withSpacer? BorderRadius.circular(8) : const BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8))
               ),
               child: Row(

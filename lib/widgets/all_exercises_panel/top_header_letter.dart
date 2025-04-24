@@ -76,7 +76,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
           child: Container(
               height: 45,
               width: double.maxFinite,
-              color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).primaryColor,
               padding: const EdgeInsets.only(left: 30),
               child: text
           )

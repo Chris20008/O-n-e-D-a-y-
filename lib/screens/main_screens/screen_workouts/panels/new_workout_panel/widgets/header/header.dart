@@ -27,7 +27,7 @@ class NewWorkoutHeader extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.only(bottom: 0, right: 20.0, left: 20.0, top: 7),
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -52,7 +52,7 @@ class NewWorkoutHeader extends StatelessWidget {
               if(cnNewWorkout.workout.isTemplate)
                 Container(
                   height: 25,
-                  color: CupertinoTheme.of(context).scaffoldBackgroundColor
+                  color: Theme.of(context).primaryColor
                 ),
             ],
           ),

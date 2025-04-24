@@ -24,7 +24,7 @@ class _ExerciseOptionsSelectorsState extends State<ExerciseOptionsSelectors> {
     return CupertinoListSection.insetGrouped(
       key: cnNewExercise.keyHeader,
       decoration: BoxDecoration(
-          color: CupertinoTheme.of(context).barBackgroundColor
+          color: Theme.of(context).cardColor
       ),
       backgroundColor: Colors.transparent,
       children: [

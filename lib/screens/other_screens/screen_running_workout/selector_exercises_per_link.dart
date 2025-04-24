@@ -60,6 +60,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
   Widget build(BuildContext context) {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
+    print("Selector Exercises Per Link");
+
     final linkNames = groupedExercises.keys.toList();
 
     return MySlideUpPanel(
@@ -78,7 +80,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
               children: [
                 Container(
                   margin: const EdgeInsets.only(bottom: 2),
-                  color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).primaryColor,
                   child: listView(
                       controller: sc,
                       physics: const BouncingScrollPhysics(),
@@ -135,7 +137,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                                           child: MultipleExerciseRow(
                                             exercises: [ex],
                                             fontSize: 15,
-                                            colorFade: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                                            colorFade: Theme.of(context).primaryColor,
                                           ),
                                         ),
                                         Transform.scale(
@@ -169,7 +171,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                 Container(
                   height: 84,
                   // padding: const EdgeInsets.all(10),
-                  color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).primaryColor,
                   child: Column(
                     children: [
                       // Padding(
@@ -198,8 +200,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            CupertinoTheme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0),
-                            CupertinoTheme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).primaryColor.withValues(alpha: 0.0),
+                            Theme.of(context).primaryColor,
                           ]
                       ),
                     ),
@@ -212,7 +214,7 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                     left: 0,
                     right: 0,
                     child: Container(
-                      color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).primaryColor,
                       height: cnBottomMenu.height,
                     )
                 ),
@@ -227,8 +229,8 @@ class _SelectorExercisesPerLinkState extends State<SelectorExercisesPerLink> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            CupertinoTheme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0),
-                            CupertinoTheme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).primaryColor.withValues(alpha: 0.0),
+                            Theme.of(context).primaryColor,
                           ]
                       ),
                     ),

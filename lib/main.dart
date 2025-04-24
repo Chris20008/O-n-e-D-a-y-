@@ -15,6 +15,7 @@ import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/widgets/background_image.dart';
+import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/show_new_features_pop_up.dart';
@@ -23,9 +24,7 @@ import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:fitness_app/widgets/tutorials/tutorial_create_workout_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -90,6 +89,7 @@ class MyAppState extends State<MyApp> {
       providers:[
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
+        ChangeNotifierProvider(create: (context) => CnBannerRunningWorkout()),
         ChangeNotifierProvider(create: (context) => CnStandardPopUp()),
         ChangeNotifierProvider(create: (context) => CnBackgroundColor()),
         ChangeNotifierProvider(create: (context) => CnAnimatedColumn()),
@@ -104,33 +104,8 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
-      child: CupertinoApp(
+      child: MaterialApp(
         // showPerformanceOverlay: true,
-        // locale: _locale,
-        // supportedLocales: supportedLocales,
-        // localizationsDelegates: const [
-        //   AppLocalizations.delegate,
-        //   GlobalMaterialLocalizations.delegate,
-        //   GlobalWidgetsLocalizations.delegate,
-        //   GlobalCupertinoLocalizations.delegate,
-        // ],
-        // themeMode: ThemeMode.dark,
-        // darkTheme: ThemeData.dark().copyWith(
-        //     cardColor: Color(0xFF2C2C2E),
-        //     primaryColor: Color(0xFF1C1C1E),
-        //     colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
-        //     // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        //     // useMaterial3: true,
-        //     splashFactory: InkSparkle.splashFactory,
-        //     cupertinoOverrideTheme: const CupertinoThemeData(
-        //       brightness: Brightness.dark,
-        //       primaryColor: Color(0xffdb7b01),
-        //     ),
-        //     iconTheme: const IconThemeData(
-        //       color: Color(0xffdb7b01),
-        //     ),
-        // ),
-        // Lokalisierung (funktioniert auch in CupertinoApp!)
         locale: _locale,
         supportedLocales: supportedLocales,
         localizationsDelegates: const [
@@ -139,17 +114,42 @@ class MyAppState extends State<MyApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-
-        // Theme
-        theme: const CupertinoThemeData(
-          brightness: Brightness.dark,
-          primaryColor: Color(0xffdb7b01),
-          barBackgroundColor: Color(0xFF2C2C2E),
-          scaffoldBackgroundColor: Color(0xFF1C1C1E),
-          textTheme: CupertinoTextThemeData(
-            primaryColor: Color(0xffdb7b01),
-          ),
+        themeMode: ThemeMode.dark,
+        darkTheme: ThemeData.dark().copyWith(
+            cardColor: Color(0xFF2C2C2E),
+            primaryColor: Color(0xFF1C1C1E),
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
+            // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+            // useMaterial3: true,
+            splashFactory: InkSparkle.splashFactory,
+            cupertinoOverrideTheme: const CupertinoThemeData(
+              brightness: Brightness.dark,
+              primaryColor: Color(0xffdb7b01),
+            ),
+            iconTheme: const IconThemeData(
+              color: Color(0xffdb7b01),
+            ),
         ),
+        // Lokalisierung (funktioniert auch in CupertinoApp!)
+        // locale: _locale,
+        // supportedLocales: supportedLocales,
+        // localizationsDelegates: const [
+        //   AppLocalizations.delegate,
+        //   GlobalMaterialLocalizations.delegate,
+        //   GlobalWidgetsLocalizations.delegate,
+        //   GlobalCupertinoLocalizations.delegate,
+        // ],
+        //
+        // // Theme
+        // theme: const CupertinoThemeData(
+        //   brightness: Brightness.dark,
+        //   primaryColor: Color(0xffdb7b01),
+        //   barBackgroundColor: Color(0xFF2C2C2E),
+        //   scaffoldBackgroundColor: Color(0xFF1C1C1E),
+        //   textTheme: CupertinoTextThemeData(
+        //     primaryColor: Color(0xffdb7b01),
+        //   ),
+        // ),
         home: const MyHomePage(),
       ),
     );
@@ -176,6 +176,7 @@ class _MyHomePageState extends State<MyHomePage>{
   late CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnAllExercisesPanel cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context, listen: false);
+  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late CnConfig cnConfig;
   late CnHomepage cnHomepage;
   bool showWelcomeScreen = false;
@@ -230,14 +231,21 @@ class _MyHomePageState extends State<MyHomePage>{
     cnStopwatchWidget.countdownTime = cnConfig.countdownTime;
 
     /// open screenRunningWorkout when it's saved in config.json and the welcome screen is not shown
-    if(cnRunningWorkout.isRunning && cnRunningWorkout.isVisible && !showWelcomeScreen){
-      Future.delayed(const Duration(milliseconds: 300), (){
-        Navigator.push(
-            context,
-            CupertinoPageRoute(
-                builder: (context) => const ScreenRunningWorkout()
-            ));
-      });
+    if(cnRunningWorkout.isRunning && !showWelcomeScreen){
+      if(cnRunningWorkout.isVisible){
+        cnBannerRunningWorkout.onlyShow();
+        Future.delayed(const Duration(milliseconds: 300), (){
+          Navigator.push(
+              context,
+              CupertinoPageRoute(
+                  builder: (context) => const ScreenRunningWorkout()
+              ));
+        });
+      }
+      else{
+        cnBannerRunningWorkout.activateButton();
+      }
+
     }
 
 
@@ -285,7 +293,7 @@ class _MyHomePageState extends State<MyHomePage>{
     if(!cnConfig.isInitialized || !mainIsInitialized){
       return Scaffold(
         body: Container(
-          // color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          // color: Theme.of(context).primaryColor,
           height: double.maxFinite,
           width: double.maxFinite,
           decoration: const BoxDecoration(
@@ -467,10 +475,15 @@ class _MyHomePageState extends State<MyHomePage>{
                     child: SafeArea(
                       child: Column(
                         children: [
-                          AnimatedContainer(
-                            height: cnRunningWorkout.isRunning && cnBottomMenu.index == 1? 55 : (Platform.isAndroid? 10 : 0),
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeOut,
+                          Selector<CnBannerRunningWorkout, bool>(
+                              selector: (_, cn) => cn.showBanner,
+                              builder: (_, showBanner, __){
+                              return AnimatedContainer(
+                                height: showBanner && cnBottomMenu.index == 1? 55 : (Platform.isAndroid? 10 : 0),
+                                duration: const Duration(milliseconds: 200),
+                                curve: Curves.easeOut,
+                              );
+                            }
                           ),
                           Container(
                             decoration: BoxDecoration(

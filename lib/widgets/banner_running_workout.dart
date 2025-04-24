@@ -3,10 +3,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
-import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'bottom_menu.dart';
 
 class BannerRunningWorkout extends StatefulWidget {
   const BannerRunningWorkout({super.key});
@@ -18,125 +15,109 @@ class BannerRunningWorkout extends StatefulWidget {
 class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
 
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  late CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
-  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
-  late CnWorkouts cnWorkouts;
+  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   final double _height = 50;
 
   @override
   Widget build(BuildContext context) {
-    cnWorkouts = Provider.of<CnWorkouts>(context);
 
-    return AnimatedCrossFade(
-        firstChild: const SizedBox(width: double.maxFinite),
-        secondChild: ClipRRect(
-          child: BackdropFilter(
-            filter: ImageFilter.blur(
-                sigmaX: 10.0,
-                sigmaY: 10.0,
-                tileMode: TileMode.mirror
-            ),
-            child: Container(
-              width: double.maxFinite,
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.45),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () {
-                    if(!cnRunningWorkout.isVisible){
-                      cnRunningWorkout.reopenRunningWorkout(context);
-                    }
-                  },
+    return Selector<CnBannerRunningWorkout, bool>(
+        selector: (_, cn) => cn.showBanner,
+        builder: (_, showBanner, __){
+          return AnimatedCrossFade(
+              firstChild: const SizedBox(width: double.maxFinite),
+              secondChild: ClipRRect(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                      sigmaX: 10.0,
+                      sigmaY: 10.0,
+                      tileMode: TileMode.mirror
+                  ),
                   child: Container(
-                    height: _height,
                     width: double.maxFinite,
-                    color: Colors.black.withValues(alpha: 0.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Spacer(),
-                        Expanded(
-                          flex: 4,
-                          child: Center(
-                            child: OverflowSafeText(
-                                cnRunningWorkout.workout.name,
-                                style: Theme.of(context).textTheme.titleMedium,
-                                maxLines: 1,
-                                minFontSize: 27
-                            ),
-                          ),
-                        ),
-                        const Spacer(),
-                      ],
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.45),
+                    ),
+                    child: SafeArea(
+                      bottom: false,
+                      child: Selector<CnBannerRunningWorkout, bool>(
+                          selector: (_, cn) => cn.canOpenWorkout,
+                          builder: (_, canOpenWorkout, __){
+                            return CupertinoButton(
+                              padding: EdgeInsets.zero,
+                              onPressed: () {
+                                if(canOpenWorkout){
+                                  cnRunningWorkout.reopenRunningWorkout(context);
+                                  cnBannerRunningWorkout.onlyShow();
+                                }
+                              },
+                              child: Container(
+                                height: _height,
+                                width: double.maxFinite,
+                                color: Colors.black.withValues(alpha: 0.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Spacer(),
+                                    Expanded(
+                                      flex: 4,
+                                      child: Center(
+                                        child: OverflowSafeText(
+                                            cnRunningWorkout.workout.name,
+                                            style: Theme.of(context).textTheme.titleMedium,
+                                            maxLines: 1,
+                                            minFontSize: 27
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ),
-        crossFadeState: !cnRunningWorkout.isRunning
-          ?CrossFadeState.showFirst
-          :CrossFadeState.showSecond,
-        duration: const Duration(
-          milliseconds: 250
-        )
+              crossFadeState: !showBanner
+                  ?CrossFadeState.showFirst
+                  :CrossFadeState.showSecond,
+              duration: const Duration(
+                  milliseconds: 250
+              )
+          );
+        }
     );
+  }
+}
 
-    // if(!cnRunningWorkout.isRunning){
-    //   return const SizedBox(width: double.maxFinite);
-    // }
-    // print("IS RUNNING");
-    // return ClipRRect(
-    //   child: BackdropFilter(
-    //     filter: ImageFilter.blur(
-    //         sigmaX: 10.0,
-    //         sigmaY: 10.0,
-    //         tileMode: TileMode.mirror
-    //     ),
-    //     child: Container(
-    //       width: double.maxFinite,
-    //       decoration: BoxDecoration(
-    //           color: Colors.black.withValues(alpha: 0.5),
-    //       ),
-    //       child: SafeArea(
-    //         bottom: false,
-    //         child: GestureDetector(
-    //           onTap: () {
-    //             if(!cnRunningWorkout.isVisible){
-    //               cnRunningWorkout.reopenRunningWorkout(context);
-    //             }
-    //           },
-    //           child: Container(
-    //             height: _height,
-    //             width: double.maxFinite,
-    //             color: Colors.black.withValues(alpha: 0.0),
-    //             child: Row(
-    //               mainAxisAlignment: MainAxisAlignment.center,
-    //               children: [
-    //                 Spacer(),
-    //                 Expanded(
-    //                   flex: 4,
-    //                   child: Center(
-    //                     child: OverflowSafeText(
-    //                       cnRunningWorkout.workout.name,
-    //                       style: Theme.of(context).textTheme.titleMedium,
-    //                       maxLines: 1,
-    //                       minFontSize: 27
-    //                     ),
-    //                   ),
-    //                 ),
-    //                 const Spacer(),
-    //               ],
-    //             ),
-    //           ),
-    //         ),
-    //       ),
-    //     ),
-    //   ),
-    // );
+class CnBannerRunningWorkout extends ChangeNotifier {
+  bool showBanner = false;
+  bool canOpenWorkout = false;
+
+  void reset(){
+    showBanner = false;
+    canOpenWorkout = false;
+    refresh();
+  }
+
+  void onlyShow(){
+    showBanner = true;
+    canOpenWorkout = false;
+    refresh();
+  }
+
+  void activateButton(){
+    showBanner = true;
+    canOpenWorkout = true;
+    refresh();
+  }
+
+  void refresh(){
+    print("Refresh Banner with show $showBanner cnOpen $canOpenWorkout");
+
+    notifyListeners();
   }
 }

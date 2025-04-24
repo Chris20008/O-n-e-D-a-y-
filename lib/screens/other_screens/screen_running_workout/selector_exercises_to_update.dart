@@ -71,6 +71,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   Widget build(BuildContext context) {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
 
+    print("Selector Exercises To Update");
+
     return MySlideUpPanel(
       animationControllerName: "SelectorExerciseToUpdate",
       descendantAnimationControllerName: widget.descendantAnimationControllerName,
@@ -88,7 +90,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
               children: [
                 Container(
                   margin: const EdgeInsets.only(bottom: 2),
-                  color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).primaryColor,
                   child: listView(
                       controller: sc,
                       physics: const BouncingScrollPhysics(),
@@ -155,7 +157,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                 MultipleExerciseRow(
                                   exercises: getExercises(index, context),
                                   fontSize: 15,
-                                  colorFade: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                                  colorFade: Theme.of(context).primaryColor,
                                   comparePreviousExercise: true,
                                 )
                               ],
@@ -167,7 +169,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                 ),
                 Container(
                   height: 84,
-                  color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                  color: Theme.of(context).primaryColor,
                   child: Column(
                     children: [
                       // Padding(
@@ -197,8 +199,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            CupertinoTheme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0),
-                            CupertinoTheme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).primaryColor.withValues(alpha: 0.0),
+                            Theme.of(context).primaryColor,
                           ]
                       ),
                     ),
@@ -211,7 +213,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     left: 0,
                     right: 0,
                     child: Container(
-                      color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                      color: Theme.of(context).primaryColor,
                       height: cnBottomMenu.height,
                     )
                 ),
@@ -226,8 +228,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            CupertinoTheme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.0),
-                            CupertinoTheme.of(context).scaffoldBackgroundColor,
+                            Theme.of(context).primaryColor.withValues(alpha: 0.0),
+                            Theme.of(context).primaryColor,
                           ]
                       ),
                     ),

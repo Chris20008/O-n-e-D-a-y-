@@ -24,7 +24,7 @@ class ExerciseNameField extends StatelessWidget {
       right: 0,
       child: Container(
           alignment: Alignment.bottomLeft,
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
           child: Padding(
             padding: const EdgeInsets.only(bottom: 15, top: 67, left: 16, right: 16),
             child: Form(

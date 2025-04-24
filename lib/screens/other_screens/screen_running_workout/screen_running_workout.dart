@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/setRow.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
@@ -12,13 +12,10 @@ import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'dart:io';
-
 import '../../../main.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
@@ -29,7 +26,6 @@ import '../../../widgets/standard_popup.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
 import 'animated_column.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({
@@ -48,34 +44,47 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
+  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout;
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu;
-  final double _iconSize = 20;
-  final double _heightOfSetRow = 30;
-  final double _widthOfTextField = 55;
-  final double _setPadding = 5;
-  final double _defaultBottomSpacerHeight = Platform.isAndroid? 80 : 100;
+  // final double _heightOfSetRow = 30;
+  // final double _setPadding = 5;
   Key selectorExerciseToUpdateKey = UniqueKey();
   Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
   bool isSavingData = false;
-  final _style = const TextStyle(color: Colors.white, fontSize: 15);
+  // final _style = const TextStyle(color: Colors.white, fontSize: 15);
   String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
   PanelController controllerSelectorExerciseToUpdate = PanelController();
   PanelController controllerSelectorExercisePerLink = PanelController();
-  String? currentDraggingKey;
   int timeAnimatedColumn = 1000;
   bool isShowingAnimatedColumn = true;
+  // bool showContent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 500), (){
+      cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
+      cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
+      cnRunningWorkout.contentIsActive = true;
+      cnRunningWorkout.refresh();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
-    cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
+    if(!cnRunningWorkout.scrollController.hasClients){
+      cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
+    }
+
+    print("Running Workout");
 
     return PopScope(
       canPop: !isSavingData,
@@ -83,14 +92,14 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
         if(cnRunningWorkout.isVisible){
           cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
           cnRunningWorkout.isVisible = false;
-          cnWorkouts.refresh();
           cnRunningWorkout.cache();
+          cnBannerRunningWorkout.activateButton();
         }
-        if(cnStandardPopUp.isVisible){
-          cnStandardPopUp.clear();
+        else{
+          cnBannerRunningWorkout.reset();
         }
-        // cnNewWorkOutPanel.showHidedPanel(context);
         FocusManager.instance.primaryFocus?.unfocus();
+        cnRunningWorkout.contentIsActive = false;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -107,7 +116,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                 backDropEnabled: true,
                 animationControllerName: "ScreenRunningWorkout",
                 child: Scaffold(
-                  backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                  backgroundColor: Theme.of(context).primaryColor,
                   extendBody: true,
                   resizeToAvoidBottomInset: false,
                   bottomNavigationBar: ClipRRect(
@@ -148,420 +157,414 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                           bottom: false,
                           child: Padding(
                             padding: EdgeInsets.only(top:0,bottom: viewInsetsBottom ,left: 20, right: 20),
-                            child: Column(
+                            child: const Column(
                               children: [
 
                                 Expanded(
 
                                   /// Each EXERCISE and SET
-                                  child: SlidableAutoCloseBehavior(
-                                    child: ReorderableListView.builder(
-                                      scrollController: cnRunningWorkout.scrollController,
-                                      physics: const BouncingScrollPhysics(),
-                                      shrinkWrap: true,
-                                      onReorderStart: (index){
-                                        currentDraggingKey = cnRunningWorkout.groupedExercises.entries.toList()[index].key.split("_").firstOrNull;
-                                      },
-                                      onReorderEnd: (index){
-                                        currentDraggingKey = null;
-                                      },
-                                      onReorder: (int oldIndex, int newIndex) {
-                                        if (oldIndex < newIndex) {
-                                          newIndex -= 1;
-                                        }
-                                        dynamic movingItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[oldIndex]];
-                                        dynamic newIndexItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[newIndex]];
-
-                                        if(movingItem is GroupedSet && newIndexItem is GroupedSet){
-                                          String linkNameOld = cnRunningWorkout.groupedExercises.keys.toList()[oldIndex].split("_").first;
-                                          String linkNameNew = cnRunningWorkout.groupedExercises.keys.toList()[newIndex].split("_").first;
-                                          if(linkNameOld != linkNameNew){
-                                            return;
-                                          }
-                                          Exercise exOld = (cnRunningWorkout.groupedExercises[linkNameOld] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameOld]!)!;
-                                          Exercise exNew = (cnRunningWorkout.groupedExercises[linkNameNew] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameNew]!)!;
-                                          movingItem = movingItem.getSet(exOld.name);
-                                          newIndexItem = newIndexItem.getSet(exNew.name);
-                                        }
-
-                                        if(movingItem is NamedSet && newIndexItem is NamedSet && movingItem.name == newIndexItem.name){
-                                          NamedSet? setToMove = cnRunningWorkout.removeSpecificSetFromExercise(movingItem);
-
-                                          if(setToMove == null){
-                                            return;
-                                          }
-                                          setToMove.index = newIndexItem.index;
-
-                                          if (oldIndex < newIndex) {
-                                            setToMove.index += 1;
-                                          }
-                                          cnRunningWorkout.addSpecificSetToExercise(setToMove);
-                                          setState(() {});
-
-                                        }
-                                      },
-                                      proxyDecorator: (Widget child, int index, Animation<double> animation) {
-                                        return AnimatedBuilder(
-                                          animation: animation,
-                                          builder: (BuildContext context, Widget? child) {
-                                            final double animValue = Curves.easeInOut.transform(animation.value);
-                                            final double scale = lerpDouble(1, 1.06, animValue)!;
-                                            return Transform.scale(
-                                              scale: scale,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(8),
-                                                child: Material(
-                                                    child: Container(
-                                                        padding: const EdgeInsets.only(left: 2),
-                                                        color: Colors.grey.withValues(alpha: 0.1),
-                                                        child: child
-                                                    )
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: child,
-                                        );
-                                      },
-                                      itemCount: cnRunningWorkout.groupedExercises.length,
-                                      itemBuilder: (BuildContext context, int indexExercise) {
-                                        Widget? child;
-                                        String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key;
-                                        dynamic mapValue = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-                                        dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-
-                                        if(mapValue.toString().contains("Separator")){
-                                          dynamic previousItem = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise-1].value;
-                                          late Exercise ex;
-                                          if(previousItem is NamedSet){
-                                            ex = previousItem.ex;
-                                          }
-                                          else{
-                                            previousItem = previousItem as GroupedSet;
-                                            String linkName = groupedExerciseKey.split("_").first;
-                                            ex = (cnRunningWorkout.groupedExercises[linkName] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkName]!)!;
-                                          }
-
-                                          Exercise? templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((e) => e.name == ex.name).firstOrNull;
-
-                                          child = GestureDetector(
-                                            /// Empty long press to prevent dragging
-                                            onLongPress: (){},
-                                            child: Column(
-                                              children: [
-                                                const SizedBox(height: 10,),
-                                                getRowButton(
-                                                    context: context,
-                                                    minusWidth: 10,
-                                                    height: 35,
-                                                    onPressed: (){
-                                                      addSet(ex, templateEx!);
-                                                    }
-                                                ),
-                                                if(indexExercise < cnRunningWorkout.groupedExercises.length-1)
-                                                  mySeparator(),
-                                              ],
-                                            ),
-                                          );
-                                        }
-
-                                        else if(item is Exercise || item is GroupedExercise){
-
-                                          Exercise? newEx = item is Exercise ? item : (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!);
-
-                                          if(newEx == null){
-                                            return const SizedBox();
-                                          }
-
-                                          child = GestureDetector(
-                                            /// Empty long press to prevent dragging
-                                            onLongPress: (){},
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                if (item is !Exercise)
-                                                  Align(
-                                                    alignment: Alignment.centerLeft,
-                                                    child: OverflowSafeText(
-                                                      groupedExerciseKey,
-                                                      textAlign: TextAlign.center,
-                                                      style: const TextStyle(
-                                                          fontSize: 13,
-                                                          color: Colors.white70
-                                                      ),
-                                                      minFontSize: 12,
-                                                      maxLines: 1,
-                                                    ),
-                                                  ),
-                                                Row(
-                                                  children: [
-                                                    item is Exercise
-                                                    /// Single Exercise
-                                                        ? Expanded(
-                                                      child: ConstrainedBox(
-                                                        constraints: BoxConstraints(
-                                                            maxWidth: MediaQuery.of(context).size.width-80
-                                                        ),
-                                                        child: OverflowSafeText(
-                                                          newEx.name,
-                                                          maxLines: 1,
-                                                          style: const TextStyle(color: Colors.white, fontSize: 20),
-                                                        ),
-                                                      ),
-                                                    )
-                                                    /// Exercise Selector
-                                                        : PullDownButton(
-                                                      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-                                                      buttonAnchor: PullDownMenuAnchor.start,
-                                                      routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
-                                                      itemBuilder: (context) {
-                                                        final children = item.exercises.map<PullDownMenuItem>((Exercise value) {
-                                                          return PullDownMenuItem.selectable(
-                                                            title: value.name,
-                                                            selected: value.name == (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!)?.name,
-                                                            onTap: () {
-                                                              FocusManager.instance.primaryFocus?.unfocus();
-                                                              HapticFeedback.selectionClick();
-                                                              Future.delayed(const Duration(milliseconds: 200), (){
-                                                                setState(() {
-                                                                  final exercises = mapValue.exercises;
-                                                                  final t = exercises.indexWhere((ex) => ex.name == value.name);
-
-                                                                  cnRunningWorkout.selectedIndexes[groupedExerciseKey] = t;
-                                                                });
-                                                                cnRunningWorkout.cache();
-                                                              });
-                                                            },
-                                                          );
-                                                        }).toList();
-                                                        return children;
-                                                      },
-                                                      buttonBuilder: (context, showMenu) => CupertinoButton(
-                                                          onPressed: (){
-                                                            HapticFeedback.selectionClick();
-                                                            showMenu();
-                                                          },
-                                                          padding: EdgeInsets.zero,
-                                                          child: Row(
-                                                            children: [
-                                                              ConstrainedBox(
-                                                                constraints: BoxConstraints(
-                                                                    maxWidth: MediaQuery.of(context).size.width-120
-                                                                ),
-                                                                child: OverflowSafeText(
-                                                                    (mapValue as GroupedExercise).exercises[cnRunningWorkout.selectedIndexes[groupedExerciseKey]!].name,
-                                                                    style: const TextStyle(color: Colors.white, fontSize: 20),
-                                                                    maxLines: 1
-                                                                ),
-                                                              ),
-                                                              const SizedBox(width: 10,),
-                                                              trailingChoice(size: 15, color: Colors.white)
-                                                            ],
-                                                          )
-                                                      ),
-                                                    ),
-
-                                                    cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
-                                                        ? const SizedBox()
-                                                        : const Spacer(),
-
-                                                    // if(cnRunningWorkout.newExNames.contains(key))
-                                                    //   SizedBox(
-                                                    //     width:40,
-                                                    //     child: myIconButton(
-                                                    //       icon:const Icon(Icons.delete_forever),
-                                                    //       onPressed: (){
-                                                    //         showCupertinoModalPopup<void>(
-                                                    //           context: context,
-                                                    //           builder: (BuildContext context) => CupertinoActionSheet(
-                                                    //             cancelButton: getActionSheetCancelButton(context),
-                                                    //             message: Text(AppLocalizations.of(context)!.runningWorkoutDeleteExercise),
-                                                    //             actions: <Widget>[
-                                                    //               CupertinoActionSheetAction(
-                                                    //                 /// This parameter indicates the action would perform
-                                                    //                 /// a destructive action such as delete or exit and turns
-                                                    //                 /// the action's text color to red.
-                                                    //                 isDestructiveAction: true,
-                                                    //                 onPressed: () {
-                                                    //                   // cnRunningWorkout.deleteExercise(item is Exercise? item : item._exercises[0]);
-                                                    //                   Navigator.pop(context);
-                                                    //                 },
-                                                    //                 child: Text(AppLocalizations.of(context)!.delete),
-                                                    //               ),
-                                                    //             ],
-                                                    //           ),
-                                                    //         );
-                                                    //       },
-                                                    //     ),
-                                                    //   ),
-                                                  ],
-                                                ),
-
-                                                const SizedBox(height: 5),
-
-                                                Row(
-                                                  // mainAxisSize: MainAxisSize.min,
-                                                  mainAxisAlignment: MainAxisAlignment.start,
-                                                  children: [
-                                                    SizedBox(width: 100, child: getSeatLevelSelector(newEx)),
-                                                    Icon(MyIcons.tags, size: _iconSize-3),
-                                                    const SizedBox(width: 8,),
-                                                    Text(newEx.getCategoryName())
-                                                  ]
-                                                ),
-
-                                                /// Rest in Seconds Row and Selector
-                                                getRestInSecondsSelector(newEx),
-
-                                                const SizedBox(height: 15),
-
-                                                /// Text for Set, Template, Weight and Amount
-                                                Row(
-                                                  children: [
-                                                    SizedBox(
-                                                        width: _widthOfTextField,
-                                                        child: OverflowSafeText(
-                                                          AppLocalizations.of(context)!.set,
-                                                          textAlign: TextAlign.center,
-                                                          // fontSize: 12,
-                                                          style: const TextStyle(
-                                                              fontSize: 13,
-                                                              color: Colors.white70
-                                                          ),
-                                                          minFontSize: 12,
-                                                          maxLines: 1,
-                                                        )
-                                                    ),
-                                                    Expanded(
-                                                        flex: 2,
-                                                        child: OverflowSafeText(
-                                                            AppLocalizations.of(context)!.template,
-                                                            textAlign: TextAlign.center,
-                                                            // fontSize: 12,
-                                                            style: const TextStyle(
-                                                                fontSize: 13,
-                                                                color: Colors.white70
-                                                            ),
-                                                            minFontSize: 12,
-                                                            maxLines: 1
-                                                        )
-                                                    ),
-                                                    /// TextField Headers
-                                                    Expanded(
-                                                        flex: 2,
-                                                        child: Row(
-                                                          mainAxisAlignment: MainAxisAlignment.center,
-                                                          children: [
-                                                            SizedBox(
-                                                                width: _widthOfTextField+10,
-                                                                child: OverflowSafeText(
-                                                                  // AppLocalizations.of(context)!.weight,
-                                                                    newEx.getLeftTitle(context),
-                                                                    textAlign: TextAlign.center,
-                                                                    // fontSize: 12,
-                                                                    style: const TextStyle(
-                                                                        fontSize: 13,
-                                                                        color: Colors.white70
-                                                                    ),
-                                                                    minFontSize: 12,
-                                                                    maxLines: 1
-                                                                )
-                                                            ),
-                                                            const SizedBox(width: 4,),
-                                                            SizedBox(
-                                                                width: _widthOfTextField+10,
-                                                                child: OverflowSafeText(
-                                                                  // AppLocalizations.of(context)!.amount,
-                                                                    newEx.getRightTitle(context),
-                                                                    textAlign: TextAlign.center,
-                                                                    // fontSize: 12,
-                                                                    style: const TextStyle(
-                                                                        fontSize: 13,
-                                                                        color: Colors.white70
-                                                                    ),
-                                                                    minFontSize: 12,
-                                                                    maxLines: 1
-                                                                )
-                                                            )
-                                                          ],
-                                                        )
-                                                    )
-                                                  ],
-                                                ),
-
-                                                const SizedBox(height: 5),
-                                              ],
-                                            ),
-                                          );
-                                        }
-
-                                        /// Single Set Row
-                                        if(item is NamedSet || item is GroupedSet){
-                                          child = SetRow(
-                                              cnRunningWorkout: cnRunningWorkout,
-                                              item: item,
-                                              groupedExerciseKey: groupedExerciseKey,
-                                              index: indexExercise,
-                                              cnHomepage: cnHomepage,
-                                          );
-                                        }
-
-                                        /// Top Spacer
-                                        if (indexExercise == 0){
-                                          child = Column(
-                                            children: [
-                                              SizedBox(height: Platform.isAndroid? 80 : 120),
-                                              child?? const SizedBox()
-                                            ],
-                                          );
-                                        }
-
-                                        /// Bottom Spacer
-                                        if (indexExercise == cnRunningWorkout.groupedExercises.length-1){
-                                          child = Column(
-                                            children: [
-                                              child?? const SizedBox(),
-                                              AnimatedContainer(
-                                                  duration: const Duration(milliseconds: 250),
-                                                  height: _defaultBottomSpacerHeight
-                                                      + (cnStopwatchWidget.isOpened
-                                                          ? cnStopwatchWidget.heightOfTimer
-                                                          : 0)
-                                                      + (cnSpotifyBar.isConnected
-                                                          ? cnSpotifyBar.height
-                                                          : 0)
-                                              ),
-                                            ],
-                                          );
-                                        }
-
-                                        // if(indexExercise == cnRunningWorkout.groupedExercises.length-1){
-                                        //   child = Padding(
-                                        //     padding: EdgeInsets.only(bottom: viewInsetsBottom),
-                                        //     child: child
-                                        //   );
-                                        // }
-
-                                        return Container(
-                                            key: currentDraggingKey == null ||
-                                                ((item is NamedSet || item is GroupedSet)
-                                                && groupedExerciseKey.contains(currentDraggingKey!))
-                                                ? ValueKey(groupedExerciseKey)
-                                                : UniqueKey(),
-                                            // key: key,
-                                            // key: ValueKey(groupedExerciseKey),
-                                            child: child?? const SizedBox());
-                                      },
-                                    ),
-                                  ),
+                                  child: RunningWorkoutContent(),
+                                  // child: SlidableAutoCloseBehavior(
+                                  //   child: ReorderableListView.builder(
+                                  //     scrollController: cnRunningWorkout.scrollController,
+                                  //     physics: const BouncingScrollPhysics(),
+                                  //     shrinkWrap: true,
+                                  //     onReorderStart: (index){
+                                  //       currentDraggingKey = cnRunningWorkout.groupedExercises.entries.toList()[index].key.split("_").firstOrNull;
+                                  //     },
+                                  //     onReorderEnd: (index){
+                                  //       currentDraggingKey = null;
+                                  //     },
+                                  //     onReorder: (int oldIndex, int newIndex) {
+                                  //       if (oldIndex < newIndex) {
+                                  //         newIndex -= 1;
+                                  //       }
+                                  //       dynamic movingItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[oldIndex]];
+                                  //       dynamic newIndexItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[newIndex]];
+                                  //
+                                  //       if(movingItem is GroupedSet && newIndexItem is GroupedSet){
+                                  //         String linkNameOld = cnRunningWorkout.groupedExercises.keys.toList()[oldIndex].split("_").first;
+                                  //         String linkNameNew = cnRunningWorkout.groupedExercises.keys.toList()[newIndex].split("_").first;
+                                  //         if(linkNameOld != linkNameNew){
+                                  //           return;
+                                  //         }
+                                  //         Exercise exOld = (cnRunningWorkout.groupedExercises[linkNameOld] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameOld]!)!;
+                                  //         Exercise exNew = (cnRunningWorkout.groupedExercises[linkNameNew] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameNew]!)!;
+                                  //         movingItem = movingItem.getSet(exOld.name);
+                                  //         newIndexItem = newIndexItem.getSet(exNew.name);
+                                  //       }
+                                  //
+                                  //       if(movingItem is NamedSet && newIndexItem is NamedSet && movingItem.name == newIndexItem.name){
+                                  //         NamedSet? setToMove = cnRunningWorkout.removeSpecificSetFromExercise(movingItem);
+                                  //
+                                  //         if(setToMove == null){
+                                  //           return;
+                                  //         }
+                                  //         setToMove.index = newIndexItem.index;
+                                  //
+                                  //         if (oldIndex < newIndex) {
+                                  //           setToMove.index += 1;
+                                  //         }
+                                  //         cnRunningWorkout.addSpecificSetToExercise(setToMove);
+                                  //         setState(() {});
+                                  //
+                                  //       }
+                                  //     },
+                                  //     proxyDecorator: (Widget child, int index, Animation<double> animation) {
+                                  //       return AnimatedBuilder(
+                                  //         animation: animation,
+                                  //         builder: (BuildContext context, Widget? child) {
+                                  //           final double animValue = Curves.easeInOut.transform(animation.value);
+                                  //           final double scale = lerpDouble(1, 1.06, animValue)!;
+                                  //           return Transform.scale(
+                                  //             scale: scale,
+                                  //             child: ClipRRect(
+                                  //               borderRadius: BorderRadius.circular(8),
+                                  //               child: Material(
+                                  //                   child: Container(
+                                  //                       padding: const EdgeInsets.only(left: 2),
+                                  //                       color: Colors.grey.withValues(alpha: 0.1),
+                                  //                       child: child
+                                  //                   )
+                                  //               ),
+                                  //             ),
+                                  //           );
+                                  //         },
+                                  //         child: child,
+                                  //       );
+                                  //     },
+                                  //     itemCount: cnRunningWorkout.groupedExercises.length,
+                                  //     itemBuilder: (BuildContext context, int indexExercise) {
+                                  //       Widget? child;
+                                  //       String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key;
+                                  //       dynamic mapValue = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+                                  //       dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+                                  //
+                                  //       if(mapValue.toString().contains("Separator")){
+                                  //         dynamic previousItem = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise-1].value;
+                                  //         late Exercise ex;
+                                  //         if(previousItem is NamedSet){
+                                  //           ex = previousItem.ex;
+                                  //         }
+                                  //         else{
+                                  //           previousItem = previousItem as GroupedSet;
+                                  //           String linkName = groupedExerciseKey.split("_").first;
+                                  //           ex = (cnRunningWorkout.groupedExercises[linkName] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkName]!)!;
+                                  //         }
+                                  //
+                                  //         Exercise? templateEx = cnRunningWorkout.workoutTemplateModifiable.exercises.where((e) => e.name == ex.name).firstOrNull;
+                                  //
+                                  //         child = GestureDetector(
+                                  //           /// Empty long press to prevent dragging
+                                  //           onLongPress: (){},
+                                  //           child: Column(
+                                  //             children: [
+                                  //               const SizedBox(height: 10,),
+                                  //               getRowButton(
+                                  //                   context: context,
+                                  //                   minusWidth: 10,
+                                  //                   height: 35,
+                                  //                   onPressed: (){
+                                  //                     addSet(ex, templateEx!);
+                                  //                   }
+                                  //               ),
+                                  //               if(indexExercise < cnRunningWorkout.groupedExercises.length-1)
+                                  //                 mySeparator(),
+                                  //             ],
+                                  //           ),
+                                  //         );
+                                  //       }
+                                  //
+                                  //       else if(item is Exercise || item is GroupedExercise){
+                                  //
+                                  //         Exercise? newEx = item is Exercise ? item : (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!);
+                                  //
+                                  //         if(newEx == null){
+                                  //           return const SizedBox();
+                                  //         }
+                                  //
+                                  //         child = GestureDetector(
+                                  //           /// Empty long press to prevent dragging
+                                  //           onLongPress: (){},
+                                  //           child: Column(
+                                  //             mainAxisSize: MainAxisSize.min,
+                                  //             children: [
+                                  //               if (item is !Exercise)
+                                  //                 Align(
+                                  //                   alignment: Alignment.centerLeft,
+                                  //                   child: OverflowSafeText(
+                                  //                     groupedExerciseKey,
+                                  //                     textAlign: TextAlign.center,
+                                  //                     style: const TextStyle(
+                                  //                         fontSize: 13,
+                                  //                         color: Colors.white70
+                                  //                     ),
+                                  //                     minFontSize: 12,
+                                  //                     maxLines: 1,
+                                  //                   ),
+                                  //                 ),
+                                  //               Row(
+                                  //                 children: [
+                                  //                   item is Exercise
+                                  //                   /// Single Exercise
+                                  //                       ? Expanded(
+                                  //                     child: ConstrainedBox(
+                                  //                       constraints: BoxConstraints(
+                                  //                           maxWidth: MediaQuery.of(context).size.width-80
+                                  //                       ),
+                                  //                       child: OverflowSafeText(
+                                  //                         newEx.name,
+                                  //                         maxLines: 1,
+                                  //                         style: const TextStyle(color: Colors.white, fontSize: 20),
+                                  //                       ),
+                                  //                     ),
+                                  //                   )
+                                  //                   /// Exercise Selector
+                                  //                       : PullDownButton(
+                                  //                     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+                                  //                     buttonAnchor: PullDownMenuAnchor.start,
+                                  //                     routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
+                                  //                     itemBuilder: (context) {
+                                  //                       final children = item.exercises.map<PullDownMenuItem>((Exercise value) {
+                                  //                         return PullDownMenuItem.selectable(
+                                  //                           title: value.name,
+                                  //                           selected: value.name == (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!)?.name,
+                                  //                           onTap: () {
+                                  //                             FocusManager.instance.primaryFocus?.unfocus();
+                                  //                             HapticFeedback.selectionClick();
+                                  //                             Future.delayed(const Duration(milliseconds: 200), (){
+                                  //                               setState(() {
+                                  //                                 final exercises = mapValue.exercises;
+                                  //                                 final t = exercises.indexWhere((ex) => ex.name == value.name);
+                                  //
+                                  //                                 cnRunningWorkout.selectedIndexes[groupedExerciseKey] = t;
+                                  //                               });
+                                  //                               cnRunningWorkout.cache();
+                                  //                             });
+                                  //                           },
+                                  //                         );
+                                  //                       }).toList();
+                                  //                       return children;
+                                  //                     },
+                                  //                     buttonBuilder: (context, showMenu) => CupertinoButton(
+                                  //                         onPressed: (){
+                                  //                           HapticFeedback.selectionClick();
+                                  //                           showMenu();
+                                  //                         },
+                                  //                         padding: EdgeInsets.zero,
+                                  //                         child: Row(
+                                  //                           children: [
+                                  //                             ConstrainedBox(
+                                  //                               constraints: BoxConstraints(
+                                  //                                   maxWidth: MediaQuery.of(context).size.width-120
+                                  //                               ),
+                                  //                               child: OverflowSafeText(
+                                  //                                   (mapValue as GroupedExercise).exercises[cnRunningWorkout.selectedIndexes[groupedExerciseKey]!].name,
+                                  //                                   style: const TextStyle(color: Colors.white, fontSize: 20),
+                                  //                                   maxLines: 1
+                                  //                               ),
+                                  //                             ),
+                                  //                             const SizedBox(width: 10,),
+                                  //                             trailingChoice(size: 15, color: Colors.white)
+                                  //                           ],
+                                  //                         )
+                                  //                     ),
+                                  //                   ),
+                                  //
+                                  //                   cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
+                                  //                       ? const SizedBox()
+                                  //                       : const Spacer(),
+                                  //
+                                  //                   // if(cnRunningWorkout.newExNames.contains(key))
+                                  //                   //   SizedBox(
+                                  //                   //     width:40,
+                                  //                   //     child: myIconButton(
+                                  //                   //       icon:const Icon(Icons.delete_forever),
+                                  //                   //       onPressed: (){
+                                  //                   //         showCupertinoModalPopup<void>(
+                                  //                   //           context: context,
+                                  //                   //           builder: (BuildContext context) => CupertinoActionSheet(
+                                  //                   //             cancelButton: getActionSheetCancelButton(context),
+                                  //                   //             message: Text(AppLocalizations.of(context)!.runningWorkoutDeleteExercise),
+                                  //                   //             actions: <Widget>[
+                                  //                   //               CupertinoActionSheetAction(
+                                  //                   //                 /// This parameter indicates the action would perform
+                                  //                   //                 /// a destructive action such as delete or exit and turns
+                                  //                   //                 /// the action's text color to red.
+                                  //                   //                 isDestructiveAction: true,
+                                  //                   //                 onPressed: () {
+                                  //                   //                   // cnRunningWorkout.deleteExercise(item is Exercise? item : item._exercises[0]);
+                                  //                   //                   Navigator.pop(context);
+                                  //                   //                 },
+                                  //                   //                 child: Text(AppLocalizations.of(context)!.delete),
+                                  //                   //               ),
+                                  //                   //             ],
+                                  //                   //           ),
+                                  //                   //         );
+                                  //                   //       },
+                                  //                   //     ),
+                                  //                   //   ),
+                                  //                 ],
+                                  //               ),
+                                  //
+                                  //               const SizedBox(height: 5),
+                                  //
+                                  //               Row(
+                                  //                 // mainAxisSize: MainAxisSize.min,
+                                  //                 mainAxisAlignment: MainAxisAlignment.start,
+                                  //                 children: [
+                                  //                   SizedBox(width: 100, child: getSeatLevelSelector(newEx)),
+                                  //                   Icon(MyIcons.tags, size: _iconSize-3),
+                                  //                   const SizedBox(width: 8,),
+                                  //                   Text(newEx.getCategoryName())
+                                  //                 ]
+                                  //               ),
+                                  //
+                                  //               /// Rest in Seconds Row and Selector
+                                  //               getRestInSecondsSelector(newEx),
+                                  //
+                                  //               const SizedBox(height: 15),
+                                  //
+                                  //               /// Text for Set, Template, Weight and Amount
+                                  //               Row(
+                                  //                 children: [
+                                  //                   SizedBox(
+                                  //                       width: _widthOfTextField,
+                                  //                       child: OverflowSafeText(
+                                  //                         AppLocalizations.of(context)!.set,
+                                  //                         textAlign: TextAlign.center,
+                                  //                         // fontSize: 12,
+                                  //                         style: const TextStyle(
+                                  //                             fontSize: 13,
+                                  //                             color: Colors.white70
+                                  //                         ),
+                                  //                         minFontSize: 12,
+                                  //                         maxLines: 1,
+                                  //                       )
+                                  //                   ),
+                                  //                   Expanded(
+                                  //                       flex: 2,
+                                  //                       child: OverflowSafeText(
+                                  //                           AppLocalizations.of(context)!.template,
+                                  //                           textAlign: TextAlign.center,
+                                  //                           // fontSize: 12,
+                                  //                           style: const TextStyle(
+                                  //                               fontSize: 13,
+                                  //                               color: Colors.white70
+                                  //                           ),
+                                  //                           minFontSize: 12,
+                                  //                           maxLines: 1
+                                  //                       )
+                                  //                   ),
+                                  //                   /// TextField Headers
+                                  //                   Expanded(
+                                  //                       flex: 2,
+                                  //                       child: Row(
+                                  //                         mainAxisAlignment: MainAxisAlignment.center,
+                                  //                         children: [
+                                  //                           SizedBox(
+                                  //                               width: _widthOfTextField+10,
+                                  //                               child: OverflowSafeText(
+                                  //                                 // AppLocalizations.of(context)!.weight,
+                                  //                                   newEx.getLeftTitle(context),
+                                  //                                   textAlign: TextAlign.center,
+                                  //                                   // fontSize: 12,
+                                  //                                   style: const TextStyle(
+                                  //                                       fontSize: 13,
+                                  //                                       color: Colors.white70
+                                  //                                   ),
+                                  //                                   minFontSize: 12,
+                                  //                                   maxLines: 1
+                                  //                               )
+                                  //                           ),
+                                  //                           const SizedBox(width: 4,),
+                                  //                           SizedBox(
+                                  //                               width: _widthOfTextField+10,
+                                  //                               child: OverflowSafeText(
+                                  //                                 // AppLocalizations.of(context)!.amount,
+                                  //                                   newEx.getRightTitle(context),
+                                  //                                   textAlign: TextAlign.center,
+                                  //                                   // fontSize: 12,
+                                  //                                   style: const TextStyle(
+                                  //                                       fontSize: 13,
+                                  //                                       color: Colors.white70
+                                  //                                   ),
+                                  //                                   minFontSize: 12,
+                                  //                                   maxLines: 1
+                                  //                               )
+                                  //                           )
+                                  //                         ],
+                                  //                       )
+                                  //                   )
+                                  //                 ],
+                                  //               ),
+                                  //
+                                  //               const SizedBox(height: 5),
+                                  //             ],
+                                  //           ),
+                                  //         );
+                                  //       }
+                                  //
+                                  //       /// Single Set Row
+                                  //       if(item is NamedSet || item is GroupedSet){
+                                  //         child = SetRow(
+                                  //             cnRunningWorkout: cnRunningWorkout,
+                                  //             item: item,
+                                  //             groupedExerciseKey: groupedExerciseKey,
+                                  //             index: indexExercise,
+                                  //             cnHomepage: cnHomepage,
+                                  //         );
+                                  //       }
+                                  //
+                                  //       /// Top Spacer
+                                  //       if (indexExercise == 0){
+                                  //         child = Column(
+                                  //           children: [
+                                  //             SizedBox(height: Platform.isAndroid? 80 : 120),
+                                  //             child?? const SizedBox()
+                                  //           ],
+                                  //         );
+                                  //       }
+                                  //
+                                  //       /// Bottom Spacer
+                                  //       if (indexExercise == cnRunningWorkout.groupedExercises.length-1){
+                                  //         child = Column(
+                                  //           children: [
+                                  //             child?? const SizedBox(),
+                                  //             AnimatedContainer(
+                                  //                 duration: const Duration(milliseconds: 250),
+                                  //                 height: _defaultBottomSpacerHeight
+                                  //                     + (cnStopwatchWidget.isOpened
+                                  //                         ? cnStopwatchWidget.heightOfTimer
+                                  //                         : 0)
+                                  //                     + (cnSpotifyBar.isConnected
+                                  //                         ? cnSpotifyBar.height
+                                  //                         : 0)
+                                  //             ),
+                                  //           ],
+                                  //         );
+                                  //       }
+                                  //
+                                  //       // if(indexExercise == cnRunningWorkout.groupedExercises.length-1){
+                                  //       //   child = Padding(
+                                  //       //     padding: EdgeInsets.only(bottom: viewInsetsBottom),
+                                  //       //     child: child
+                                  //       //   );
+                                  //       // }
+                                  //
+                                  //       return Container(
+                                  //           key: currentDraggingKey == null ||
+                                  //               ((item is NamedSet || item is GroupedSet)
+                                  //               && groupedExerciseKey.contains(currentDraggingKey!))
+                                  //               ? ValueKey(groupedExerciseKey)
+                                  //               : UniqueKey(),
+                                  //           // key: key,
+                                  //           // key: ValueKey(groupedExerciseKey),
+                                  //           child: child?? const SizedBox());
+                                  //     },
+                                  //   ),
+                                  // ),
                                 ),
-                                // SizedBox(
-                                //   height: 150,
-                                // )
-                                // AnimatedContainer(
-                                //     height: viewInsetsBottom,
-                                //     duration: const Duration(milliseconds: 0)
-                                // )
                               ],
                             ),
                           ),
@@ -621,14 +624,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
               //     ),
               //   ),
 
-              // if(/*Platform.isIOS &&*/ viewInsetsBottom > 100)
-              //   KeyboardTopBar(
-              //     key: cnRunningWorkout.keyKeyboardTopBar,
-              //     onPressedLeft: onPressedLeft,
-              //     onPressedRight: onPressedRight
-              //   ),
-
-              const StandardPopUp(),
+              // const StandardPopUp(),
 
               SelectorExercisesPerLink(
                 controller: controllerSelectorExercisePerLink,
@@ -812,33 +808,33 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     }
   }
 
-  void addSet(Exercise ex, Exercise lastEx){
-    int newIndex = ex.sets.length;
-    ex.addSet();
-    lastEx.addSet();
-    SingleSet newSet = ex.sets[newIndex];
-    NamedSet newNamedSet = NamedSet(
-        set: newSet,
-        name: ex.name,
-        index: newIndex,
-        ex: ex,
-        weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
-    );
-    if(ex.linkName == null){
-      cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
-    } else{
-      final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
-      if(cnRunningWorkout.groupedExercises.containsKey(newSetKey)){
-        (cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
-      } else{
-        cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
-      }
-    }
-    final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
-    cnRunningWorkout.scrollController.jumpTo(newControllerPos);
-    cnRunningWorkout.refresh();
-  }
+  // void addSet(Exercise ex, Exercise lastEx){
+  //   int newIndex = ex.sets.length;
+  //   ex.addSet();
+  //   lastEx.addSet();
+  //   SingleSet newSet = ex.sets[newIndex];
+  //   NamedSet newNamedSet = NamedSet(
+  //       set: newSet,
+  //       name: ex.name,
+  //       index: newIndex,
+  //       ex: ex,
+  //       weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
+  //       amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+  //   );
+  //   if(ex.linkName == null){
+  //     cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
+  //   } else{
+  //     final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
+  //     if(cnRunningWorkout.groupedExercises.containsKey(newSetKey)){
+  //       (cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
+  //     } else{
+  //       cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
+  //     }
+  //   }
+  //   final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
+  //   cnRunningWorkout.scrollController.jumpTo(newControllerPos);
+  //   cnRunningWorkout.refresh();
+  // }
 
   void undoDismiss(){
     // if(cnRunningWorkout.dismissedSets.isEmpty){
@@ -999,6 +995,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     await Future.delayed(Duration(milliseconds: time), ()async{
       cnRunningWorkout.isVisible = false;
       cnRunningWorkout.isRunning = false;
+      cnBannerRunningWorkout.reset();
       cnHomepage.refresh();
       cnWorkouts.refresh();
       await Future.delayed(const Duration(milliseconds: 50), ()async{
@@ -1067,96 +1064,96 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
     });
   }
 
-  Widget getSeatLevelSelector(Exercise newEx) {
-    return SizedBox(
-      height: 30,
-      child: getSelectSeatLevel(
-          currentSeatLevel: newEx.seatLevel,
-          child: SizedBox(
-            width: 100,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                width: 100,
-                height: 30,
-                color: Colors.transparent,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.airline_seat_recline_normal, size: _iconSize),
-                    const SizedBox(width: 2,),
-                    if (newEx.seatLevel == null)
-                      Text("-", style: _style,)
-                    else
-                      Text(newEx.seatLevel.toString(), style: _style,)
-                  ],
-                ),
-              ),
-            ),
-          ),
-          onConfirm: (dynamic value){
-            if(value is int){
-              newEx.seatLevel = value;
-              cnRunningWorkout.refresh();
-            }
-            else if(value == AppLocalizations.of(context)!.clear){
-              newEx.seatLevel = null;
-              cnRunningWorkout.refresh();
-            }
-          },
-        context: context
-      ),
-    );
-  }
+  // Widget getSeatLevelSelector(Exercise newEx) {
+  //   return SizedBox(
+  //     height: 30,
+  //     child: getSelectSeatLevel(
+  //         currentSeatLevel: newEx.seatLevel,
+  //         child: SizedBox(
+  //           width: 100,
+  //           child: Align(
+  //             alignment: Alignment.centerLeft,
+  //             child: Container(
+  //               width: 100,
+  //               height: 30,
+  //               color: Colors.transparent,
+  //               child: Row(
+  //                 mainAxisAlignment: MainAxisAlignment.start,
+  //                 children: [
+  //                   Icon(Icons.airline_seat_recline_normal, size: _iconSize),
+  //                   const SizedBox(width: 2,),
+  //                   if (newEx.seatLevel == null)
+  //                     Text("-", style: _style,)
+  //                   else
+  //                     Text(newEx.seatLevel.toString(), style: _style,)
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //         onConfirm: (dynamic value){
+  //           if(value is int){
+  //             newEx.seatLevel = value;
+  //             cnRunningWorkout.refresh();
+  //           }
+  //           else if(value == AppLocalizations.of(context)!.clear){
+  //             newEx.seatLevel = null;
+  //             cnRunningWorkout.refresh();
+  //           }
+  //         },
+  //       context: context
+  //     ),
+  //   );
+  // }
 
-  getRestInSecondsSelector(Exercise newEx) {
-    return SizedBox(
-      height: 30,
-      child: Row(
-        children: [
-          getSelectRestInSeconds(
-              currentTime: newEx.restInSeconds,
-              context: context,
-              child: SizedBox(
-                width: 100,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Icon(CupertinoIcons.timer, size: _iconSize),
-                      const SizedBox(width: 2,),
-                      Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
-                      const SizedBox(width: 10,)
-                    ],
-                  ),
-                ),
-              ),
-              onConfirm: (dynamic value){
-                if(value is int){
-                  newEx.restInSeconds = value;
-                  cnRunningWorkout.refresh();
-                }
-                else if(value == AppLocalizations.of(context)!.clear){
-                  newEx.restInSeconds = 0;
-                  cnRunningWorkout.refresh();
-                }
-                else{
-                  showDialogMinuteSecondPicker(
-                    context: context,
-                    initialTimeDuration: Duration(minutes: newEx.restInSeconds~/60, seconds: newEx.restInSeconds%60),
-                    onConfirm: (Duration newDuration){
-                      newEx.restInSeconds = newDuration.inSeconds;
-                    }
-                  ).then((value) => setState(() {}));
-                }
-              }
-          ),
-          const Spacer()
-        ],
-      ),
-    );
-  }
+  // getRestInSecondsSelector(Exercise newEx) {
+  //   return SizedBox(
+  //     height: 30,
+  //     child: Row(
+  //       children: [
+  //         getSelectRestInSeconds(
+  //             currentTime: newEx.restInSeconds,
+  //             context: context,
+  //             child: SizedBox(
+  //               width: 100,
+  //               child: Align(
+  //                 alignment: Alignment.centerLeft,
+  //                 child: Row(
+  //                   mainAxisSize: MainAxisSize.max,
+  //                   children: [
+  //                     Icon(CupertinoIcons.timer, size: _iconSize),
+  //                     const SizedBox(width: 2,),
+  //                     Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
+  //                     const SizedBox(width: 10,)
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //             onConfirm: (dynamic value){
+  //               if(value is int){
+  //                 newEx.restInSeconds = value;
+  //                 cnRunningWorkout.refresh();
+  //               }
+  //               else if(value == AppLocalizations.of(context)!.clear){
+  //                 newEx.restInSeconds = 0;
+  //                 cnRunningWorkout.refresh();
+  //               }
+  //               else{
+  //                 showDialogMinuteSecondPicker(
+  //                   context: context,
+  //                   initialTimeDuration: Duration(minutes: newEx.restInSeconds~/60, seconds: newEx.restInSeconds%60),
+  //                   onConfirm: (Duration newDuration){
+  //                     newEx.restInSeconds = newDuration.inSeconds;
+  //                   }
+  //                 ).then((value) => setState(() {}));
+  //               }
+  //             }
+  //         ),
+  //         const Spacer()
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 class CnRunningWorkout extends ChangeNotifier {
@@ -1186,6 +1183,9 @@ class CnRunningWorkout extends ChangeNotifier {
   int currentIndexFocus = 0;
   int currentIndexWeightOrAmount = 0;
   GlobalKey keyKeyboardTopBar = GlobalKey();
+  final double heightOfSetRow = 30;
+  final double setPadding = 5;
+  bool contentIsActive = false;
 
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -1264,6 +1264,34 @@ class CnRunningWorkout extends ChangeNotifier {
     refresh();
   }
 
+  void addSet({required Exercise ex, required Exercise lastEx}){
+    int newIndex = ex.sets.length;
+    ex.addSet();
+    lastEx.addSet();
+    SingleSet newSet = ex.sets[newIndex];
+    NamedSet newNamedSet = NamedSet(
+        set: newSet,
+        name: ex.name,
+        index: newIndex,
+        ex: ex,
+        weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+    );
+    if(ex.linkName == null){
+      groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
+    } else{
+      final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
+      if(groupedExercises.containsKey(newSetKey)){
+        (groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
+      } else{
+        groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
+      }
+    }
+    final newControllerPos = scrollController.position.pixels+heightOfSetRow + setPadding*2;
+    scrollController.jumpTo(newControllerPos);
+    refresh();
+  }
+
   double getMaxScrollExtend(BuildContext context, {double? additionalScrollPosition}){
     final amountNamedSets = groupedExercises.values.whereType<NamedSet>().length;
     final groupedSets = groupedExercises.values.whereType<GroupedSet>();
@@ -1326,26 +1354,26 @@ class CnRunningWorkout extends ChangeNotifier {
     }
   }
 
-  void openRunningWorkout(BuildContext context, Workout w){
+  void openRunningWorkout(BuildContext context, Workout w) async{
     setWorkoutTemplate(w);
     isRunning = true;
-    Navigator.push(
+    isVisible = true;
+    await Navigator.push(
         context,
         CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
-    isVisible = true;
     cache();
   }
 
   void reopenRunningWorkout(BuildContext context) async{
     HapticFeedback.selectionClick();
+    isVisible = true;
     Navigator.push(
         context,
         CupertinoPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
-    isVisible = true;
     cache();
   }
 

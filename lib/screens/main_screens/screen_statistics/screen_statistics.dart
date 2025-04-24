@@ -173,7 +173,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       borderRadius: BorderRadius.circular(15),
       child: Container(
         height: MediaQuery.of(context).size.height*0.6,
-        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+        color: Theme.of(context).primaryColor,
         child: StatefulBuilder(
           builder: (context, setModalState){
             return Stack(
@@ -221,7 +221,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                     ),
                     CupertinoListSection.insetGrouped(
                       decoration: BoxDecoration(
-                        color: CupertinoTheme.of(context).barBackgroundColor
+                        color: Theme.of(context).cardColor
                       ),
                       backgroundColor: Colors.transparent,
                       header: const Padding(
@@ -311,7 +311,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
                     CupertinoListSection.insetGrouped(
                       decoration: BoxDecoration(
-                          color: CupertinoTheme.of(context).barBackgroundColor
+                          color: Theme.of(context).cardColor
                       ),
                       backgroundColor: Colors.transparent,
                       header: Padding(

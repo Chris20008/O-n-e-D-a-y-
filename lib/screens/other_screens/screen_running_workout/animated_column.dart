@@ -50,6 +50,8 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
     cnConfig = Provider.of<CnConfig>(context);
     showSpotify = cnConfig.useSpotify;
 
+    print("Animated Column");
+
     return SafeArea(
       child: Stack(
         alignment: Alignment.bottomRight,
@@ -212,7 +214,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                     child: Scaffold(
                       resizeToAvoidBottomInset: false,
                       body: Container(
-                        color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                        color: Theme.of(context).primaryColor,
                         child: SafeArea(
                           top: false,
                           left: false,
@@ -326,7 +328,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                                         CupertinoListSection.insetGrouped(
                                           margin: const EdgeInsets.only(top: 15),
                                           decoration: BoxDecoration(
-                                              color: CupertinoTheme.of(context).barBackgroundColor
+                                              color: Theme.of(context).cardColor
                                           ),
                                           backgroundColor: Colors.transparent,
                                           children: [

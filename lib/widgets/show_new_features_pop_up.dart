@@ -29,7 +29,7 @@ Future showNewFeaturesPopUp({
                 child: Container(
                     width: double.maxFinite,
                     height: MediaQuery.of(context).size.height - (Platform.isAndroid? 50 : 70),
-                    color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                    color: Theme.of(context).primaryColor,
                     child: Stack(
                       children: [
                         ListView(
@@ -39,7 +39,7 @@ Future showNewFeaturesPopUp({
                               const SizedBox(height: 40),
                               CupertinoListSection.insetGrouped(
                                 decoration: BoxDecoration(
-                                    color: CupertinoTheme.of(context).barBackgroundColor
+                                    color: Theme.of(context).cardColor
                                 ),
                                 backgroundColor: Colors.transparent,
                                 header: Padding(
@@ -67,7 +67,7 @@ Future showNewFeaturesPopUp({
 
                               CupertinoListSection.insetGrouped(
                                 decoration: BoxDecoration(
-                                    color: CupertinoTheme.of(context).barBackgroundColor
+                                    color: Theme.of(context).cardColor
                                 ),
                                 backgroundColor: Colors.transparent,
                                 header: Padding(
@@ -192,7 +192,7 @@ Future showNewFeaturesPopUp({
 
                               CupertinoListSection.insetGrouped(
                                 decoration: BoxDecoration(
-                                    color: CupertinoTheme.of(context).barBackgroundColor
+                                    color: Theme.of(context).cardColor
                                 ),
                                 backgroundColor: Colors.transparent,
                                 header: Padding(
@@ -221,7 +221,7 @@ Future showNewFeaturesPopUp({
                           margin: const EdgeInsets.symmetric(horizontal: 15),
                           width: double.maxFinite,
                           height: 50,
-                          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                          color: Theme.of(context).primaryColor,
                           child: Stack(
                             children: [
                               Center(child: Text(AppLocalizations.of(context)!.newVersion, textScaler: const TextScaler.linear(1.3),)),

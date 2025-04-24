@@ -30,7 +30,7 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: CupertinoTheme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Theme.of(context).primaryColor,
         extendBody: true,
         body: PopScope(
           canPop: !_showLoadingIndicator,

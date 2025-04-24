@@ -1,4 +1,3 @@
-import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
@@ -11,7 +10,6 @@ class SetRow extends StatelessWidget {
   final dynamic item;
   final dynamic groupedExerciseKey;
   final int index;
-  final CnHomepage cnHomepage;
 
   const SetRow({
     super.key,
@@ -19,7 +17,6 @@ class SetRow extends StatelessWidget {
     required this.item,
     required this.groupedExerciseKey,
     required this.index,
-    required this.cnHomepage
   });
 
 
@@ -31,6 +28,8 @@ class SetRow extends StatelessWidget {
   Widget build(BuildContext context) {
     NamedSet? tempSet;
     Widget? child;
+
+    print("Set Row");
 
     dynamic item = this.item;
 
@@ -235,7 +234,7 @@ class SetRow extends StatelessWidget {
       ),
     );
 
-    if(set.ex.sets.length > 1){
+    if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
       child = Slidable(
           key: set.slidableKey,
           endActionPane: ActionPane(

@@ -250,7 +250,7 @@ Widget standardDialog({
       ),
       child: Container(
           width: MediaQuery.of(context).size.width * widthFactor,
-          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+          color: Theme.of(context).primaryColor,
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Padding(
@@ -926,7 +926,7 @@ Widget buildCalendarDialogButton({
           : calendarType == CalendarDatePicker2Type.single
             ? [DateTime.now()]
             : [DateTime.now(), DateTime.now()],
-          dialogBackgroundColor: CupertinoTheme.of(context).barBackgroundColor
+          dialogBackgroundColor: Theme.of(context).cardColor
       );
       if (values != null && onConfirm != null) {
         onConfirm(values);
@@ -1035,7 +1035,7 @@ Future getExplainExerciseGroups(BuildContext context) async{
             ),
             child: Scaffold(
               body: Container(
-                color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                color: Theme.of(context).primaryColor,
                 child: SafeArea(
                   top: false,
                   left: false,
@@ -1497,7 +1497,7 @@ Widget getRowButton({
             padding: EdgeInsets.zero,
               key: key,
               alignment: Alignment.center,
-              color: CupertinoTheme.of(context).barBackgroundColor,
+              color: Theme.of(context).cardColor,
               onPressed: onPressed,
               child: Icon(
                 icon,

@@ -12,6 +12,7 @@ import '../objects/workout.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'banner_running_workout.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -40,6 +41,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -104,7 +106,9 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                 if(!cnRunningWorkout.isRunning){
                                   cnRunningWorkout.isRunning = true;
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
-                                  cnWorkouts.refresh();
+                                  cnBannerRunningWorkout.onlyShow();
+                                  // cnRunningWorkout.refresh();
+                                  // cnWorkouts.refresh();
                                   HapticFeedback.selectionClick();
                                   // await cnNewWorkout.hidePanel(context);
                                   Future.delayed(const Duration(milliseconds: 300), (){
@@ -113,6 +117,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                 }
                                 else{
                                   if(cnRunningWorkout.workout.name == widget.workout.name){
+                                    cnBannerRunningWorkout.onlyShow();
                                     cnRunningWorkout.reopenRunningWorkout(context);
                                   }
                                   else{
@@ -120,12 +125,17 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   }
                                 }
                               },
-                              icon: Icon(Icons.play_arrow,
-                                color: !cnRunningWorkout.isRunning
-                                    ? Colors.grey.withValues(alpha: 0.4)
-                                    : cnRunningWorkout.workout.name == widget.workout.name
-                                      ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
-                                      : Colors.grey.withValues(alpha: 0.2)
+                              icon: Selector<CnBannerRunningWorkout, bool>(
+                                  selector: (_, cn) => cn.canOpenWorkout,
+                                  builder: (_, canOpenWorkout, __){
+                                    return Icon(Icons.play_arrow,
+                                        color: !canOpenWorkout
+                                            ? Colors.grey.withValues(alpha: 0.4)
+                                            : cnRunningWorkout.workout.name == widget.workout.name
+                                            ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
+                                            : Colors.grey.withValues(alpha: 0.2)
+                                    );
+                                  }
                               )
                           ),
                         IconButton(
@@ -207,6 +217,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
             /// the action's text color to red.
             isDestructiveAction: true,
             onPressed: () {
+              cnBannerRunningWorkout.onlyShow();
               Future.delayed(const Duration(milliseconds: 200), (){
                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
               });

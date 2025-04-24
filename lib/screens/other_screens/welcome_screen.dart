@@ -54,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           decoration: null,
           animationControllerName: "ScreenWelcome",
           child: Container(
-            color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+            color: Theme.of(context).primaryColor,
             child: Stack(
                 children: [
                   animatedScreen(0, screenOne()),

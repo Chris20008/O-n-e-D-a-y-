@@ -98,12 +98,12 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
                         child: Container(
                           height: 60,
                           width: double.maxFinite,
-                          color: CupertinoTheme.of(context).scaffoldBackgroundColor,
+                          color: Theme.of(context).primaryColor,
                           padding: const EdgeInsets.all(10),
                           child: CupertinoSearchTextField(
                             controller: cnAllExercisesPanel.textController,
                             style: const TextStyle(color: Colors.white),
-                            backgroundColor: CupertinoTheme.of(context).barBackgroundColor,
+                            backgroundColor: Theme.of(context).cardColor,
                             onChanged: (value){
                               cnAllExercisesPanel.scrollController.jumpTo(0);
                               cnAllExercisesPanel.filterExercises(value);

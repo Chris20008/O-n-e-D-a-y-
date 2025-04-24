@@ -34,6 +34,8 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
     double width = MediaQuery.of(context).size.width;
 
+    print("Stop Watch");
+
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
@@ -226,10 +228,6 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
               height: cnSpotifyBar.heightOfButton,
               width: cnSpotifyBar.heightOfButton,
               child: CupertinoButton(
-                  // iconSize: 28,
-                  // style: ButtonStyle(
-                  //   backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                  // ),
                   onPressed: () {
                     cnStopwatchWidget.open(scrollController: cnRunningWorkout.scrollController);
                     cnRunningWorkout.refresh();

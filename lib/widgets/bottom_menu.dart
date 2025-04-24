@@ -83,7 +83,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
         // color: Colors.black.withValues(alpha: 0.4),
-        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? CupertinoTheme.of(context).scaffoldBackgroundColor : Colors.black.withValues(alpha: 0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? Theme.of(context).primaryColor : Colors.black.withValues(alpha: 0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(

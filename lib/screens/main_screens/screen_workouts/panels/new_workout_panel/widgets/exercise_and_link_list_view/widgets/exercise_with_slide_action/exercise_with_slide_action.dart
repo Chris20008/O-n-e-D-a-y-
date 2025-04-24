@@ -68,7 +68,7 @@ class ExerciseWithSlideAction extends StatelessWidget {
               context: context,
               overflowHeight: 2,
               width: MediaQuery.of(context).size.width - 40,
-              overflowColor: CupertinoTheme.of(context).barBackgroundColor,
+              overflowColor: Theme.of(context).cardColor,
             ),
           Container(
               height: exercise.hasLink? 70 : 75,
@@ -78,7 +78,7 @@ class ExerciseWithSlideAction extends StatelessWidget {
                     isTotalLastItem: isTotalLastItem,
                     isLastItemInGroup: isLastItemInGroup
                 ),
-                color: CupertinoTheme.of(context).barBackgroundColor,
+                color: Theme.of(context).cardColor,
               ),
               margin: EdgeInsets.only(bottom: withSpacer? heightSpacerExerciseRow : 0),
               child: exerciseRow
@@ -95,7 +95,7 @@ class ExerciseWithSlideAction extends StatelessWidget {
             context: context,
             overflowHeight: 2,
             width: MediaQuery.of(context).size.width - 40,
-            overflowColor: CupertinoTheme.of(context).barBackgroundColor,
+            overflowColor: Theme.of(context).cardColor,
           ),
         Slidable(
             key: exercise.key,
@@ -117,7 +117,7 @@ class ExerciseWithSlideAction extends StatelessWidget {
                       isTotalLastItem: isTotalLastItem,
                       isLastItemInGroup: isLastItemInGroup
                   ),
-                  color: CupertinoTheme.of(context).barBackgroundColor,
+                  color: Theme.of(context).cardColor,
                 ),
                 child: exerciseRow
             )
