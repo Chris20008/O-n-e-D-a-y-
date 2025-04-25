@@ -116,6 +116,10 @@ class MyAppState extends State<MyApp> {
         ],
         themeMode: ThemeMode.dark,
         darkTheme: ThemeData.dark().copyWith(
+            pageTransitionsTheme: PageTransitionsTheme(builders: {
+              TargetPlatform.iOS: MyTransition(),
+              TargetPlatform.android: MyTransition(),
+            }),
             cardColor: const Color(0xFF2C2C2E),
             primaryColor: const Color(0xFF1C1C1E),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
@@ -237,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage>{
         Future.delayed(const Duration(milliseconds: 300), (){
           Navigator.push(
               context,
-              CupertinoPageRoute(
+              MaterialPageRoute(
                   builder: (context) => const ScreenRunningWorkout()
               ));
         });
@@ -533,7 +537,7 @@ class _MyHomePageState extends State<MyHomePage>{
                 //     onPressed: ()async{
                 //       Navigator.push(
                 //           context,
-                //           CupertinoPageRoute(
+                //           MaterialPageRoute(
                 //               builder: (context) => const LocalFilePicker()
                 //           ));
                 //     },
@@ -660,4 +664,11 @@ class CnHomepage extends ChangeNotifier {
       });
     }
   }
+}
+
+class MyTransition extends CupertinoPageTransitionsBuilder {
+  MyTransition();
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 500);
 }

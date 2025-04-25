@@ -1360,7 +1360,7 @@ class CnRunningWorkout extends ChangeNotifier {
     isVisible = true;
     await Navigator.push(
         context,
-        CupertinoPageRoute(
+        MaterialPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
     cache();
@@ -1371,7 +1371,7 @@ class CnRunningWorkout extends ChangeNotifier {
     isVisible = true;
     Navigator.push(
         context,
-        CupertinoPageRoute(
+        MaterialPageRoute(
             builder: (context) => const ScreenRunningWorkout()
         ));
     cache();

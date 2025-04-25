@@ -69,9 +69,14 @@ class SelectorLoadBackup extends StatelessWidget {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), () async{
                 // final localFiles = await getLocalBackupFiles();
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //         builder: (context) => const LocalFilePicker()
+                //     ));
                 Navigator.push(
                     context,
-                    CupertinoPageRoute(
+                    MaterialPageRoute(
                         builder: (context) => const LocalFilePicker()
                     ));
               });
