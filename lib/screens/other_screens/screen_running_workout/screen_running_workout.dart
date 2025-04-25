@@ -99,7 +99,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
           cnBannerRunningWorkout.reset();
         }
         FocusManager.instance.primaryFocus?.unfocus();
-        cnRunningWorkout.contentIsActive = false;
+        // cnRunningWorkout.contentIsActive = false;
       },
       child: Scaffold(
         resizeToAvoidBottomInset: false,
@@ -785,7 +785,7 @@ class CnRunningWorkout extends ChangeNotifier {
   GlobalKey keyKeyboardTopBar = GlobalKey();
   final double heightOfSetRow = 30;
   final double setPadding = 5;
-  bool contentIsActive = false;
+  bool contentIsActive = true;
 
   CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
