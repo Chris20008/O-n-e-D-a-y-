@@ -108,27 +108,28 @@ class _SetRowState extends State<SetRow> {
                     width: _widthOfTextField,
                     height: _heightOfSetRow,
                     child: Center(
-                      child: showMask?
-                      GestureDetector(
-                        onTap: (){
-                          setState(() {
-                            showMask = false;
-                          });
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            set.focusNodeWeight.requestFocus();
-                          });
-                        },
-                        child: Container(
-                          // color: Colors.blue,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                                color: const Color(0xff848383),
-                                width: 1
-                            ),
-                          ),
-                        ),
-                      ) :
+                      child:
+                      // showMask?
+                      // GestureDetector(
+                      //   onTap: (){
+                      //     setState(() {
+                      //       showMask = false;
+                      //     });
+                      //     WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //       set.focusNodeWeight.requestFocus();
+                      //     });
+                      //   },
+                      //   child: Container(
+                      //     // color: Colors.blue,
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(8),
+                      //       border: Border.all(
+                      //           color: const Color(0xff848383),
+                      //           width: 1
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ) :
                       TextField(
                         focusNode: set.focusNodeWeight,
                         key: set.weightKey,
@@ -190,27 +191,28 @@ class _SetRowState extends State<SetRow> {
                     width: _widthOfTextField,
                     height: _heightOfSetRow,
                     child: Center(
-                      child: showMask?
-                      GestureDetector(
-                        onTap: (){
-                          setState(() {
-                            showMask = false;
-                          });
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            set.focusNodeAmount.requestFocus();
-                          });
-                        },
-                        child: Container(
-                          // color: Colors.blue,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                                color: const Color(0xff848383),
-                                width: 1
-                            ),
-                          ),
-                        ),
-                      ) :
+                      child:
+                      // showMask?
+                      // GestureDetector(
+                      //   onTap: (){
+                      //     setState(() {
+                      //       showMask = false;
+                      //     });
+                      //     WidgetsBinding.instance.addPostFrameCallback((_) {
+                      //       set.focusNodeAmount.requestFocus();
+                      //     });
+                      //   },
+                      //   child: Container(
+                      //     // color: Colors.blue,
+                      //     decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(8),
+                      //       border: Border.all(
+                      //           color: const Color(0xff848383),
+                      //           width: 1
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ) :
                       TextField(
                         focusNode: set.focusNodeAmount,
                         key: set.amountKey,

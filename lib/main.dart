@@ -7,7 +7,6 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
@@ -690,8 +689,8 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
       Animation<double> secondaryAnimation,
       Widget child,
       ) {
-    const delay = Duration(milliseconds: 100);
-    final totalDuration = route.transitionDuration;
+    const delay = Duration(milliseconds: 150);
+    final totalDuration = route.transitionDuration + delay;
 
     final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
     const pauseValue = 0.001;
@@ -740,7 +739,7 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
   }
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 600);
+  Duration get transitionDuration => const Duration(milliseconds: 550);
 }
 
 
