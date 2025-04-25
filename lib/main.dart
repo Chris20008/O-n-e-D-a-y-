@@ -105,7 +105,7 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],
       child: MaterialApp(
-        showPerformanceOverlay: true,
+        // showPerformanceOverlay: true,
         locale: _locale,
         supportedLocales: supportedLocales,
         localizationsDelegates: const [
@@ -189,6 +189,13 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
+    /// Init Shader for PageRoute
+    Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (context) => const ScreenRunningWorkout()
+        )
+    );
+    Navigator.of(context).pop();
     initMain();
     super.initState();
   }
