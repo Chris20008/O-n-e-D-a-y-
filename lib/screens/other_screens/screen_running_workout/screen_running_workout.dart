@@ -67,12 +67,12 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(milliseconds: 500), (){
-      cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
-      cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
-      cnRunningWorkout.contentIsActive = true;
-      cnRunningWorkout.refresh();
-    });
+    // Future.delayed(const Duration(milliseconds: 500), (){
+    //   cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
+    //   cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
+    //   cnRunningWorkout.contentIsActive = true;
+    //   cnRunningWorkout.refresh();
+    // });
   }
 
   @override
@@ -958,6 +958,8 @@ class CnRunningWorkout extends ChangeNotifier {
     setWorkoutTemplate(w);
     isRunning = true;
     isVisible = true;
+    // refresh();
+    // await Future.delayed(const Duration(milliseconds: 500));
     await Navigator.push(
         context,
         MaterialPageRoute(

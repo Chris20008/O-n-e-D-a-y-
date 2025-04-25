@@ -7,6 +7,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
@@ -190,12 +191,12 @@ class _MyHomePageState extends State<MyHomePage>{
   @override
   void initState() {
     /// Init Shader for PageRoute
-    Navigator.of(context).push(
-        MaterialPageRoute(
-            builder: (context) => const ScreenRunningWorkout()
-        )
-    );
-    Navigator.of(context).pop();
+    // Navigator.of(context).push(
+    //     MaterialPageRoute(
+    //         builder: (context) => const ScreenRunningWorkout()
+    //     )
+    // );
+    // Navigator.of(context).pop();
     initMain();
     super.initState();
   }
@@ -673,9 +674,73 @@ class CnHomepage extends ChangeNotifier {
   }
 }
 
+// class MyTransition extends CupertinoPageTransitionsBuilder {
+//   MyTransition();
+//
+//   @override
+//   Duration get transitionDuration => const Duration(milliseconds: 500);
+// }
+
 class MyTransition extends CupertinoPageTransitionsBuilder {
-  MyTransition();
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+      ) {
+    const delay = Duration(milliseconds: 100);
+    final totalDuration = route.transitionDuration;
+
+    final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
+    const pauseValue = 0.001;
+
+    final delayedPrimary = TweenSequence([
+      TweenSequenceItem(
+        tween: ConstantTween(pauseValue),
+        weight: delayFraction,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: pauseValue, end: 1.0),
+        weight: 1 - delayFraction,
+      ),
+    ]).animate(animation);
+
+    final delayedSecondary = TweenSequence([
+      TweenSequenceItem(
+        tween: ConstantTween(0.0),
+        weight: delayFraction,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0),
+        weight: 1 - delayFraction,
+      ),
+    ]).animate(secondaryAnimation);
+
+    // return CupertinoPageTransition(
+    //   primaryRouteAnimation: delayedPrimary,
+    //   secondaryRouteAnimation: delayedSecondary,
+    //   linearTransition: false,
+    //   child: child,
+    // );
+    // return CupertinoPageTransition(
+    //   primaryRouteAnimation: animation,
+    //   secondaryRouteAnimation: secondaryAnimation,
+    //   linearTransition: false,
+    //   child: child,
+    // );
+    return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
+      route,
+      context,
+      delayedPrimary,
+      delayedSecondary,
+      child,
+    );
+  }
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 500);
+  Duration get transitionDuration => const Duration(milliseconds: 600);
 }
+
+
