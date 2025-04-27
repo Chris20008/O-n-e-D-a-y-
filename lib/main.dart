@@ -690,7 +690,7 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
       Widget child,
       ) {
     const delay = Duration(milliseconds: 150);
-    final totalDuration = route.transitionDuration + delay;
+    final totalDuration = route.transitionDuration;
 
     final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
     const pauseValue = 0.001;
@@ -739,7 +739,10 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
   }
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 550);
+  Duration get transitionDuration => const Duration(milliseconds: 650);
+
+  // @override
+  // Duration get reverseTransitionDuration => const Duration(milliseconds: 550);
 }
 
 
