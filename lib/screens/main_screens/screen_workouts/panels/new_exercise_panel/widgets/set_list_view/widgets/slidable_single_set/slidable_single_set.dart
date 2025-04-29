@@ -30,6 +30,7 @@ class SlidableSingleSet extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Slidable(
+        key: key,
         endActionPane: buildSetEndActionPane(index: index, cnNewExercise: cnNewExercise),
         child: Padding(
           padding: const EdgeInsets.only(top: 3, bottom: 3),

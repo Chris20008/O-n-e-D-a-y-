@@ -24,6 +24,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'block_swipe_back.dart';
+
 class SpotifyBar extends StatefulWidget {
   const SpotifyBar({super.key});
 
@@ -120,271 +122,273 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
             sizeCurve: Curves.easeInOut,
               firstChild: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
-                child: SizedBox(
-                  height: cnSpotifyBar.height,
-                  width: cnSpotifyBar.width - paddingLeftRight*2,
-                  child: Stack(
-                    children: [
-                      const BackgroundColor(),
-                      if(cnSpotifyBar.data == null)
-                        GestureDetector(
-                            onTap: () => cnSpotifyBar.connectToSpotify(context),
-                            child: Container(
-                              height: cnSpotifyBar.height,
-                              width: double.maxFinite,
-                              color: Colors.transparent,
-                            )
-                        )
-                      else
-                        Stack(
-                          children: [
-                            Row(
-                              children: [
-                                Padding(
-                                    padding: const EdgeInsets.all(6),
-                                    child: GestureDetector(
-                                        onTap: (){
-                                          /// Just opens Spotify
-                                          String uri = "spotify:";
-                                          HapticFeedback.selectionClick();
-                                          /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
-                                          /// when the delay is not there
-                                          Future.delayed(const Duration(milliseconds: 50), (){
-                                            openUrl(uri);
-                                          });
-                                        },
-                                        child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
-                                    )
-                                ),
-                                Expanded(
-                                  child: SizedBox(
-                                    height: cnSpotifyBar.height,
-                                    // width: double.maxFinite,
-                                    child: Stack(
-                                        children:[
-                                          Align(
-                                            alignment: Alignment.topLeft,
-                                            child: Container(
-                                                padding: const EdgeInsets.only(left:8, top:2),
-                                                height: cnSpotifyBar.height/2,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: TextScrollCustomized(
-                                                        key: cnSpotifyBar.keySongName,
-                                                        text: cnSpotifyBar.data!.track?.name ?? "",
-                                                        style: Theme.of(context).textTheme.titleMedium,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 5),
-                                                    GestureDetector(
-                                                      onTapDown: (details){
-                                                        setState(() {
-                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.25);
-                                                        });
-                                                      },
-                                                      onTapCancel: (){
-                                                        setState(() {
-                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
-                                                        });
-                                                      },
-                                                      onTap: (){
-                                                        /// Just opens Spotify
-                                                        String uri = "spotify:";
-																												HapticFeedback.selectionClick();
-                                                        /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
-                                                        /// when the delay is not there
-                                                        Future.delayed(const Duration(milliseconds: 50), (){
-                                                          openUrl(uri);
-                                                        });
-                                                        setState(() {
-                                                          colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
-                                                        });
-                                                      },
-                                                      child: Container(
-                                                        height: 20,
-                                                        decoration: BoxDecoration(
-                                                          borderRadius: BorderRadius.circular(20),
-                                                          color: colorSpotifyButton,
-                                                        ),
-                                                        child: Row(
-                                                          children: [
-                                                            SizedBox(width: 4,),
-                                                            Text(
-                                                                "Open Spotify",
-                                                                textScaler: const TextScaler.linear(0.8),
-                                                                style: Theme.of(context).textTheme.titleSmall
-                                                            ),
-                                                            const Icon(
-                                                                MyIcons.spotify,
-                                                                size: 14,
-                                                                color: Color(0xff1ed560)
-                                                            ),
-                                                            const SizedBox(width: 4,),
-                                                          ],
+                child: BlockSwipeBack(
+                  child: SizedBox(
+                    height: cnSpotifyBar.height,
+                    width: cnSpotifyBar.width - paddingLeftRight*2,
+                    child: Stack(
+                      children: [
+                        const BackgroundColor(),
+                        if(cnSpotifyBar.data == null)
+                          GestureDetector(
+                              onTap: () => cnSpotifyBar.connectToSpotify(context),
+                              child: Container(
+                                height: cnSpotifyBar.height,
+                                width: double.maxFinite,
+                                color: Colors.transparent,
+                              )
+                          )
+                        else
+                          Stack(
+                            children: [
+                              Row(
+                                children: [
+                                  Padding(
+                                      padding: const EdgeInsets.all(6),
+                                      child: GestureDetector(
+                                          onTap: (){
+                                            /// Just opens Spotify
+                                            String uri = "spotify:";
+                                            HapticFeedback.selectionClick();
+                                            /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
+                                            /// when the delay is not there
+                                            Future.delayed(const Duration(milliseconds: 50), (){
+                                              openUrl(uri);
+                                            });
+                                          },
+                                          child: cnSpotifyBar.spotifyImageWidget(cnBackgroundColor)
+                                      )
+                                  ),
+                                  Expanded(
+                                    child: SizedBox(
+                                      height: cnSpotifyBar.height,
+                                      // width: double.maxFinite,
+                                      child: Stack(
+                                          children:[
+                                            Align(
+                                              alignment: Alignment.topLeft,
+                                              child: Container(
+                                                  padding: const EdgeInsets.only(left:8, top:2),
+                                                  height: cnSpotifyBar.height/2,
+                                                  child: Row(
+                                                    children: [
+                                                      Expanded(
+                                                        child: TextScrollCustomized(
+                                                          key: cnSpotifyBar.keySongName,
+                                                          text: cnSpotifyBar.data!.track?.name ?? "",
+                                                          style: Theme.of(context).textTheme.titleMedium,
                                                         ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(width: 38,)
-                                                  ],
-                                                )
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.bottomLeft,
-                                            child: Padding(
-                                              padding: const EdgeInsets.only(left: 5, bottom:2),
-                                              child: Row(
-                                                  children:[
-                                                    IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
-                                                        iconSize: 25,
-                                                        style: ButtonStyle(
-                                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                                        ),
-                                                        onPressed: () async{
-                                                          cnSpotifyBar.seekToRelative(-15000);
+                                                      const SizedBox(width: 5),
+                                                      GestureDetector(
+                                                        onTapDown: (details){
+                                                          setState(() {
+                                                            colorSpotifyButton = Colors.white.withValues(alpha: 0.25);
+                                                          });
                                                         },
-                                                        icon: Icon(
-                                                          CupertinoIcons.gobackward_15,
-                                                          color: Colors.amber[800],
-                                                        )
-                                                    ),
-                                                    // const Spacer(flex:2),
-                                                    IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
-                                                        iconSize: 32,
-                                                        style: ButtonStyle(
-                                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                                        ),
-                                                        onPressed: () async{
-                                                          await cnSpotifyBar.skipPrevious();
+                                                        onTapCancel: (){
+                                                          setState(() {
+                                                            colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
+                                                          });
                                                         },
-                                                        icon: Icon(
-                                                          Icons.skip_previous,
-                                                          color: Colors.amber[800],
-                                                        )
-                                                    ),
-                                                    // const Spacer(flex:1),
-                                                    IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
-                                                        iconSize: 32,
-                                                        style: ButtonStyle(
-                                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                                        ),
-                                                        onPressed: () async{
-                                                          cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
+                                                        onTap: (){
+                                                          /// Just opens Spotify
+                                                          String uri = "spotify:";
+                      																												HapticFeedback.selectionClick();
+                                                          /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
+                                                          /// when the delay is not there
+                                                          Future.delayed(const Duration(milliseconds: 50), (){
+                                                            openUrl(uri);
+                                                          });
+                                                          setState(() {
+                                                            colorSpotifyButton = Colors.white.withValues(alpha: 0.12);
+                                                          });
                                                         },
-                                                        icon: Icon(
-                                                          cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
-                                                          color: Colors.amber[800],
-                                                        )
-                                                    ),
-                                                    // const Spacer(flex:1),
-                                                    IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
-                                                        iconSize: 32,
-                                                        style: ButtonStyle(
-                                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                                        ),
-                                                        onPressed: () async{
-                                                          await cnSpotifyBar.skipNext();
-                                                        },
-                                                        icon: Icon(
-                                                          Icons.skip_next,
-                                                          color: Colors.amber[800],
-                                                        )
-                                                    ),
-                                                    // const Spacer(flex:2),
-                                                    IconButton(
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: const BoxConstraints(minWidth:36, minHeight:36),
-                                                        iconSize: 25,
-                                                        style: ButtonStyle(
-                                                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                                        ),
-                                                        onPressed: () async{
-                                                          cnSpotifyBar.seekToRelative(15000);
-                                                        },
-                                                        icon: Icon(
-                                                          CupertinoIcons.goforward_15,
-                                                          color: Colors.amber[800],
-                                                        )
-                                                    ),
-                                                    Expanded(
-                                                      child: TextScrollCustomized(
-                                                        key: cnSpotifyBar.keySongName,
-                                                        text: cnSpotifyBar.data!.track?.artist.name ?? "",
-                                                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                                            color: Colors.grey[400]
+                                                        child: Container(
+                                                          height: 20,
+                                                          decoration: BoxDecoration(
+                                                            borderRadius: BorderRadius.circular(20),
+                                                            color: colorSpotifyButton,
+                                                          ),
+                                                          child: Row(
+                                                            children: [
+                                                              SizedBox(width: 4,),
+                                                              Text(
+                                                                  "Open Spotify",
+                                                                  textScaler: const TextScaler.linear(0.8),
+                                                                  style: Theme.of(context).textTheme.titleSmall
+                                                              ),
+                                                              const Icon(
+                                                                  MyIcons.spotify,
+                                                                  size: 14,
+                                                                  color: Color(0xff1ed560)
+                                                              ),
+                                                              const SizedBox(width: 4,),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
-                                                    const SizedBox(width: 32,)
-                                                  ]
+                                                      const SizedBox(width: 38,)
+                                                    ],
+                                                  )
                                               ),
                                             ),
-                                          ),
-                                        ]
+                                            Align(
+                                              alignment: Alignment.bottomLeft,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(left: 5, bottom:2),
+                                                child: Row(
+                                                    children:[
+                                                      IconButton(
+                                                          padding: EdgeInsets.zero,
+                                                          constraints: const BoxConstraints(minWidth:36, minHeight:36),
+                                                          iconSize: 25,
+                                                          style: ButtonStyle(
+                                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                                          ),
+                                                          onPressed: () async{
+                                                            cnSpotifyBar.seekToRelative(-15000);
+                                                          },
+                                                          icon: Icon(
+                                                            CupertinoIcons.gobackward_15,
+                                                            color: Colors.amber[800],
+                                                          )
+                                                      ),
+                                                      // const Spacer(flex:2),
+                                                      IconButton(
+                                                          padding: EdgeInsets.zero,
+                                                          constraints: const BoxConstraints(minWidth:36, minHeight:36),
+                                                          iconSize: 32,
+                                                          style: ButtonStyle(
+                                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                                          ),
+                                                          onPressed: () async{
+                                                            await cnSpotifyBar.skipPrevious();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.skip_previous,
+                                                            color: Colors.amber[800],
+                                                          )
+                                                      ),
+                                                      // const Spacer(flex:1),
+                                                      IconButton(
+                                                          padding: EdgeInsets.zero,
+                                                          constraints: const BoxConstraints(minWidth:36, minHeight:36),
+                                                          iconSize: 32,
+                                                          style: ButtonStyle(
+                                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                                          ),
+                                                          onPressed: () async{
+                                                            cnSpotifyBar.data!.isPaused? cnSpotifyBar.resume() : cnSpotifyBar.pause();
+                                                          },
+                                                          icon: Icon(
+                                                            cnSpotifyBar.data!.isPaused? Icons.play_arrow : Icons.pause,
+                                                            color: Colors.amber[800],
+                                                          )
+                                                      ),
+                                                      // const Spacer(flex:1),
+                                                      IconButton(
+                                                          padding: EdgeInsets.zero,
+                                                          constraints: const BoxConstraints(minWidth:36, minHeight:36),
+                                                          iconSize: 32,
+                                                          style: ButtonStyle(
+                                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                                          ),
+                                                          onPressed: () async{
+                                                            await cnSpotifyBar.skipNext();
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.skip_next,
+                                                            color: Colors.amber[800],
+                                                          )
+                                                      ),
+                                                      // const Spacer(flex:2),
+                                                      IconButton(
+                                                          padding: EdgeInsets.zero,
+                                                          constraints: const BoxConstraints(minWidth:36, minHeight:36),
+                                                          iconSize: 25,
+                                                          style: ButtonStyle(
+                                                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                                          ),
+                                                          onPressed: () async{
+                                                            cnSpotifyBar.seekToRelative(15000);
+                                                          },
+                                                          icon: Icon(
+                                                            CupertinoIcons.goforward_15,
+                                                            color: Colors.amber[800],
+                                                          )
+                                                      ),
+                                                      Expanded(
+                                                        child: TextScrollCustomized(
+                                                          key: cnSpotifyBar.keySongName,
+                                                          text: cnSpotifyBar.data!.track?.artist.name ?? "",
+                                                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                                              color: Colors.grey[400]
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 32,)
+                                                    ]
+                                                ),
+                                              ),
+                                            ),
+                                          ]
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            Align(
-                              alignment: Alignment.bottomCenter,
-                              child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
-                            ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                      iconSize: 30,
-                                      style: ButtonStyle(
-                                        backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                                      ),
-                                      onPressed: () async{
-                                        // cnSpotifyBar.disconnect();
-                                        cnSpotifyBar.close();
-                                      },
-                                      icon: Icon(
-                                        Icons.keyboard_arrow_right,
-                                        color: Colors.amber[800],
-                                      )
-                                    // icon: Icon(
-                                    //   Icons.cancel,
-                                    //   color: Colors.amber[800],
-                                    // )
-                                  ),
-                                  const SizedBox(width: 3,)
                                 ],
                               ),
-                            )
-                            // Align(
-                            //   alignment: Alignment.topRight,
-                            //   child: Padding(
-                            //     padding: const EdgeInsets.all(5.0),
-                            //     child: const Icon(
-                            //         MyIcons.spotify,
-                            //         size: 18,
-                            //         color: Color(0xff1ed560)
-                            //     ),
-                            //   ),
-                            // )
-                          ],
-                        )
-                    ],
+                              Align(
+                                alignment: Alignment.bottomCenter,
+                                child: SpotifyProgressIndicator(key: cnSpotifyBar.progressIndicatorKey, data: cnSpotifyBar.data!),
+                              ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                        iconSize: 30,
+                                        style: ButtonStyle(
+                                          backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                        ),
+                                        onPressed: () async{
+                                          // cnSpotifyBar.disconnect();
+                                          cnSpotifyBar.close();
+                                        },
+                                        icon: Icon(
+                                          Icons.keyboard_arrow_right,
+                                          color: Colors.amber[800],
+                                        )
+                                      // icon: Icon(
+                                      //   Icons.cancel,
+                                      //   color: Colors.amber[800],
+                                      // )
+                                    ),
+                                    const SizedBox(width: 3,)
+                                  ],
+                                ),
+                              )
+                              // Align(
+                              //   alignment: Alignment.topRight,
+                              //   child: Padding(
+                              //     padding: const EdgeInsets.all(5.0),
+                              //     child: const Icon(
+                              //         MyIcons.spotify,
+                              //         size: 18,
+                              //         color: Color(0xff1ed560)
+                              //     ),
+                              //   ),
+                              // )
+                            ],
+                          )
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -8,6 +8,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
+import 'package:fitness_app/widgets/block_swipe_back.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -120,26 +121,28 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
                   extendBody: true,
                   resizeToAvoidBottomInset: false,
                   bottomNavigationBar: ClipRRect(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                          sigmaX: 10.0,
-                          sigmaY: 10.0,
-                          tileMode: TileMode.mirror
-                      ),
-                      child: Container(
-                        height: cnBottomMenu.height,
-                        color: Colors.black.withValues(alpha: 0.5),
-                        child: CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: openPopUpFinishWorkout,
-                          child: Center(
-                              child: Text(
-                                AppLocalizations.of(context)!.finish,
-                                  style: TextStyle(
-                                      color: Colors.amber[800]
-                                  ),
-                                  textScaler: const TextScaler.linear(1.2)
-                              )
+                    child: BlockSwipeBack(
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(
+                            sigmaX: 10.0,
+                            sigmaY: 10.0,
+                            tileMode: TileMode.mirror
+                        ),
+                        child: Container(
+                          height: cnBottomMenu.height,
+                          color: Colors.black.withValues(alpha: 0.5),
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed: openPopUpFinishWorkout,
+                            child: Center(
+                                child: Text(
+                                  AppLocalizations.of(context)!.finish,
+                                    style: TextStyle(
+                                        color: Colors.amber[800]
+                                    ),
+                                    textScaler: const TextScaler.linear(1.2)
+                                )
+                            ),
                           ),
                         ),
                       ),

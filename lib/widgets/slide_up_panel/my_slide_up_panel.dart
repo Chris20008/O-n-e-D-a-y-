@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:fitness_app/main.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:fitness_app/widgets/block_swipe_back.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -423,7 +422,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 },
                 panel: ClipRRect(
                   borderRadius: widget.borderRadius,
-                  child: widget.panel?? widget.panelBuilder!(context, myListView),
+                  child: BlockSwipeBack(
+                      child: widget.panel?? widget.panelBuilder!(context, myListView)
+                  ),
                 ),
                 backdropEnabled: widget.backdropEnabled,
                 backdropColor: widget.backdropColor,
