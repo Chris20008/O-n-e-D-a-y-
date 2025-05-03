@@ -1,15 +1,11 @@
 import 'dart:io';
 import 'dart:ui';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/widgets/bottom_spacer.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/widgets/rest_in_seconds_selector.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/widgets/seat_level_selector.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/widgets/set_header_row.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/widgets/exercise_header/exercise_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import '../../../../../objects/exercise.dart';
 import '../../../../../util/constants.dart';
 import '../../screen_running_workout.dart';
@@ -25,7 +21,7 @@ class RunningWorkoutContent extends StatefulWidget {
 class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
 
   String? currentDraggingKey;
-  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout;// = Provider.of<CnRunningWorkout>(context, listen: false);
   final double iconSize = 20;
   final style = const TextStyle(color: Colors.white, fontSize: 15);
 
@@ -35,6 +31,16 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
     print("Running Workout Content");
 
     final contentIsActive = context.select<CnRunningWorkout, bool>((cn) => cn.contentIsActive);
+    cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: true);
+    // final listLength = context.select<CnRunningWorkout, int>((cn) => cn.groupedExercises.length);
+
+    print("All Keys in Content");
+    for(dynamic item in cnRunningWorkout.groupedExercises.values){
+      if(item is NamedSet){
+        print(item.slidableKey.value);
+      }
+    }
+    print("");
 
     if(contentIsActive) {
       return SlidableAutoCloseBehavior(
@@ -43,10 +49,7 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
           physics: const BouncingScrollPhysics(),
           shrinkWrap: true,
           onReorderStart: (index) {
-            currentDraggingKey =
-                cnRunningWorkout.groupedExercises.entries.toList()[index].key
-                    .split("_")
-                    .firstOrNull;
+            currentDraggingKey = cnRunningWorkout.groupedExercises.entries.toList()[index].key.split("_").firstOrNull;
           },
           onReorderEnd: (index) {
             currentDraggingKey = null;
@@ -55,39 +58,24 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
             if (oldIndex < newIndex) {
               newIndex -= 1;
             }
-            dynamic movingItem = cnRunningWorkout
-                .groupedExercises[cnRunningWorkout.groupedExercises.keys
-                .toList()[oldIndex]];
-            dynamic newIndexItem = cnRunningWorkout
-                .groupedExercises[cnRunningWorkout.groupedExercises.keys
-                .toList()[newIndex]];
+            dynamic movingItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[oldIndex]];
+            dynamic newIndexItem = cnRunningWorkout.groupedExercises[cnRunningWorkout.groupedExercises.keys.toList()[newIndex]];
 
             if (movingItem is GroupedSet && newIndexItem is GroupedSet) {
-              String linkNameOld = cnRunningWorkout.groupedExercises.keys
-                  .toList()[oldIndex]
-                  .split("_")
-                  .first;
-              String linkNameNew = cnRunningWorkout.groupedExercises.keys
-                  .toList()[newIndex]
-                  .split("_")
-                  .first;
+              String linkNameOld = cnRunningWorkout.groupedExercises.keys.toList()[oldIndex].split("_").first;
+              String linkNameNew = cnRunningWorkout.groupedExercises.keys.toList()[newIndex].split("_").first;
               if (linkNameOld != linkNameNew) {
                 return;
               }
-              Exercise exOld = (cnRunningWorkout
-                  .groupedExercises[linkNameOld] as GroupedExercise)
-                  .getExercise(cnRunningWorkout.selectedIndexes[linkNameOld]!)!;
-              Exercise exNew = (cnRunningWorkout
-                  .groupedExercises[linkNameNew] as GroupedExercise)
-                  .getExercise(cnRunningWorkout.selectedIndexes[linkNameNew]!)!;
+              Exercise exOld = (cnRunningWorkout.groupedExercises[linkNameOld] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameOld]!)!;
+              Exercise exNew = (cnRunningWorkout.groupedExercises[linkNameNew] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkNameNew]!)!;
               movingItem = movingItem.getSet(exOld.name);
               newIndexItem = newIndexItem.getSet(exNew.name);
             }
 
             if (movingItem is NamedSet && newIndexItem is NamedSet &&
                 movingItem.name == newIndexItem.name) {
-              NamedSet? setToMove = cnRunningWorkout
-                  .removeSpecificSetFromExercise(movingItem);
+              NamedSet? setToMove = cnRunningWorkout.removeSpecificSetFromExercise(movingItem);
 
               if (setToMove == null) {
                 return;
@@ -98,7 +86,8 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
                 setToMove.index += 1;
               }
               cnRunningWorkout.addSpecificSetToExercise(setToMove);
-              setState(() {});
+              cnRunningWorkout.refresh();
+              // setState(() {});
             }
           },
           proxyDecorator: (Widget child, int index,
@@ -128,6 +117,13 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
           },
           itemCount: cnRunningWorkout.groupedExercises.length,
           itemBuilder: (BuildContext context, int indexExercise) {
+            print("");
+            print("In Builder with Index: $indexExercise");
+            dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+            if(item is NamedSet){
+              print("Has Key");
+              print(item.slidableKey.value);
+            }
             return getItem(indexExercise);
           },
         ),
@@ -148,11 +144,16 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
 
   Widget getItem(int indexExercise) {
     Widget? child;
-    String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key;
-    dynamic mapValue = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-    dynamic  item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
 
-    if(mapValue.toString().contains("Separator")){
+    /// gets the map key from the indexed value
+    /// is either the linkname, when grouped set - related sets like linkname_A, linkname_B for each set
+    /// the exercisename - related sets like exercisename_A, exercisename_B for each set
+    /// or the separator exercisename_| Separator or linkname_|Separator depending on group or no group
+    String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].key;
+    // dynamic mapValue = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+    dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+
+    if(item.toString().contains("Separator")){
       dynamic previousItem = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise-1].value;
       late Exercise ex;
       if(previousItem is NamedSet){
@@ -189,160 +190,30 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
 
     else if(item is Exercise || item is GroupedExercise){
 
-      Exercise? newEx = item is Exercise ? item : (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!);
+      Exercise? exercise = item is Exercise ? item : (item as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!);
+      GroupedExercise? exerciseGroup = item is GroupedExercise ? item : null;
 
-      if(newEx == null){
+      if(exercise == null){
         return const SizedBox();
       }
 
-      child = GestureDetector(
-        /// Empty long press to prevent dragging
-        onLongPress: (){},
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (item is !Exercise)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: OverflowSafeText(
-                  groupedExerciseKey,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.white70
-                  ),
-                  minFontSize: 12,
-                  maxLines: 1,
-                ),
-              ),
-            Row(
-              children: [
-                item is Exercise
-                /// Single Exercise
-                    ? Expanded(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                        maxWidth: MediaQuery.of(context).size.width-80
-                    ),
-                    child: OverflowSafeText(
-                      newEx.name,
-                      maxLines: 1,
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                )
-                /// Exercise Selector
-                    : PullDownButton(
-                  onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-                  buttonAnchor: PullDownMenuAnchor.start,
-                  routeTheme: const PullDownMenuRouteTheme(backgroundColor: CupertinoColors.secondaryLabel),
-                  itemBuilder: (context) {
-                    final children = item.exercises.map<PullDownMenuItem>((Exercise value) {
-                      return PullDownMenuItem.selectable(
-                        title: value.name,
-                        selected: value.name == (mapValue as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!)?.name,
-                        onTap: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          HapticFeedback.selectionClick();
-                          Future.delayed(const Duration(milliseconds: 200), (){
-                            setState(() {
-                              final exercises = mapValue.exercises;
-                              final t = exercises.indexWhere((ex) => ex.name == value.name);
+      child = ExerciseHeader(
+          exercise: exercise,
+          exerciseGroup: exerciseGroup,
+          currentSelectedExerciseName: exerciseGroup?.getExercise(cnRunningWorkout.selectedIndexes[groupedExerciseKey]!)?.name,
+          onChangeSelectedExercise: (tappedName){
+            FocusManager.instance.primaryFocus?.unfocus();
+            HapticFeedback.selectionClick();
+            Future.delayed(const Duration(milliseconds: 200), (){
+              setState(() {
+                final exercises = item.exercises;
+                final t = exercises.indexWhere((ex) => ex.name == tappedName);
 
-                              cnRunningWorkout.selectedIndexes[groupedExerciseKey] = t;
-                            });
-                            cnRunningWorkout.cache();
-                          });
-                        },
-                      );
-                    }).toList();
-                    return children;
-                  },
-                  buttonBuilder: (context, showMenu) => CupertinoButton(
-                      onPressed: (){
-                        HapticFeedback.selectionClick();
-                        showMenu();
-                      },
-                      padding: EdgeInsets.zero,
-                      child: Row(
-                        children: [
-                          ConstrainedBox(
-                            constraints: BoxConstraints(
-                                maxWidth: MediaQuery.of(context).size.width-120
-                            ),
-                            child: OverflowSafeText(
-                                (mapValue as GroupedExercise).exercises[cnRunningWorkout.selectedIndexes[groupedExerciseKey]!].name,
-                                style: const TextStyle(color: Colors.white, fontSize: 20),
-                                maxLines: 1
-                            ),
-                          ),
-                          const SizedBox(width: 10,),
-                          trailingChoice(size: 15, color: Colors.white)
-                        ],
-                      )
-                  ),
-                ),
-
-                cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value is Exercise
-                    ? const SizedBox()
-                    : const Spacer(),
-
-                // if(cnRunningWorkout.newExNames.contains(key))
-                //   SizedBox(
-                //     width:40,
-                //     child: myIconButton(
-                //       icon:const Icon(Icons.delete_forever),
-                //       onPressed: (){
-                //         showCupertinoModalPopup<void>(
-                //           context: context,
-                //           builder: (BuildContext context) => CupertinoActionSheet(
-                //             cancelButton: getActionSheetCancelButton(context),
-                //             message: Text(AppLocalizations.of(context)!.runningWorkoutDeleteExercise),
-                //             actions: <Widget>[
-                //               CupertinoActionSheetAction(
-                //                 /// This parameter indicates the action would perform
-                //                 /// a destructive action such as delete or exit and turns
-                //                 /// the action's text color to red.
-                //                 isDestructiveAction: true,
-                //                 onPressed: () {
-                //                   // cnRunningWorkout.deleteExercise(item is Exercise? item : item._exercises[0]);
-                //                   Navigator.pop(context);
-                //                 },
-                //                 child: Text(AppLocalizations.of(context)!.delete),
-                //               ),
-                //             ],
-                //           ),
-                //         );
-                //       },
-                //     ),
-                //   ),
-              ],
-            ),
-
-            const SizedBox(height: 5),
-
-            SeatLevelSelectorRunningWorkout(
-                exercise: newEx,
-                iconSize: iconSize,
-                style: style
-            ),
-
-            /// Rest in Seconds Row and Selector
-            // getRestInSecondsSelector(newEx),
-            RestInSecondsSelectorRunningWorkout(
-                exercise: newEx,
-                iconSize: iconSize,
-                style: style
-            ),
-
-            const SizedBox(height: 15),
-
-            /// Text for Set, Template, Weight and Amount
-            SetHeaderRow(exercise: newEx),
-
-            const SizedBox(height: 5),
-          ],
-        ),
+                cnRunningWorkout.selectedIndexes[groupedExerciseKey] = t;
+              });
+              cnRunningWorkout.cache();
+            });
+          }
       );
     }
 

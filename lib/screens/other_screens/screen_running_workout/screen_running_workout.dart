@@ -46,7 +46,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
-  late CnRunningWorkout cnRunningWorkout;
+  late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu;
   // final double _heightOfSetRow = 30;
@@ -78,7 +78,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
 
   @override
   Widget build(BuildContext context) {
-    cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
+    // cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     if(!cnRunningWorkout.scrollController.hasClients){
@@ -770,9 +770,8 @@ class CnRunningWorkout extends ChangeNotifier {
   bool isVisible = false;
   ScrollController scrollController = ScrollController();
   List<String> newExNames = [];
-  /// Contains all Exercises - linked and non linked ones - as a Map
-  /// linked exercises are saved as another Map with key = linkName
-  /// non linked Exercises are saved as the exercise itself with the ex.name as the key
+  /// Contains all Exercises - linked and non linked ones - with their
+  /// corresponding sets as a Map
   SplayTreeMap<String, dynamic> groupedExercises = SplayTreeMap();
   /// Contains for each linked exercise the currently selected index for getting the right one
   /// from the groupedExercises Map
@@ -1109,16 +1108,31 @@ class CnRunningWorkout extends ChangeNotifier {
     NamedSet? removedSet;
     Exercise ex = set.ex;
     final oldSetsAmount = ex.sets.length;
+    // print("Index to remove: ${set.index}");
 
+    print("Remove Set with Key ${set.slidableKey.value}");
+    print("Link Name: ${ex.linkName}");
+
+    /// remove set from exercise
     set.ex.sets.removeAt(set.index);
+    /// remove set from template modifiable exercise
     Exercise? templateEx = workoutTemplateModifiable.exercises.where((exercise) => exercise.name == set.ex.name).firstOrNull;
     SingleSet? removedTemplateSet = templateEx?.sets.removeAt(set.index);
 
+    /// Remove Set from groupedExercises Map
+    /// Single Exercise, no Group
     if(ex.linkName == null){
+      print("Link Name is null");
       removedSet = groupedExercises[getSetKeyName(ex.name, set.index)];
+      // print(removedSet?.ex.name);
+      /// iterate over all higher sets and reduce index by one
       for(int i = set.index; i <= (oldSetsAmount-1); i++){
+        print("Iterate over sets");
+        /// when reached last set, remove the set
         if(i == oldSetsAmount-1){
-          groupedExercises.remove(getSetKeyName(ex.name, i));
+          print("Remove Set now");
+          NamedSet removedSetTest = groupedExercises.remove(getSetKeyName(ex.name, i));
+          print("Removed set from grouped exercise with Key value ${removedSet?.slidableKey.value}");
           break;
         }
         NamedSet nextNamedSet = groupedExercises[getSetKeyName(ex.name, i+1)];
@@ -1126,8 +1140,11 @@ class CnRunningWorkout extends ChangeNotifier {
         groupedExercises[getSetKeyName(ex.name, i)] = nextNamedSet;
       }
     }
+
+    /// Grouped Exercise
     else {
       removedSet = groupedExercises[getSetKeyName(ex.linkName!, set.index)].getSet(ex.name);
+      /// iterate over all higher sets and reduce index by one
       for(int i = set.index; i <= (oldSetsAmount-1); i++){
         if(i == oldSetsAmount-1){
           groupedExercises[getSetKeyName(ex.linkName!, i)].remove(ex.name);
@@ -1141,6 +1158,15 @@ class CnRunningWorkout extends ChangeNotifier {
         groupedExercises[getSetKeyName(ex.linkName!, i)].set(nextNamedSet);
       }
     }
+
+    print("All Keys in function");
+    for(dynamic item in groupedExercises.values){
+      if(item is NamedSet && item.name == ex.name){
+        print(item.slidableKey.value);
+      }
+    }
+    print("");
+
     removedSet?.templateSet = removedTemplateSet;
     return removedSet;
   }
@@ -1252,7 +1278,7 @@ class NamedSet{
   final Exercise ex;
   final TextEditingController weightController;
   final TextEditingController amountController;
-  final UniqueKey slidableKey = UniqueKey();
+  late final ValueKey slidableKey = ValueKey("${ex.name}_$index");
   final GlobalKey weightKey = GlobalKey();
   final GlobalKey amountKey = GlobalKey();
   final FocusNode focusNodeWeight = FocusNode();

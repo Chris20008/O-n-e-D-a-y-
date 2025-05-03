@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../../../assets/custom_icons/my_icons_icons.dart';
-import '../../../../../../objects/exercise.dart';
-import '../../../../../../util/constants.dart';
+import '../../../../../../../../assets/custom_icons/my_icons_icons.dart';
+import '../../../../../../../../objects/exercise.dart';
+import '../../../../../../../../util/constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SeatLevelSelectorRunningWorkout extends StatefulWidget {

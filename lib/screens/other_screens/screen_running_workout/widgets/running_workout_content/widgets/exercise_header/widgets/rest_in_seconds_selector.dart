@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import '../../../../../../objects/exercise.dart';
-import '../../../../../../util/constants.dart';
+import '../../../../../../../../objects/exercise.dart';
+import '../../../../../../../../util/constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class RestInSecondsSelectorRunningWorkout extends StatefulWidget {

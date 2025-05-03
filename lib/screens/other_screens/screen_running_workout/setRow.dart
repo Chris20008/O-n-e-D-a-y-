@@ -28,20 +28,21 @@ class _SetRowState extends State<SetRow> {
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
-  late final int index = widget.index;
-  late dynamic item = widget.item;
-  late dynamic groupedExerciseKey = widget.groupedExerciseKey;
-  late CnRunningWorkout cnRunningWorkout = widget.cnRunningWorkout;
+  late int index;
+  late dynamic item;
+  late dynamic groupedExerciseKey;
+  late CnRunningWorkout cnRunningWorkout;
   bool showMask = true;
 
   @override
   Widget build(BuildContext context) {
+    index = widget.index;
+    item = widget.item;
+    groupedExerciseKey = widget.groupedExerciseKey;
+    cnRunningWorkout = widget.cnRunningWorkout;
+
     NamedSet? tempSet;
     Widget? child;
-
-    print("Set Row $index");
-
-    // return SizedBox();
 
 
 
@@ -89,7 +90,7 @@ class _SetRowState extends State<SetRow> {
                 width: _widthOfTextField,
                 onConfirm: (){
                   cnRunningWorkout.cache();
-                  cnRunningWorkout.refresh();
+                  setState((){});
                 }
             ),
 
@@ -177,8 +178,7 @@ class _SetRowState extends State<SetRow> {
                             set.set.weight = null;
                           }
                           cnRunningWorkout.cache();
-                          cnRunningWorkout.refresh();
-                          // setState();
+                          setState((){});
                         },
                       ),
                     ),
@@ -254,14 +254,12 @@ class _SetRowState extends State<SetRow> {
                                 amountController.clear();
                               }
                               if(value.length == 1){
-                                cnRunningWorkout.refresh();
-                                // setState();
+                                setState((){});
                               }
                             }
                             else{
                               set.set.amount = null;
-                              cnRunningWorkout.refresh();
-                              // setState();
+                              setState((){});
                             }
                           }
                           /// For Time
@@ -274,8 +272,7 @@ class _SetRowState extends State<SetRow> {
                               amountController.text = result[1];
                               set.set.amount = result[0];
                             }
-                            cnRunningWorkout.refresh();
-                            // setState();
+                            setState((){});
                           }
                           cnRunningWorkout.cache();
                         },
@@ -298,13 +295,13 @@ class _SetRowState extends State<SetRow> {
             motion: const ScrollMotion(),
             dismissible: DismissiblePane(
                 onDismissed: () {
-                  dismiss(set.ex, templateEx, set);
+                  dismiss(set);
                 }),
             children: [
               SlidableAction(
                 flex:10,
                 onPressed: (BuildContext context){
-                  dismiss(set.ex, templateEx, set);
+                  dismiss(set);
                 },
                 backgroundColor: const Color(0xFFA12D2C),
                 foregroundColor: Colors.white,
@@ -321,7 +318,7 @@ class _SetRowState extends State<SetRow> {
     return child;
   }
 
-  void dismiss(Exercise ex, Exercise templateEx, NamedSet set){
+  void dismiss(NamedSet set){
     cnRunningWorkout.removeSpecificSetFromExercise(set);
     cnRunningWorkout.refresh();
     cnRunningWorkout.cache();
@@ -422,8 +419,8 @@ class _SetRowState extends State<SetRow> {
                     amountController?.text = templateSet.amountAsTime.toString();
                   }
                   newSet.amount = templateSet.amount;
-                  cnRunningWorkout.refresh();
                   cnRunningWorkout.cache();
+                  setState((){});
                 } else{
                   FocusManager.instance.primaryFocus?.unfocus();
                 }
