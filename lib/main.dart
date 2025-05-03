@@ -681,68 +681,79 @@ class CnHomepage extends ChangeNotifier {
 // }
 
 class MyTransition extends CupertinoPageTransitionsBuilder {
-  // @override
-  // Widget buildTransitions<T>(
-  //     PageRoute<T> route,
-  //     BuildContext context,
-  //     Animation<double> animation,
-  //     Animation<double> secondaryAnimation,
-  //     Widget child,
-  //     ) {
-  //   const delay = Duration(milliseconds: 150);
-  //   final totalDuration = route.transitionDuration;
-  //
-  //   final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
-  //   const pauseValue = 0.001;
-  //
-  //   final delayedPrimary = TweenSequence([
-  //     TweenSequenceItem(
-  //       tween: ConstantTween(pauseValue),
-  //       weight: delayFraction,
-  //     ),
-  //     TweenSequenceItem(
-  //       tween: Tween(begin: pauseValue, end: 1.0),
-  //       weight: 1 - delayFraction,
-  //     ),
-  //   ]).animate(animation);
-  //
-  //   final delayedSecondary = TweenSequence([
-  //     TweenSequenceItem(
-  //       tween: ConstantTween(0.0),
-  //       weight: delayFraction,
-  //     ),
-  //     TweenSequenceItem(
-  //       tween: Tween(begin: 0.0, end: 1.0),
-  //       weight: 1 - delayFraction,
-  //     ),
-  //   ]).animate(secondaryAnimation);
-  //
-  //   // return CupertinoPageTransition(
-  //   //   primaryRouteAnimation: delayedPrimary,
-  //   //   secondaryRouteAnimation: delayedSecondary,
-  //   //   linearTransition: false,
-  //   //   child: child,
-  //   // );
-  //   // return CupertinoPageTransition(
-  //   //   primaryRouteAnimation: animation,
-  //   //   secondaryRouteAnimation: secondaryAnimation,
-  //   //   linearTransition: false,
-  //   //   child: child,
-  //   // );
-  //   return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
-  //     route,
-  //     context,
-  //     delayedPrimary,
-  //     delayedSecondary,
-  //     child,
-  //   );
-  // }
+  @override
+  Widget buildTransitions<T>(
+      PageRoute<T> route,
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child,
+      ) {
+    const delay = Duration(milliseconds: 50);
+    final totalDuration = route.transitionDuration;
 
-  // @override
-  // Duration get transitionDuration => const Duration(milliseconds: 650);
+    final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
+    const pauseValue = 0.001;
 
-  // @override
-  // Duration get reverseTransitionDuration => const Duration(milliseconds: 550);
+    // if(animation.status == AnimationStatus.reverse){
+    //   print("Is reverse");
+    //   return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
+    //     route,
+    //     context,
+    //     animation,
+    //     secondaryAnimation,
+    //     child,
+    //   );
+    // }
+
+    final delayedPrimary = TweenSequence([
+      TweenSequenceItem(
+        tween: ConstantTween(pauseValue),
+        weight: delayFraction,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: pauseValue, end: 1.0),
+        weight: 1 - delayFraction,
+      ),
+    ]).animate(animation);
+
+    final delayedSecondary = TweenSequence([
+      TweenSequenceItem(
+        tween: ConstantTween(0.0),
+        weight: delayFraction,
+      ),
+      TweenSequenceItem(
+        tween: Tween(begin: 0.0, end: 1.0),
+        weight: 1 - delayFraction,
+      ),
+    ]).animate(secondaryAnimation);
+
+    // return CupertinoPageTransition(
+    //   primaryRouteAnimation: delayedPrimary,
+    //   secondaryRouteAnimation: delayedSecondary,
+    //   linearTransition: false,
+    //   child: child,
+    // );
+    // return CupertinoPageTransition(
+    //   primaryRouteAnimation: animation,
+    //   secondaryRouteAnimation: secondaryAnimation,
+    //   linearTransition: false,
+    //   child: child,
+    // );
+    return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
+      route,
+      context,
+      delayedPrimary,
+      delayedSecondary,
+      child,
+    );
+  }
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 550);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 450);
 }
 
 

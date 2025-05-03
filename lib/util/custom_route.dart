@@ -760,7 +760,7 @@
 //         return;
 //       }
 //
-//       if (details.primaryDelta! > 0) {
+//       if (details.primaryDelta! >= 0) {
 //         // Swipe nach rechts - Geste starten
 //         _backGestureController = widget.onStartPopGesture();
 //         _gestureStarted = true;
