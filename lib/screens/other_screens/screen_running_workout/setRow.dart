@@ -24,7 +24,7 @@ class SetRow extends StatefulWidget {
 
 }
 
-class _SetRowState extends State<SetRow> {
+class _SetRowState extends State<SetRow> with TickerProviderStateMixin{
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
@@ -44,8 +44,6 @@ class _SetRowState extends State<SetRow> {
     NamedSet? tempSet;
     Widget? child;
 
-
-
     if(item is NamedSet){
       tempSet = item;
     }
@@ -60,6 +58,7 @@ class _SetRowState extends State<SetRow> {
     }
 
     NamedSet set = tempSet;
+    set.initSlidableController(SlidableController(this));
 
     /// Each Set
     final TextEditingController weightController = set.weightController;
@@ -290,6 +289,7 @@ class _SetRowState extends State<SetRow> {
     if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
       child = Slidable(
           key: set.slidableKey,
+          controller: set.slidableController,
           endActionPane: ActionPane(
             extentRatio: 0.3,
             motion: const ScrollMotion(),

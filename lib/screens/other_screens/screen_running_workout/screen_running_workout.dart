@@ -13,6 +13,7 @@ import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -37,7 +38,7 @@ class ScreenRunningWorkout extends StatefulWidget {
   State<ScreenRunningWorkout> createState() => _ScreenRunningWorkoutState();
 }
 
-class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout> {
+class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
@@ -1278,11 +1279,13 @@ class NamedSet{
   final Exercise ex;
   final TextEditingController weightController;
   final TextEditingController amountController;
+  late final SlidableController _slidableController;
   late final ValueKey slidableKey = ValueKey("${ex.name}_$index");
   final GlobalKey weightKey = GlobalKey();
   final GlobalKey amountKey = GlobalKey();
   final FocusNode focusNodeWeight = FocusNode();
   final FocusNode focusNodeAmount = FocusNode();
+  bool _slidableControllerInitialized = false;
 
   NamedSet({
     required this.set,
@@ -1293,6 +1296,19 @@ class NamedSet{
     required this.amountController,
     this.templateSet
   });
+
+  initSlidableController(SlidableController c){
+    if(!_slidableControllerInitialized){
+      _slidableController = c;
+      _slidableControllerInitialized = true;
+    }
+  }
+
+  SlidableController? get slidableController => _slidableControllerInitialized? _slidableController : null;
+  bool get slidableControllerInitialized => _slidableControllerInitialized;
+  bool get isOpened{
+    return slidableController != null && slidableController!.ratio != 0;
+  }
 
 }
 
