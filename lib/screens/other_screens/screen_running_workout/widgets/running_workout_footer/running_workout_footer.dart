@@ -5,7 +5,6 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../../../widgets/bottom_menu.dart';
 import 'package:flutter/material.dart';
 import '../../screen_running_workout.dart';
-import '../../selector_exercises_per_link.dart';
 import '../../selector_exercises_to_update.dart';
 import 'functions/open_pop_up_finish_workout.dart';
 
@@ -16,7 +15,6 @@ class RunningWorkoutFooter extends StatelessWidget {
   Widget build(BuildContext context) {
     late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
     late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen: false);
-    // late CnSelectorExercisePerLink cnSelectorExercisePerLink = Provider.of<CnSelectorExercisePerLink>(context, listen: false);
 
     return ClipRRect(
       child: BackdropFilter(

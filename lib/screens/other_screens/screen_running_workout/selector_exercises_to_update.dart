@@ -54,7 +54,6 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
       backdropEnabled: true,
       backdropOpacity: 0.25,
       controller: cnSelectorExerciseToUpdate.panelController,
-      // maxHeight: ((relevantExercises.length == 1? 192 : relevantExercises.length * 207) + cnBottomMenu.height + 94),
       panelBuilder: (context, listView){
         return SafeArea(
           top: false,
@@ -285,7 +284,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
 class CnSelectorExerciseToUpdate extends ChangeNotifier {
   final String animationControllerName = "SelectorExerciseToUpdate";
-  String _descendantNameExerciseToUpdate = "ScreenRunningWorkout";
+  final String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
   PanelController panelController = PanelController();
   List<bool> isCheckedList = [];
   List<Exercise> relevantExercises = [];
@@ -328,12 +327,6 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
     }
   }
 
-  void setDescendantName(String name){
-    _descendantNameExerciseToUpdate = name;
-    key = UniqueKey();
-    refresh();
-  }
-
   Future openPanel() async{
     await panelController.animatePanelToPosition(
         1,
@@ -343,7 +336,6 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
   }
 
   bool get isOpened => panelController.panelPosition > 0;
-  String get descendantNameExerciseToUpdate => _descendantNameExerciseToUpdate;
 
   void refresh(){
     notifyListeners();

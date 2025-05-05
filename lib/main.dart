@@ -6,7 +6,6 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
@@ -98,7 +97,6 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin{
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnConfig()),
-        // ChangeNotifierProvider(create: (context) => CnSelectorExercisePerLink()),
         ChangeNotifierProvider(create: (context) => CnSelectorExerciseToUpdate()),
         ChangeNotifierProvider(create: (context) => CnAllExercisesPanel()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
