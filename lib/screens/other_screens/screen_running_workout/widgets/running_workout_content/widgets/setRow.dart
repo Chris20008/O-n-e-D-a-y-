@@ -286,29 +286,52 @@ class _SetRowState extends State<SetRow>{
     );
 
     if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
-      child = Slidable(
-          key: set.slidableKey,
-          controller: set.slidableController,
-          endActionPane: ActionPane(
-            extentRatio: 0.3,
-            motion: const ScrollMotion(),
-            dismissible: DismissiblePane(
-                onDismissed: () {
-                  dismiss(set);
-                }),
-            children: [
-              SlidableAction(
-                flex:10,
-                onPressed: (BuildContext context){
-                  dismiss(set);
-                },
-                backgroundColor: const Color(0xFFA12D2C),
-                foregroundColor: Colors.white,
-                icon: Icons.delete,
-              ),
-            ],
-          ),
-          child: child
+      child = Listener(
+        onPointerDown: (details){
+          /// When controller is opened disable canPop
+          if(set.slidableController.animation.value != 0){
+            cnRunningWorkout.canPop = false;
+            cnRunningWorkout.refresh();
+          }
+        },
+        onPointerMove: (details){
+          /// When swiping left and popping is enabled
+          if(details.delta.dx < 0 && cnRunningWorkout.canPop){
+            cnRunningWorkout.canPop = false;
+            cnRunningWorkout.refresh();
+          }
+        },
+        onPointerUp: (details){
+          /// ReEnable popping
+          if(!cnRunningWorkout.canPop){
+            cnRunningWorkout.canPop = true;
+            cnRunningWorkout.refresh();
+          }
+        },
+        child: Slidable(
+            key: set.slidableKey,
+            controller: set.slidableController,
+            endActionPane: ActionPane(
+              extentRatio: 0.3,
+              motion: const ScrollMotion(),
+              dismissible: DismissiblePane(
+                  onDismissed: () {
+                    dismiss(set);
+                  }),
+              children: [
+                SlidableAction(
+                  flex:10,
+                  onPressed: (BuildContext context){
+                    dismiss(set);
+                  },
+                  backgroundColor: const Color(0xFFA12D2C),
+                  foregroundColor: Colors.white,
+                  icon: Icons.delete,
+                ),
+              ],
+            ),
+            child: child
+        ),
       );
     }
 

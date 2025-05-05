@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../../../../objects/exercise.dart';
 import '../../../../../util/constants.dart';
 import '../../screen_running_workout.dart';
-import '../../setRow.dart';
+import 'widgets/setRow.dart';
 
 class RunningWorkoutContent extends StatefulWidget {
   const RunningWorkoutContent({super.key});
@@ -31,7 +31,7 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
     print("Running Workout Content");
 
     final contentIsActive = context.select<CnRunningWorkout, bool>((cn) => cn.contentIsActive);
-    cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: true);
+    cnRunningWorkout = context.watch<CnRunningWorkout>();
 
     if(contentIsActive) {
       return SlidableAutoCloseBehavior(

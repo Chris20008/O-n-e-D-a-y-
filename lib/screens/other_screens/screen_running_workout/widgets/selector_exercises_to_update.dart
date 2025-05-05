@@ -10,8 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import '../../../objects/exercise.dart';
-import '../../../objects/workout.dart';
+import '../../../../objects/exercise.dart';
+import '../../../../objects/workout.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 

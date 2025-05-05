@@ -4,10 +4,11 @@ import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_w
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/selector_exercises_to_update.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/wrapper_screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
@@ -251,7 +252,7 @@ class _MyHomePageState extends State<MyHomePage>{
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const ScreenRunningWorkout()
+                  builder: (context) => const WrapperScreenRunningWorkout()
               ));
         });
       }
@@ -742,6 +743,9 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
     //   linearTransition: false,
     //   child: child,
     // );
+    // if(!route.popGestureEnabled){
+    //   return const SizedBox();
+    // }
     return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
       route,
       context,

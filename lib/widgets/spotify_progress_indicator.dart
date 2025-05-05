@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
-import '../screens/other_screens/screen_running_workout/stopwatch.dart';
+import '../screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
 
 class SpotifyProgressIndicator extends StatefulWidget {
   final PlayerState? data;

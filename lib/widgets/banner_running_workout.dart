@@ -31,57 +31,55 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             return AnimatedCrossFade(
                 firstChild: const SizedBox(width: double.maxFinite),
                 secondChild: ClipRRect(
-                  child: BlockSwipeBack(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(
-                          sigmaX: 10.0,
-                          sigmaY: 10.0,
-                          tileMode: TileMode.mirror
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(
+                        sigmaX: 10.0,
+                        sigmaY: 10.0,
+                        tileMode: TileMode.mirror
+                    ),
+                    child: Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.45),
                       ),
-                      child: Container(
-                        width: double.maxFinite,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.45),
-                        ),
-                        child: SafeArea(
-                          bottom: false,
-                          child: Selector<CnBannerRunningWorkout, bool>(
-                              selector: (_, cn) => cn.canOpenWorkout,
-                              builder: (_, canOpenWorkout, __){
-                                return CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () {
-                                    if(canOpenWorkout){
-                                      cnRunningWorkout.reopenRunningWorkout(context);
-                                      cnBannerRunningWorkout.onlyShow();
-                                    }
-                                  },
-                                  child: Container(
-                                    height: _height,
-                                    width: double.maxFinite,
-                                    color: Colors.black.withValues(alpha: 0.0),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Spacer(),
-                                        Expanded(
-                                          flex: 4,
-                                          child: Center(
-                                            child: OverflowSafeText(
-                                                cnRunningWorkout.workout.name,
-                                                style: Theme.of(context).textTheme.titleMedium,
-                                                maxLines: 1,
-                                                minFontSize: 27
-                                            ),
+                      child: SafeArea(
+                        bottom: false,
+                        child: Selector<CnBannerRunningWorkout, bool>(
+                            selector: (_, cn) => cn.canOpenWorkout,
+                            builder: (_, canOpenWorkout, __){
+                              return CupertinoButton(
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  if(canOpenWorkout){
+                                    cnRunningWorkout.reopenRunningWorkout(context);
+                                    cnBannerRunningWorkout.onlyShow();
+                                  }
+                                },
+                                child: Container(
+                                  height: _height,
+                                  width: double.maxFinite,
+                                  color: Colors.black.withValues(alpha: 0.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Spacer(),
+                                      Expanded(
+                                        flex: 4,
+                                        child: Center(
+                                          child: OverflowSafeText(
+                                              cnRunningWorkout.workout.name,
+                                              style: Theme.of(context).textTheme.titleMedium,
+                                              maxLines: 1,
+                                              minFontSize: 27
                                           ),
                                         ),
-                                        const Spacer(),
-                                      ],
-                                    ),
+                                      ),
+                                      const Spacer(),
+                                    ],
                                   ),
-                                );
-                              }
-                          ),
+                                ),
+                              );
+                            }
                         ),
                       ),
                     ),

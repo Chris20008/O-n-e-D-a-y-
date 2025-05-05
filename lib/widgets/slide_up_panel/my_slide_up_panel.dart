@@ -422,9 +422,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
                 },
                 panel: ClipRRect(
                   borderRadius: widget.borderRadius,
-                  child: BlockSwipeBack(
-                      child: widget.panel?? widget.panelBuilder!(context, myListView)
-                  ),
+                  child: widget.panel?? widget.panelBuilder!(context, myListView),
                 ),
                 backdropEnabled: widget.backdropEnabled,
                 backdropColor: widget.backdropColor,

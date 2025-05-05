@@ -1,9 +1,10 @@
 import 'dart:collection';
 import 'package:collection/collection.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
-import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/selector_exercises_to_update.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_footer/running_workout_footer.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/wrapper_screen_running_workout.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
@@ -20,7 +21,7 @@ import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../util/constants.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
-import 'animated_column.dart';
+import 'widgets/animated_column.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
@@ -43,14 +44,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
-  bool isSavingData = false;
   int timeAnimatedColumn = 1000;
   bool isShowingAnimatedColumn = true;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,120 +56,105 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
 
     print("Running Workout");
 
-    return PopScope(
-      canPop: !isSavingData,
-      onPopInvokedWithResult: (doPop, res){
-        if(cnRunningWorkout.isVisible){
-          cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
-          cnRunningWorkout.isVisible = false;
-          cnRunningWorkout.cache();
-          cnBannerRunningWorkout.activateButton();
-        }
-        else{
-          cnBannerRunningWorkout.reset();
-        }
-        FocusManager.instance.primaryFocus?.unfocus();
-        // cnRunningWorkout.contentIsActive = false;
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Container(
-          height: double.maxFinite,
-          width: double.maxFinite,
-          decoration: const BoxDecoration(
-            color: Colors.black
-          ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              InitialAnimatedScreen(
-                backDropEnabled: true,
-                animationControllerName: "ScreenRunningWorkout",
-                child: Scaffold(
-                  backgroundColor: Theme.of(context).primaryColor,
-                  extendBody: true,
-                  resizeToAvoidBottomInset: false,
-                  bottomNavigationBar: const RunningWorkoutFooter(),
-                  body: GestureDetector(
-                    onTap: (){
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    behavior: HitTestBehavior.translucent,
-                    child: Stack(
-                      children: [
-                        SafeArea(
-                          top: false,
-                          bottom: false,
-                          child: Padding(
-                            padding: EdgeInsets.only(top:0,bottom: viewInsetsBottom ,left: 20, right: 20),
-                            child: const Column(
-                              children: [
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        height: double.maxFinite,
+        width: double.maxFinite,
+        decoration: const BoxDecoration(
+          color: Colors.black
+        ),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InitialAnimatedScreen(
+              backDropEnabled: true,
+              animationControllerName: "ScreenRunningWorkout",
+              child: Scaffold(
+                backgroundColor: Theme.of(context).primaryColor,
+                extendBody: true,
+                resizeToAvoidBottomInset: false,
+                bottomNavigationBar: const RunningWorkoutFooter(),
+                body: GestureDetector(
+                  onTap: (){
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  behavior: HitTestBehavior.translucent,
+                  child: Stack(
+                    children: [
+                      SafeArea(
+                        top: false,
+                        bottom: false,
+                        child: Padding(
+                          padding: EdgeInsets.only(top:0,bottom: viewInsetsBottom ,left: 20, right: 20),
+                          child: const Column(
+                            children: [
 
-                                Expanded(
+                              Expanded(
 
-                                  /// Each EXERCISE and SET
-                                  child: RunningWorkoutContent(),
-                                ),
-                              ],
-                            ),
+                                /// Each EXERCISE and SET
+                                child: RunningWorkoutContent(),
+                              ),
+                            ],
                           ),
                         ),
+                      ),
 
-                        /// do not make const, should be updated by rebuild
-                        const BannerRunningWorkout(),
+                      /// do not make const, should be updated by rebuild
+                      const BannerRunningWorkout(),
 
-                        AnimatedCrossFade(
-                            layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
-                              return Stack(
-                                clipBehavior: Clip.none,
-                                alignment: Alignment.center,
-                                children: <Widget>[
-                                  Positioned(
-                                    key: bottomChildKey,
-                                    child: bottomChild,
-                                  ),
-                                  Positioned(
-                                    key: topChildKey,
-                                    child: topChild,
-                                  ),
-                                ],
-                              );
-                            },
-                            firstChild: const AnimatedColumn(),
-                            secondChild: const Align(
-                              alignment: Alignment.bottomRight,
-                                child: SizedBox(width: double.maxFinite)
-                            ),
-                            crossFadeState: viewInsetsBottom < 100
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                            duration: Duration(milliseconds: viewInsetsBottom < 100? 150 : 0)
-                        ),
-                      ],
-                    ),
+                      AnimatedCrossFade(
+                          layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                            return Stack(
+                              clipBehavior: Clip.none,
+                              alignment: Alignment.center,
+                              children: <Widget>[
+                                Positioned(
+                                  key: bottomChildKey,
+                                  child: bottomChild,
+                                ),
+                                Positioned(
+                                  key: topChildKey,
+                                  child: topChild,
+                                ),
+                              ],
+                            );
+                          },
+                          firstChild: const AnimatedColumn(),
+                          secondChild: const Align(
+                            alignment: Alignment.bottomRight,
+                              child: SizedBox(width: double.maxFinite)
+                          ),
+                          crossFadeState: viewInsetsBottom < 100
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                          duration: Duration(milliseconds: viewInsetsBottom < 100? 150 : 0)
+                      ),
+                    ],
                   ),
                 ),
               ),
+            ),
 
-              // if(cnRunningWorkout.dismissedSets.isNotEmpty)
-              //   SafeArea(
-              //     child: Align(
-              //       alignment: Alignment.topRight,
-              //       child: IconButton(
-              //           onPressed: undoDismiss,
-              //           icon: Icon(
-              //             Icons.undo,
-              //             color: Colors.amber[800],
-              //           )
-              //       ),
-              //     ),
-              //   ),
+            // if(cnRunningWorkout.dismissedSets.isNotEmpty)
+            //   SafeArea(
+            //     child: Align(
+            //       alignment: Alignment.topRight,
+            //       child: IconButton(
+            //           onPressed: undoDismiss,
+            //           icon: Icon(
+            //             Icons.undo,
+            //             color: Colors.amber[800],
+            //           )
+            //       ),
+            //     ),
+            //   ),
 
-              // const StandardPopUp(),
+            // const StandardPopUp(),
 
-              // const SelectorExercisesPerLink(),
+            // const SelectorExercisesPerLink(),
 
-              const SelectorExercisesToUpdate(),
+            const SelectorExercisesToUpdate(),
 
               Selector<CnRunningWorkout, bool>(
                   selector: (_, cn) => cn.isSavingData,
@@ -190,8 +170,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
                     ) : const SizedBox();
                 }
               )
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -297,6 +276,7 @@ class CnRunningWorkout extends ChangeNotifier {
   final double setPadding = 5;
   bool contentIsActive = true;
   bool isSavingData = false;
+  bool canPop = true;
   late final TickerProvider vsync;
   late CnConfig cnConfig;
   late CnWorkouts cnWorkouts;
@@ -620,7 +600,7 @@ class CnRunningWorkout extends ChangeNotifier {
     await Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const ScreenRunningWorkout()
+            builder: (context) => const WrapperScreenRunningWorkout()
         ));
     cache();
   }
@@ -631,7 +611,7 @@ class CnRunningWorkout extends ChangeNotifier {
     Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => const ScreenRunningWorkout()
+            builder: (context) => const WrapperScreenRunningWorkout()
         ));
     cache();
   }

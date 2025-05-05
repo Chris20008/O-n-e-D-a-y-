@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../../../../util/constants.dart';
 import '../../../screen_running_workout.dart';
-import '../../../selector_exercises_to_update.dart';
+import '../../selector_exercises_to_update.dart';
 import 'open_pop_up_confirm_cancel_workout.dart';
 
 Future openPopUpFinishWorkout(
