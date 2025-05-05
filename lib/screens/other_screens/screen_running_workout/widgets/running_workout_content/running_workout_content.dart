@@ -32,15 +32,6 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
 
     final contentIsActive = context.select<CnRunningWorkout, bool>((cn) => cn.contentIsActive);
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: true);
-    // final listLength = context.select<CnRunningWorkout, int>((cn) => cn.groupedExercises.length);
-
-    print("All Keys in Content");
-    for(dynamic item in cnRunningWorkout.groupedExercises.values){
-      if(item is NamedSet){
-        print(item.slidableKey.value);
-      }
-    }
-    print("");
 
     if(contentIsActive) {
       return SlidableAutoCloseBehavior(
@@ -117,13 +108,7 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
           },
           itemCount: cnRunningWorkout.groupedExercises.length,
           itemBuilder: (BuildContext context, int indexExercise) {
-            print("");
-            print("In Builder with Index: $indexExercise");
             dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
-            if(item is NamedSet){
-              print("Has Key");
-              print(item.slidableKey.value);
-            }
             return getItem(indexExercise);
           },
         ),

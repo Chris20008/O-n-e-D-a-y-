@@ -24,7 +24,7 @@ class SetRow extends StatefulWidget {
 
 }
 
-class _SetRowState extends State<SetRow> with TickerProviderStateMixin{
+class _SetRowState extends State<SetRow>{
   final double _heightOfSetRow = 30;
   final double _widthOfTextField = 55;
   final double _setPadding = 5;
@@ -58,7 +58,6 @@ class _SetRowState extends State<SetRow> with TickerProviderStateMixin{
     }
 
     NamedSet set = tempSet;
-    set.initSlidableController(SlidableController(this));
 
     /// Each Set
     final TextEditingController weightController = set.weightController;

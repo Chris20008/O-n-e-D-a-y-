@@ -5,6 +5,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/selecto
 import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_footer/running_workout_footer.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
@@ -41,46 +42,25 @@ class ScreenRunningWorkout extends StatefulWidget {
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
   late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  /// listen to bottomMenu for height changes
-  late CnBottomMenu cnBottomMenu;
-  // final double _heightOfSetRow = 30;
-  // final double _setPadding = 5;
-  Key selectorExerciseToUpdateKey = UniqueKey();
-  Key selectorExercisePerLinkKey = UniqueKey();
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
   bool isAlreadyCheckingKeyboardPermanent = false;
   bool isSavingData = false;
-  // final _style = const TextStyle(color: Colors.white, fontSize: 15);
-  String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
-  PanelController controllerSelectorExerciseToUpdate = PanelController();
-  PanelController controllerSelectorExercisePerLink = PanelController();
   int timeAnimatedColumn = 1000;
   bool isShowingAnimatedColumn = true;
-  // bool showContent = false;
 
   @override
   void initState() {
     super.initState();
-    // Future.delayed(const Duration(milliseconds: 500), (){
-    //   cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;
-    //   cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
-    //   cnRunningWorkout.contentIsActive = true;
-    //   cnRunningWorkout.refresh();
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    // cnRunningWorkout = Provider.of<CnRunningWorkout>(context);
-    cnBottomMenu = Provider.of<CnBottomMenu>(context);
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     if(!cnRunningWorkout.scrollController.hasClients){
       cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
@@ -121,34 +101,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
                   backgroundColor: Theme.of(context).primaryColor,
                   extendBody: true,
                   resizeToAvoidBottomInset: false,
-                  bottomNavigationBar: ClipRRect(
-                    child: BlockSwipeBack(
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(
-                            sigmaX: 10.0,
-                            sigmaY: 10.0,
-                            tileMode: TileMode.mirror
-                        ),
-                        child: Container(
-                          height: cnBottomMenu.height,
-                          color: Colors.black.withValues(alpha: 0.5),
-                          child: CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: openPopUpFinishWorkout,
-                            child: Center(
-                                child: Text(
-                                  AppLocalizations.of(context)!.finish,
-                                    style: TextStyle(
-                                        color: Colors.amber[800]
-                                    ),
-                                    textScaler: const TextScaler.linear(1.2)
-                                )
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  bottomNavigationBar: const RunningWorkoutFooter(),
                   body: GestureDetector(
                     onTap: (){
                       FocusManager.instance.primaryFocus?.unfocus();
@@ -175,11 +128,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
                         ),
 
                         /// do not make const, should be updated by rebuild
-                        Hero(
-                            transitionOnUserGestures: true,
-                            tag: "Banner",
-                            child: BannerRunningWorkout()
-                        ),
+                        const BannerRunningWorkout(),
 
                         AnimatedCrossFade(
                             layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
@@ -230,39 +179,24 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
 
               // const StandardPopUp(),
 
-              SelectorExercisesPerLink(
-                controller: controllerSelectorExercisePerLink,
-                key: selectorExercisePerLinkKey,
-                groupedExercises: cnRunningWorkout.groupedExercises,
-                relevantLinkNames: cnRunningWorkout.linkWithMultipleExercisesStarted,
-                onConfirm: confirmSelectorExPerLink,
-                onCancel: (){
-                  controllerSelectorExercisePerLink.close();
-                },
-              ),
+              // const SelectorExercisesPerLink(),
 
-              SelectorExercisesToUpdate(
-                key: selectorExerciseToUpdateKey,
-                controller: controllerSelectorExerciseToUpdate,
-                descendantAnimationControllerName: descendantNameExerciseToUpdate,
-                workout: Workout.clone(cnRunningWorkout.workout),
-                workoutTemplate: Workout.clone(cnRunningWorkout.workoutTemplateNotModifiable),
-                onConfirm: finishWorkout,
-                onCancel: (){
-                  controllerSelectorExerciseToUpdate.close();
-                },
-              ),
+              const SelectorExercisesToUpdate(),
 
-              if (isSavingData)
-                Container(
-                  color: Colors.black.withValues(alpha: 0.5),
-                  child: Center(
-                    child: CupertinoActivityIndicator(
-                        radius: 20.0,
-                        color: Colors.amber[800]
-                    ),
-                  ),
-                )
+              Selector<CnRunningWorkout, bool>(
+                  selector: (_, cn) => cn.isSavingData,
+                  builder: (_, isSavingData, __){
+                    return isSavingData ? Container(
+                      color: Colors.black.withValues(alpha: 0.5),
+                      child: Center(
+                        child: CupertinoActivityIndicator(
+                            radius: 20.0,
+                            color: Colors.amber[800]
+                        ),
+                      ),
+                    ) : const SizedBox();
+                }
+              )
             ],
           ),
         ),
@@ -270,174 +204,132 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
     );
   }
 
-  bool showAnimatedColumn(){
-    if(100 > viewInsetsBottom && !isShowingAnimatedColumn){
-      isShowingAnimatedColumn = true;
-      timeAnimatedColumn = 1000;
-      return true;
-    }
-    else if(viewInsetsBottom > 0 && isShowingAnimatedColumn){
-      isShowingAnimatedColumn = false;
-      timeAnimatedColumn = 0;
-      return false;
-    }
-    return isShowingAnimatedColumn;
-  }
-
-  onPressedLeft(){
-    if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
-      cnRunningWorkout.currentIndexFocus -= 1;
-      cnRunningWorkout.currentIndexWeightOrAmount = 1;
-    } else{
-      cnRunningWorkout.currentIndexWeightOrAmount = 0;
-    }
-
-    NamedSet? set = getSet(-1);
-
-    if(set == null){
-      FocusManager.instance.primaryFocus?.unfocus();
-      return;
-    }
-
-    FocusNode focusNode = cnRunningWorkout.currentIndexWeightOrAmount == 0? set.focusNodeWeight : set.focusNodeAmount;
-
-    if (cnRunningWorkout.currentIndexFocus < cnRunningWorkout.groupedExercises.length) {
-      FocusScope.of(context).requestFocus(focusNode);
-      onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
-    }
-  }
-
-  onPressedRight(){
-    if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
-      cnRunningWorkout.currentIndexWeightOrAmount = 1;
-    } else{
-      cnRunningWorkout.currentIndexWeightOrAmount = 0;
-      cnRunningWorkout.currentIndexFocus += 1;
-    }
-
-    NamedSet? set = getSet(1);
-
-    if(set == null){
-      FocusManager.instance.primaryFocus?.unfocus();
-      return;
-    }
-
-    FocusNode focusNode = cnRunningWorkout.currentIndexWeightOrAmount == 0? set.focusNodeWeight : set.focusNodeAmount;
-
-    if (cnRunningWorkout.currentIndexFocus < cnRunningWorkout.groupedExercises.length) {
-      FocusScope.of(context).requestFocus(focusNode);
-      onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
-    }
-  }
-
-  NamedSet? getSet(int direction){
-    NamedSet? tempSet;
-
-    try {
-      while (tempSet == null && cnRunningWorkout.currentIndexFocus <cnRunningWorkout.groupedExercises.length) {
-        dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].value;
-
-        if (item is! NamedSet && item is! GroupedSet) {
-          cnRunningWorkout.currentIndexFocus += (2*direction);
-          item = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].value;
-        }
-
-        String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].key;
-
-        if (item is NamedSet) {
-          tempSet = item;
-        }
-        else {
-          item = item as GroupedSet;
-          String linkName = groupedExerciseKey.split("_").first;
-          Exercise ex = (cnRunningWorkout.groupedExercises[linkName] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkName]!)!;
-          tempSet = item.getSet(ex.name);
-        }
-        if(tempSet == null){
-          cnRunningWorkout.currentIndexFocus += (1*direction);
-        }
-      }
-      if (tempSet == null) {
-        return null;
-      }
-      return tempSet;
-    }
-    catch (e){
-      return null;
-    }
-  }
-
-  Future onTapField(int index, int weightOrAmountIndex, {required NamedSet set}) async{
-    cnRunningWorkout.currentIndexFocus = index;
-    cnRunningWorkout.currentIndexWeightOrAmount = weightOrAmountIndex;
-    TextEditingController controller = weightOrAmountIndex == 0? set.weightController : set.amountController;
-    controller.selection =  TextSelection(baseOffset: 0, extentOffset: controller.value.text.length);
-    // await Future.delayed(Duration(milliseconds: 50));
-    // // double factor = Platform.isAndroid? 0.8 : 1;
-    // // final positionKeyboard = getWidgetPosition(cnHomepage.keyKeyboardTopBar);
-    // final value = Platform.isAndroid? 80 : 100;
-    // final height = MediaQuery.of(context).size.height;
-    // final relativeHeight = height - MediaQuery.of(context).viewInsets.bottom;
-    // // double factor = (relativeHeight - 90) / relativeHeight;
-    // double factor = (relativeHeight - value) / height;
-    // Scrollable.ensureVisible(
-    //     set.weightKey.currentContext!,
-    //     duration: const Duration(milliseconds: 300),
-    //     curve: Curves.easeInOut,
-    //     alignment: factor
-    // );
-  }
-
-  void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
-    cnRunningWorkout.exercisesToRemove = exToRemove?? [];
-    if(canUpdateTemplate()){
-      Future.delayed(Duration(milliseconds: delay?? cnStandardPopUp.animationTime), (){
-        setState(() {
-          selectorExerciseToUpdateKey = UniqueKey();
-          controllerSelectorExerciseToUpdate = PanelController();
-        });
-        Future.delayed(const Duration(milliseconds: (100)), (){
-          FocusManager.instance.primaryFocus?.unfocus();
-          // controllerSelectorExerciseToUpdate.open();
-          controllerSelectorExerciseToUpdate.animatePanelToPosition(
-              1,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastEaseInToSlowEaseOut
-          );
-        });
-      });
-    }
-    else{
-      finishWorkout();
-    }
-  }
-
-  // void addSet(Exercise ex, Exercise lastEx){
-  //   int newIndex = ex.sets.length;
-  //   ex.addSet();
-  //   lastEx.addSet();
-  //   SingleSet newSet = ex.sets[newIndex];
-  //   NamedSet newNamedSet = NamedSet(
-  //       set: newSet,
-  //       name: ex.name,
-  //       index: newIndex,
-  //       ex: ex,
-  //       weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-  //       amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
-  //   );
-  //   if(ex.linkName == null){
-  //     cnRunningWorkout.groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
-  //   } else{
-  //     final String newSetKey = getSetKeyName(ex.linkName!, newIndex);
-  //     if(cnRunningWorkout.groupedExercises.containsKey(newSetKey)){
-  //       (cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] as GroupedSet).add(newNamedSet);
-  //     } else{
-  //       cnRunningWorkout.groupedExercises[getSetKeyName(ex.linkName!, newIndex)] = GroupedSet(set: newNamedSet);
-  //     }
+  // bool showAnimatedColumn(){
+  //   if(100 > viewInsetsBottom && !isShowingAnimatedColumn){
+  //     isShowingAnimatedColumn = true;
+  //     timeAnimatedColumn = 1000;
+  //     return true;
   //   }
-  //   final newControllerPos = cnRunningWorkout.scrollController.position.pixels+_heightOfSetRow + _setPadding*2;
-  //   cnRunningWorkout.scrollController.jumpTo(newControllerPos);
-  //   cnRunningWorkout.refresh();
+  //   else if(viewInsetsBottom > 0 && isShowingAnimatedColumn){
+  //     isShowingAnimatedColumn = false;
+  //     timeAnimatedColumn = 0;
+  //     return false;
+  //   }
+  //   return isShowingAnimatedColumn;
+  // }
+
+  // onPressedLeft(){
+  //   if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
+  //     cnRunningWorkout.currentIndexFocus -= 1;
+  //     cnRunningWorkout.currentIndexWeightOrAmount = 1;
+  //   } else{
+  //     cnRunningWorkout.currentIndexWeightOrAmount = 0;
+  //   }
+  //
+  //   NamedSet? set = getSet(-1);
+  //
+  //   if(set == null){
+  //     FocusManager.instance.primaryFocus?.unfocus();
+  //     return;
+  //   }
+  //
+  //   FocusNode focusNode = cnRunningWorkout.currentIndexWeightOrAmount == 0? set.focusNodeWeight : set.focusNodeAmount;
+  //
+  //   if (cnRunningWorkout.currentIndexFocus < cnRunningWorkout.groupedExercises.length) {
+  //     FocusScope.of(context).requestFocus(focusNode);
+  //     onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
+  //   }
+  // }
+  //
+  // onPressedRight(){
+  //   if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
+  //     cnRunningWorkout.currentIndexWeightOrAmount = 1;
+  //   } else{
+  //     cnRunningWorkout.currentIndexWeightOrAmount = 0;
+  //     cnRunningWorkout.currentIndexFocus += 1;
+  //   }
+  //
+  //   NamedSet? set = getSet(1);
+  //
+  //   if(set == null){
+  //     FocusManager.instance.primaryFocus?.unfocus();
+  //     return;
+  //   }
+  //
+  //   FocusNode focusNode = cnRunningWorkout.currentIndexWeightOrAmount == 0? set.focusNodeWeight : set.focusNodeAmount;
+  //
+  //   if (cnRunningWorkout.currentIndexFocus < cnRunningWorkout.groupedExercises.length) {
+  //     FocusScope.of(context).requestFocus(focusNode);
+  //     onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
+  //   }
+  // }
+
+  // NamedSet? getSet(int direction){
+  //   NamedSet? tempSet;
+  //
+  //   try {
+  //     while (tempSet == null && cnRunningWorkout.currentIndexFocus <cnRunningWorkout.groupedExercises.length) {
+  //       dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].value;
+  //
+  //       if (item is! NamedSet && item is! GroupedSet) {
+  //         cnRunningWorkout.currentIndexFocus += (2*direction);
+  //         item = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].value;
+  //       }
+  //
+  //       String groupedExerciseKey = cnRunningWorkout.groupedExercises.entries.toList()[cnRunningWorkout.currentIndexFocus].key;
+  //
+  //       if (item is NamedSet) {
+  //         tempSet = item;
+  //       }
+  //       else {
+  //         item = item as GroupedSet;
+  //         String linkName = groupedExerciseKey.split("_").first;
+  //         Exercise ex = (cnRunningWorkout.groupedExercises[linkName] as GroupedExercise).getExercise(cnRunningWorkout.selectedIndexes[linkName]!)!;
+  //         tempSet = item.getSet(ex.name);
+  //       }
+  //       if(tempSet == null){
+  //         cnRunningWorkout.currentIndexFocus += (1*direction);
+  //       }
+  //     }
+  //     if (tempSet == null) {
+  //       return null;
+  //     }
+  //     return tempSet;
+  //   }
+  //   catch (e){
+  //     return null;
+  //   }
+  // }
+
+  // Future onTapField(int index, int weightOrAmountIndex, {required NamedSet set}) async{
+  //   cnRunningWorkout.currentIndexFocus = index;
+  //   cnRunningWorkout.currentIndexWeightOrAmount = weightOrAmountIndex;
+  //   TextEditingController controller = weightOrAmountIndex == 0? set.weightController : set.amountController;
+  //   controller.selection =  TextSelection(baseOffset: 0, extentOffset: controller.value.text.length);
+  // }
+
+  // void confirmSelectorExPerLink({List<String>? exToRemove, int? delay}){
+  //   cnRunningWorkout.exercisesToRemove = exToRemove?? [];
+  //   if(canUpdateTemplate()){
+  //     Future.delayed(Duration(milliseconds: delay?? 200), (){
+  //       setState(() {
+  //         cnRunningWorkout.selectorExerciseToUpdateKey = UniqueKey();
+  //         cnRunningWorkout.controllerSelectorExerciseToUpdate = PanelController();
+  //       });
+  //       Future.delayed(const Duration(milliseconds: (100)), (){
+  //         FocusManager.instance.primaryFocus?.unfocus();
+  //         // controllerSelectorExerciseToUpdate.open();
+  //         cnRunningWorkout.controllerSelectorExerciseToUpdate.animatePanelToPosition(
+  //             1,
+  //             duration: const Duration(milliseconds: 500),
+  //             curve: Curves.fastEaseInToSlowEaseOut
+  //         );
+  //       });
+  //     });
+  //   }
+  //   else{
+  //     finishWorkout();
+  //   }
   // }
 
   void undoDismiss(){
@@ -465,298 +357,204 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
     // cnRunningWorkout.cache();
   }
 
-  /// Find the first indication of whether or not an Exercise has changed.
-  ///
-  /// Can be through:
-  ///   - amount of sets
-  ///   - weight
-  ///   - amount
-  ///   - rest in seconds
-  ///   - seat level
-  ///   - new Exercise added
-  bool canUpdateTemplate(){
-    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
-    tempWo.removeEmptyExercises();
+  // /// Find the first indication of whether or not an Exercise has changed.
+  // ///
+  // /// Can be through:
+  // ///   - amount of sets
+  // ///   - weight
+  // ///   - amount
+  // ///   - rest in seconds
+  // ///   - seat level
+  // ///   - new Exercise added
+  // bool canUpdateTemplate(){
+  //   Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+  //   tempWo.removeEmptyExercises();
+  //
+  //   if(tempWo.exercises.isEmpty){
+  //     return false;
+  //   }
+  //
+  //   /// Get exercises names of true template
+  //   List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplateNotModifiable.exercises.map((e) => e.name).toList();
+  //
+  //   /// Iterate over every exercise in the current running (new) one
+  //   for(Exercise ex in tempWo.exercises){
+  //     /// Exercise name does not exist in true template yet => new exercise has been added => can update Template
+  //     if(!templateWorkoutExerciseNames.contains(ex.name)){
+  //       return true;
+  //     }
+  //     /// When the exercise name already exists, we check if the exercise of the true template and the current running one are truly the same
+  //     Exercise tempTemplateEx = cnRunningWorkout.workoutTemplateNotModifiable.exercises.firstWhere((e) => e.name == ex.name);
+  //     if(!tempTemplateEx.equals(ex)){
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
-    if(tempWo.exercises.isEmpty){
-      return false;
-    }
+  // bool hasStartedWorkout(){
+  //   Workout tempWo = Workout.clone(cnRunningWorkout.workout);
+  //   tempWo.removeEmptyExercises();
+  //   if(tempWo.exercises.isEmpty){
+  //     return false;
+  //   }
+  //   return true;
+  // }
 
-    /// Get exercises names of true template
-    List<String> templateWorkoutExerciseNames = cnRunningWorkout.workoutTemplateNotModifiable.exercises.map((e) => e.name).toList();
-
-    /// Iterate over every exercise in the current running (new) one
-    for(Exercise ex in tempWo.exercises){
-      /// Exercise name does not exist in true template yet => new exercise has been added => can update Template
-      if(!templateWorkoutExerciseNames.contains(ex.name)){
-        return true;
-      }
-      /// When the exercise name already exists, we check if the exercise of the true template and the current running one are truly the same
-      Exercise tempTemplateEx = cnRunningWorkout.workoutTemplateNotModifiable.exercises.firstWhere((e) => e.name == ex.name);
-      if(!tempTemplateEx.equals(ex)){
-        return true;
-      }
-    }
-    return false;
-  }
-
-  bool hasStartedWorkout(){
-    Workout tempWo = Workout.clone(cnRunningWorkout.workout);
-    tempWo.removeEmptyExercises();
-    if(tempWo.exercises.isEmpty){
-      return false;
-    }
-    return true;
-  }
-
-  void openPopUpFinishWorkout(){
-    final bool canFinish = hasStartedWorkout();
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        cancelButton: getActionSheetCancelButton(context, text: AppLocalizations.of(context)!.runningWorkoutContinueWorkout),
-        title: Text(AppLocalizations.of(context)!.runningWorkoutFinishWorkout),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            /// This parameter indicates the action would perform
-            /// a destructive action such as delete or exit and turns
-            /// the action's text color to red.
-            isDestructiveAction: true,
-            onPressed: () {
-              Navigator.pop(context);
-              Future.delayed(const Duration(milliseconds: 250), (){
-                openPopUpConfirmCancelWorkout();
-              });
-            },
-            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
-          ),
-          if(canFinish)
-            CupertinoActionSheetAction(
-              /// This parameter indicates the action would perform
-              /// a destructive action such as delete or exit and turns
-              /// the action's text color to red.
-              isDestructiveAction: false,
-              onPressed: () {
-                Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-                  setState(() {
-                    cnRunningWorkout.checkMultipleExercisesPerLink();
-                    if(cnRunningWorkout.linkWithMultipleExercisesStarted.isNotEmpty){
-                      descendantNameExerciseToUpdate = "SelectorExercisePerLink";
-                      selectorExercisePerLinkKey = UniqueKey();
-                      controllerSelectorExercisePerLink = PanelController();
-                      Future.delayed(const Duration(milliseconds: 100), (){
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        controllerSelectorExercisePerLink.animatePanelToPosition(
-                            1,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.fastEaseInToSlowEaseOut
-                        );
-                      });
-                    } else{
-                      descendantNameExerciseToUpdate = "ScreenRunningWorkout";
-                      confirmSelectorExPerLink(delay: 0);
-                    }
-                  });
-                });
-                Navigator.pop(context);
-              },
-              child: Text(AppLocalizations.of(context)!.finish, style: cupButtonTextStyle),
-            ),
-        ],
-      ),
-    );
-  }
-
-  void openPopUpConfirmCancelWorkout() {
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        cancelButton: getActionSheetCancelButton(context, text: AppLocalizations.of(context)!.runningWorkoutContinueWorkout),
-        title: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout),
-        message: Text(AppLocalizations.of(context)!.runningWorkoutConfirmCancelWorkout),
-        actions: <Widget>[
-          CupertinoActionSheetAction(
-            /// This parameter indicates the action would perform
-            /// a destructive action such as delete or exit and turns
-            /// the action's text color to red.
-            isDestructiveAction: true,
-            onPressed: () {
-              stopWorkout();
-              Navigator.pop(context);
-            },
-            child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future stopWorkout({int? time})async{
-    time = time?? cnStandardPopUp.animationTime;
-    if(cnStandardPopUp.isVisible){
-      cnStandardPopUp.clear();
-    }
-    await Future.delayed(Duration(milliseconds: time), ()async{
-      cnRunningWorkout.isVisible = false;
-      cnRunningWorkout.isRunning = false;
-      cnBannerRunningWorkout.reset();
-      cnHomepage.refresh();
-      cnWorkouts.refresh();
-      await Future.delayed(const Duration(milliseconds: 50), ()async{
-        Navigator.of(context).pop();
-        /// delayed that the pop context is finished, if to short, the user
-        /// will se a blank page which is not wanted
-        await Future.delayed(const Duration(milliseconds: 500), (){
-          cnRunningWorkout.clear();
-          if(cnStopwatchWidget.isRunning){
-            cnStopwatchWidget.cancelTimer();
-          }
-        });
-      });
-    });
-  }
-
-  Future finishWorkout() async{
-    int time = 0;
-
-    setState(() {
-      isSavingData = true;
-    });
-
-
-    await Future.delayed(const Duration(milliseconds: 300));
-    if(controllerSelectorExerciseToUpdate.panelPosition > 0){
-      await controllerSelectorExerciseToUpdate.close();
-      time = 100;
-    }
-    if(controllerSelectorExercisePerLink.panelPosition > 0){
-      await Future.delayed(Duration(milliseconds: time));
-      await controllerSelectorExercisePerLink.close();
-    }
-
-    /// delay that the popup is closed
-    await Future.delayed(const Duration(milliseconds: 100), ()async{
-      cnRunningWorkout.workout.refreshDate();
-      cnRunningWorkout.removeNotRelevantExercises();
-      cnRunningWorkout.workout.removeEmptyExercises();
-      if(cnRunningWorkout.workout.exercises.isNotEmpty){
-        cnRunningWorkout.workout.saveToDatabase();
-        cnWorkouts.refreshAllWorkouts();
-      }
-      if(cnStopwatchWidget.isRunning){
-        cnStopwatchWidget.cancelTimer();
-      }
-
-      if(cnConfig.automaticBackups){
-        await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
-      }
-
-      await saveCurrentData(cnConfig) != null;
-
-      Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.runningWorkoutCompletedWorkout,
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
-          textColor: Colors.white,
-          fontSize: 16.0
-      );
-      vibrateSuccess();
-      await stopWorkout(time: 0);
-      isSavingData = false;
-    });
-  }
-
-  // Widget getSeatLevelSelector(Exercise newEx) {
-  //   return SizedBox(
-  //     height: 30,
-  //     child: getSelectSeatLevel(
-  //         currentSeatLevel: newEx.seatLevel,
-  //         child: SizedBox(
-  //           width: 100,
-  //           child: Align(
-  //             alignment: Alignment.centerLeft,
-  //             child: Container(
-  //               width: 100,
-  //               height: 30,
-  //               color: Colors.transparent,
-  //               child: Row(
-  //                 mainAxisAlignment: MainAxisAlignment.start,
-  //                 children: [
-  //                   Icon(Icons.airline_seat_recline_normal, size: _iconSize),
-  //                   const SizedBox(width: 2,),
-  //                   if (newEx.seatLevel == null)
-  //                     Text("-", style: _style,)
-  //                   else
-  //                     Text(newEx.seatLevel.toString(), style: _style,)
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
+  // void openPopUpFinishWorkout(){
+  //   final bool canFinish = cnRunningWorkout.hasStartedWorkout();
+  //   showCupertinoModalPopup<void>(
+  //     context: context,
+  //     builder: (BuildContext context) => CupertinoActionSheet(
+  //       cancelButton: getActionSheetCancelButton(context, text: AppLocalizations.of(context)!.runningWorkoutContinueWorkout),
+  //       title: Text(AppLocalizations.of(context)!.runningWorkoutFinishWorkout),
+  //       actions: <Widget>[
+  //         CupertinoActionSheetAction(
+  //           /// This parameter indicates the action would perform
+  //           /// a destructive action such as delete or exit and turns
+  //           /// the action's text color to red.
+  //           isDestructiveAction: true,
+  //           onPressed: () {
+  //             Navigator.pop(context);
+  //             Future.delayed(const Duration(milliseconds: 250), (){
+  //               openPopUpConfirmCancelWorkout();
+  //             });
+  //           },
+  //           child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
   //         ),
-  //         onConfirm: (dynamic value){
-  //           if(value is int){
-  //             newEx.seatLevel = value;
-  //             cnRunningWorkout.refresh();
-  //           }
-  //           else if(value == AppLocalizations.of(context)!.clear){
-  //             newEx.seatLevel = null;
-  //             cnRunningWorkout.refresh();
-  //           }
-  //         },
-  //       context: context
+  //         if(canFinish)
+  //           CupertinoActionSheetAction(
+  //             /// This parameter indicates the action would perform
+  //             /// a destructive action such as delete or exit and turns
+  //             /// the action's text color to red.
+  //             isDestructiveAction: false,
+  //             onPressed: () {
+  //               Future.delayed(const Duration(milliseconds: 200), (){
+  //                 setState(() {
+  //                   cnRunningWorkout.checkMultipleExercisesPerLink();
+  //                   if(cnRunningWorkout.linkWithMultipleExercisesStarted.isNotEmpty){
+  //                     cnRunningWorkout.descendantNameExerciseToUpdate = "SelectorExercisePerLink";
+  //                     cnRunningWorkout.selectorExercisePerLinkKey = UniqueKey();
+  //                     cnRunningWorkout.controllerSelectorExercisePerLink = PanelController();
+  //                     Future.delayed(const Duration(milliseconds: 100), (){
+  //                       FocusManager.instance.primaryFocus?.unfocus();
+  //                       cnRunningWorkout.controllerSelectorExercisePerLink.animatePanelToPosition(
+  //                           1,
+  //                           duration: const Duration(milliseconds: 500),
+  //                           curve: Curves.fastEaseInToSlowEaseOut
+  //                       );
+  //                     });
+  //                   } else{
+  //                     cnRunningWorkout.descendantNameExerciseToUpdate = "ScreenRunningWorkout";
+  //                     confirmSelectorExPerLink(delay: 0);
+  //                   }
+  //                 });
+  //               });
+  //               Navigator.pop(context);
+  //             },
+  //             child: Text(AppLocalizations.of(context)!.finish, style: cupButtonTextStyle),
+  //           ),
+  //       ],
   //     ),
   //   );
   // }
 
-  // getRestInSecondsSelector(Exercise newEx) {
-  //   return SizedBox(
-  //     height: 30,
-  //     child: Row(
-  //       children: [
-  //         getSelectRestInSeconds(
-  //             currentTime: newEx.restInSeconds,
-  //             context: context,
-  //             child: SizedBox(
-  //               width: 100,
-  //               child: Align(
-  //                 alignment: Alignment.centerLeft,
-  //                 child: Row(
-  //                   mainAxisSize: MainAxisSize.max,
-  //                   children: [
-  //                     Icon(CupertinoIcons.timer, size: _iconSize),
-  //                     const SizedBox(width: 2,),
-  //                     Text(mapRestInSecondsToString(restInSeconds: newEx.restInSeconds), style: _style),
-  //                     const SizedBox(width: 10,)
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //             onConfirm: (dynamic value){
-  //               if(value is int){
-  //                 newEx.restInSeconds = value;
-  //                 cnRunningWorkout.refresh();
-  //               }
-  //               else if(value == AppLocalizations.of(context)!.clear){
-  //                 newEx.restInSeconds = 0;
-  //                 cnRunningWorkout.refresh();
-  //               }
-  //               else{
-  //                 showDialogMinuteSecondPicker(
-  //                   context: context,
-  //                   initialTimeDuration: Duration(minutes: newEx.restInSeconds~/60, seconds: newEx.restInSeconds%60),
-  //                   onConfirm: (Duration newDuration){
-  //                     newEx.restInSeconds = newDuration.inSeconds;
-  //                   }
-  //                 ).then((value) => setState(() {}));
-  //               }
-  //             }
+  // void openPopUpConfirmCancelWorkout() {
+  //   showCupertinoModalPopup<void>(
+  //     context: context,
+  //     builder: (BuildContext context) => CupertinoActionSheet(
+  //       cancelButton: getActionSheetCancelButton(context, text: AppLocalizations.of(context)!.runningWorkoutContinueWorkout),
+  //       title: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout),
+  //       message: Text(AppLocalizations.of(context)!.runningWorkoutConfirmCancelWorkout),
+  //       actions: <Widget>[
+  //         CupertinoActionSheetAction(
+  //           /// This parameter indicates the action would perform
+  //           /// a destructive action such as delete or exit and turns
+  //           /// the action's text color to red.
+  //           isDestructiveAction: true,
+  //           onPressed: () {
+  //             stopWorkout();
+  //             Navigator.pop(context);
+  //           },
+  //           child: Text(AppLocalizations.of(context)!.runningWorkoutStopWorkout, style: cupButtonTextStyleOnlyFontSize),
   //         ),
-  //         const Spacer()
   //       ],
   //     ),
   //   );
+  // }
+
+  // Future stopWorkout({int? time})async{
+  //   time = time?? 200;
+  //   await Future.delayed(Duration(milliseconds: time), ()async{
+  //     cnRunningWorkout.isVisible = false;
+  //     cnRunningWorkout.isRunning = false;
+  //     cnBannerRunningWorkout.reset();
+  //     cnHomepage.refresh();
+  //     cnWorkouts.refresh();
+  //     await Future.delayed(const Duration(milliseconds: 50), ()async{
+  //       Navigator.of(context).pop();
+  //       /// delayed that the pop context is finished, if to short, the user
+  //       /// will se a blank page which is not wanted
+  //       await Future.delayed(const Duration(milliseconds: 500), (){
+  //         cnRunningWorkout.clear();
+  //         if(cnStopwatchWidget.isRunning){
+  //           cnStopwatchWidget.cancelTimer();
+  //         }
+  //       });
+  //     });
+  //   });
+  // }
+
+  // Future finishWorkout() async{
+  //   int time = 0;
+  //
+  //   setState(() {
+  //     isSavingData = true;
+  //   });
+  //
+  //
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //   if(cnRunningWorkout.controllerSelectorExerciseToUpdate.panelPosition > 0){
+  //     await cnRunningWorkout.controllerSelectorExerciseToUpdate.close();
+  //     time = 100;
+  //   }
+  //   if(cnRunningWorkout.controllerSelectorExercisePerLink.panelPosition > 0){
+  //     await Future.delayed(Duration(milliseconds: time));
+  //     await cnRunningWorkout.controllerSelectorExercisePerLink.close();
+  //   }
+  //
+  //   /// delay that the popup is closed
+  //   await Future.delayed(const Duration(milliseconds: 100), ()async{
+  //     cnRunningWorkout.workout.refreshDate();
+  //     cnRunningWorkout.removeNotRelevantExercises();
+  //     cnRunningWorkout.workout.removeEmptyExercises();
+  //     if(cnRunningWorkout.workout.exercises.isNotEmpty){
+  //       cnRunningWorkout.workout.saveToDatabase();
+  //       cnWorkouts.refreshAllWorkouts();
+  //     }
+  //     if(cnStopwatchWidget.isRunning){
+  //       cnStopwatchWidget.cancelTimer();
+  //     }
+  //
+  //     if(cnConfig.automaticBackups){
+  //       await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
+  //     }
+  //
+  //     await saveCurrentData(cnConfig) != null;
+  //
+  //     Fluttertoast.showToast(
+  //         msg: AppLocalizations.of(context)!.runningWorkoutCompletedWorkout,
+  //         toastLength: Toast.LENGTH_LONG,
+  //         gravity: ToastGravity.TOP,
+  //         timeInSecForIosWeb: 1,
+  //         backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
+  //         textColor: Colors.white,
+  //         fontSize: 16.0
+  //     );
+  //     vibrateSuccess();
+  //     await stopWorkout(time: 0);
+  //     isSavingData = false;
+  //   });
   // }
 }
 
@@ -777,9 +575,8 @@ class CnRunningWorkout extends ChangeNotifier {
   /// Contains for each linked exercise the currently selected index for getting the right one
   /// from the groupedExercises Map
   Map<String, int> selectedIndexes = {};
-  late CnConfig cnConfig;
   List<String> linkWithMultipleExercisesStarted = [];
-  List<String> exercisesToRemove = [];
+  // List<String> exercisesToRemove = [];
   List<DismissedSingleSet> dismissedSets = [];
   double lastScrollPosition = 0;
   List<String> exerciseOrder = [];
@@ -789,9 +586,161 @@ class CnRunningWorkout extends ChangeNotifier {
   final double heightOfSetRow = 30;
   final double setPadding = 5;
   bool contentIsActive = true;
+  bool isSavingData = false;
+  late final TickerProvider vsync;
+  late CnConfig cnConfig;
+  late CnWorkouts cnWorkouts;
+  late CnStopwatchWidget cnStopwatch;
+  late CnBannerRunningWorkout cnBannerRunningWorkout;
+  late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate;
+  // late CnSelectorExercisePerLink cnSelectorExercisePerLink;
 
-  CnRunningWorkout(BuildContext context){
+  CnRunningWorkout(BuildContext context, this.vsync){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
+    cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+    cnStopwatch = Provider.of<CnStopwatchWidget>(context, listen: false);
+    cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
+    cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen: false);
+    // cnSelectorExercisePerLink = Provider.of<CnSelectorExercisePerLink>(context, listen: false);
+  }
+
+  void confirmSelectorExPerLink({List<String>? exToRemove, int? delay, required BuildContext context}){
+    // exercisesToRemove = exToRemove?? [];
+    if(canUpdateTemplate()){
+      Future.delayed(Duration(milliseconds: delay?? 200), (){
+        cnSelectorExerciseToUpdate.reset();
+        cnSelectorExerciseToUpdate.initData(
+          wo: workout,
+          woT: workoutTemplateModifiable
+        );
+        Future.delayed(const Duration(milliseconds: (100)), (){
+          FocusManager.instance.primaryFocus?.unfocus();
+          cnSelectorExerciseToUpdate.openPanel();
+        });
+      });
+    }
+    else{
+      finishWorkout(context);
+    }
+  }
+
+  /// Find the first indication of whether or not an Exercise has changed.
+  ///
+  /// Can be through:
+  ///   - amount of sets
+  ///   - weight
+  ///   - amount
+  ///   - rest in seconds
+  ///   - seat level
+  ///   - new Exercise added
+  bool canUpdateTemplate(){
+    Workout tempWo = Workout.clone(workout);
+    tempWo.removeEmptyExercises();
+
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+
+    /// Get exercises names of true template
+    List<String> templateWorkoutExerciseNames = workoutTemplateNotModifiable.exercises.map((e) => e.name).toList();
+
+    /// Iterate over every exercise in the current running (new) one
+    for(Exercise ex in tempWo.exercises){
+      /// Exercise name does not exist in true template yet => new exercise has been added => can update Template
+      if(!templateWorkoutExerciseNames.contains(ex.name)){
+        return true;
+      }
+      /// When the exercise name already exists, we check if the exercise of the true template and the current running one are truly the same
+      Exercise tempTemplateEx = workoutTemplateNotModifiable.exercises.firstWhere((e) => e.name == ex.name);
+      if(!tempTemplateEx.equals(ex)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future finishWorkout(BuildContext context) async{
+    // int time = 0;
+
+    // setState(() {
+    isSavingData = true;
+    refresh();
+    // });
+
+
+    await Future.delayed(const Duration(milliseconds: 300));
+    if(cnSelectorExerciseToUpdate.isOpened){
+      await cnSelectorExerciseToUpdate.panelController.close();
+      // time = 100;
+    }
+    // if(cnSelectorExercisePerLink.isOpened){
+    //   await Future.delayed(Duration(milliseconds: time));
+    //   await cnSelectorExercisePerLink.panelController.close();
+    // }
+
+    /// delay that the popup is closed
+    await Future.delayed(const Duration(milliseconds: 100), ()async{
+      workout.refreshDate();
+      // removeNotRelevantExercises();
+      workout.removeEmptyExercises();
+      if(workout.exercises.isNotEmpty){
+        workout.saveToDatabase();
+        cnWorkouts.refreshAllWorkouts();
+      }
+      if(cnStopwatch.isRunning){
+        cnStopwatch.cancelTimer();
+      }
+
+      if(cnConfig.automaticBackups){
+        await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
+      }
+
+      await saveCurrentData(cnConfig) != null;
+
+      if(context.mounted){
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.runningWorkoutCompletedWorkout,
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+        vibrateSuccess();
+        await stopWorkout(time: 0, context: context);
+        isSavingData = false;
+      }
+      // else {
+      //   isSavingData = false;
+      // }
+
+      // refresh();
+    });
+  }
+
+  Future stopWorkout({int? time, required BuildContext context})async{
+    time = time?? 200;
+    await Future.delayed(Duration(milliseconds: time), ()async{
+      isVisible = false;
+      isRunning = false;
+      cnBannerRunningWorkout.reset();
+      // refresh();
+      cnWorkouts.refresh();
+      await Future.delayed(const Duration(milliseconds: 50), ()async{
+        if(context.mounted){
+          Navigator.of(context).pop();
+        }
+        /// delayed that the pop context is finished, if to short, the user
+        /// will se a blank page which is not wanted
+        await Future.delayed(const Duration(milliseconds: 500), (){
+          clear();
+          if(cnStopwatch.isRunning){
+            cnStopwatch.cancelTimer();
+          }
+        });
+      });
+    });
   }
   
   void addExercise(
@@ -806,7 +755,8 @@ class CnRunningWorkout extends ChangeNotifier {
         index: 0,
         ex: ex,
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString()),
+        slidableController: SlidableController(vsync)
     );
     double maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
     if(ex.linkName == null){
@@ -878,7 +828,8 @@ class CnRunningWorkout extends ChangeNotifier {
         index: newIndex,
         ex: ex,
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString()),
+        slidableController: SlidableController(vsync)
     );
     if(ex.linkName == null){
       groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
@@ -923,6 +874,15 @@ class CnRunningWorkout extends ChangeNotifier {
       return 0;
     }
     return scrollExtend;
+  }
+
+  bool hasStartedWorkout(){
+    Workout tempWo = Workout.clone(workout);
+    tempWo.removeEmptyExercises();
+    if(tempWo.exercises.isEmpty){
+      return false;
+    }
+    return true;
   }
 
   void deleteExercise(Exercise ex){
@@ -982,9 +942,9 @@ class CnRunningWorkout extends ChangeNotifier {
     cache();
   }
 
-  void removeNotRelevantExercises(){
-    workout.exercises.removeWhere((ex) => exercisesToRemove.contains(ex.name));
-  }
+  // void removeNotRelevantExercises(){
+  //   workout.exercises.removeWhere((ex) => exercisesToRemove.contains(ex.name));
+  // }
 
   void setWorkoutTemplate(Workout w){
     workoutTemplateModifiable = w;
@@ -1022,7 +982,8 @@ class CnRunningWorkout extends ChangeNotifier {
               index: i,
               ex: ex,
               weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
-              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString()),
+              slidableController: SlidableController(vsync)
           );
         }
       }
@@ -1045,7 +1006,8 @@ class CnRunningWorkout extends ChangeNotifier {
               index: i,
               ex: ex,
               weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
-              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString()),
+              slidableController: SlidableController(vsync)
           );
           final String keyName = getSetKeyName(ex.linkName??"", i);
           if(groupedExercises.containsKey(keyName)){
@@ -1123,17 +1085,13 @@ class CnRunningWorkout extends ChangeNotifier {
     /// Remove Set from groupedExercises Map
     /// Single Exercise, no Group
     if(ex.linkName == null){
-      print("Link Name is null");
       removedSet = groupedExercises[getSetKeyName(ex.name, set.index)];
       // print(removedSet?.ex.name);
       /// iterate over all higher sets and reduce index by one
       for(int i = set.index; i <= (oldSetsAmount-1); i++){
-        print("Iterate over sets");
         /// when reached last set, remove the set
         if(i == oldSetsAmount-1){
-          print("Remove Set now");
           NamedSet removedSetTest = groupedExercises.remove(getSetKeyName(ex.name, i));
-          print("Removed set from grouped exercise with Key value ${removedSet?.slidableKey.value}");
           break;
         }
         NamedSet nextNamedSet = groupedExercises[getSetKeyName(ex.name, i+1)];
@@ -1235,13 +1193,14 @@ class CnRunningWorkout extends ChangeNotifier {
     workout = Workout();
     selectedIndexes.clear();
     groupedExercises.clear();
-    exercisesToRemove.clear();
+    // exercisesToRemove.clear();
     dismissedSets.clear();
     newExNames.clear();
     linkWithMultipleExercisesStarted.clear();
     scrollController = ScrollController();
     isRunning = false;
     cnConfig.setCnRunningWorkout({});
+    isSavingData = false;
     refresh();
   }
 
@@ -1279,13 +1238,12 @@ class NamedSet{
   final Exercise ex;
   final TextEditingController weightController;
   final TextEditingController amountController;
-  late final SlidableController _slidableController;
+  final SlidableController slidableController;
   late final ValueKey slidableKey = ValueKey("${ex.name}_$index");
   final GlobalKey weightKey = GlobalKey();
   final GlobalKey amountKey = GlobalKey();
   final FocusNode focusNodeWeight = FocusNode();
   final FocusNode focusNodeAmount = FocusNode();
-  bool _slidableControllerInitialized = false;
 
   NamedSet({
     required this.set,
@@ -1294,20 +1252,12 @@ class NamedSet{
     required this.ex,
     required this.weightController,
     required this.amountController,
+    required this.slidableController,
     this.templateSet
   });
 
-  initSlidableController(SlidableController c){
-    if(!_slidableControllerInitialized){
-      _slidableController = c;
-      _slidableControllerInitialized = true;
-    }
-  }
-
-  SlidableController? get slidableController => _slidableControllerInitialized? _slidableController : null;
-  bool get slidableControllerInitialized => _slidableControllerInitialized;
   bool get isOpened{
-    return slidableController != null && slidableController!.ratio != 0;
+    return slidableController.ratio != 0;
   }
 
 }

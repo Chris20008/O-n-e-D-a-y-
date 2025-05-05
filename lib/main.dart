@@ -6,6 +6,8 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_per_link.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
@@ -63,7 +65,7 @@ class MyApp extends StatefulWidget {
   static MyAppState? of(BuildContext context) => context.findAncestorStateOfType<MyAppState>();
 }
 
-class MyAppState extends State<MyApp> {
+class MyAppState extends State<MyApp> with TickerProviderStateMixin{
   final Language _language = languages[LANGUAGES.en.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
   final GlobalKey k = GlobalKey();
@@ -96,11 +98,13 @@ class MyAppState extends State<MyApp> {
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnConfig()),
+        // ChangeNotifierProvider(create: (context) => CnSelectorExercisePerLink()),
+        ChangeNotifierProvider(create: (context) => CnSelectorExerciseToUpdate()),
         ChangeNotifierProvider(create: (context) => CnAllExercisesPanel()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
-        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
+        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context, this)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],

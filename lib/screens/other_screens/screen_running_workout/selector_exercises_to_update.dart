@@ -1,10 +1,10 @@
 import 'package:collection/collection.dart';
+import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/multiple_exercise_row.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -17,21 +17,8 @@ import 'dart:io';
 
 class SelectorExercisesToUpdate extends StatefulWidget {
 
-  final Workout workout;
-  final Workout workoutTemplate;
-  final Function onConfirm;
-  final Function onCancel;
-  final PanelController controller;
-  final String descendantAnimationControllerName;
-
   const SelectorExercisesToUpdate({
     super.key,
-    required this.workout,
-    required this.workoutTemplate,
-    required this.onConfirm,
-    required this.onCancel,
-    required this.controller,
-    required this.descendantAnimationControllerName
   });
 
   @override
@@ -40,45 +27,33 @@ class SelectorExercisesToUpdate extends StatefulWidget {
 
 class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
-  late List<bool> isCheckedList;
-  late Workout workout;
-  List<Exercise> relevantExercises = [];
-  ScrollController sc = ScrollController();
-
   /// listen to bottomMenu for height changes
   late CnBottomMenu cnBottomMenu;
+  late CnRunningWorkout cnRunningWorkout;
+  late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate;
 
   @override
   void initState() {
-    workout = Workout.clone(widget.workout);
-    workout.removeEmptyExercises();
-    final List<String> allExNamesTemplate = widget.workoutTemplate.exercises.map((e) => e.name).toList();
-    for(Exercise ex in workout.exercises){
-      if(!allExNamesTemplate.contains(ex.name)){
-        relevantExercises.add(ex);
-        continue;
-      }
-      final tempEx = widget.workoutTemplate.exercises.firstWhere((e) => ex.name == e.name);
-      if(!ex.equals(tempEx)){
-        relevantExercises.add(ex);
-      }
-    }
-    isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
+    cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen:false);
+    cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen:true);
 
-    print("Selector Exercises To Update");
+    final List<Exercise> relevantExercises = cnSelectorExerciseToUpdate.relevantExercises;
+    final List isCheckedList = cnSelectorExerciseToUpdate.isCheckedList;
+    final Workout workout = cnSelectorExerciseToUpdate.workout;
 
     return MySlideUpPanel(
-      animationControllerName: "SelectorExerciseToUpdate",
-      descendantAnimationControllerName: widget.descendantAnimationControllerName,
+      key: cnSelectorExerciseToUpdate.key,
+      animationControllerName: cnSelectorExerciseToUpdate.animationControllerName,
+      descendantAnimationControllerName: cnSelectorExerciseToUpdate.descendantNameExerciseToUpdate,
       backdropEnabled: true,
       backdropOpacity: 0.25,
-      controller: widget.controller,
+      controller: cnSelectorExerciseToUpdate.panelController,
       // maxHeight: ((relevantExercises.length == 1? 192 : relevantExercises.length * 207) + cnBottomMenu.height + 94),
       panelBuilder: (context, listView){
         return SafeArea(
@@ -92,7 +67,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                   margin: const EdgeInsets.only(bottom: 2),
                   color: Theme.of(context).primaryColor,
                   child: listView(
-                      controller: sc,
+                      controller: cnSelectorExerciseToUpdate.sc,
                       physics: const BouncingScrollPhysics(),
                       padding: EdgeInsets.only(bottom: cnBottomMenu.height+10, top: 100),
                       shrinkWrap: true,
@@ -250,7 +225,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                               text: relevantExercises.isNotEmpty? AppLocalizations.of(context)!.cancel : AppLocalizations.of(context)!.ok,
                               onPressed: () {
                                 HapticFeedback.selectionClick();
-                                widget.onCancel();
+                                cnSelectorExerciseToUpdate.panelController.close();
                               },
                             ),
                           ),
@@ -275,7 +250,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                                     }
                                   }
                                   Future.delayed(const Duration(milliseconds: 200), (){
-                                    widget.onConfirm();
+                                    cnRunningWorkout.finishWorkout(context);
                                     if(doUpdate){
                                       workout.exercises = relevantExercises;
                                       workout.updateTemplate();
@@ -297,12 +272,80 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
   }
 
   List<Exercise> getExercises(int index, BuildContext context){
-    Exercise tempNew = Exercise.copy(relevantExercises[index]);
-    Exercise tempTemplate = Exercise.copy(widget.workoutTemplate.exercises.firstWhereOrNull((ex) => ex.name == tempNew.name) ?? Exercise());
+    Exercise tempNew = Exercise.copy(cnSelectorExerciseToUpdate.relevantExercises[index]);
+    Exercise tempTemplate = Exercise.copy(cnSelectorExerciseToUpdate.workoutTemplate.exercises.firstWhereOrNull((ex) => ex.name == tempNew.name) ?? Exercise());
 
     tempNew.name = AppLocalizations.of(context)!.myNew;
     tempTemplate.name = AppLocalizations.of(context)!.template;
 
     return [tempTemplate, tempNew];
+  }
+}
+
+
+class CnSelectorExerciseToUpdate extends ChangeNotifier {
+  final String animationControllerName = "SelectorExerciseToUpdate";
+  String _descendantNameExerciseToUpdate = "ScreenRunningWorkout";
+  PanelController panelController = PanelController();
+  List<bool> isCheckedList = [];
+  List<Exercise> relevantExercises = [];
+  ScrollController sc = ScrollController();
+  Workout workoutTemplate =  Workout();
+  Workout workout = Workout();
+  UniqueKey key = UniqueKey();
+
+  CnSelectorExerciseToUpdate();
+
+  void reset(){
+    isCheckedList.clear();
+    relevantExercises.clear();
+    sc = ScrollController();
+  }
+
+  void initData({
+    required Workout woT,
+    required Workout wo,
+    bool withRefresh = true
+  }){
+    workoutTemplate =  Workout.clone(woT);
+    workout = Workout.clone(wo);
+    workout.removeEmptyExercises();
+    relevantExercises.clear();
+    final List<String> allExNamesTemplate = workoutTemplate.exercises.map((e) => e.name).toList();
+    for(Exercise ex in workout.exercises){
+      if(!allExNamesTemplate.contains(ex.name)){
+        relevantExercises.add(ex);
+        continue;
+      }
+      final tempEx = workoutTemplate.exercises.firstWhere((e) => ex.name == e.name);
+      if(!ex.equals(tempEx)){
+        relevantExercises.add(ex);
+      }
+    }
+    isCheckedList = List<bool>.generate(relevantExercises.length, (index) => false);
+    if(withRefresh){
+      refresh();
+    }
+  }
+
+  void setDescendantName(String name){
+    _descendantNameExerciseToUpdate = name;
+    key = UniqueKey();
+    refresh();
+  }
+
+  Future openPanel() async{
+    await panelController.animatePanelToPosition(
+        1,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.fastEaseInToSlowEaseOut
+    );
+  }
+
+  bool get isOpened => panelController.panelPosition > 0;
+  String get descendantNameExerciseToUpdate => _descendantNameExerciseToUpdate;
+
+  void refresh(){
+    notifyListeners();
   }
 }

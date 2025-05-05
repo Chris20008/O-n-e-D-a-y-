@@ -106,11 +106,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 }
             ),
             /// do not make const, should be updated by rebuild
-            const Hero(
-                transitionOnUserGestures: true,
-                tag: "Banner",
-                child: BannerRunningWorkout()
-            ),
+            const BannerRunningWorkout(),
+
             SafeArea(
               bottom: true,
               child: AnimatedContainer(
