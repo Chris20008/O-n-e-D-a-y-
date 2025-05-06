@@ -287,6 +287,7 @@ class _SetRowState extends State<SetRow>{
 
     if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
       child = Listener(
+        behavior: HitTestBehavior.translucent,
         onPointerDown: (details){
           /// When controller is opened disable canPop
           if(set.slidableController.animation.value != 0){
@@ -308,29 +309,33 @@ class _SetRowState extends State<SetRow>{
             cnRunningWorkout.refresh();
           }
         },
-        child: Slidable(
-            key: set.slidableKey,
-            controller: set.slidableController,
-            endActionPane: ActionPane(
-              extentRatio: 0.3,
-              motion: const ScrollMotion(),
-              dismissible: DismissiblePane(
-                  onDismissed: () {
-                    dismiss(set);
-                  }),
-              children: [
-                SlidableAction(
-                  flex:10,
-                  onPressed: (BuildContext context){
-                    dismiss(set);
-                  },
-                  backgroundColor: const Color(0xFFA12D2C),
-                  foregroundColor: Colors.white,
-                  icon: Icons.delete,
-                ),
-              ],
-            ),
-            child: child
+        child: MetaData(
+          metaData: "blockSwipeBack",
+          behavior: HitTestBehavior.translucent,
+          child: Slidable(
+              key: set.slidableKey,
+              controller: set.slidableController,
+              endActionPane: ActionPane(
+                extentRatio: 0.3,
+                motion: const ScrollMotion(),
+                dismissible: DismissiblePane(
+                    onDismissed: () {
+                      dismiss(set);
+                    }),
+                children: [
+                  SlidableAction(
+                    flex:10,
+                    onPressed: (BuildContext context){
+                      dismiss(set);
+                    },
+                    backgroundColor: const Color(0xFFA12D2C),
+                    foregroundColor: Colors.white,
+                    icon: Icons.delete,
+                  ),
+                ],
+              ),
+              child: child
+          ),
         ),
       );
     }

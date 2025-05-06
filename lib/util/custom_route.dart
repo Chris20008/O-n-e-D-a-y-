@@ -713,6 +713,7 @@
 //   late HorizontalDragGestureRecognizer _recognizer;
 //   bool _gestureStarted = false; // Hilfsflag
 //   bool _gestureCanceled = false;
+//   int lastAddedPointer = 0;
 //
 //   @override
 //   void initState() {
@@ -750,7 +751,6 @@
 //
 //   void _handleDragUpdate(DragUpdateDetails details) {
 //     assert(mounted);
-//     // pritn("In Update")
 //     if(_gestureCanceled){
 //       return;
 //     }
@@ -761,11 +761,11 @@
 //       }
 //
 //       if (details.primaryDelta! >= 0) {
-//         // Swipe nach rechts - Geste starten
+//         // Swipe right - start gesture
 //         _backGestureController = widget.onStartPopGesture();
 //         _gestureStarted = true;
 //       } else {
-//         // Swipe nach links - Geste ignorieren
+//         // Swipe left - ignore gesture
 //         _handleDragCancel();
 //         return;
 //       }
@@ -791,7 +791,6 @@
 //   }
 //
 //   void _handleDragCancel() {
-//     print("Do Cancel");
 //     assert(mounted);
 //
 //     _backGestureController?.dragEnd(0.0);
@@ -801,9 +800,25 @@
 //   }
 //
 //   void _handlePointerDown(PointerDownEvent event) {
+//
+//     final result = HitTestResult();
+//     WidgetsBinding.instance.hitTest(result, event.position);
+//
+//     /// when metadata is blockSwipeBack, ignore this pointer
+//     for(final entry in result.path){
+//       final target = entry.target;
+//       if(target is RenderMetaData){
+//         final meta = target.metaData;
+//         if(meta == "blockSwipeBack"){
+//           return;
+//         }
+//       }
+//     }
+//
 //     if (widget.enabledCallback()) {
 //       _recognizer.addPointer(event);
-//       _gestureCanceled = false;;
+//       _gestureCanceled = false;
+//       lastAddedPointer = event.pointer;
 //     }
 //   }
 //
