@@ -21,12 +21,11 @@ class _WrapperScreenRunningWorkout extends State<WrapperScreenRunningWorkout> {
   @override
   Widget build(BuildContext context) {
     final isSavingData = context.select<CnRunningWorkout, bool>((cn) => cn.isSavingData);
-    final canPop = context.select<CnRunningWorkout, bool>((cn) => cn.canPop);
 
     print("Wrapper Running Workout");
 
     return PopScope(
-      canPop: !isSavingData && canPop,
+      canPop: !isSavingData,
       onPopInvokedWithResult: (doPop, res) {
         if (cnRunningWorkout.isVisible) {
           cnRunningWorkout.lastScrollPosition = cnRunningWorkout.scrollController.offset;

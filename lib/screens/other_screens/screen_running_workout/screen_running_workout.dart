@@ -16,7 +16,6 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
-import '../../../main.dart';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../util/constants.dart';
@@ -35,17 +34,9 @@ class ScreenRunningWorkout extends StatefulWidget {
 
 class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
 
-  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
-  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
-  late CnConfig cnConfig  = Provider.of<CnConfig>(context, listen: false);
-  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   double viewInsetsBottom = 0;
   bool isAlreadyCheckingKeyboard = false;
-  bool isAlreadyCheckingKeyboardPermanent = false;
-  int timeAnimatedColumn = 1000;
-  bool isShowingAnimatedColumn = true;
 
   @override
   Widget build(BuildContext context) {
@@ -150,10 +141,6 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
             //     ),
             //   ),
 
-            // const StandardPopUp(),
-
-            // const SelectorExercisesPerLink(),
-
             const SelectorExercisesToUpdate(),
 
               Selector<CnRunningWorkout, bool>(
@@ -176,7 +163,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
     );
   }
 
-  // onPressedLeft(){
+  onPressedLeft(){
   //   if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
   //     cnRunningWorkout.currentIndexFocus -= 1;
   //     cnRunningWorkout.currentIndexWeightOrAmount = 1;
@@ -197,9 +184,9 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
   //     FocusScope.of(context).requestFocus(focusNode);
   //     onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
   //   }
-  // }
-  //
-  // onPressedRight(){
+  }
+
+  onPressedRight(){
   //   if(cnRunningWorkout.currentIndexWeightOrAmount == 0){
   //     cnRunningWorkout.currentIndexWeightOrAmount = 1;
   //   } else{
@@ -220,7 +207,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
   //     FocusScope.of(context).requestFocus(focusNode);
   //     onTapField(cnRunningWorkout.currentIndexFocus, cnRunningWorkout.currentIndexWeightOrAmount, set: set);
   //   }
-  // }
+  }
 
   void undoDismiss(){
     // if(cnRunningWorkout.dismissedSets.isEmpty){
@@ -276,7 +263,6 @@ class CnRunningWorkout extends ChangeNotifier {
   final double setPadding = 5;
   bool contentIsActive = true;
   bool isSavingData = false;
-  bool canPop = true;
   late final TickerProvider vsync;
   late CnConfig cnConfig;
   late CnWorkouts cnWorkouts;

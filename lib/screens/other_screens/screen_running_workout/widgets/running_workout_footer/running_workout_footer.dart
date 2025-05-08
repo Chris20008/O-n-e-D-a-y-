@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:fitness_app/widgets/block_swipe_back.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -17,38 +18,40 @@ class RunningWorkoutFooter extends StatelessWidget {
     late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen: false);
 
     return ClipRRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-            sigmaX: 10.0,
-            sigmaY: 10.0,
-            tileMode: TileMode.mirror
-        ),
-        child: Selector<CnBottomMenu, double>(
-            selector: (_, cn) => cn.height,
-            builder: (_, height, __){
-              return Container(
-                height: height,
-                color: Colors.black.withValues(alpha: 0.5),
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  onPressed: () async => await openPopUpFinishWorkout(
-                      context,
-                      cnRunningWorkout,
-                      cnSelectorExerciseToUpdate,
-                      // cnSelectorExercisePerLink
+      child: BlockSwipeBack(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(
+              sigmaX: 10.0,
+              sigmaY: 10.0,
+              tileMode: TileMode.mirror
+          ),
+          child: Selector<CnBottomMenu, double>(
+              selector: (_, cn) => cn.height,
+              builder: (_, height, __){
+                return Container(
+                  height: height,
+                  color: Colors.black.withValues(alpha: 0.5),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: () async => await openPopUpFinishWorkout(
+                        context,
+                        cnRunningWorkout,
+                        cnSelectorExerciseToUpdate,
+                        // cnSelectorExercisePerLink
+                    ),
+                    child: Center(
+                        child: Text(
+                            AppLocalizations.of(context)!.finish,
+                            style: TextStyle(
+                                color: Colors.amber[800]
+                            ),
+                            textScaler: const TextScaler.linear(1.2)
+                        )
+                    ),
                   ),
-                  child: Center(
-                      child: Text(
-                          AppLocalizations.of(context)!.finish,
-                          style: TextStyle(
-                              color: Colors.amber[800]
-                          ),
-                          textScaler: const TextScaler.linear(1.2)
-                      )
-                  ),
-                ),
-              );
-            }
+                );
+              }
+          ),
         ),
       ),
     );

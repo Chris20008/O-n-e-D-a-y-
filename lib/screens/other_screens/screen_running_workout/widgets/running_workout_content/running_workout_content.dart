@@ -21,7 +21,7 @@ class RunningWorkoutContent extends StatefulWidget {
 class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
 
   String? currentDraggingKey;
-  late CnRunningWorkout cnRunningWorkout;// = Provider.of<CnRunningWorkout>(context, listen: false);
+  late CnRunningWorkout cnRunningWorkout;
   final double iconSize = 20;
   final style = const TextStyle(color: Colors.white, fontSize: 15);
 
@@ -108,7 +108,7 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
           },
           itemCount: cnRunningWorkout.groupedExercises.length,
           itemBuilder: (BuildContext context, int indexExercise) {
-            dynamic item = cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
+            cnRunningWorkout.groupedExercises.entries.toList()[indexExercise].value;
             return getItem(indexExercise);
           },
         ),
