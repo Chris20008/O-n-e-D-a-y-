@@ -51,7 +51,7 @@ class _TextScrollCustomized extends State<TextScrollCustomized> {
         velocity: const Velocity(pixelsPerSecond: Offset(25, 0)),
         delayBefore: const Duration(milliseconds: 1000),
         pauseOnBounce: const Duration(milliseconds: 1000),
-        numberOfReps: widget.numberOfReps,
+        numberOfReps: null, //widget.numberOfReps,
         fadedBorder: true,
         fadeBorderVisibility: FadeBorderVisibility.auto,
         fadeBorderSide: FadeBorderSide.both,

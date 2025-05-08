@@ -195,7 +195,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                                                         onTap: (){
                                                           /// Just opens Spotify
                                                           String uri = "spotify:";
-                      																												HapticFeedback.selectionClick();
+                                                          HapticFeedback.selectionClick();
                                                           /// Slight delay before opening because on iOS the HapticFeedback sometimes gets skipped
                                                           /// when the delay is not there
                                                           Future.delayed(const Duration(milliseconds: 50), (){
