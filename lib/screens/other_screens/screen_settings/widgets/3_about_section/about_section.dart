@@ -29,21 +29,21 @@ class AboutSection extends StatelessWidget {
           title: SelectorContactButton(),
         ),
         /// Github
-        CupertinoListTile(
-          onTap: () async{
-            await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
-          },
-          leading: const Icon(
-            MyIcons.github_circled,
-            color: Colors.white,
-          ),
-          trailing: trailingArrow,
-          title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
-        ),
+        // CupertinoListTile(
+        //   onTap: () async{
+        //     await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-");
+        //   },
+        //   leading: const Icon(
+        //     MyIcons.github_circled,
+        //     color: Colors.white,
+        //   ),
+        //   trailing: trailingArrow,
+        //   title: Text(AppLocalizations.of(context)!.settingsContribute, style: const TextStyle(color: Colors.white)),
+        // ),
         /// Term Of Use
         CupertinoListTile(
           onTap: () async{
-            await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/TERMS%20OF%20USE.md#terms-of-use");
+            await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/terms-of-use");
           },
           leading: const Icon(
             Icons.my_library_books_rounded,
@@ -55,7 +55,7 @@ class AboutSection extends StatelessWidget {
         /// Privacy Policy
         CupertinoListTile(
           onTap: () async{
-            await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/PRIVACY%20POLICY.md#privacy-policy");
+            await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/privacy-policy");
           },
           leading: const Icon(
             Icons.lock_outline,
@@ -67,7 +67,7 @@ class AboutSection extends StatelessWidget {
         /// Imprint
         CupertinoListTile(
           onTap: () async{
-            await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+            await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/imprint");
           },
           leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
           trailing: trailingArrow,

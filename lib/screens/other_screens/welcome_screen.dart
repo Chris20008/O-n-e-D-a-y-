@@ -113,7 +113,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             padding: EdgeInsets.zero,
             onPressed: () async{
               HapticFeedback.selectionClick();
-              await openUrl("https://github.com/Chris20008/O-n-e-D-a-y-/blob/master/IMPRINT.md#imprint");
+              await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/imprint");
             },
             child: Text(
               AppLocalizations.of(context)!.settingsImprint,
