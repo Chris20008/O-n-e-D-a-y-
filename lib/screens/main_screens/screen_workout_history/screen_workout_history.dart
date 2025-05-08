@@ -116,7 +116,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                     dateOfWorkout = cnWorkoutHistory.workoutsAndSickDays[index].date;
                     child = WorkoutExpansionTile(
                       workout: cnWorkoutHistory.workoutsAndSickDays[index],
-                      padding: EdgeInsets.zero,
+                      padding: const EdgeInsets.only(top: 5),
                       onExpansionChange: (bool isOpen) => cnWorkoutHistory.opened[index] = isOpen,
                       initiallyExpanded: cnWorkoutHistory.opened[index],
                     );

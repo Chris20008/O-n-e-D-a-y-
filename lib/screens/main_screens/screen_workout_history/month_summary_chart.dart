@@ -25,11 +25,9 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
   late int restDays;
 
   List<Color> colorsShades = [
-    Colors.black45,
-    Colors.black26,
-    Colors.black38,
-    // Colors.black12,
-    Colors.black54,
+    Color(0xfff69135),
+    Color(0xff97866a),
+    Color(0xff212121),
   ];
 
   @override
@@ -157,12 +155,13 @@ class _MonthSummaryChartState extends State<MonthSummaryChart> {
     return List.generate(names.length, (i) {
       final isTouched = i == touchedIndex;
       final fontSize = touchedIndex < 0 || isTouched ? 17.0 : 12.0;
-      final radius = touchedIndex < 0 || isTouched ? 45.0 : 35.0;
+      final radius = touchedIndex < 0 || isTouched ? 20.0 : 15.0;
       const shadows = [Shadow(color: Colors.black, blurRadius: 2)];
       return PieChartSectionData(
         color: colorsShades[i < colorsShades.length ?  i % colorsShades.length : (i+1) % colorsShades.length],
         value: (widget.summary.workoutCounts[names[i]]??0 / totalCount) * 360,
-        title: getChartNames(i),
+        title: "",
+        // title: getChartNames(i),
         radius: radius,
         titleStyle: TextStyle(
           fontSize: fontSize,

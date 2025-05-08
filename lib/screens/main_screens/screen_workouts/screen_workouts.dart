@@ -87,7 +87,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                           ),
                           WorkoutExpansionTile(
                             workout: cnWorkouts.workouts[index],
-                            padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
+                            padding: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 0),
                             onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                             initiallyExpanded: cnWorkouts.opened[index],
                           )
@@ -99,7 +99,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                   /// Other 2 - n Templates
                   return WorkoutExpansionTile(
                       workout: cnWorkouts.workouts[index],
-                      padding: const EdgeInsets.only(top: 10, left: 20, right: 20, bottom: 0),
+                      padding: const EdgeInsets.only(top: 15, left: 20, right: 20, bottom: 0),
                       onExpansionChange: (bool isOpen) => cnWorkouts.opened[index] = isOpen,
                       initiallyExpanded: cnWorkouts.opened[index],
                   );

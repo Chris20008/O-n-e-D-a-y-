@@ -125,6 +125,8 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin{
             }),
             cardColor: const Color(0xFF2C2C2E),
             primaryColor: const Color(0xFF1C1C1E),
+            primaryColorDark: const Color(0xFF0B0B0B),
+            hintColor: const Color(0xFF515154),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             // useMaterial3: true,
@@ -676,13 +678,6 @@ class CnHomepage extends ChangeNotifier {
   }
 }
 
-// class MyTransition extends CupertinoPageTransitionsBuilder {
-//   MyTransition();
-//
-//   @override
-//   Duration get transitionDuration => const Duration(milliseconds: 500);
-// }
-
 class MyTransition extends CupertinoPageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
@@ -697,17 +692,6 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
 
     final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
     const pauseValue = 0.001;
-
-    // if(animation.status == AnimationStatus.reverse){
-    //   print("Is reverse");
-    //   return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
-    //     route,
-    //     context,
-    //     animation,
-    //     secondaryAnimation,
-    //     child,
-    //   );
-    // }
 
     final delayedPrimary = TweenSequence([
       TweenSequenceItem(
@@ -731,21 +715,6 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
       ),
     ]).animate(secondaryAnimation);
 
-    // return CupertinoPageTransition(
-    //   primaryRouteAnimation: delayedPrimary,
-    //   secondaryRouteAnimation: delayedSecondary,
-    //   linearTransition: false,
-    //   child: child,
-    // );
-    // return CupertinoPageTransition(
-    //   primaryRouteAnimation: animation,
-    //   secondaryRouteAnimation: secondaryAnimation,
-    //   linearTransition: false,
-    //   child: child,
-    // );
-    // if(!route.popGestureEnabled){
-    //   return const SizedBox();
-    // }
     return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
       route,
       context,

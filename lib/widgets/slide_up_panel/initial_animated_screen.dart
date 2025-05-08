@@ -93,7 +93,8 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(borderRadius),
                 child: Container(
-                  decoration: widget.decoration,
+                  // decoration: widget.decoration,
+                  color: Theme.of(context).primaryColorDark,
                   child: Stack(
                     children: [
                       child?? const SizedBox(),

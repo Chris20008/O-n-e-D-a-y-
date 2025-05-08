@@ -49,9 +49,22 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
     return Padding(
       padding: widget.padding,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(22),
         child: Container(
-          color: Colors.black.withValues(alpha: 0.5),
+          color: Theme.of(context).primaryColor,
+          // decoration: BoxDecoration(
+          //   gradient: LinearGradient(
+          //       begin: Alignment.topLeft,
+          //       end: Alignment.bottomRight,
+          //       colors: [
+          //         Color(0xff3b2b1b),
+          //         Color(0xff23170b)
+          //         // Colors.blue,
+          //         // Colors.green
+          //       ],
+          //   )
+          // ),
+          // color: Colors.black.withValues(alpha: 0.5),
           // color: const Color(0x33939393),
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -94,58 +107,85 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 24,
+                                fontWeight: FontWeight.w500
                               ),
                               numberOfReps: null,
                               pauseBetween: 4000,
                               mode: TextScrollMode.endless,
                             )
                         ),
+                        CupertinoButton(
+                            sizeStyle: CupertinoButtonSize.medium,
+                            // padding: EdgeInsets.zero,
+                            // color: Colors.red,
+                            child: Icon(Icons.edit,
+                                color: Theme.of(context).hintColor //Colors.grey.withValues(alpha: 0.4),
+                            ),
+                            onPressed: () => cnNewWorkout.editWorkout(workout: widget.workout)
+                        ),
                         if(widget.workout.isTemplate)
-                          IconButton(
-                              onPressed: () {
-                                if(!cnRunningWorkout.isRunning){
-                                  cnRunningWorkout.isRunning = true;
-                                  cnRunningWorkout.workout = Workout.copy(widget.workout);
-                                  cnBannerRunningWorkout.onlyShow();
-                                  // cnRunningWorkout.refresh();
-                                  // cnWorkouts.refresh();
-                                  HapticFeedback.selectionClick();
-                                  // await cnNewWorkout.hidePanel(context);
-                                  Future.delayed(const Duration(milliseconds: 300), (){
-                                    cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
-                                  });
-                                }
-                                else{
-                                  if(cnRunningWorkout.workout.name == widget.workout.name){
-                                    cnBannerRunningWorkout.onlyShow();
-                                    cnRunningWorkout.reopenRunningWorkout(context);
-                                  }
-                                  else{
-                                    openPopUp(widget.workout.name);
-                                  }
-                                }
-                              },
-                              icon: Selector<CnBannerRunningWorkout, bool>(
-                                  selector: (_, cn) => cn.canOpenWorkout,
-                                  builder: (_, canOpenWorkout, __){
-                                    return Icon(Icons.play_arrow,
-                                        color: !canOpenWorkout
-                                            ? Colors.grey.withValues(alpha: 0.4)
-                                            : cnRunningWorkout.workout.name == widget.workout.name
-                                            ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
-                                            : Colors.grey.withValues(alpha: 0.2)
-                                    );
-                                  }
-                              )
+                          Selector<CnBannerRunningWorkout, bool>(
+                              selector: (_, cn) => cn.canOpenWorkout,
+                              builder: (_, canOpenWorkout, __){
+                                return CupertinoButton(
+                                    sizeStyle: CupertinoButtonSize.medium,
+                                    child: Text(
+                                      "Start",
+                                      style: TextStyle(
+                                          color: !canOpenWorkout
+                                              ? Colors.amber[800]  // Colors.grey.withValues(alpha: 0.4)
+                                              : cnRunningWorkout.workout.name == widget.workout.name
+                                              ? Colors.amber[800]
+                                              : Theme.of(context).hintColor // Colors.grey.withValues(alpha: 0.2)
+                                      ),
+                                    ),
+                                    onPressed: (){
+                                      if(!cnRunningWorkout.isRunning){
+                                        cnRunningWorkout.isRunning = true;
+                                        cnRunningWorkout.workout = Workout.copy(widget.workout);
+                                        cnBannerRunningWorkout.onlyShow();
+                                        // cnRunningWorkout.refresh();
+                                        // cnWorkouts.refresh();
+                                        HapticFeedback.selectionClick();
+                                        // await cnNewWorkout.hidePanel(context);
+                                        Future.delayed(const Duration(milliseconds: 300), (){
+                                          cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
+                                        });
+                                      }
+                                      else{
+                                        if(cnRunningWorkout.workout.name == widget.workout.name){
+                                          cnBannerRunningWorkout.onlyShow();
+                                          cnRunningWorkout.reopenRunningWorkout(context);
+                                        }
+                                        else{
+                                          openPopUp(widget.workout.name);
+                                        }
+                                      }
+                                    },
+                                    // color: !canOpenWorkout
+                                    //     ? Theme.of(context).hintColor // Colors.grey.withValues(alpha: 0.4)
+                                    //     : cnRunningWorkout.workout.name == widget.workout.name
+                                    //     ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
+                                    //     : Theme.of(context).hintColor // Colors.grey.withValues(alpha: 0.2)
+                                );
+                                // return Icon(Icons.play_arrow,
+                                //     color: !canOpenWorkout
+                                //         ? Theme.of(context).hintColor // Colors.grey.withValues(alpha: 0.4)
+                                //         : cnRunningWorkout.workout.name == widget.workout.name
+                                //         ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
+                                //         : Theme.of(context).hintColor // Colors.grey.withValues(alpha: 0.2)
+                                // );
+                              }
                           ),
-                        IconButton(
-                            onPressed: () {
-                              cnNewWorkout.editWorkout(workout: widget.workout);
-                            },
-                            icon: Icon(Icons.edit,
-                              color: Colors.grey.withValues(alpha: 0.4),
-                            )
-                        )
+
+                        // IconButton(
+                        //     onPressed: () {
+                        //       cnNewWorkout.editWorkout(workout: widget.workout);
+                        //     },
+                        //     icon: Icon(Icons.edit,
+                        //       color: Theme.of(context).hintColor //Colors.grey.withValues(alpha: 0.4),
+                        //     )
+                        // )
                       ],
                     ),
                     AnimatedCrossFade(
@@ -154,28 +194,40 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                             const Spacer(flex: 1,),
                             Expanded(
                               flex: 5,
-                              child: Wrap(
-                                alignment: WrapAlignment.end,
-                                runAlignment: WrapAlignment.end,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                // alignment: WrapAlignment.end,
+                                // runAlignment: WrapAlignment.end,
                                 children: [
                                   for (Exercise ex in widget.workout.exercises)
-                                    if(ex == widget.workout.exercises.last)
-                                      OverflowSafeText(
-                                          ex.name,
-                                          maxLines: 1,
-                                          fontSize: 15,
-                                          minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
-                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withValues(alpha: 0.7), fontWeight: FontWeight.w400)
-                                      )
-                                    else
-                                      OverflowSafeText(
-                                          "${ex.name}, ",
-                                          maxLines: 1,
-                                          fontSize: 15,
-                                          minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
-                                      )
+                                    OverflowSafeText(
+                                        "• ${ex.name}",
+                                        maxLines: 1,
+                                        fontSize: 12,
+                                        minFontSize: 12,
+                                        style: TextStyle(
+                                            color: CupertinoColors.extraLightBackgroundGray,
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 12.5
+                                        )
+                                    )
+                                  //   if(ex == widget.workout.exercises.last)
+                                  //     OverflowSafeText(
+                                  //         ex.name,
+                                  //         maxLines: 1,
+                                  //         fontSize: 15,
+                                  //         minFontSize: 15,
+                                  //         style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
+                                  //         // style: TextStyle(color: CupertinoColors.inactiveGray.withValues(alpha: 0.7), fontWeight: FontWeight.w400)
+                                  //     )
+                                  //   else
+                                  //     OverflowSafeText(
+                                  //         "${ex.name}, ",
+                                  //         maxLines: 1,
+                                  //         fontSize: 15,
+                                  //         minFontSize: 15,
+                                  //         style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
+                                  //     )
                                 ],
                               ),
                             ),
