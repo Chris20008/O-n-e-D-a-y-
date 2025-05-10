@@ -42,21 +42,23 @@ class _TextScrollCustomized extends State<TextScrollCustomized> {
 
     return SizedBox(
       key: widget.key,
-      child: TextScroll(
-        key: key,
-        " ${widget.text} ",
-        style: widget.style,
-        mode: widget.mode,
-        pauseBetween: Duration(milliseconds: widget.pauseBetween),
-        velocity: const Velocity(pixelsPerSecond: Offset(25, 0)),
-        delayBefore: const Duration(milliseconds: 1000),
-        pauseOnBounce: const Duration(milliseconds: 1000),
-        numberOfReps: null, //widget.numberOfReps,
-        fadedBorder: true,
-        fadeBorderVisibility: FadeBorderVisibility.auto,
-        fadeBorderSide: FadeBorderSide.both,
-        fadedBorderWidth: 0.03,
-        intervalSpaces: 15,
+      child: RepaintBoundary(
+        child: TextScroll(
+          key: key,
+          " ${widget.text} ",
+          style: widget.style,
+          mode: widget.mode,
+          pauseBetween: Duration(milliseconds: widget.pauseBetween),
+          velocity: const Velocity(pixelsPerSecond: Offset(25, 0)),
+          delayBefore: const Duration(milliseconds: 1000),
+          pauseOnBounce: const Duration(milliseconds: 1000),
+          numberOfReps: null, //widget.numberOfReps,
+          fadedBorder: true,
+          fadeBorderVisibility: FadeBorderVisibility.auto,
+          fadeBorderSide: FadeBorderSide.both,
+          fadedBorderWidth: 0.03,
+          intervalSpaces: 15,
+        ),
       ),
     );
   }
