@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../screen_statistics.dart';
+import '../../screen_statistics.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ExerciseSelector extends StatefulWidget {
@@ -62,10 +62,22 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
         ),
       ),
     );
+
+    // await Future.delayed(const Duration(milliseconds: 300));
+
     if(initExercise != selectedExerciseName){
       print("Refresh After Selector");
       cnScreenStatistics.calcMinMaxDates(context);
+
+      cnScreenStatistics.szController?.updateConfig(
+        minDate: cnScreenStatistics.minDate,
+        maxDate: cnScreenStatistics.maxDate
+      );
+
       cnScreenStatistics.refresh();
+
+      cnScreenStatistics.szController?.resetGraph();
+
       cnScreenStatistics.cache();
     }
   }

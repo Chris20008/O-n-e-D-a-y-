@@ -385,26 +385,6 @@ class _MyHomePageState extends State<MyHomePage>{
         canPop: false,
         child: Container(
           color: Colors.black,
-            // decoration: const BoxDecoration(
-            //     gradient: LinearGradient(
-            //         begin: Alignment.topRight,
-            //         end: Alignment.bottomLeft,
-            //         colors: [
-            //           Color(0xffc26a0e),
-            //           Color(0xbb110a02)
-            //         ]
-            //     )
-            // ),
-          // decoration: const BoxDecoration(
-          //     gradient: LinearGradient(
-          //         begin: Alignment.topRight,
-          //         end: Alignment.bottomLeft,
-          //         colors: [
-          //           Color(0x95c26a0e),
-          //           Color(0x7f110a02)
-          //         ]
-          //     )
-          // ),
             child: Stack(
               alignment: Alignment.topCenter,
               children: [
@@ -676,13 +656,6 @@ class CnHomepage extends ChangeNotifier {
   }
 }
 
-// class MyTransition extends CupertinoPageTransitionsBuilder {
-//   MyTransition();
-//
-//   @override
-//   Duration get transitionDuration => const Duration(milliseconds: 500);
-// }
-
 class MyTransition extends CupertinoPageTransitionsBuilder {
   @override
   Widget buildTransitions<T>(
@@ -697,17 +670,6 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
 
     final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;
     const pauseValue = 0.001;
-
-    // if(animation.status == AnimationStatus.reverse){
-    //   print("Is reverse");
-    //   return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
-    //     route,
-    //     context,
-    //     animation,
-    //     secondaryAnimation,
-    //     child,
-    //   );
-    // }
 
     final delayedPrimary = TweenSequence([
       TweenSequenceItem(
@@ -730,22 +692,6 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
         weight: 1 - delayFraction,
       ),
     ]).animate(secondaryAnimation);
-
-    // return CupertinoPageTransition(
-    //   primaryRouteAnimation: delayedPrimary,
-    //   secondaryRouteAnimation: delayedSecondary,
-    //   linearTransition: false,
-    //   child: child,
-    // );
-    // return CupertinoPageTransition(
-    //   primaryRouteAnimation: animation,
-    //   secondaryRouteAnimation: secondaryAnimation,
-    //   linearTransition: false,
-    //   child: child,
-    // );
-    // if(!route.popGestureEnabled){
-    //   return const SizedBox();
-    // }
     return CupertinoRouteTransitionMixin.buildPageTransitions<T>(
       route,
       context,

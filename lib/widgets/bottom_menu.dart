@@ -155,8 +155,9 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     else if(index == 2) {
       cnScreenStatistics.refreshData(context);
       if(lastIndex == 2){
-        cnScreenStatistics.resetGraph(withKeyReset: false);
-        cnScreenStatistics.refresh();
+        cnScreenStatistics.szController?.resetGraph();
+        // cnScreenStatistics.resetGraph(withKeyReset: false);
+        // cnScreenStatistics.refresh();
       }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){

@@ -3,14 +3,13 @@ import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/objects/exercise.dart';
-import 'package:fitness_app/screens/main_screens/screen_statistics/selectors/exercise_selector.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/exercise_line_chart/exercise_line_chart.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/header_screen_statistics/header_screen_statistics.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
-import 'package:fitness_app/widgets/cupertino_button_text.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/sz_controller.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
-import 'package:fitness_app/widgets/vertical_scroll_wheel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:health/health.dart';
@@ -22,7 +21,6 @@ import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings/screen_settings.dart';
-import 'charts/exercise_line_chart.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ScreenStatistics extends StatefulWidget {
@@ -89,308 +87,16 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
               physics: const BouncingScrollPhysics(),
               shrinkWrap: false,
               padding: const EdgeInsets.symmetric(horizontal: 5),
-              children: [
-                getHeader(),
-                // const SizedBox(height: 20,),
-                ExerciseLineChart(key: cnScreenStatistics.lineChartKey),
-                const SafeArea(top:false, child: SizedBox(height: 30,)),
+              children: const [
+                HeaderScreenStatistics(),
+                ExerciseLineChart(),
+                SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
           ),
         ),
         const SettingsPanel(),
       ],
-    );
-  }
-
-  Widget getHeader() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              // color: Colors.amber[200]!,
-                color: Colors.white,
-                onPressed: (){
-                  cnScreenStatistics.saveCurrentFilterState();
-                  openFilterPopUp(context);
-                },
-                icon: const Icon(
-                  Icons.filter_list,
-                )
-            ),
-            IconButton(
-              // color: Colors.amber[200]!,
-                color: Colors.white,
-                onPressed: (){
-                  cnScreenStatistics.openSettingsPanel();
-                },
-                icon: const Icon(
-                  Icons.settings,
-                )
-            ),
-          ],
-        ),
-        const Center(
-          child: ExerciseSelector(),
-        ),
-      ],
-    );
-  }
-
-  void openFilterPopUp(BuildContext context) async{
-
-    final result = await showModalBottomSheet(
-      backgroundColor: Colors.transparent,
-      context: context,
-      isScrollControlled: true,
-      builder: (context){
-        return getFilterWidget(context);
-      }
-    );
-
-    print("RESULT $result");
-
-    if(result == true){
-      cnScreenStatistics.refreshData(context);
-      Future.delayed(Duration(milliseconds: cnStandardPopUp.animationTime), (){
-        cnScreenStatistics.refresh();
-        cnScreenStatistics.cache();
-      });
-    } else{
-      cnScreenStatistics.restoreLastFilterState();
-    }
-
-  }
-
-  Widget getFilterWidget(BuildContext context){
-    List<String> workoutNames = List.from(cnScreenStatistics.allWorkoutNames);
-    /// Replace the "ALL Workouts" name in correct language
-    workoutNames[0] = AppLocalizations.of(context)!.filterAllWorkouts;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(15),
-      child: Container(
-        height: MediaQuery.of(context).size.height*0.6,
-        color: Theme.of(context).primaryColor,
-        child: StatefulBuilder(
-          builder: (context, setModalState){
-            return Stack(
-              children: [
-                ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    const SizedBox(height: 50,),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SizedBox(
-                          height:50,
-                          child: Row(
-                            children: [
-                              const Icon(
-                                Icons.arrow_back_ios,
-                                size: 15,
-                              ),
-                              Expanded(
-                                child: VerticalScrollWheel(
-                                  widthOfChildren: 100,
-                                  heightOfChildren: 30,
-                                  onTap: (int index){
-                                    cnScreenStatistics.selectedWorkoutName = cnScreenStatistics.allWorkoutNames[index];
-                                    cnScreenStatistics.selectedWorkoutIndex = index;
-                                    HapticFeedback.selectionClick();
-                                  },
-                                  selectedIndex: cnScreenStatistics.selectedWorkoutIndex,
-                                  children: List<Widget>.generate(
-                                      workoutNames.length, (index) =>
-                                      OverflowSafeText(
-                                          workoutNames[index],
-                                          maxLines: 1
-                                      )
-                                  ),
-                                ),
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 15,
-                              ),
-                            ],
-                          )
-                      ),
-                    ),
-                    CupertinoListSection.insetGrouped(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor
-                      ),
-                      backgroundColor: Colors.transparent,
-                      header: const Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: Text("Graph", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-                      ),
-                      // footer: GestureDetector(
-                      //   onTap: () async{
-                      //     HapticFeedback.selectionClick();
-                      //   },
-                      //   child: Padding(
-                      //     padding: const EdgeInsets.only(left: 10),
-                      //     child: Row(
-                      //       children: [
-                      //         const Icon(
-                      //           Icons.info,
-                      //           size:12,
-                      //           color: Colors.white,
-                      //         ),
-                      //         const SizedBox(width: 5,),
-                      //         Text(AppLocalizations.of(context)!.settingsBackupMoreInfo, style: const TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w300),),
-                      //       ],
-                      //     ),
-                      //   ),
-                      // ),
-                      children: [
-                        CupertinoListTile(
-                          title: OverflowSafeText(
-                              maxLines: 1,
-                              AppLocalizations.of(context)!.statisticsFilter1RM,
-                              style: const TextStyle(color: Colors.white)
-                          ),
-                          trailing: CupertinoSwitch(
-                              value: cnScreenStatistics.showOneRepMax,
-                              activeTrackColor: activeColor,
-                              onChanged: (value){
-                                setModalState(() {
-                                  if(Platform.isAndroid){
-                                    HapticFeedback.selectionClick();
-                                  }
-                                  cnScreenStatistics.showOneRepMax = value;
-                                });
-                              }
-                          ),
-                        ),
-
-                        CupertinoListTile(
-                          title: OverflowSafeText(
-                              maxLines: 2,
-                              AppLocalizations.of(context)!.filterAvgMovWeightHead,
-                              style: const TextStyle(color: Colors.white)
-                          ),
-                          trailing: CupertinoSwitch(
-                              value: cnScreenStatistics.showAvgWeightPerSetLine,
-                              activeTrackColor: activeColor,
-                              onChanged: (value){
-                                setModalState(() {
-                                  if(Platform.isAndroid){
-                                    HapticFeedback.selectionClick();
-                                  }
-                                  cnScreenStatistics.showAvgWeightPerSetLine = value;
-                                });
-                              }
-                          ),
-                        ),
-                        CupertinoListTile(
-                            title: OverflowSafeText(
-                                maxLines: 1,
-                                AppLocalizations.of(context)!.statisticsFilterSickDays,
-                                style: const TextStyle(color: Colors.white)
-                            ),
-                            trailing: CupertinoSwitch(
-                                value: cnScreenStatistics.showSickDays,
-                                activeTrackColor: activeColor,
-                                onChanged: (value){
-                                  setModalState(() {
-                                    if(Platform.isAndroid){
-                                      HapticFeedback.selectionClick();
-                                    }
-                                    cnScreenStatistics.showSickDays = value;
-                                  });
-                                }
-                            )
-                        ),
-                      ],
-                    ),
-
-                    CupertinoListSection.insetGrouped(
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).cardColor
-                      ),
-                      backgroundColor: Colors.transparent,
-                      header: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Text(AppLocalizations.of(context)!.other, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-                      ),
-                      children: [
-                        CupertinoListTile(
-                            title: OverflowSafeText(
-                                maxLines: 1,
-                                AppLocalizations.of(context)!.filterOnlyWorkingSets,
-                                style: const TextStyle(color: Colors.white)
-                            ),
-                            trailing: CupertinoSwitch(
-                                value: cnScreenStatistics.onlyWorkingSets,
-                                activeTrackColor: activeColor,
-                                onChanged: (value){
-                                  setModalState(() {
-                                    if(Platform.isAndroid){
-                                      HapticFeedback.selectionClick();
-                                    }
-                                    cnScreenStatistics.onlyWorkingSets = value;
-                                  });
-                                }
-                            )
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 50,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                          flex: 10,
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: CupertinoButtonText(
-                                  onPressed: (){
-                                    Navigator.of(context).pop(false);
-                                  },
-                                  text: AppLocalizations.of(context)!.cancel,
-                                  textAlign: TextAlign.left
-                              )
-                          )
-                      ),
-                      Expanded(
-                          flex: 11,
-                          child: Center(
-                            child: Text(
-                              AppLocalizations.of(context)!.statisticsFilter,
-                              textScaler: const TextScaler.linear(1.3),
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                      ),
-                      Expanded(
-                          flex: 10,
-                          child: Align(
-                              alignment: Alignment.centerRight,
-                              child: CupertinoButtonText(
-                                  onPressed: () {
-                                    Navigator.of(context).pop(true);
-                                  },
-                                  text: AppLocalizations.of(context)!.save,
-                                  textAlign: TextAlign.right
-                              )
-                          )
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
     );
   }
 }
@@ -400,13 +106,14 @@ class CnScreenStatistics extends ChangeNotifier {
   Orientation orientation = Orientation.portrait;
   double width = 0;
   double height = 0;
-  Key lineChartKey = UniqueKey();
+  // Key lineChartKey = UniqueKey();
   DateTime minDate = DateTime.now();
   DateTime maxDate = DateTime.now().add(const Duration(days: 32));
   late List<String> allWorkoutNames = getAllWorkoutNames();
   late List<String> allExerciseNames;
   List<ObSickDays> allSickDays = [];
   GlobalKey backupOptionsKey = GlobalKey();
+  SZController? szController;
 
   Exercise selectedExerciseFirst = Exercise();
   Exercise selectedExerciseLast = Exercise();
@@ -425,11 +132,28 @@ class CnScreenStatistics extends ChangeNotifier {
   bool onlyWorkingSetsLast = true;
   bool showOneRepMaxLast = true;
   bool showSickDaysLast = false;
+  bool firstAnimationGraph = true;
 
-  double currentVisibleDays = 0;
-  double maxVisibleDays = 1900;
-  double offsetMinX = 0;
-  double offsetMaxX = 0;
+  List<Color> gradientColors = [
+    Colors.amber[200]!,
+    Colors.amber[800]!,
+  ];
+
+  List<Color> gradientColors2 = [
+    const Color(0xffb3b3b3),
+    const Color(0xff3e3e3e),
+  ];
+
+  List<Color> gradientColors3 = [
+    const Color(0xffffa3a3),
+    const Color(0xffa66161),
+  ];
+
+  List<Color> gradientColors4 = [
+    const Color(0xff147e88),
+    const Color(0xff147e88),
+  ];
+
   late CnConfig cnConfig;
   final health = Health();
   List<HealthDataPointWrapper> healthData = [];
@@ -446,13 +170,15 @@ class CnScreenStatistics extends ChangeNotifier {
 
   void init(Map? data, BuildContext context) async{
     isInitialized = true;
-    await health.configure();
-    await refreshHealthData();
+    // await health.configure();
+    // await refreshHealthData();
     allExerciseNames = getAllExerciseNames(context);
     calcMinMaxDates(context);
     if(data != null){
       initCachedData(data, context);
     }
+    await health.configure();
+    await refreshHealthData();
   }
 
   Future<bool> refreshHealthData() async{
@@ -617,11 +343,15 @@ class CnScreenStatistics extends ChangeNotifier {
     if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
       minDate = healthData.last.dateFrom;
       maxDate = healthData.first.dateFrom;
+      // szController?.minDate = minDate;
+      // szController?.maxDate = maxDate;
       return;
     }
     setExerciseTemplate(context);
     setExerciseFirst(context);
     setExerciseLast(context);
+    // szController?.minDate = minDate;
+    // szController?.maxDate = maxDate;
   }
 
   void setExerciseFirst(BuildContext context){
@@ -704,6 +434,7 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void refreshData(BuildContext context){
+    firstAnimationGraph = true;
     allWorkoutNames = getAllWorkoutNames();
     allExerciseNames = getAllExerciseNames(context);
     if(cnConfig.useHealthData){
@@ -725,13 +456,8 @@ class CnScreenStatistics extends ChangeNotifier {
     showOneRepMax = data["showOneRepMax"] ?? true;
   }
 
-  void resetGraph({bool withKeyReset = true}){
-    maxVisibleDays = 1900;
-    offsetMinX = 0;
-    offsetMaxX = 0;
-    if(withKeyReset){
-      lineChartKey = UniqueKey();
-    }
+  void resetGraph(){
+    szController?.resetGraph();
   }
 
   Future<void> cache() async{
@@ -747,7 +473,6 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void refresh(){
-    print("Should notify Listeners");
     notifyListeners();
   }
 }
