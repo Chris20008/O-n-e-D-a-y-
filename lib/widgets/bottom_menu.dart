@@ -159,6 +159,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
         cnScreenStatistics.szController?.resetGraph();
       } else{
         cnScreenStatistics.szController?.graphIsReduced = false;
+        cnScreenStatistics.firstAnimationGraph = true;
       }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){

@@ -19,17 +19,9 @@ void openFilterPopUp({
   );
 
   if(result == true){
-    /// ToDo: handling when change selected workout
-    /// Update selector and szController?
-
-
-    /// Without his update teh animation of lines would not happen
-    /// ToDo: Why is not animating without this update?
-    cnScreenStatistics.szController?.updateGraph();
 
     await Future.delayed(const Duration(milliseconds: 400));
 
-    // cnScreenStatistics.refreshData(context);
     cnScreenStatistics.refresh();
     cnScreenStatistics.cache();
   } else{

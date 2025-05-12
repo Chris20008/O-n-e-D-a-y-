@@ -384,6 +384,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   }
 
   LineChartData mainData() {
+    pr("Rebuild main Data");
     return LineChartData(
       clipData: const FlClipData.all(),
       lineTouchData: LineTouchData(

@@ -50,9 +50,9 @@ class SZController{
   ScrollZoomState get current => state.value;
   double get maxVisibleArea => min(_maxZoomArea, (totalRange+totalPadding).toDouble());
   double get totalRangeWithOffset => totalRange + _offsetZoomArea;
-  double get _minZoomAreaWithOffset => _minZoomArea + _offsetZoomArea;
+  // double get _minZoomAreaWithOffset => _minZoomArea + _offsetZoomArea;
   double get _maxZoomAreaWithOffset => _maxZoomArea + _offsetZoomArea;
-  double get _defaultZoomAreaWithOffset => _defaultZoomArea + _offsetZoomArea;
+  // double get _defaultZoomAreaWithOffset => _defaultZoomArea + _offsetZoomArea;
   double get _scrollPositionZoomedIn => (totalRangeWithOffset - _defaultZoomArea).clamp(0, totalRangeWithOffset);
   double get deltaScrollPosition => _previousState.scrollPosition - state.value.scrollPosition;
   double get _velocity => _velocityTracker.getVelocity().pixelsPerSecond.dx * 0.00006 * (state.value.zoomArea * 0.5);
@@ -64,6 +64,8 @@ class SZController{
   }){
     allSpots[key] = List.from(value);
     allSpots["${_originalLineNameDefault}_$key"] = value;
+
+    handleFlPointReduction(key);
   }
 
   List<FlSpot> getLine({required String key}) => allSpots[key]?? [];
@@ -128,56 +130,7 @@ class SZController{
         return;
       }
       for(String key in allSpots.keys){
-        if (key.contains(_originalLineNameDefault) || key.contains("sickDaysSpots")) continue;
-        animationTime = 500;
-
-        List<FlSpot> newSpots = [];
-        List<FlSpot> tempSpots = [];
-        DateTime? lastSpotDate;
-        FlSpot lastSpot = allSpots[key]!.last;
-
-        for(FlSpot spot in allSpots[key]!){
-          final spotsDate = minDate.add(Duration(days: (spot.x + state.value.scrollPosition).toInt()));
-          lastSpotDate ??= spotsDate;
-
-          if(lastSpotDate.isSameMonth(spotsDate)){
-            tempSpots.add(spot);
-          }
-          else{
-            tempSpots.sort((a, b){
-              if(a.y > b.y){
-                return -1;
-              }
-              else if(a.y < b.y){
-                return 1;
-              }
-              else if(a.x > b.y){
-                return -11;
-              }
-              return 1;
-            });
-            FlSpot? maxSpot = tempSpots.firstOrNull;
-            if(maxSpot != null){
-              final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
-              maxSpot = FlSpot(newX, maxSpot.y);
-              newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
-            }
-            tempSpots.clear();
-            lastSpotDate = spotsDate;
-            tempSpots.add(spot);
-          }
-
-
-          if(spot == lastSpot){
-            FlSpot? maxSpot = tempSpots.firstOrNull;
-            if(maxSpot != null){
-              final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
-              maxSpot = FlSpot(newX, maxSpot.y);
-              newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
-            }
-          }
-        }
-        allSpots[key] = newSpots;
+        handleFlPointReduction(key);
       }
       graphIsReduced = true;
       updateGraph();
@@ -191,6 +144,64 @@ class SZController{
       }
       updateGraph();
     }
+  }
+
+  void handleFlPointReduction(String key){
+    if(state.value.zoomArea <= _defaultZoomArea){
+      return;
+    }
+    if (key.contains(_originalLineNameDefault) || key.contains("sickDaysSpots")){
+     return;
+    }
+    animationTime = 500;
+
+    List<FlSpot> newSpots = [];
+    List<FlSpot> tempSpots = [];
+    DateTime? lastSpotDate;
+    FlSpot lastSpot = allSpots[key]!.last;
+
+    for(FlSpot spot in allSpots[key]!){
+      final spotsDate = minDate.add(Duration(days: (spot.x + state.value.scrollPosition).toInt()));
+      lastSpotDate ??= spotsDate;
+
+      if(lastSpotDate.isSameMonth(spotsDate)){
+        tempSpots.add(spot);
+      }
+      else{
+        tempSpots.sort((a, b){
+          if(a.y > b.y){
+            return -1;
+          }
+          else if(a.y < b.y){
+            return 1;
+          }
+          else if(a.x > b.y){
+            return -11;
+          }
+          return 1;
+        });
+        FlSpot? maxSpot = tempSpots.firstOrNull;
+        if(maxSpot != null){
+          final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
+          maxSpot = FlSpot(newX, maxSpot.y);
+          newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
+        }
+        tempSpots.clear();
+        lastSpotDate = spotsDate;
+        tempSpots.add(spot);
+      }
+
+
+      if(spot == lastSpot){
+        FlSpot? maxSpot = tempSpots.firstOrNull;
+        if(maxSpot != null){
+          final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
+          maxSpot = FlSpot(newX, maxSpot.y);
+          newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
+        }
+      }
+    }
+    allSpots[key] = newSpots;
   }
 
   void resetGraph({
@@ -234,6 +245,7 @@ class SZController{
   }
 
   void doAnimateVertical(double startPositionY) async{
+    print("Do animate Vertical");
     Map<String, List<FlSpot>> tempAllSpots = allSpots.map((key, spots) {
       return MapEntry(key, spots);
     });

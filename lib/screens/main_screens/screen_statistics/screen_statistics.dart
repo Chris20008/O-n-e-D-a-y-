@@ -434,7 +434,6 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void refreshData(BuildContext context){
-    firstAnimationGraph = true;
     allWorkoutNames = getAllWorkoutNames();
     allExerciseNames = getAllExerciseNames(context);
     if(cnConfig.useHealthData){
