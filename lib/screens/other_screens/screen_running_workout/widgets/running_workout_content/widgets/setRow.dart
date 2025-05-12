@@ -291,7 +291,6 @@ class _SetRowState extends State<SetRow>{
       child = BlockSwipeBack(
         child: Slidable(
             key: set.slidableKey,
-            controller: set.slidableController,
             endActionPane: ActionPane(
               extentRatio: 0.3,
               motion: const ScrollMotion(),

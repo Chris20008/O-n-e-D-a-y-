@@ -65,7 +65,7 @@ class MyApp extends StatefulWidget {
   static MyAppState? of(BuildContext context) => context.findAncestorStateOfType<MyAppState>();
 }
 
-class MyAppState extends State<MyApp> with TickerProviderStateMixin{
+class MyAppState extends State<MyApp>{
   final Language _language = languages[LANGUAGES.en.value];
   late Locale _locale = Locale.fromSubtags(countryCode: _language.countryCode, languageCode: _language.languageCode);
   final GlobalKey k = GlobalKey();
@@ -103,7 +103,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin{
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
         ChangeNotifierProvider(create: (context) => CnStopwatchWidget(context)),
         ChangeNotifierProvider(create: (context) => CnSpotifyBar(context)),
-        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context, this)),
+        ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
       ],

@@ -263,14 +263,13 @@ class CnRunningWorkout extends ChangeNotifier {
   final double setPadding = 5;
   bool contentIsActive = true;
   bool isSavingData = false;
-  late final TickerProvider vsync;
   late CnConfig cnConfig;
   late CnWorkouts cnWorkouts;
   late CnStopwatchWidget cnStopwatch;
   late CnBannerRunningWorkout cnBannerRunningWorkout;
   late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate;
 
-  CnRunningWorkout(BuildContext context, this.vsync){
+  CnRunningWorkout(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
     cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
     cnStopwatch = Provider.of<CnStopwatchWidget>(context, listen: false);
@@ -417,8 +416,7 @@ class CnRunningWorkout extends ChangeNotifier {
         index: 0,
         ex: ex,
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString()),
-        slidableController: SlidableController(vsync)
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
     );
     double maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
     if(ex.linkName == null){
@@ -490,8 +488,7 @@ class CnRunningWorkout extends ChangeNotifier {
         index: newIndex,
         ex: ex,
         weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString()),
-        slidableController: SlidableController(vsync)
+        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
     );
     if(ex.linkName == null){
       groupedExercises[getSetKeyName(ex.name, newIndex)] = newNamedSet;
@@ -638,8 +635,7 @@ class CnRunningWorkout extends ChangeNotifier {
               index: i,
               ex: ex,
               weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
-              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString()),
-              slidableController: SlidableController(vsync)
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
           );
         }
       }
@@ -662,8 +658,7 @@ class CnRunningWorkout extends ChangeNotifier {
               index: i,
               ex: ex,
               weightController: TextEditingController(text: (ex.sets[i].weightAsTrimmedDouble?? "").toString()),
-              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString()),
-              slidableController: SlidableController(vsync)
+              amountController: TextEditingController(text: (ex.sets[i].getAmountAsText(ex.category)?? "").toString())
           );
           final String keyName = getSetKeyName(ex.linkName??"", i);
           if(groupedExercises.containsKey(keyName)){
@@ -880,7 +875,6 @@ class NamedSet{
   final Exercise ex;
   final TextEditingController weightController;
   final TextEditingController amountController;
-  final SlidableController slidableController;
   late final ValueKey slidableKey = ValueKey("${ex.name}_$index");
   final GlobalKey weightKey = GlobalKey();
   final GlobalKey amountKey = GlobalKey();
@@ -894,14 +888,8 @@ class NamedSet{
     required this.ex,
     required this.weightController,
     required this.amountController,
-    required this.slidableController,
     this.templateSet
   });
-
-  bool get isOpened{
-    return slidableController.ratio != 0;
-  }
-
 }
 
 class GroupedSet{
