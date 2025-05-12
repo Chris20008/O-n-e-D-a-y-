@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../../../../util/constants.dart';
 import '../../../screen_statistics.dart';
 import '../sz_wrapper.dart';
 
@@ -69,7 +70,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
   @override
   Widget build(BuildContext context) {
-    print("Refresh Line Chart");
+    pr("Refresh Line Chart");
     cnScreenStatistics = context.watch<CnScreenStatistics>();
     cnScreenStatistics.szController = cnScreenStatistics.szController?? szController;
 
@@ -126,7 +127,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     spotsMaxWeight.clear();
     /// Set Spots Max Weight
     maxWeights?.forEach((date, weight) {
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.offsetMinX + leftPadding;
+      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
@@ -134,7 +135,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.offsetMinX + leftPadding;
+      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       if(percent.isNaN){
         percent = totalWeight / (maxTotalWeight.isNaN? 1 : maxTotalWeight);
         if(percent.isNaN){
@@ -162,19 +163,19 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     /// Set Spots One Rep Max
     spotsOneRepMax.clear();
     oneRepMaxPerDate?.forEach((date, weight) {
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.offsetMinX + leftPadding;
+      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       final yCoordinate = !cnScreenStatistics.showOneRepMax? minY-5 : weight.toDouble();
       spotsOneRepMax.add(FlSpot(xCoordinate, yCoordinate));
     });
     
     /// Set Spots Sick Days
     for (ObSickDays sickDay in allSickDays){
-      double xCoordinate = sickDay.startDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.offsetMinX + leftPadding;
+      double xCoordinate = sickDay.startDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       double percent = 5;
       double factor = maxWeight > 0? maxWeight : 4;
       sickDaysSpots.add(FlSpot(xCoordinate, -5));
       sickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
-      xCoordinate = sickDay.endDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.offsetMinX + leftPadding;
+      xCoordinate = sickDay.endDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       sickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       sickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
@@ -191,10 +192,31 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       sickDaysSpots = List.generate(sickDaysSpots.length, (index) => FlSpot(sickDaysSpots[index].x, -5));
     }
 
-    szController.allSpots["maxWeight"] = spotsMaxWeight;
-    szController.allSpots["oneRepMax"] = spotsOneRepMax;
-    szController.allSpots["spotsAvgWeightPerSet"] = spotsAvgWeightPerSet;
-    szController.allSpots["sickDaysSpots"] = sickDaysSpots;
+    szController.addLine(
+      key: "maxWeight",
+      value: spotsMaxWeight
+    );
+    szController.addLine(
+        key: "oneRepMax",
+        value: spotsOneRepMax
+    );
+    szController.addLine(
+        key: "spotsAvgWeightPerSet",
+        value: spotsAvgWeightPerSet
+    );
+    szController.addLine(
+        key: "sickDaysSpots",
+        value: sickDaysSpots
+    );
+
+    // addLine(
+    //   MapEntry("maxWeight", spotsMaxWeight)
+    // );
+
+    // szController.allSpots["maxWeight"] = spotsMaxWeight;
+    // szController.allSpots["oneRepMax"] = spotsOneRepMax;
+    // szController.allSpots["spotsAvgWeightPerSet"] = spotsAvgWeightPerSet;
+    // szController.allSpots["sickDaysSpots"] = sickDaysSpots;
 
     if(cnScreenStatistics.firstAnimationGraph){
       szController.doAnimateVertical(minY);
@@ -257,14 +279,31 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     );
     Widget text;
 
-    value += szController.state.value.offsetMinX;
+    value += szController.state.value.scrollPosition;
 
-    if(szController.state.value.currentVisibleDays < 200 && value % 1.0 > 0.1){
+    if(szController.state.value.zoomArea < 50 && value % 1.0 > 0.1){
+      // return SizedBox();
       return SideTitleWidget(
           axisSide: meta.axisSide,
           child: const Text('', style: style)
       );
     }
+
+    if(szController.state.value.zoomArea < 100 && value % 1.0 > 0.25){
+      // return SizedBox();
+      return SideTitleWidget(
+          axisSide: meta.axisSide,
+          child: const Text('', style: style)
+      );
+    }
+
+    if(szController.state.value.zoomArea < 200 && value % 1.0 > 0.5){
+      return SideTitleWidget(
+          axisSide: meta.axisSide,
+          child: const Text('', style: style)
+      );
+    }
+
 
     if(value < 5){
       text = const Text('', style: style);
@@ -283,22 +322,22 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   Widget generateXAxisText(DateTime date, TextStyle style){
     bool doLabel;
     String format;
-    if(szController.state.value.currentVisibleDays < 20){
+    if(szController.state.value.zoomArea < 20){
       doLabel = date.day % 5 == 0;
       format = 'd. MMM';
-    } else if(szController.state.value.currentVisibleDays < 40){
+    } else if(szController.state.value.zoomArea < 40){
       doLabel = date.day % 10 == 0;
       format = 'd. MMM';
-    } else if(szController.state.value.currentVisibleDays < 80){
+    } else if(szController.state.value.zoomArea < 80){
       doLabel = date.day % 15 == 0 || (date.day == 28 && date.month == 2);
       format = 'd. MMM';
-    } else if(szController.state.value.currentVisibleDays < 200){
+    } else if(szController.state.value.zoomArea < 200){
       doLabel = date.day == 1;
       format = 'MMM yy';
-    } else if(szController.state.value.currentVisibleDays < 400){
+    } else if(szController.state.value.zoomArea < 450){
       doLabel = date.day == 1 && date.month % 2 == 0;
       format = 'MMM yy';
-    }else if (szController.state.value.currentVisibleDays < 700){
+    }else if (szController.state.value.zoomArea < 700){
       doLabel = date.day == 1 && date.month % 3 == 0;
       format = 'MMM yy';
     } else{
@@ -420,7 +459,13 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 30,
-            interval: szController.state.value.currentVisibleDays < 200? 0.1 : 1,
+            interval: szController.state.value.zoomArea < 50
+                ? 0.1
+                : szController.state.value.zoomArea < 100
+                ? 0.25
+                : szController.state.value.zoomArea < 200
+                ? 0.5
+                : 1,
             getTitlesWidget: bottomTitleWidgets,
           ),
         ),
@@ -438,7 +483,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         border: Border.all(color: const Color(0xff5e5e5e)),
       ),
       minX: 0,
-      maxX: szController.state.value.currentVisibleDays.toDouble(),
+      maxX: szController.state.value.zoomArea.toDouble(),
       minY: minY,
       maxY: maxY,
       lineBarsData: [
@@ -447,7 +492,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         LineChartBarData(
           isCurved: true,
           curveSmoothness: 0.1,
-          spots: szController.allSpots["maxWeight"]?? [], //spotsMaxWeight,
+          spots: szController.getLine(key: "maxWeight"),
           gradient: LinearGradient(
             colors: cnScreenStatistics.gradientColors,
           ),
@@ -471,7 +516,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         LineChartBarData(
           isCurved: true,
           curveSmoothness: 0.1,
-          spots: szController.allSpots["spotsAvgWeightPerSet"]?? [],
+          spots: szController.getLine(key: "spotsAvgWeightPerSet"),
           gradient: LinearGradient(
             colors: cnScreenStatistics.gradientColors2,
           ),
@@ -486,7 +531,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         LineChartBarData(
           isCurved: true,
           curveSmoothness: 0.1,
-          spots: szController.allSpots["oneRepMax"]?? [],
+          spots: szController.getLine(key: "oneRepMax"),
           gradient: LinearGradient(
             colors: cnScreenStatistics.gradientColors3,
           ),
@@ -502,7 +547,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
           LineChartBarData(
             isCurved: false,
             curveSmoothness: 0.1,
-            spots: szController.allSpots["sickDaysSpots"]?? [],
+            spots: szController.getLine(key: "sickDaysSpots"),
             gradient: LinearGradient(
               colors: cnScreenStatistics.gradientColors4,
             ),
@@ -526,17 +571,26 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
   String getSpotData(LineBarSpot spot){
     Map<DateTime, double> data;
+    // if(spot.barIndex == 0){
+    //   data = maxWeights!;
+    // } else if(spot.barIndex == 1){
+    //   data = avgWeights!;
+    // } else if(spot.barIndex == 2){
+    //   data = oneRepMaxPerDate!;
+    // }
     if(spot.barIndex == 0){
-      data = maxWeights!;
+      data = szController.getLineFormatted(key: "maxWeight");
     } else if(spot.barIndex == 1){
-      data = avgWeights!;
+      data = szController.getLineFormatted(key: "spotsAvgWeightPerSet");
     } else if(spot.barIndex == 2){
-      data = oneRepMaxPerDate!;
+      data = szController.getLineFormatted(key: "oneRepMax");
     }
     else{
       return AppLocalizations.of(context)!.statisticsSick;
     }
-    return "${DateFormat("d.MMM").format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
+    // return "Test";
+    final formattedDate = szController.graphIsReduced? DateFormat("MMM") : DateFormat("d.MMM");
+    return "${formattedDate.format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
   }
 }
 

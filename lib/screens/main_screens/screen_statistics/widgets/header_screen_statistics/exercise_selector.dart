@@ -66,7 +66,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
     // await Future.delayed(const Duration(milliseconds: 300));
 
     if(initExercise != selectedExerciseName){
-      print("Refresh After Selector");
+      pr("Refresh After Selector");
       cnScreenStatistics.calcMinMaxDates(context);
 
       cnScreenStatistics.szController?.updateConfig(

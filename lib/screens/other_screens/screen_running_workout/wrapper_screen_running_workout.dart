@@ -2,6 +2,7 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import '../../../util/constants.dart';
 import '../../../widgets/banner_running_workout.dart';
 
 class WrapperScreenRunningWorkout extends StatefulWidget {
@@ -22,7 +23,7 @@ class _WrapperScreenRunningWorkout extends State<WrapperScreenRunningWorkout> {
   Widget build(BuildContext context) {
     final isSavingData = context.select<CnRunningWorkout, bool>((cn) => cn.isSavingData);
 
-    print("Wrapper Running Workout");
+    pr("Wrapper Running Workout");
 
     return PopScope(
       canPop: !isSavingData,

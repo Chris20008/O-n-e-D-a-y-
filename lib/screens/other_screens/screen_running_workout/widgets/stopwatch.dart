@@ -35,7 +35,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
     cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context);
     double width = MediaQuery.of(context).size.width;
 
-    print("Stop Watch");
+    pr("Stop Watch");
 
     return Align(
       alignment: Alignment.bottomRight,

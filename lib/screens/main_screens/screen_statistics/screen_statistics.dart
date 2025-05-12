@@ -69,7 +69,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
-    print("Refresh Screen statistics");
+    pr("Refresh Screen statistics");
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
     if(cnScreenStatistics.width == 0 || cnScreenStatistics.height == 0 || initOrientation){

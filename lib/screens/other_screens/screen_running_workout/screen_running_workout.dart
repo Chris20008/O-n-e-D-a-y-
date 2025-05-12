@@ -45,7 +45,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
       cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
     }
 
-    print("Running Workout");
+    pr("Running Workout");
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

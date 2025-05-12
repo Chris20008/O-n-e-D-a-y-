@@ -60,6 +60,10 @@ extension DateOnlyCompare on DateTime {
     return toDate().difference(DateTime(year, month, 1)).inDays + 1;
   }
 
+  DateTime getMidDayOfMonth(){
+    return DateTime(year, month, 15);
+  }
+
   int numOfDaysOfMonth(){
     return DateTime(year, month+1, 0).difference(DateTime(year, month, 1)).inDays + 1;
   }

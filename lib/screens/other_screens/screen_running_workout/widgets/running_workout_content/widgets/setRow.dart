@@ -345,7 +345,6 @@ class _SetRowState extends State<SetRow>{
     // double factor = (relativeHeight - value) / height;
     //
     // if(position.dy + value > relativeHeight){
-    //   print("Do Scroll");
     //   await Future.delayed(const Duration(milliseconds: 10), () async{
     //     // final factor = Platform.isAndroid? 0.8 : 0.84;
     //     await Scrollable.ensureVisible(

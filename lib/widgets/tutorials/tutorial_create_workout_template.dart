@@ -491,7 +491,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
   tutorialIsRunning = true;
   bool continueAfterAnimatedFirstExerciseRow = false;
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   TutorialCoachMark tutorial = TutorialCoachMark(
     targets: targets, // List<TargetFocus>
     // colorShadow: Colors.black, // DEFAULT Colors.black
@@ -618,8 +618,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
       cnNewWorkOutPanel.allowAnimateFirstExerciseDrag = false;
       currentTutorialStep = 999999;
       cnConfig.setCurrentTutorialStep(currentTutorialStep);
-      SystemChrome.setPreferredOrientations([]);
-      // print("finish");
+      // SystemChrome.setPreferredOrientations([]);
     },
   );
   tutorial.show(context: context);

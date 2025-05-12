@@ -39,7 +39,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   void initState() {
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     super.initState();
   }
 
@@ -833,7 +833,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     padding: EdgeInsets.zero,
                     onPressed: () {
                       widget.onFinish(false);
-                      SystemChrome.setPreferredOrientations([]);
+                      // SystemChrome.setPreferredOrientations([]);
                     },
                     child: OverflowSafeText(
                       AppLocalizations.of(context)!.welcomeButtonExploreMyself,

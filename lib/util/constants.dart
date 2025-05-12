@@ -7,6 +7,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -57,6 +58,14 @@ Widget backgroundSingleSet = Container(
     borderRadius: BorderRadius.circular(5),
   ),
 );
+
+void pr(String? s) {
+  if (kDebugMode || kProfileMode) {
+    if (kDebugMode) {
+      print(s);
+    }
+  }
+}
 
 Widget dataSingleSet(SingleSet set, Exercise exercise){
   return Padding(
@@ -498,7 +507,7 @@ Widget getSelectBodyWeightPercent({
 //   //       FocusManager.instance.primaryFocus?.unfocus();
 //   //       Future.delayed(const Duration(milliseconds: 200), (){
 //   //         set.setType = value+10;
-//   //         // print(setType);
+//   //         // pr(setType);
 //   //         onConfirm();
 //   //       });
 //   //     },
@@ -1445,25 +1454,6 @@ Offset getWidgetPosition(GlobalKey key) {
   // });
   return position;
 }
-
-// Offset getWidgetPosition(GlobalKey key) {
-//   Offset position = const Offset(0, 0);
-//   // // WidgetsBinding.instance.addPostFrameCallback((_) {
-//   // final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-//   // if (renderBox != null) {
-//   //   position = renderBox.localToGlobal(Offset.zero);
-//   // }
-//   // // });
-//   // print(position);
-//   // return position;
-//   final renderObject = key.currentContext?.findRenderObject();
-//   final translation = renderObject?.getTransformTo(null).getTranslation();
-//   if(translation != null && renderObject?.paintBounds != null){
-//     position = Offset(translation.x, translation.y);
-//   }
-//   print(position);
-//   return position;
-// }
 
 Size getWidgetSize(GlobalKey key){
   Size size = const Size(0, 0);

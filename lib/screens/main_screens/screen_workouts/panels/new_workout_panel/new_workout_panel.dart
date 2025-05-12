@@ -59,7 +59,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
   Widget build(BuildContext context) {
     cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
 
-    print("Workout Panel");
+    pr("Workout Panel");
 
     return PopScope(
       canPop: false,
@@ -313,7 +313,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   Future openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
     // minPanelHeight = keepShowingPanelHeight;
-    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     refresh();
     await openPanel();
     minPanelHeight = keepShowingPanelHeight;
@@ -613,7 +613,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
           duration: const Duration(milliseconds: 350),
           curve: Curves.decelerate
       ).then((value) => {
-        SystemChrome.setPreferredOrientations([]),
+        // SystemChrome.setPreferredOrientations([]),
         if(doClear){
           clear()
         }

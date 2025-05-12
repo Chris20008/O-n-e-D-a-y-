@@ -50,7 +50,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
     cnConfig = Provider.of<CnConfig>(context);
     showSpotify = cnConfig.useSpotify;
 
-    print("Animated Column");
+    pr("Animated Column");
 
     return SafeArea(
       child: Stack(

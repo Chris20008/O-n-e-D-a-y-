@@ -342,14 +342,6 @@ Future saveBackupiCloud(String sourceFilePath, String filename)async{
       containerId: dotenv.env["ICLOUD_CONTAINER_ID"]!,
       filePath: sourceFilePath,
       destinationRelativePath: '$folderPathiCloud$filename',
-      // onProgress: (stream) {
-      //   final uploadProgressSub = stream.listen(
-      //         (progress) => print('Upload File Progress: $progress'),
-      //     onDone: () => print('Upload File Done'),
-      //     onError: (err) => print('Upload File Error: $err'),
-      //     cancelOnError: true,
-      //   );
-      // },
     );
   }
 }

@@ -49,7 +49,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
-    // DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitUp,
     // DeviceOrientation.portraitDown,
   ]).then((value) {
     runApp(const MyApp());
@@ -86,7 +86,7 @@ class MyAppState extends State<MyApp> with TickerProviderStateMixin{
 
   @override
   Widget build(BuildContext context) {
-    print("Main");
+    pr("Main");
     return MultiProvider(
       providers:[
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
@@ -294,7 +294,7 @@ class _MyHomePageState extends State<MyHomePage>{
   @override
   Widget build(BuildContext context) {
 
-    print("Homepage");
+    pr("Homepage");
 
     cnConfig  = Provider.of<CnConfig>(context);
     cnHomepage = Provider.of<CnHomepage>(context);
@@ -665,7 +665,7 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
       Animation<double> secondaryAnimation,
       Widget child,
       ) {
-    const delay = Duration(milliseconds: 50);
+    const delay = Duration(milliseconds: 80);
     final totalDuration = route.transitionDuration;
 
     final delayFraction = delay.inMilliseconds / totalDuration.inMilliseconds;

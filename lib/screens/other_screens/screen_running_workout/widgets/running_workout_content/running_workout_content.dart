@@ -28,7 +28,7 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
   @override
   Widget build(BuildContext context) {
 
-    print("Running Workout Content");
+    pr("Running Workout Content");
 
     final contentIsActive = context.select<CnRunningWorkout, bool>((cn) => cn.contentIsActive);
     cnRunningWorkout = context.watch<CnRunningWorkout>();

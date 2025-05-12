@@ -285,14 +285,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                         ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
                                         ? 0.3 :  0.1,
                                     curve: Curves.easeInOut
-                                ).then((value) {
-                                  // Future.delayed(const Duration(seconds: 1), (){
-                                  //   setState(() {
-                                  //     cnWorkoutHistory.opened[index!] = true;
-                                  //     print(cnWorkoutHistory.opened);
-                                  //   });
-                                  // });
-                                });
+                                );
                                 break;
                               }
                               else {

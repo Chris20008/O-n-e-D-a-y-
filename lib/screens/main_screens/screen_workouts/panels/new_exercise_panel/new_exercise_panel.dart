@@ -36,7 +36,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   Widget build(BuildContext context) {
     cnNewExercise = Provider.of<CnNewExercisePanel>(context);
 
-    print("Exercise Panel");
+    pr("Exercise Panel");
 
     return PopScope(
       canPop: false,

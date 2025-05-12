@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../objectbox.g.dart';
 import '../../../objects/workout.dart';
+import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
@@ -36,7 +37,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
     cnWorkouts = Provider.of<CnWorkouts>(context);
     final size = MediaQuery.of(context).size;
 
-    print("Screen Workouts");
+    pr("Screen Workouts");
 
     return SafeArea(
       top: false,

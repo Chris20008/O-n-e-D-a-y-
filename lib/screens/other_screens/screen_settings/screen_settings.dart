@@ -10,12 +10,12 @@ import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../main.dart';
 import '../../../util/config.dart';
+import '../../../util/constants.dart';
 
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({
@@ -87,11 +87,11 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     cnBottomMenu.adjustHeight(value);
     if(value > 0 && !setOrientation){
       setOrientation = true;
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     }
     else if (value == 0 && setOrientation){
       setOrientation = false;
-      SystemChrome.setPreferredOrientations([]);
+      // SystemChrome.setPreferredOrientations([]);
     }
   }
 
@@ -100,7 +100,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     cnConfig = Provider.of<CnConfig>(context);
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
-    print("Rebuild Screen Settings");
+    pr("Rebuild Screen Settings");
 
     return PopScope(
         canPop: true,

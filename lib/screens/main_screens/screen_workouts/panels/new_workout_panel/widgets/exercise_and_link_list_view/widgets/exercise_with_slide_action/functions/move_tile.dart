@@ -6,8 +6,6 @@ Future moveTile({
   required double endY,
   required CnNewWorkOutPanel cnNewWorkout
 }) async{
-  // CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
-  print("move Tiel");
   cnNewWorkout.blockUi = true;
   cnNewWorkout.refresh();
 

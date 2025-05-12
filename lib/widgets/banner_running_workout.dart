@@ -123,8 +123,6 @@ class CnBannerRunningWorkout extends ChangeNotifier {
   }
 
   void refresh(){
-    print("Refresh Banner with show $showBanner cnOpen $canOpenWorkout");
-
     notifyListeners();
   }
 }

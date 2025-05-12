@@ -154,16 +154,17 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     }
     else if(index == 2) {
       cnScreenStatistics.refreshData(context);
+      // cnScreenStatistics.szController?.resetGraph();
       if(lastIndex == 2){
         cnScreenStatistics.szController?.resetGraph();
-        // cnScreenStatistics.resetGraph(withKeyReset: false);
-        // cnScreenStatistics.refresh();
+      } else{
+        cnScreenStatistics.szController?.graphIsReduced = false;
       }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     } else{
-      SystemChrome.setPreferredOrientations([]);
+      // SystemChrome.setPreferredOrientations([]);
     }
     cnHomepage.refresh();
   }
