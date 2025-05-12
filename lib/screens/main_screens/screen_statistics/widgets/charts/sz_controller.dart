@@ -245,7 +245,6 @@ class SZController{
   }
 
   void doAnimateVertical(double startPositionY) async{
-    print("Do animate Vertical");
     Map<String, List<FlSpot>> tempAllSpots = allSpots.map((key, spots) {
       return MapEntry(key, spots);
     });
