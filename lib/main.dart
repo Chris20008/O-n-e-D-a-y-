@@ -702,10 +702,10 @@ class MyTransition extends CupertinoPageTransitionsBuilder {
   }
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 550);
+  Duration get transitionDuration => const Duration(milliseconds: 580);
 
   @override
-  Duration get reverseTransitionDuration => const Duration(milliseconds: 450);
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 480);
 }
 
 
