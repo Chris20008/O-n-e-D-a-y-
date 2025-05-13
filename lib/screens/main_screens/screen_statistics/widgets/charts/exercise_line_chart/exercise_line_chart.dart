@@ -293,8 +293,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       );
     }
 
-    pr(value);
-
     if(value < szController.leftPaddingGraph || value > szController.totalRange+szController.leftPaddingGraph){
       text = const Text('', style: style);
     }
