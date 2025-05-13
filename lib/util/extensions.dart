@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 
 extension DateOnlyCompare on DateTime {
@@ -64,6 +65,28 @@ extension DateOnlyCompare on DateTime {
     return DateTime(year, month, 15);
   }
 
+  DateTime getMidDayOfWeek() {
+    int delta = DateTime.wednesday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  DateTime getFirstDayOfWeek() {
+    int delta = DateTime.monday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  DateTime getLastDayOfWeek() {
+    int delta = DateTime.sunday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  String formatAsFirstLastDayOfWeek(){
+    return "${DateFormat("d.MMM").format(getFirstDayOfWeek())} - ${DateFormat("d.MMM").format(getLastDayOfWeek())}";
+  }
+
   Duration differenceSafe(DateTime other){
     return toUtcSafe().difference(other.toUtcSafe());
   }
@@ -76,14 +99,17 @@ extension DateOnlyCompare on DateTime {
     return toUtcSafe().subtract(d).toLocal();
   }
 
+  DateTime round(){
+    DateTime current = toUtc();
+    if(current.hour > 12){
+      current = current.add(const Duration(hours: 13)).copyWith(hour: 0);
+    } else if(current.hour <= 12){
+      current = current.copyWith(hour: 0);
+    }
+    return current;
+  }
+
   DateTime toUtcSafe(){
-    // DateTime current = toUtc();
-    // if(current.hour > 12){
-    //   current = current.add(const Duration(hours: 13)).copyWith(hour: 0);
-    // } else if(current.hour <= 12){
-    //   current = current.copyWith(hour: 0);
-    // }
-    // return current;
     return DateTime.utc(year, month, day, hour, minute, second, millisecond, microsecond);
   }
 

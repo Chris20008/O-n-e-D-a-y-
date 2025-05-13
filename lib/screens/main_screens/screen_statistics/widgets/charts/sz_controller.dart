@@ -12,7 +12,9 @@ class SZController{
 
   final double _minZoomArea = 20;
   final double _maxZoomArea = 1200;
-  final double _defaultZoomArea = 365;
+  final double _defaultZoomArea = 364;
+  final double _weeklyZoomArea = 150;
+  final double _monthlyZoomArea = 365;
   final String _originalLineNameDefault = "original";
   final double _leftPaddingGraph = 15;
   late final double _totalPaddingGraph = _leftPaddingGraph * 2;
@@ -43,7 +45,7 @@ class SZController{
   double totalScreenWidth;
   late DateTime minDate;
   late DateTime maxDate;
-  bool graphIsReduced = false;
+  SpotDetailLevel _spotDetailLevel = SpotDetailLevel.daily;
 
   Map<String, List<FlSpot>> allSpots = {};
 
@@ -64,6 +66,8 @@ class SZController{
 
   double get scrollPositionWithPadding => state.value.scrollPosition + _leftPaddingGraph;
 
+  double get scrollPositionMinusPadding => state.value.scrollPosition - _leftPaddingGraph;
+
   /// calculated velocity of last current scroll
   double get _velocity => _velocityTracker.getVelocity().pixelsPerSecond.dx * 0.00006 * (state.value.zoomArea * 0.5);
 
@@ -75,6 +79,7 @@ class SZController{
   double get _maxPossibleXCoordinate => totalRange -state.value.scrollPosition + _leftPaddingGraph;
 
   double get leftPaddingGraph => _leftPaddingGraph;
+  SpotDetailLevel get spotDetailLevel => _spotDetailLevel;
 
   void addLine({
     required String key,
@@ -92,14 +97,13 @@ class SZController{
 
   Map<DateTime, double> getLineFormatted({required String key}){
     final spots = allSpots[key]?? [];
-    final entries = spots.mapIndexed((index, spot) => MapEntry(minDate.addSafe(Duration(days: (spot.x + state.value.scrollPosition).ceil() - _leftPaddingGraph.toInt(), microseconds: index)), spot.y));
+    final entries = spots.mapIndexed((index, spot) => MapEntry(minDate.addSafe(Duration(days: (spot.x + scrollPositionMinusPadding).toInt(), microseconds: index)).toUtcSafe(), spot.y));
     return { for (var item in entries) item.key : item.value };
   }
 
   SZController({
     required this.widthAxisTitles,
     required this.totalScreenWidth,
-    // required this.leftPaddingGraph,
     required this.minDate,
     required this.maxDate
   }) : state = ValueNotifier(
@@ -141,20 +145,19 @@ class SZController{
       return MapEntry(key, shifted);
     });
 
-    /// reduce spots
-    final reduce = state.value.zoomArea > _defaultZoomArea;
-    if(reduce){
-      if(graphIsReduced){
-        return;
-      }
+    /// check if reduce spots
+    final level = calcSpotDetailLevel();
+    /// if level is not daily we need to reduce the spots
+    /// but we only reduce if the current _spotDetailLevel != level
+    if(level != SpotDetailLevel.daily && _spotDetailLevel != level){
+      _spotDetailLevel = level;
       for(String key in allSpots.keys){
         handleFlPointReduction(key);
       }
-      graphIsReduced = true;
       updateGraph();
     }
-    else if(graphIsReduced){
-      graphIsReduced = false;
+    else if(level == SpotDetailLevel.daily && _spotDetailLevel != level){
+      _spotDetailLevel = level;
       for(String key in allSpots.keys) {
         if (key.contains(_originalLineNameDefault)) continue;
         allSpots[key] = List.from(allSpots['${_originalLineNameDefault}_$key']!);
@@ -164,18 +167,53 @@ class SZController{
     }
   }
 
+  SpotDetailLevel calcSpotDetailLevel(){
+    if(state.value.zoomArea > _monthlyZoomArea){
+      return SpotDetailLevel.monthly;
+    }
+    if(state.value.zoomArea > _weeklyZoomArea){
+      return SpotDetailLevel.weekly;
+    }
+    return SpotDetailLevel.daily;
+  }
+
+  double calcNewXMonthly(DateTime spot){
+    return (spot.getMidDayOfMonth().differenceSafe(minDate).inDays - state.value.scrollPosition + _leftPaddingGraph)
+        .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
+        .toDouble();
+  }
+
+  double calcNewXWeekly(DateTime spot){
+    return (spot.getMidDayOfWeek().differenceSafe(minDate).inDays - state.value.scrollPosition + _leftPaddingGraph)
+        .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
+        .toDouble();
+  }
+
   void handleFlPointReduction(String key){
-    if(state.value.zoomArea <= _defaultZoomArea){
+    /// return if no reduction is needed
+    if(state.value.zoomArea <= _weeklyZoomArea){
       return;
     }
+    /// reduction is not needed for sickDaysSpots and the original Lists
     if (key.contains(_originalLineNameDefault) || key.contains("sickDaysSpots")){
      return;
     }
 
+    /// reset to original spots
+    allSpots[key] = List.from(allSpots['${_originalLineNameDefault}_$key']!);
+
     double calcNewX(DateTime spot){
-      return (spot.getMidDayOfMonth().differenceSafe(minDate).inDays - state.value.scrollPosition - leftPaddingGraph)
-          .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
-          .toDouble();
+      if(_spotDetailLevel == SpotDetailLevel.monthly){
+        return calcNewXMonthly(spot);
+      }
+      return calcNewXWeekly(spot);
+    }
+
+    bool isSamePeriod(DateTime first, DateTime second){
+      if(_spotDetailLevel == SpotDetailLevel.monthly){
+        return first.isSameMonth(second);
+      }
+      return first.isSameWeek(second);
     }
 
     animationTime = _defaultAnimationTime;
@@ -188,11 +226,11 @@ class SZController{
     for(var entry in allSpots[key]!.asMap().entries){
       final index = entry.key;
       final spot = entry.value;
-      final spotsDate = minDate.addSafe(Duration(days: (spot.x + scrollPositionWithPadding).toInt()));
+      final spotsDate = minDate.addSafe(Duration(days: (spot.x + scrollPositionMinusPadding).toInt()));
       lastSpotDate ??= spotsDate;
 
-      /// Same month as previous, just add spot
-      if(lastSpotDate.isSameMonth(spotsDate)){
+      /// When is same period (either week or month) just add spot
+      if(isSamePeriod(lastSpotDate, spotsDate)){
         tempSpots.add(spot);
       }
       /// Different month => save current temp spots, clear them and add the new spot
@@ -242,9 +280,7 @@ class SZController{
     return 1;
   }
 
-  void resetGraph({
-    doubleUpdate = false
-  }) {
+  void resetGraph() {
     resetAnimationTime(withPostFrameCallBack: false);
     _allowAfterScroll = false;
     _previousState = state.value.copy();
@@ -452,6 +488,10 @@ class SZController{
     // }
   }
 
+  void resetSpotDetailLevel(){
+    _spotDetailLevel = SpotDetailLevel.daily;
+  }
+
   bool handleAfterScroll() {
     double vel = _velocity;
     const friction = 0.98;
@@ -556,3 +596,11 @@ class ScrollZoomState {
   }
 }
 
+enum SpotDetailLevel{
+  daily ("daily"),
+  weekly ("weekly"),
+  monthly ("monthly");
+
+  const SpotDetailLevel(this.value);
+  final String value;
+}

@@ -577,8 +577,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     else{
       return AppLocalizations.of(context)!.statisticsSick;
     }
+    if(szController.spotDetailLevel == SpotDetailLevel.weekly){
+      return "${data.keys.toList()[spot.spotIndex].formatAsFirstLastDayOfWeek()} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
+    }
     // return "Test";
-    final formattedDate = szController.graphIsReduced? DateFormat("MMM") : DateFormat("d.MMM");
+    final formattedDate = szController.spotDetailLevel == SpotDetailLevel.monthly? DateFormat("MMM") : DateFormat("d.MMM");
     return "${formattedDate.format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
   }
 }

@@ -22,6 +22,15 @@ void openFilterPopUp({
 
     await Future.delayed(const Duration(milliseconds: 400));
 
+    if(cnScreenStatistics.selectedWorkoutNameLast != cnScreenStatistics.selectedWorkoutName){
+      cnScreenStatistics.refreshData(context);
+      cnScreenStatistics.szController?.updateConfig(
+          minDate: cnScreenStatistics.minDate,
+          maxDate: cnScreenStatistics.maxDate
+      );
+      cnScreenStatistics.szController?.resetGraph();
+    }
+
     cnScreenStatistics.refresh();
     cnScreenStatistics.cache();
   } else{
