@@ -59,7 +59,7 @@ Widget backgroundSingleSet = Container(
   ),
 );
 
-void pr(String? s) {
+void pr(Object? s) {
   if (kDebugMode || kProfileMode) {
     if (kDebugMode) {
       print(s);

@@ -22,12 +22,12 @@ class ExerciseLineChart extends StatefulWidget {
 class _ExerciseLineChartState extends State<ExerciseLineChart> {
   late CnScreenStatistics cnScreenStatistics;
   final double widthAxisTitles = 50;
-  final int leftPadding = 5;
+  final double leftPadding = 0;
 
   late SZController szController = cnScreenStatistics.szController?? SZController(
       widthAxisTitles: widthAxisTitles,
       totalScreenWidth: MediaQuery.of(context).size.width,
-      leftPadding: leftPadding,
+      // leftPaddingGraph: leftPadding,
       minDate: cnScreenStatistics.minDate.toDate(),
       maxDate: cnScreenStatistics.maxDate.toDate()
   );
@@ -127,7 +127,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     spotsMaxWeight.clear();
     /// Set Spots Max Weight
     maxWeights?.forEach((date, weight) {
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
+      final xCoordinate = date.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       spotsMaxWeight.add(FlSpot(xCoordinate, weight.toDouble()));
     });
 
@@ -135,7 +135,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     spotsAvgWeightPerSet.clear();
     avgWeights?.forEach((date, totalWeight) {
       double percent = (totalWeight*1.1) / maxTotalWeight;
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
+      final xCoordinate = date.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       if(percent.isNaN){
         percent = totalWeight / (maxTotalWeight.isNaN? 1 : maxTotalWeight);
         if(percent.isNaN){
@@ -163,19 +163,19 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     /// Set Spots One Rep Max
     spotsOneRepMax.clear();
     oneRepMaxPerDate?.forEach((date, weight) {
-      final xCoordinate = date.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
+      final xCoordinate = date.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       final yCoordinate = !cnScreenStatistics.showOneRepMax? minY-5 : weight.toDouble();
       spotsOneRepMax.add(FlSpot(xCoordinate, yCoordinate));
     });
     
     /// Set Spots Sick Days
     for (ObSickDays sickDay in allSickDays){
-      double xCoordinate = sickDay.startDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
+      double xCoordinate = sickDay.startDate.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       double percent = 5;
       double factor = maxWeight > 0? maxWeight : 4;
       sickDaysSpots.add(FlSpot(xCoordinate, -5));
       sickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
-      xCoordinate = sickDay.endDate.toDate().difference(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
+      xCoordinate = sickDay.endDate.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble() - szController.state.value.scrollPosition + leftPadding;
       sickDaysSpots.add(FlSpot(xCoordinate, factor * percent));
       sickDaysSpots.add(FlSpot(xCoordinate, -5));
     }
@@ -208,15 +208,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
         key: "sickDaysSpots",
         value: sickDaysSpots
     );
-
-    // addLine(
-    //   MapEntry("maxWeight", spotsMaxWeight)
-    // );
-
-    // szController.allSpots["maxWeight"] = spotsMaxWeight;
-    // szController.allSpots["oneRepMax"] = spotsOneRepMax;
-    // szController.allSpots["spotsAvgWeightPerSet"] = spotsAvgWeightPerSet;
-    // szController.allSpots["sickDaysSpots"] = sickDaysSpots;
 
     if(cnScreenStatistics.firstAnimationGraph){
       szController.doAnimateVertical(minY);
@@ -281,31 +272,30 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
     value += szController.state.value.scrollPosition;
 
-    if(szController.state.value.zoomArea < 50 && value % 1.0 > 0.1){
-      // return SizedBox();
+    if(szController.state.value.zoomArea < 50 && value % 1.0 >= 0.1){
       return SideTitleWidget(
           axisSide: meta.axisSide,
           child: const Text('', style: style)
       );
     }
 
-    if(szController.state.value.zoomArea < 100 && value % 1.0 > 0.25){
-      // return SizedBox();
+    if(szController.state.value.zoomArea < 100 && value % 1.0 >= 0.25){
       return SideTitleWidget(
           axisSide: meta.axisSide,
           child: const Text('', style: style)
       );
     }
 
-    if(szController.state.value.zoomArea < 200 && value % 1.0 > 0.5){
+    if(szController.state.value.zoomArea < 200 && value % 1.0 >= 0.5){
       return SideTitleWidget(
           axisSide: meta.axisSide,
           child: const Text('', style: style)
       );
     }
 
+    pr(value);
 
-    if(value < 5){
+    if(value < szController.leftPaddingGraph || value > szController.totalRange+szController.leftPaddingGraph){
       text = const Text('', style: style);
     }
     else{
@@ -322,23 +312,24 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   Widget generateXAxisText(DateTime date, TextStyle style){
     bool doLabel;
     String format;
+    date = date.subtract(Duration(days: szController.leftPaddingGraph.toInt()));
     if(szController.state.value.zoomArea < 20){
       doLabel = date.day % 5 == 0;
       format = 'd. MMM';
     } else if(szController.state.value.zoomArea < 40){
-      doLabel = date.day % 10 == 0;
+      doLabel = date.day % 10 == 0 || (date.day == 1 && date.month == 3);
       format = 'd. MMM';
     } else if(szController.state.value.zoomArea < 80){
       doLabel = date.day % 15 == 0 || (date.day == 28 && date.month == 2);
       format = 'd. MMM';
     } else if(szController.state.value.zoomArea < 200){
-      doLabel = date.day == 1;
+      doLabel = date.day == 15;
       format = 'MMM yy';
     } else if(szController.state.value.zoomArea < 450){
-      doLabel = date.day == 1 && date.month % 2 == 0;
+      doLabel = date.day == 15 && date.month % 2 == 0;
       format = 'MMM yy';
     }else if (szController.state.value.zoomArea < 700){
-      doLabel = date.day == 1 && date.month % 3 == 0;
+      doLabel = date.day == 15 && date.month % 3 == 0;
       format = 'MMM yy';
     } else{
       doLabel = date.day == 1 && date.month == 1;
@@ -384,7 +375,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
   }
 
   LineChartData mainData() {
-    pr("Rebuild main Data");
     return LineChartData(
       clipData: const FlClipData.all(),
       lineTouchData: LineTouchData(

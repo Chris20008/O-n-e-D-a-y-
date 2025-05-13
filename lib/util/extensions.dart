@@ -64,6 +64,29 @@ extension DateOnlyCompare on DateTime {
     return DateTime(year, month, 15);
   }
 
+  Duration differenceSafe(DateTime other){
+    return toUtcSafe().difference(other.toUtcSafe());
+  }
+
+  DateTime addSafe(Duration d){
+    return toUtcSafe().add(d).toLocal();
+  }
+
+  DateTime subtractSafe(Duration d){
+    return toUtcSafe().subtract(d).toLocal();
+  }
+
+  DateTime toUtcSafe(){
+    // DateTime current = toUtc();
+    // if(current.hour > 12){
+    //   current = current.add(const Duration(hours: 13)).copyWith(hour: 0);
+    // } else if(current.hour <= 12){
+    //   current = current.copyWith(hour: 0);
+    // }
+    // return current;
+    return DateTime.utc(year, month, day, hour, minute, second, millisecond, microsecond);
+  }
+
   int numOfDaysOfMonth(){
     return DateTime(year, month+1, 0).difference(DateTime(year, month, 1)).inDays + 1;
   }

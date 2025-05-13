@@ -10,11 +10,13 @@ import 'package:flutter/services.dart';
 
 class SZController{
 
-  final int _offsetZoomArea = 10;
   final double _minZoomArea = 20;
   final double _maxZoomArea = 1200;
   final double _defaultZoomArea = 365;
   final String _originalLineNameDefault = "original";
+  final double _leftPaddingGraph = 15;
+  late final double _totalPaddingGraph = _leftPaddingGraph * 2;
+  final int _defaultAnimationTime = 500;
 
   final ValueNotifier<ScrollZoomState> state;
   late ScrollZoomState _previousState;
@@ -26,7 +28,7 @@ class SZController{
   bool _allowAfterScroll = true;
 
   bool graphLocked = false;
-  int animationTime = 500;
+  late int animationTime = _defaultAnimationTime;
   Offset? pointerA;
   Offset? pointerAPreviousPos;
   Offset? pointerAStartPositionForGraphLock;
@@ -36,32 +38,50 @@ class SZController{
   double lastPointerDistance = 0;
   double focalPointPercent = 0;
   int allowedMovementForGraphLock = 4;
-  late double totalRange = maxDate.toDate().difference(minDate.toDate()).inDays.toDouble();
+  late double totalRange = maxDate.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
   double widthAxisTitles;
   double totalScreenWidth;
   late DateTime minDate;
   late DateTime maxDate;
-  int leftPadding;
-  late int totalPadding = leftPadding * 2;
   bool graphIsReduced = false;
 
   Map<String, List<FlSpot>> allSpots = {};
 
   ScrollZoomState get current => state.value;
-  double get maxVisibleArea => min(_maxZoomArea, (totalRange+totalPadding).toDouble());
-  double get totalRangeWithOffset => totalRange + _offsetZoomArea;
-  // double get _minZoomAreaWithOffset => _minZoomArea + _offsetZoomArea;
-  double get _maxZoomAreaWithOffset => _maxZoomArea + _offsetZoomArea;
-  // double get _defaultZoomAreaWithOffset => _defaultZoomArea + _offsetZoomArea;
-  double get _scrollPositionZoomedIn => (totalRangeWithOffset - _defaultZoomArea).clamp(0, totalRangeWithOffset);
+  double get maxVisibleArea => min(_maxZoomArea, (totalRange+_totalPaddingGraph).toDouble());
+
+  /// range between minDate and maxDate plus the offset
+  double get totalRangeWithPadding => totalRange + _totalPaddingGraph;
+
+  /// maximum possible zoom are with offset
+  double get _maxZoomAreaWithPadding => _maxZoomArea + _totalPaddingGraph;
+
+  /// scroll position when zoomed in to default zoom
+  double get _scrollPositionZoomedIn => (totalRangeWithPadding - _defaultZoomArea).clamp(0, totalRangeWithPadding);
+
+  /// delta between current and last scroll position
   double get deltaScrollPosition => _previousState.scrollPosition - state.value.scrollPosition;
+
+  double get scrollPositionWithPadding => state.value.scrollPosition + _leftPaddingGraph;
+
+  /// calculated velocity of last current scroll
   double get _velocity => _velocityTracker.getVelocity().pixelsPerSecond.dx * 0.00006 * (state.value.zoomArea * 0.5);
-  double get maxScrollPosition => totalRange - state.value.zoomArea + totalPadding;
+
+  /// maximum possible scroll position
+  double get maxScrollPosition => totalRange - state.value.zoomArea + _totalPaddingGraph;
+
+  double get _minPossibleXCoordinate => -state.value.scrollPosition + _leftPaddingGraph;
+
+  double get _maxPossibleXCoordinate => totalRange -state.value.scrollPosition + _leftPaddingGraph;
+
+  double get leftPaddingGraph => _leftPaddingGraph;
 
   void addLine({
     required String key,
     required List<FlSpot> value
   }){
+    /// move graph on x-axis according to padding
+    value = value.map((spot) => FlSpot(spot.x + _leftPaddingGraph, spot.y)).toList();
     allSpots[key] = List.from(value);
     allSpots["${_originalLineNameDefault}_$key"] = value;
 
@@ -72,20 +92,20 @@ class SZController{
 
   Map<DateTime, double> getLineFormatted({required String key}){
     final spots = allSpots[key]?? [];
-    final entries = spots.mapIndexed((index, spot) => MapEntry(minDate.add(Duration(days: (spot.x + state.value.scrollPosition).toInt(), microseconds: index)), spot.y));
+    final entries = spots.mapIndexed((index, spot) => MapEntry(minDate.addSafe(Duration(days: (spot.x + state.value.scrollPosition).ceil() - _leftPaddingGraph.toInt(), microseconds: index)), spot.y));
     return { for (var item in entries) item.key : item.value };
   }
 
   SZController({
     required this.widthAxisTitles,
     required this.totalScreenWidth,
-    required this.leftPadding,
+    // required this.leftPaddingGraph,
     required this.minDate,
     required this.maxDate
   }) : state = ValueNotifier(
     ScrollZoomState(
       scrollPosition: 0,
-      zoomArea: maxDate.difference(minDate).inDays.toDouble() + 10, /// 10 is value of _visibleDayOffset
+      zoomArea: maxDate.differenceSafe(minDate).inDays.toDouble() + 30, /// 30 is value of _totalPaddingGraph
     ),
   ){
     if(state.value.zoomArea > _defaultZoomArea){
@@ -94,13 +114,11 @@ class SZController{
         scrollPosition: _scrollPositionZoomedIn
       );
     }
-    if(state.value.zoomArea > _maxZoomAreaWithOffset){
+    if(state.value.zoomArea > _maxZoomAreaWithPadding){
       resetGraph();
     }
     _previousState = state.value.copy();
   }
-
-
 
   void updateGraph({
     double? scrollPosition,
@@ -118,12 +136,12 @@ class SZController{
   }
 
   void refreshSpots(){
-    // final stopwatch = Stopwatch()..start();
     allSpots = allSpots.map((key, spots) {
       final shifted = spots.map((spot) => FlSpot(spot.x + deltaScrollPosition, spot.y)).toList();
       return MapEntry(key, shifted);
     });
 
+    /// reduce spots
     final reduce = state.value.zoomArea > _defaultZoomArea;
     if(reduce){
       if(graphIsReduced){
@@ -140,7 +158,7 @@ class SZController{
       for(String key in allSpots.keys) {
         if (key.contains(_originalLineNameDefault)) continue;
         allSpots[key] = List.from(allSpots['${_originalLineNameDefault}_$key']!);
-        animationTime = 500;
+        animationTime = _defaultAnimationTime;
       }
       updateGraph();
     }
@@ -153,36 +171,41 @@ class SZController{
     if (key.contains(_originalLineNameDefault) || key.contains("sickDaysSpots")){
      return;
     }
-    animationTime = 500;
+
+    double calcNewX(DateTime spot){
+      return (spot.getMidDayOfMonth().differenceSafe(minDate).inDays - state.value.scrollPosition - leftPaddingGraph)
+          .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
+          .toDouble();
+    }
+
+    animationTime = _defaultAnimationTime;
 
     List<FlSpot> newSpots = [];
     List<FlSpot> tempSpots = [];
     DateTime? lastSpotDate;
-    FlSpot lastSpot = allSpots[key]!.last;
+    int lastIndex = allSpots[key]!.length - 1;
 
-    for(FlSpot spot in allSpots[key]!){
-      final spotsDate = minDate.add(Duration(days: (spot.x + state.value.scrollPosition).toInt()));
+    for(var entry in allSpots[key]!.asMap().entries){
+      final index = entry.key;
+      final spot = entry.value;
+      final spotsDate = minDate.addSafe(Duration(days: (spot.x + scrollPositionWithPadding).toInt()));
       lastSpotDate ??= spotsDate;
 
+      /// Same month as previous, just add spot
       if(lastSpotDate.isSameMonth(spotsDate)){
         tempSpots.add(spot);
       }
+      /// Different month => save current temp spots, clear them and add the new spot
       else{
-        tempSpots.sort((a, b){
-          if(a.y > b.y){
-            return -1;
-          }
-          else if(a.y < b.y){
-            return 1;
-          }
-          else if(a.x > b.y){
-            return -11;
-          }
-          return 1;
-        });
+        /// sort from highest to lowest y-axis
+        tempSpots.sort(highestToLowestSort);
+        /// take highest y-axis spot
         FlSpot? maxSpot = tempSpots.firstOrNull;
         if(maxSpot != null){
-          final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
+          /// newX can't be lower than minDate
+          /// Take difference in days
+          /// if difference is negative we clamp it to the most low value which is the negative state.value.scrollPosition
+          final double newX = calcNewX(lastSpotDate);
           maxSpot = FlSpot(newX, maxSpot.y);
           newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
         }
@@ -191,17 +214,32 @@ class SZController{
         tempSpots.add(spot);
       }
 
-
-      if(spot == lastSpot){
+      /// Last Spot
+      if(index == lastIndex){
+        /// sort from highest to lowest y-axis
+        tempSpots.sort(highestToLowestSort);
         FlSpot? maxSpot = tempSpots.firstOrNull;
         if(maxSpot != null){
-          final double newX = (lastSpotDate.getMidDayOfMonth().difference(minDate).inDays - state.value.scrollPosition).clamp(-state.value.scrollPosition, totalRangeWithOffset).toDouble();
+          final double newX = calcNewX(lastSpotDate);
           maxSpot = FlSpot(newX, maxSpot.y);
           newSpots.addAll(List.generate(tempSpots.length, (_) => maxSpot!));
         }
       }
     }
     allSpots[key] = newSpots;
+  }
+
+  int highestToLowestSort(a, b){
+    if(a.y > b.y){
+      return -1;
+    }
+    else if(a.y < b.y){
+      return 1;
+    }
+    else if(a.x > b.y){
+      return -1;
+    }
+    return 1;
   }
 
   void resetGraph({
@@ -212,8 +250,8 @@ class SZController{
     _previousState = state.value.copy();
 
     /// Zoom to max outer position
-    double newZoomArea = min(totalRangeWithOffset, _maxZoomAreaWithOffset);
-    double scrollPosition = (totalRangeWithOffset - newZoomArea).clamp(0, totalRangeWithOffset);
+    double newZoomArea = min(totalRangeWithPadding, _maxZoomAreaWithPadding);
+    double scrollPosition = (totalRangeWithPadding - newZoomArea).clamp(0, totalRangeWithPadding);
 
     /// Zoom to default state
     if(newZoomArea > _defaultZoomArea && state.value.zoomArea != _defaultZoomArea){
@@ -230,18 +268,18 @@ class SZController{
   void updateConfig({
     double? widthAxisTitles,
     double? totalScreenWidth,
-    int? leftPadding,
+    // double? leftPadding,
     DateTime? minDate,
     DateTime? maxDate
   }){
     this.widthAxisTitles = widthAxisTitles?? this.widthAxisTitles;
     this.totalScreenWidth = totalScreenWidth?? this.totalScreenWidth;
-    this.leftPadding = leftPadding?? this.leftPadding;
+    // this.leftPaddingGraph = leftPadding?? this.leftPaddingGraph;
     this.minDate = minDate?? this.minDate;
     this.maxDate = maxDate?? this.maxDate;
 
-    totalPadding = this.leftPadding * 2;
-    totalRange = this.maxDate.toDate().difference(this.minDate.toDate()).inDays.toDouble();
+    // totalPaddingGraph = this.leftPaddingGraph * 2;
+    totalRange = this.maxDate.toDate().differenceSafe(this.minDate.toDate()).inDays.toDouble();
   }
 
   void doAnimateVertical(double startPositionY) async{
@@ -271,19 +309,7 @@ class SZController{
       });
     }
 
-    // if(doubleTapTimer == null){
-    //   doubleTapTimer ??= Timer(const Duration(milliseconds: 250), (){
-    //     doubleTapTimer = null;
-    //   });
-    // }
-    // else if(doubleTapTimer!.isActive && pointerA == null){
-    //   onDoubleTap(details);
-    //   return;
-    // }
-    // else{
-    //   doubleTapTimer?.cancel();
-    //   doubleTapTimer = null;
-    // }
+    // onDoubleTap(details);
 
     _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
     _velocityTracker.addPosition(details.timeStamp, details.position);
@@ -349,11 +375,9 @@ class SZController{
       if(_minZoomArea < state.value.zoomArea + difference){
         newScrollPosition = tempScrollPosition;
       }
-      if(newScrollPosition + newCurrentVisibleDays > totalRangeWithOffset){
-        newScrollPosition = totalRangeWithOffset - newCurrentVisibleDays;
+      if(newScrollPosition + newCurrentVisibleDays > totalRangeWithPadding){
+        newScrollPosition = totalRangeWithPadding - newCurrentVisibleDays;
       }
-
-      // _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
 
       /// Set new values
       updateGraph(
@@ -365,12 +389,11 @@ class SZController{
     /// SCROLL
     else if(
       pointerA != null && pointerB == null && pointerAPreviousPos != null &&
-      state.value.zoomArea <= totalRangeWithOffset
+      state.value.zoomArea <= totalRangeWithPadding
     ){
 
       _velocityTracker.addPosition(details.timeStamp, details.position);
 
-      final maxValueOffsetMinX = maxScrollPosition;
       double sensibility = 1/ (state.value.zoomArea / (constraints.maxWidth-widthAxisTitles));
       sensibility = sensibility < 0.1? 0.1 : sensibility > 500? 500 : sensibility;
       final currentPointerDistance = (pointerAPreviousPos!.dx - pointerA!.dx) / sensibility;
@@ -381,23 +404,14 @@ class SZController{
         graphLocked = false;
       }
 
-      double newOffsetMinX;
+      /// calc newScrollPosition and limit it to its bounds
+      double newScrollPosition = (state.value.scrollPosition + currentPointerDistance).clamp(0, maxScrollPosition);
 
-      newOffsetMinX = state.value.scrollPosition + currentPointerDistance;
-      if(newOffsetMinX < 0 && state.value.scrollPosition != 0){
-        updateGraph(
-            scrollPosition: 0
-        );
-      }
-      else if(newOffsetMinX > maxValueOffsetMinX && state.value.scrollPosition != maxValueOffsetMinX){
-        updateGraph(
-            scrollPosition: maxValueOffsetMinX
-        );
-      }
-      else if(newOffsetMinX >= 0 && newOffsetMinX != state.value.scrollPosition && (newOffsetMinX <= maxValueOffsetMinX || newOffsetMinX <= state.value.scrollPosition)){
+      /// When the scrollPosition is different from the current one, set it and update Graph
+      if(newScrollPosition != state.value.scrollPosition){
         pointerAPreviousPos = Offset(pointerA!.dx, pointerA!.dy);
         updateGraph(
-            scrollPosition: newOffsetMinX
+            scrollPosition: newScrollPosition
         );
       }
     }
@@ -416,12 +430,6 @@ class SZController{
 
     if(!handleAfterScroll()){
       resetAnimationTime();
-      // /// Small delay to allow UI to be drawn at least once and after that reset the animation time back to allow animations
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   if(pointerA == null && pointerB == null){
-      //     animationTime = 500;
-      //   }
-      // });
     }
   }
 
@@ -429,18 +437,18 @@ class SZController{
     if(withPostFrameCallBack){
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if(pointerA == null && pointerB == null){
-          animationTime = 500;
+          animationTime = _defaultAnimationTime;
         }
       });
     }
     else{
       if(pointerA == null && pointerB == null){
-        animationTime = 500;
+        animationTime = _defaultAnimationTime;
       }
     }
 
     // if(pointerA == null && pointerB == null){
-    //   animationTime = 500;
+    //   animationTime = _defaultAnimationTime;
     // }
   }
 
@@ -453,7 +461,7 @@ class SZController{
         vel *= friction;
 
         final newScrollPos = (state.value.scrollPosition - vel)
-            .clamp(0, totalRangeWithOffset - state.value.zoomArea)
+            .clamp(0, totalRangeWithPadding - state.value.zoomArea)
             .toDouble();
 
         // Stoppkriterium
@@ -478,7 +486,19 @@ class SZController{
   }
 
   // void onDoubleTap(PointerDownEvent details){
-  //   zoomTo(details.position.dx);
+  //   if(doubleTapTimer == null){
+  //     doubleTapTimer ??= Timer(const Duration(milliseconds: 250), (){
+  //       doubleTapTimer = null;
+  //     });
+  //   }
+  //   else if(doubleTapTimer!.isActive && pointerA == null){
+  //     zoomTo(details.position.dx);
+  //     return;
+  //   }
+  //   else{
+  //     doubleTapTimer?.cancel();
+  //     doubleTapTimer = null;
+  //   }
   //   pr("------------ DOUBLE TAP");
   // }
   //
