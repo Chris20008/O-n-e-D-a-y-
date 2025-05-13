@@ -240,12 +240,12 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
                 aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
                 child: Stack(
                   children: [
+                    const StatisticsOverlay(),
                     LineChart(
                         duration: Duration(milliseconds: szController.stateManager.animationTime),
                         curve: Curves.easeInOut,
                         mainData()
                     ),
-                    const StatisticsOverlay()
                   ],
                 ),
               );

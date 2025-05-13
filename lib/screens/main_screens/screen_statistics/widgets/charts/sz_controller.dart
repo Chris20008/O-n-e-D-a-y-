@@ -171,7 +171,7 @@ class SZController{
       return;
     }
 
-    stateManager.allowAfterScroll = true;
+    stateManager.allowAfterScroll = false;
 
     if(details.pointer == pointerAIdentifier){
       pointerA = details.position;
@@ -230,7 +230,7 @@ class SZController{
       pointerA != null && pointerB == null && pointerAPreviousPos != null &&
           stateManager.current.zoomArea <= totalRangeWithPadding
     ){
-
+      stateManager.animationTime = 0;
       _velocityTracker.addPosition(details.timeStamp, details.position);
 
       double sensibility = 1/ (stateManager.current.zoomArea / (constraints.maxWidth-widthAxisTitles));
@@ -287,7 +287,9 @@ class SZController{
         // Stoppkriterium
         if (vel.abs() < 0.05 || newScrollPos == stateManager.current.scrollPosition || !stateManager.allowAfterScroll) {
           vel = 0;
-          stateManager.resetAnimationTime();
+          if(pointerA == null){
+            stateManager.resetAnimationTime();
+          }
           return;
         }
 
