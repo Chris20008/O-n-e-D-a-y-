@@ -178,7 +178,7 @@ class SZController{
       }
 
       /// calc difference
-      double sensibility = ((stateManager.current.zoomArea) / (1500 / sqrt(stateManager.current.zoomArea)));
+      double sensibility = ((stateManager.current.zoomArea) / (300 / pow(stateManager.current.zoomArea, 0.1)));
       final currentPointerDistance = (pointerB!.dx - pointerA!.dx).abs();
       final difference = (lastPointerDistance - currentPointerDistance) * sensibility;
       lastPointerDistance = currentPointerDistance;

@@ -568,11 +568,11 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
       return AppLocalizations.of(context)!.statisticsSick;
     }
     if(szController.spotManager.spotDetailLevel == SpotDetailLevel.weekly){
-      return "${data.keys.toList()[spot.spotIndex].formatAsFirstLastDayOfWeek()} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
+      return "${data.keys.toList()[spot.spotIndex].formatAsFirstLastDayOfWeek()}  ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
     }
     // return "Test";
-    final formattedDate = szController.spotManager.spotDetailLevel == SpotDetailLevel.monthly? DateFormat("MMM") : DateFormat("d.MMM");
-    return "${formattedDate.format(data.keys.toList()[spot.spotIndex])} ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
+    final formattedDate = szController.spotManager.spotDetailLevel == SpotDetailLevel.monthly? DateFormat("MMM yy") : DateFormat("d.MMM");
+    return "${formattedDate.format(data.keys.toList()[spot.spotIndex])}  ${formatNumber(data.values.toList()[spot.spotIndex])} kg";
   }
 }
 
