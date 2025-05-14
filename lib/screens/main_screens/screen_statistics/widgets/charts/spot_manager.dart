@@ -6,7 +6,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 class SpotManager {
   final ScrollZoomStateManager stateManager;
-  final double leftPadding;
+  double leftPaddingGraph;
   DateTime minDate;
   final double weeklyZoomArea;
   final double monthlyZoomArea;
@@ -18,21 +18,21 @@ class SpotManager {
 
   SpotManager({
     required this.stateManager,
-    required this.leftPadding,
+    required this.leftPaddingGraph,
     required this.minDate,
     required this.weeklyZoomArea,
     required this.monthlyZoomArea,
     required this.totalRange,
   });
 
-  double get _minPossibleXCoordinate => -stateManager.current.scrollPosition + leftPadding;
-  double get _maxPossibleXCoordinate => totalRange -stateManager.current.scrollPosition + leftPadding;
-  double get scrollPositionMinusPadding => stateManager.current.scrollPosition - leftPadding;
+  double get _minPossibleXCoordinate => -stateManager.current.scrollPosition + leftPaddingGraph;
+  double get _maxPossibleXCoordinate => totalRange -stateManager.current.scrollPosition + leftPaddingGraph;
+  double get scrollPositionMinusPadding => stateManager.current.scrollPosition - leftPaddingGraph;
   SpotDetailLevel get spotDetailLevel => _spotDetailLevel;
 
   void addLine({required String key, required List<FlSpot> value}) {
     /// move graph on x-axis according to padding
-    value = value.map((spot) => FlSpot(spot.x + leftPadding - stateManager.current.scrollPosition, spot.y)).toList();
+    value = value.map((spot) => FlSpot(spot.x + leftPaddingGraph - stateManager.current.scrollPosition, spot.y)).toList();
     _spots[key] = List.from(value);
     _spots["${_originalLineNameDefault}_$key"] = value;
 
@@ -157,13 +157,13 @@ class SpotManager {
   }
 
   double calcNewXMonthly(DateTime spot){
-    return (spot.getMidDayOfMonth().differenceSafe(minDate).inDays - stateManager.current.scrollPosition + leftPadding)
+    return (spot.getMidDayOfMonth().differenceSafe(minDate).inDays - stateManager.current.scrollPosition + leftPaddingGraph)
         .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
         .toDouble();
   }
 
   double calcNewXWeekly(DateTime spot){
-    return (spot.getMidDayOfWeek().differenceSafe(minDate).inDays - stateManager.current.scrollPosition + leftPadding)
+    return (spot.getMidDayOfWeek().differenceSafe(minDate).inDays - stateManager.current.scrollPosition + leftPaddingGraph)
         .clamp(_minPossibleXCoordinate, _maxPossibleXCoordinate)
         .toDouble();
   }
@@ -215,7 +215,7 @@ class SpotManager {
 
   double dateTimeToScrollPosition(DateTime date){
     final xPos = date.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
-    return xPos + leftPadding - stateManager.current.scrollPosition;
+    return xPos + leftPaddingGraph - stateManager.current.scrollPosition;
   }
 
   void shiftSpotsByScrollDelta() {

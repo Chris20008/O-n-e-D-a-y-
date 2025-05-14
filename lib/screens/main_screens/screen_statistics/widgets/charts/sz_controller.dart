@@ -15,8 +15,6 @@ class SZController{
   final double _defaultZoomArea = 364;
   final double _weeklyZoomArea = 150;
   final double _monthlyZoomArea = 365;
-  final double _leftPaddingGraph = 15;
-  late final double _totalPaddingGraph = _leftPaddingGraph * 2;
 
 
   late final ScrollZoomStateManager stateManager;
@@ -39,11 +37,23 @@ class SZController{
   double focalPointPercent = 0;
   int allowedMovementForGraphLock = 4;
 
-  late double totalRange = maxDate.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
   double widthAxisTitles;
   double totalScreenWidth;
   late DateTime minDate;
+
   late DateTime maxDate;
+
+  double get totalRange => maxDate.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
+
+  double get _leftPaddingGraph {
+    if (totalRange < 15) return 1;
+    if (totalRange < 40) return 2;
+    if (totalRange < 80) return 5;
+    if (totalRange < 200) return 10;
+    return 15;
+  }
+
+  double get _totalPaddingGraph => _leftPaddingGraph * 2;
 
   double get maxVisibleArea => min(_maxZoomArea, (totalRange+_totalPaddingGraph).toDouble());
 
@@ -76,7 +86,7 @@ class SZController{
 
     spotManager = SpotManager(
       stateManager: stateManager,
-      leftPadding: _leftPaddingGraph,
+      leftPaddingGraph: _leftPaddingGraph,
       minDate: minDate,
       weeklyZoomArea: _weeklyZoomArea,
       monthlyZoomArea: _monthlyZoomArea,
@@ -96,13 +106,14 @@ class SZController{
     this.minDate = minDate?? this.minDate;
     this.maxDate = maxDate?? this.maxDate;
 
-    totalRange = this.maxDate.toDate().differenceSafe(this.minDate.toDate()).inDays.toDouble();
-
     /// Update Managers
     stateManager.totalRangeWithPadding = totalRangeWithPadding;
+    stateManager.leftPaddingGraph = _leftPaddingGraph;
 
     spotManager.minDate = minDate?? spotManager.minDate;
     spotManager.totalRange = totalRange;
+    spotManager.leftPaddingGraph = _leftPaddingGraph;
+
     resetGraph(forceToDefault: forceToDefault);
   }
 
@@ -174,6 +185,11 @@ class SZController{
 
       if(stateManager.animationTime != 0){
         pointerUp(null);
+        return;
+      }
+
+      /// Zoom is not possible if _minZoomArea >= maxVisibleArea
+      if(_minZoomArea >= maxVisibleArea){
         return;
       }
 

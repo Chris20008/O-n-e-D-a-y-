@@ -1,5 +1,6 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/exercise_line_chart/statistics_overlay.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/sz_controller.dart';
@@ -72,6 +73,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     cnScreenStatistics = context.watch<CnScreenStatistics>();
     cnScreenStatistics.szController = cnScreenStatistics.szController?? szController;
 
+    pr("SELECTED EXERCISE NAME: ${cnScreenStatistics.selectedExerciseName}");
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
     if(t == null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
       if(cnScreenStatistics.selectedExerciseName != null){
@@ -104,10 +106,16 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     allSickDays = cnScreenStatistics.allSickDays;
     minWeight = 10000;
     maxWeight = 0;
-    maxWeights?.forEach((key, value) {
-      minWeight = minWeight < value? minWeight : value;
-      maxWeight = maxWeight < value? value : maxWeight;
-    });
+    if(maxWeights != null && maxWeights!.isNotEmpty){
+      maxWeights?.forEach((key, value) {
+        minWeight = minWeight < value? minWeight : value;
+        maxWeight = maxWeight < value? value : maxWeight;
+      });
+    } else{
+      minWeight = 0;
+      maxWeight = 100;
+    }
+
     if(cnScreenStatistics.showOneRepMax){
       oneRepMaxPerDate?.forEach((key, value) {
         maxWeight = maxWeight < value? value : maxWeight;
@@ -230,10 +238,15 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
             childBuilder: (context){
               return AspectRatio(
                 aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
-                child: LineChart(
-                    duration: Duration(milliseconds: szController.stateManager.animationTime),
-                    curve: Curves.easeInOut,
-                    mainData()
+                child: Stack(
+                  children: [
+                    LineChart(
+                        duration: Duration(milliseconds: szController.stateManager.animationTime),
+                        curve: Curves.easeInOut,
+                        mainData()
+                    ),
+                    const StatisticsOverlay()
+                  ],
                 ),
               );
             },

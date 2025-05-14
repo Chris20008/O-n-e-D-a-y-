@@ -8,7 +8,7 @@ class ScrollZoomStateManager {
   final double defaultZoom;
   final double initialZoom;
   double totalRangeWithPadding;
-  final double leftPaddingGraph;
+  double leftPaddingGraph;
   bool allowAfterScroll = true;
 
   final int defaultAnimationTime;

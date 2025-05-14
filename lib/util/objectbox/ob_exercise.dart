@@ -12,6 +12,10 @@ class ObExercise{
   int restInSeconds;
   int? seatLevel;
   String? linkName;
+
+  /// category = 1 => isReps
+  /// category = 1 => isCardio
+  /// category = 1 => isStaticHold
   int category;
   bool blockLink;
   double bodyWeightPercent;

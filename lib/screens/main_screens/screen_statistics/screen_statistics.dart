@@ -228,6 +228,9 @@ class CnScreenStatistics extends ChangeNotifier {
     res.sort();
     if((selectedExerciseName == null || !res.contains(selectedExerciseName)) && (selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight || !cnConfig.useHealthData)){
       selectedExerciseName = res.firstOrNull;
+      if(selectedExerciseName == null && cnConfig.useHealthData){
+        selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
+      }
     }
     return res;
   }
@@ -341,17 +344,16 @@ class CnScreenStatistics extends ChangeNotifier {
 
   void calcMinMaxDates(BuildContext context)async{
     if (selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
-      minDate = healthData.last.dateFrom;
-      maxDate = healthData.first.dateFrom;
-      // szController?.minDate = minDate;
-      // szController?.maxDate = maxDate;
+      if(healthData.isNotEmpty){
+        minDate = healthData.last.dateFrom;
+        maxDate = healthData.first.dateFrom;
+      }
       return;
     }
     setExerciseTemplate(context);
     setExerciseFirst(context);
     setExerciseLast(context);
-    // szController?.minDate = minDate;
-    // szController?.maxDate = maxDate;
+
     if(szController != null
       &&( minDate != szController!.minDate
       || maxDate != szController!.maxDate)
@@ -375,7 +377,9 @@ class CnScreenStatistics extends ChangeNotifier {
     firstWorkout = firstBuilder.order(ObWorkout_.date).build().findFirst();
     if(firstWorkout != null){
       minDate = firstWorkout.date;
-      selectedExerciseFirst = Exercise.fromObExercise(firstWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
+      ObExercise? obEx = firstWorkout.exercises.firstWhereOrNull((ex) => ex.name == selectedExerciseName);
+      Exercise ex = obEx != null? Exercise.fromObExercise(obEx) : Exercise();
+      selectedExerciseFirst = ex;
     }
   }
 
@@ -391,7 +395,9 @@ class CnScreenStatistics extends ChangeNotifier {
     lastWorkout = lastBuilder.order(ObWorkout_.date, flags: Order.descending).build().findFirst();
     if(lastWorkout != null){
       maxDate = lastWorkout.date;
-      selectedExerciseLast = Exercise.fromObExercise(lastWorkout.exercises.firstWhere((ex) => ex.name == selectedExerciseName));
+      ObExercise? obEx = lastWorkout.exercises.firstWhereOrNull((ex) => ex.name == selectedExerciseName);
+      Exercise ex = obEx != null? Exercise.fromObExercise(obEx) : Exercise();
+      selectedExerciseLast = ex;
     }
   }
 
