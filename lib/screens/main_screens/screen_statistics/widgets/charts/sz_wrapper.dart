@@ -26,7 +26,7 @@ class _SzWrapperState extends State<SzWrapper> {
             onPointerMove: (PointerMoveEvent details) => widget.szController.pointerMove(details, constraints),
             onPointerUp: (PointerUpEvent details) => widget.szController.pointerUp(details),
             child: ValueListenableBuilder(
-              valueListenable: widget.szController.state,
+              valueListenable: widget.szController.stateManager.state,
               builder: (_, state, __) {
                 return Stack(
                   children: [

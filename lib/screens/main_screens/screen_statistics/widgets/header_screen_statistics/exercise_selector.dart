@@ -65,18 +65,20 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
     // await Future.delayed(const Duration(milliseconds: 300));
 
-    if(initExercise != selectedExerciseName){
+    /// init Name is different from current und providersName was truly updated to current
+    if(initExercise != selectedExerciseName && cnScreenStatistics.selectedExerciseName == selectedExerciseName){
       pr("Refresh After Selector");
       cnScreenStatistics.calcMinMaxDates(context);
 
       cnScreenStatistics.szController?.updateConfig(
         minDate: cnScreenStatistics.minDate,
-        maxDate: cnScreenStatistics.maxDate
+        maxDate: cnScreenStatistics.maxDate,
+        forceToDefault: true
       );
 
       cnScreenStatistics.refresh();
 
-      cnScreenStatistics.szController?.resetGraph();
+      // cnScreenStatistics.szController?.resetGraph();
 
       cnScreenStatistics.cache();
     }

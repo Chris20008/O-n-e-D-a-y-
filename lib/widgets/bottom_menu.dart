@@ -157,8 +157,10 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       // cnScreenStatistics.szController?.resetGraph();
       if(lastIndex == 2){
         cnScreenStatistics.szController?.resetGraph();
-      } else{
-        cnScreenStatistics.szController?.resetSpotDetailLevel();
+      }
+      else{
+        cnScreenStatistics.szController?.spotManager.resetSpotDetailLevel();
+        cnScreenStatistics.szController?.spotManager.refreshSpots();
         cnScreenStatistics.firstAnimationGraph = true;
       }
     }

@@ -352,6 +352,15 @@ class CnScreenStatistics extends ChangeNotifier {
     setExerciseLast(context);
     // szController?.minDate = minDate;
     // szController?.maxDate = maxDate;
+    if(szController != null
+      &&( minDate != szController!.minDate
+      || maxDate != szController!.maxDate)
+    ){
+      szController?.updateConfig(
+          minDate: minDate,
+          maxDate: maxDate
+      );
+    }
   }
 
   void setExerciseFirst(BuildContext context){

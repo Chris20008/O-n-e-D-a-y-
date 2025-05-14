@@ -28,7 +28,7 @@ void openFilterPopUp({
           minDate: cnScreenStatistics.minDate,
           maxDate: cnScreenStatistics.maxDate
       );
-      cnScreenStatistics.szController?.resetGraph();
+      // cnScreenStatistics.szController?.resetGraph();
     }
 
     cnScreenStatistics.refresh();
