@@ -39,11 +39,10 @@ class SZController{
 
   double widthAxisTitles;
   double totalScreenWidth;
+
   late DateTime minDate;
-
   late DateTime maxDate;
-
-  double get totalRange => maxDate.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
+  late double totalRange;
 
   double get _leftPaddingGraph {
     if (totalRange < 15) return 1;
@@ -74,6 +73,7 @@ class SZController{
     required this.minDate,
     required this.maxDate
   }) {
+    totalRange = maxDate.toDate().differenceSafe(minDate.toDate()).inDays.toDouble();
 
     stateManager = ScrollZoomStateManager(
       minZoomArea: _minZoomArea,
@@ -105,6 +105,8 @@ class SZController{
     this.totalScreenWidth = totalScreenWidth?? this.totalScreenWidth;
     this.minDate = minDate?? this.minDate;
     this.maxDate = maxDate?? this.maxDate;
+
+    totalRange = this.maxDate.toDate().differenceSafe(this.minDate.toDate()).inDays.toDouble();
 
     /// Update Managers
     stateManager.totalRangeWithPadding = totalRangeWithPadding;

@@ -73,7 +73,6 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     cnScreenStatistics = context.watch<CnScreenStatistics>();
     cnScreenStatistics.szController = cnScreenStatistics.szController?? szController;
 
-    pr("SELECTED EXERCISE NAME: ${cnScreenStatistics.selectedExerciseName}");
     final t = objectbox.exerciseBox.query((ObExercise_.name.equals(cnScreenStatistics.selectedExerciseName??"").and(ObExercise_.category.equals(1)))).build().findFirst();
     if(t == null && cnScreenStatistics.selectedExerciseName != AppLocalizations.of(context)!.statisticsWeight){
       if(cnScreenStatistics.selectedExerciseName != null){
