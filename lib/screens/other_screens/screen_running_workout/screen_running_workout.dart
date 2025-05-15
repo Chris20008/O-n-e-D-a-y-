@@ -12,7 +12,6 @@ import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'dart:io';
@@ -42,6 +41,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
   Widget build(BuildContext context) {
     viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
     if(!cnRunningWorkout.scrollController.hasClients){
+      cnRunningWorkout.scrollController.dispose();
       cnRunningWorkout.scrollController = ScrollController(initialScrollOffset: cnRunningWorkout.lastScrollPosition);
     }
 

@@ -221,36 +221,44 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
     calcVerticalStepSize();
 
-    return Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: cnScreenStatistics.gradientColors[0]),),
-              const Spacer(),
-            ],
-          ),
-          const SizedBox(height: 10,),
-          SzWrapper(
-            szController: szController,
-            childBuilder: (context){
-              return AspectRatio(
-                aspectRatio: cnScreenStatistics.width / (cnScreenStatistics.height * (cnScreenStatistics.orientation == Orientation.portrait? 0.6 : 0.7)),
-                child: Stack(
-                  children: [
-                    const StatisticsOverlay(),
-                    LineChart(
-                        duration: Duration(milliseconds: szController.stateManager.animationTime),
-                        curve: Curves.easeInOut,
-                        mainData()
-                    ),
-                  ],
-                ),
-              );
-            },
-          )
-        ]
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: cnScreenStatistics.gradientColors[0]),),
+                const Spacer(),
+              ],
+            ),
+            const SizedBox(height: 10,),
+            SzWrapper(
+              szController: szController,
+              childBuilder: (context){
+                return ValueListenableBuilder(
+                    valueListenable: cnScreenStatistics.heightExerciseLineChart,
+                    builder: (_, height, __) {
+                    return AspectRatio(
+                      aspectRatio: cnScreenStatistics.width / height,
+                      child: Stack(
+                        children: [
+                          const StatisticsOverlay(),
+                          LineChart(
+                              duration: Duration(milliseconds: szController.stateManager.animationTime),
+                              curve: Curves.easeInOut,
+                              mainData()
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                );
+              },
+            )
+          ]
+      ),
     );
   }
 
@@ -426,25 +434,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
               }
           )
       ),
-      gridData: FlGridData(
-        show: false,
-        // drawHorizontalLine: true,
-        // drawVerticalLine: true,
-        // horizontalInterval: verticalStepSize.toDouble(),
-        // verticalInterval: 30,
-        // getDrawingHorizontalLine: (value) {
-        //   return FlLine(
-        //     color: Colors.grey[700]!.withValues(alpha: 0.7),
-        //     strokeWidth: 1,
-        //   );
-        // },
-        // getDrawingVerticalLine: (value) {
-        //   return FlLine(
-        //     color: Colors.grey[700]!.withValues(alpha: 0.7),
-        //     strokeWidth: 1,
-        //   );
-        // },
-      ),
+      gridData: const FlGridData(show: false,),
       titlesData: FlTitlesData(
         show: true,
         rightTitles: const AxisTitles(

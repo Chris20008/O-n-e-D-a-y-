@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
@@ -9,10 +10,12 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/sz_controller.dart';
+import 'package:fitness_app/widgets/exercise_row.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:health/health.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -35,11 +38,21 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   bool initOrientation = true;
 
+  List<ObExercise> obExs = [];
+  List<Exercise> exs = [];
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // handleOrientation();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      cnScreenStatistics.scrollController.addListener((){
+        cnScreenStatistics.heightExerciseLineChart.value = (cnScreenStatistics.heightExerciseLineChartMax - cnScreenStatistics.scrollController.position.pixels)
+            .clamp(cnScreenStatistics.heightExerciseLineChartMin, cnScreenStatistics.heightExerciseLineChartMax);
+        cnScreenStatistics.lastScrollPosition = cnScreenStatistics.scrollController.position.pixels;
+      });
+    });
   }
 
   @override
@@ -77,20 +90,74 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       handleOrientation();
     }
 
+    if(!cnScreenStatistics.scrollController.hasClients){
+      cnScreenStatistics.scrollController.dispose();
+      cnScreenStatistics.scrollController = ScrollController(initialScrollOffset: cnScreenStatistics.lastScrollPosition);
+      cnScreenStatistics.heightExerciseLineChart.value = (cnScreenStatistics.heightExerciseLineChartMax - cnScreenStatistics.lastScrollPosition)
+          .clamp(cnScreenStatistics.heightExerciseLineChartMin, cnScreenStatistics.heightExerciseLineChartMax);
+    }
+
+    final tempMap = cnScreenStatistics.getSelectedExerciseHistory();
+    obExs = tempMap?.values.toList().reversed.toList()?? [];
+    exs = obExs.map((obEx) => Exercise.fromObExercise(obEx)).toList();
+
     return Stack(
       children: [
         InitialAnimatedScreen(
           animationControllerName: "ScreenStatistics",
           child: SafeArea(
             bottom: false,
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              shrinkWrap: false,
-              padding: const EdgeInsets.symmetric(horizontal: 5),
-              children: const [
-                HeaderScreenStatistics(),
-                ExerciseLineChart(),
-                SafeArea(top:false, child: SizedBox(height: 30,)),
+            child: Column(
+              // physics: const BouncingScrollPhysics(),
+              // shrinkWrap: false,
+              // padding: const EdgeInsets.symmetric(horizontal: 5),
+              children: [
+                const HeaderScreenStatistics(),
+                const ExerciseLineChart(),
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                      controller: cnScreenStatistics.scrollController,
+                      itemCount: exs.length + 1,
+                      itemBuilder: (context, index){
+                        if (index == 0){
+                          return ValueListenableBuilder(
+                              valueListenable: cnScreenStatistics.heightExerciseLineChart,
+                              builder: (_, height, __) {
+                              return SizedBox(
+                                height: cnScreenStatistics.scrollController.position.pixels.clamp(0, cnScreenStatistics.heightExerciseLineChartMax-cnScreenStatistics.heightExerciseLineChartMin),
+                              );
+                            }
+                          );
+                        }
+                        return Row(
+                          children: [
+                            Expanded(
+                                flex: 1,
+                                child: Center(child: Text(DateFormat("dd MMMyy").format(tempMap!.keys.toList().reversed.toList()[index-1])))
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: SizedBox(
+                                height: 50,
+                                child: ExerciseRow(
+                                  exercise: exs[index-1],
+                                  child: SizedBox(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                        // final color = index%2 == 0? Colors.green : Colors.red;
+                        // return Container(
+                        //   height: 30,
+                        //   width: double.maxFinite,
+                        //   color: color,
+                        // );
+                      }
+                  ),
+                ),
+                // SafeArea(top:false, child: SizedBox(height: 30,)),
               ],
             ),
           ),
@@ -114,6 +181,11 @@ class CnScreenStatistics extends ChangeNotifier {
   List<ObSickDays> allSickDays = [];
   GlobalKey backupOptionsKey = GlobalKey();
   SZController? szController;
+  ScrollController scrollController = ScrollController();
+  double lastScrollPosition = 0;
+  late final double heightExerciseLineChartMin = height * 0.2;
+  late final double heightExerciseLineChartMax = height * 0.6;
+  late ValueNotifier<double> heightExerciseLineChart = ValueNotifier<double>(height * 0.6);
 
   Exercise selectedExerciseFirst = Exercise();
   Exercise selectedExerciseLast = Exercise();
