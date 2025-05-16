@@ -8,6 +8,7 @@ class ScrollListener extends StatefulWidget {
   final double? maxOffset;
   final bool inverted;
   final Widget Function(BuildContext context, double value, double percent) builder;
+  final Curve? curve;
 
   const ScrollListener({
     super.key,
@@ -17,7 +18,8 @@ class ScrollListener extends StatefulWidget {
     this.minOffset = 0,
     this.maxOffset,
     required this.builder,
-    this.inverted = false
+    this.inverted = false,
+    this.curve = Curves.linear
   }) :
   // Ensure that the value range is valid
         assert(minValue < maxValue,
@@ -48,13 +50,16 @@ class ScrollListener extends StatefulWidget {
 
 class _ScrollListenerState extends State<ScrollListener> {
 
-  late final factor = (widget.maxValue-widget.minValue) / ((widget.maxOffset?? widget.maxValue) - widget.minOffset);
+  late final _linearFactor = (widget.maxValue-widget.minValue) / ((widget.maxOffset?? widget.maxValue) - widget.minOffset);
   late double value;
   late double percent;
+  late final _area = widget.maxValue-widget.minValue;
 
   @override
   void initState() {
     super.initState();
+    // percent = _calcPercentNew();
+    // value = _calcValueNew();
     value = _calcCurrentValue();
     percent = _calcPercent();
     widget.controller.addListener(_listener);
@@ -67,13 +72,29 @@ class _ScrollListenerState extends State<ScrollListener> {
       setState(() {
         value = newValue;
         percent = _calcPercent();
+        _applyCurve();
       });
     }
   }
 
+  void _applyCurve(){
+    if(widget.curve != Curves.linear){
+      percent = widget.inverted
+          ? widget.curve!.transform(percent)              /// value is already inverted
+          : widget.curve!.flipped.transform(percent);     /// invert again to revert invert
+      value = _area * percent;
+      value += widget.minValue;
+    }
+  }
+
   double _calcCurrentValue(){
-    final offset = widget.controller.hasClients? widget.controller.position.pixels : widget.controller.initialScrollOffset;
-    final currPosition = (offset - widget.minOffset) * factor;
+
+    /// either initialScrollOffset or current scrollPosition
+    final offset = widget.controller.hasClients
+        ? widget.controller.position.pixels
+        : widget.controller.initialScrollOffset;
+
+    final currPosition = (offset - widget.minOffset) * _linearFactor;
     final tempVal = (widget.maxValue - currPosition).clamp(widget.minValue, widget.maxValue);
     return widget.inverted? widget.maxValue + widget.minValue - tempVal : tempVal;
   }
