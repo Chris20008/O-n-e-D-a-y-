@@ -22,14 +22,14 @@ samples, guidance on mobile development, and a full API reference.
 Diese Dokumentation beschreibt im Detail jede Komponente im `lib/screens/`-Ordner, erklärt Aufbau, Klassen, Funktionen und die Datenflüsse zwischen den einzelnen Screens. Sie ist nach Funktionsbereichen gegliedert:
 
 1. [Main Screens](#1-main-screens)  
-   1.1 [Workout-Screen](#11-screen_workouts)  
-   1.2 [Statistics-Screen](#12-screen_statistics)  
-   1.3 [History-Screen](#13-screen_workout_history)  
+   1.1 [Workout-Screen](#1.1-screen_workouts)  
+   1.2 [Statistics-Screen](#1.2-screen_statistics)  
+   1.3 [History-Screen](#1.3-screen_workout_history)  
 2. [Other Screens](#2-other-screens)  
-   2.1 [Running-Workout-Screen](#21-screen_running_workout)  
-   2.2 [Settings-Screen](#22-screen_settings)  
-   2.3 [Backup-Datei-Picker](#23-local_file_picker)  
-   2.4 [Welcome-Screen](#24-welcome_screen)  
+   2.1 [Running-Workout-Screen](#2.1-screen_running_workout)  
+   2.2 [Settings-Screen](#2.2-screen_settings)  
+   2.3 [Backup-Datei-Picker](#2.3-local_file_picker)  
+   2.4 [Welcome-Screen](#2.4-welcome_screen)  
 3. [Zusammenhänge & Datenfluss](#3-zusammenhänge--datenfluss)
 
 ---
