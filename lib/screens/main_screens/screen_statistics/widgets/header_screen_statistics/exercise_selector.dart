@@ -151,7 +151,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
         children: [
           ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: cnScreenStatistics.width - 50
+              maxWidth: cnScreenStatistics.width - 130
             ),
             child: OverflowSafeText(
                 cnScreenStatistics.selectedExerciseName!,
@@ -162,7 +162,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
                 maxLines: 1
             ),
           ),
-          const SizedBox(width: 10,),
+          const SizedBox(width: 7,),
           trailingChoice(size: 17, color: Colors.white),
         ],
       ),

@@ -28,12 +28,7 @@ class _SzWrapperState extends State<SzWrapper> {
             child: ValueListenableBuilder(
               valueListenable: widget.szController.stateManager.state,
               builder: (_, state, __) {
-                return Stack(
-                  children: [
-                    // StatisticsOverlay(),
-                    widget.childBuilder(context)
-                  ],
-                );
+                return widget.childBuilder(context);
               }
             ),
           );

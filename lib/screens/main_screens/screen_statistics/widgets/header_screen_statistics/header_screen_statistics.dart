@@ -1,4 +1,5 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/header_screen_statistics/exercise_selector.dart';
+import 'package:fitness_app/widgets/scroll_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,10 +12,11 @@ class HeaderScreenStatistics extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CnScreenStatistics cnScreenStatistics = context.read<CnScreenStatistics>();
-    return Column(
+    return Stack(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             IconButton(
                 color: Colors.white,
@@ -26,6 +28,20 @@ class HeaderScreenStatistics extends StatelessWidget {
                   Icons.filter_list,
                 )
             ),
+            Expanded(
+              child: ScrollListener(
+                controller: cnScreenStatistics.scrollController.controller,
+                minValue: 5,
+                maxValue: 30,
+                maxOffset: cnScreenStatistics.heightExerciseLineChartMax,
+                builder: (context, value, percent) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: value),
+                    child: const ExerciseSelector(),
+                  );
+                },
+              ),
+            ),
             IconButton(
               // color: Colors.amber[200]!,
                 color: Colors.white,
@@ -36,9 +52,20 @@ class HeaderScreenStatistics extends StatelessWidget {
             ),
           ],
         ),
-        const Center(
-          child: ExerciseSelector(),
-        ),
+        // Center(
+        //   child: ScrollListener(
+        //     controller: cnScreenStatistics.scrollController,
+        //     minValue: 5,
+        //     maxValue: 30,
+        //     maxOffset: cnScreenStatistics.heightExerciseLineChartMax,
+        //     builder: (context, value) {
+        //       return Padding(
+        //         padding: EdgeInsets.only(top: value),
+        //         child: const ExerciseSelector(),
+        //       );
+        //     },
+        //   ),
+        // ),
       ],
     );
   }

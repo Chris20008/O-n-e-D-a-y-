@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/exercise_line_chart/statistics_overlay.dart';
@@ -10,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../../../../util/constants.dart';
+import '../../../../../../widgets/scroll_listener.dart';
 import '../../../screen_statistics.dart';
 import '../sz_wrapper.dart';
 
@@ -223,41 +226,49 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: cnScreenStatistics.gradientColors[0]),),
-                const Spacer(),
-              ],
-            ),
-            const SizedBox(height: 10,),
-            SzWrapper(
-              szController: szController,
-              childBuilder: (context){
-                return ValueListenableBuilder(
-                    valueListenable: cnScreenStatistics.heightExerciseLineChart,
-                    builder: (_, height, __) {
-                    return AspectRatio(
-                      aspectRatio: cnScreenStatistics.width / height,
-                      child: Stack(
-                        children: [
-                          const StatisticsOverlay(),
-                          LineChart(
-                              duration: Duration(milliseconds: szController.stateManager.animationTime),
-                              curve: Curves.easeInOut,
-                              mainData()
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                );
-              },
-            )
-          ]
+      child: ScrollListener(
+          minValue: cnScreenStatistics.heightExerciseLineChartMin,
+          maxValue: cnScreenStatistics.heightExerciseLineChartMax,
+          controller: cnScreenStatistics.scrollController.controller,
+          builder: (context, value, percent) {
+            return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: sqrt(percent) * 30,
+                    child: AnimatedOpacity(
+                      opacity: pow(percent, 3).toDouble(),
+                      duration: const Duration(milliseconds: 0),
+                      child: Text(AppLocalizations.of(context)!.statisticsMaxWeight, textScaler: const TextScaler.linear(1.2), style: TextStyle(color: cnScreenStatistics.gradientColors[0]),),
+                    ),
+                  ),
+                  const SizedBox(height: 10,),
+                  SzWrapper(
+                    szController: szController,
+                    childBuilder: (context){
+                      return AspectRatio(
+                        aspectRatio: cnScreenStatistics.width / value,
+                        child: Stack(
+                          children: [
+                            AnimatedOpacity(
+                              opacity: pow(percent, 3).toDouble(),
+                              duration: const Duration(milliseconds: 0),
+                              child: const StatisticsOverlay()
+                            ),
+                            LineChart(
+                                duration: Duration(milliseconds: szController.stateManager.animationTime),
+                                curve: Curves.easeInOut,
+                                mainData()
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                ]
+            );
+        }
       ),
     );
   }

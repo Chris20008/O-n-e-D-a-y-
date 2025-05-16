@@ -10,7 +10,6 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/sz_controller.dart';
-import 'package:fitness_app/widgets/exercise_row.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -22,6 +21,8 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
+import '../../../util/persistent_scroll_controller.dart';
+import '../../../widgets/scroll_listener.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings/screen_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -45,14 +46,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      cnScreenStatistics.scrollController.addListener((){
-        cnScreenStatistics.heightExerciseLineChart.value = (cnScreenStatistics.heightExerciseLineChartMax - cnScreenStatistics.scrollController.position.pixels)
-            .clamp(cnScreenStatistics.heightExerciseLineChartMin, cnScreenStatistics.heightExerciseLineChartMax);
-        cnScreenStatistics.lastScrollPosition = cnScreenStatistics.scrollController.position.pixels;
-      });
-    });
   }
 
   @override
@@ -90,12 +83,12 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
       handleOrientation();
     }
 
-    if(!cnScreenStatistics.scrollController.hasClients){
-      cnScreenStatistics.scrollController.dispose();
-      cnScreenStatistics.scrollController = ScrollController(initialScrollOffset: cnScreenStatistics.lastScrollPosition);
-      cnScreenStatistics.heightExerciseLineChart.value = (cnScreenStatistics.heightExerciseLineChartMax - cnScreenStatistics.lastScrollPosition)
-          .clamp(cnScreenStatistics.heightExerciseLineChartMin, cnScreenStatistics.heightExerciseLineChartMax);
-    }
+    cnScreenStatistics.scrollController.resume();
+
+    // if(!cnScreenStatistics.scrollController.controller.hasClients){
+    //   cnScreenStatistics.scrollController.controller.dispose();
+    //   cnScreenStatistics.scrollController.controller = ScrollController(initialScrollOffset: 150);
+    // }
 
     final tempMap = cnScreenStatistics.getSelectedExerciseHistory();
     obExs = tempMap?.values.toList().reversed.toList()?? [];
@@ -115,46 +108,56 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
                 const HeaderScreenStatistics(),
                 const ExerciseLineChart(),
                 Expanded(
-                  child: ListView.builder(
-                    physics: const BouncingScrollPhysics(),
-                      controller: cnScreenStatistics.scrollController,
-                      itemCount: exs.length + 1,
-                      itemBuilder: (context, index){
-                        if (index == 0){
-                          return ValueListenableBuilder(
-                              valueListenable: cnScreenStatistics.heightExerciseLineChart,
-                              builder: (_, height, __) {
-                              return SizedBox(
-                                height: cnScreenStatistics.scrollController.position.pixels.clamp(0, cnScreenStatistics.heightExerciseLineChartMax-cnScreenStatistics.heightExerciseLineChartMin),
-                              );
-                            }
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient:  const LinearGradient(
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                            colors: [
+                              Color(0xff2a1a0a),
+                              Color(0xff633e14),
+                            ]
+                        )
+                    ),
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                        controller: cnScreenStatistics.scrollController.controller,
+                        itemCount: exs.length + 1,
+                        itemBuilder: (context, index){
+                          if (index == 0){
+                            return ScrollListener(
+                                minValue: 0,
+                                maxValue: cnScreenStatistics.heightExerciseLineChartMax,
+                                controller: cnScreenStatistics.scrollController.controller,
+                                inverted: true,
+                                builder: (context, value, percent) {
+                                  return SizedBox(height: value);
+                              }
+                            );
+                          }
+                          final maxWeight = max(exs[index-1].sets.map((s) => s.weightAsTrimmedDouble?? 0))?? 0;
+                          return Container(
+                            padding: const EdgeInsets.all(5),
+                            margin: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              color: Colors.white.withValues(alpha: 0.05),
+                            ),
+                            child: Row(
+                              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                const SizedBox(width: 50,),
+                                Expanded(child: Align(alignment: Alignment.centerRight, child: Text(DateFormat("dd MMM yy").format(tempMap!.keys.toList().reversed.toList()[index-1])))),
+                                Expanded(child: Align(alignment: Alignment.centerRight, child: Text("${maxWeight.toString()} kg"))),
+                                const Spacer()
+                              ],
+                            ),
                           );
                         }
-                        return Row(
-                          children: [
-                            Expanded(
-                                flex: 1,
-                                child: Center(child: Text(DateFormat("dd MMMyy").format(tempMap!.keys.toList().reversed.toList()[index-1])))
-                            ),
-                            Expanded(
-                              flex: 3,
-                              child: SizedBox(
-                                height: 50,
-                                child: ExerciseRow(
-                                  exercise: exs[index-1],
-                                  child: SizedBox(),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                        // final color = index%2 == 0? Colors.green : Colors.red;
-                        // return Container(
-                        //   height: 30,
-                        //   width: double.maxFinite,
-                        //   color: color,
-                        // );
-                      }
+                    ),
                   ),
                 ),
                 // SafeArea(top:false, child: SizedBox(height: 30,)),
@@ -181,11 +184,14 @@ class CnScreenStatistics extends ChangeNotifier {
   List<ObSickDays> allSickDays = [];
   GlobalKey backupOptionsKey = GlobalKey();
   SZController? szController;
-  ScrollController scrollController = ScrollController();
+
+  final PersistentScrollController scrollController = PersistentScrollController();
+  // ScrollController get scrollController => _scrollController.controller;
+  // PersistentScrollController get persistentScrollController => _scrollController;
+
   double lastScrollPosition = 0;
   late final double heightExerciseLineChartMin = height * 0.2;
   late final double heightExerciseLineChartMax = height * 0.6;
-  late ValueNotifier<double> heightExerciseLineChart = ValueNotifier<double>(height * 0.6);
 
   Exercise selectedExerciseFirst = Exercise();
   Exercise selectedExerciseLast = Exercise();
