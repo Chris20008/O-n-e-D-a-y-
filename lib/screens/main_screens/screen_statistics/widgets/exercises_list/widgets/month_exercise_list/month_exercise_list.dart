@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../exercises_list.dart';
-import '../exercises_per_day/single_day.dart';
+import 'single_day.dart';
 
 class MonthExerciseList extends StatelessWidget {
   final MonthGroupedExercises groupedExercises;
