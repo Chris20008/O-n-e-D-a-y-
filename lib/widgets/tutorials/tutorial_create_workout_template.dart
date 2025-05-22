@@ -519,7 +519,6 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
 
         case "Add Exercise":{
           cnNewExercisePanel.openPanel(
-              workout: cnNewWorkOutPanel.workout,
               onConfirm: cnNewWorkOutPanel.confirmAddExercise
           );
           blockUserInput(context, duration: 1500);

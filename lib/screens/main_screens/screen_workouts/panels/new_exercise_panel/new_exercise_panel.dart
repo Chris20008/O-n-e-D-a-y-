@@ -1,6 +1,7 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/header.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/set_list_view.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../../objects/exercise.dart';
-import '../../../../../objects/workout.dart';
 import '../../../../../util/constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import '../../../../../widgets/bottom_menu.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -22,6 +24,8 @@ class NewExercisePanel extends StatefulWidget {
 
 class _NewExercisePanelState extends State<NewExercisePanel> with TickerProviderStateMixin{
   late CnNewExercisePanel cnNewExercise;
+  late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
+  late CnNewWorkOutPanel cnNewWorkOutPanel = Provider.of<CnNewWorkOutPanel>(context, listen: false);
 
   @override
   void initState() {
@@ -51,11 +55,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
         },
         child: MySlideUpPanel(
           key: cnNewExercise.key,
+          onPanelSlide: onPanelSlide,
           controller: cnNewExercise.panelController,
           backdropOpacity: 0.25,
           color: Theme.of(context).primaryColor,
           animationControllerName: "NewExercisePanel",
-          descendantAnimationControllerName: "NewWorkoutPanel",
+          descendantAnimationControllerName: cnBottomMenu.index == 2? "ScreenStatistics" : "NewWorkoutPanel",
           panelBuilder: (context, listView) {
             return Stack(
               children: [
@@ -74,6 +79,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       ),
     );
   }
+
+  void onPanelSlide(value){
+    if(cnNewWorkOutPanel.panelController.panelPosition < 0.1){
+      cnBottomMenu.adjustHeight(value);
+    }
+  }
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
@@ -89,11 +100,10 @@ class CnNewExercisePanel extends ChangeNotifier {
   final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
   Exercise exercise = Exercise();
-  // Workout workout = Workout();
   TextEditingController exerciseNameController = TextEditingController();
   ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
-  Function? onConfirm;
+  Function(Exercise ex)? onConfirm;
   final int animationTime = 500;
   late TickerProvider vsync;
   double iconSize = 25;
@@ -205,7 +215,6 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   /// SELECTORS
-  // Color(0xffdb7b01)
   Widget getRestInSecondsSelector({
     required BuildContext context,
     required Exercise exercise,
@@ -372,7 +381,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     );
   }
 
-  Future openPanel({required Workout workout, Exercise? exercise, Function? onConfirm})async{
+  Future openPanel({Exercise? exercise, Function(Exercise ex)? onConfirm})async{
     clear();
     if(exercise != null){
       setExercise(exercise);

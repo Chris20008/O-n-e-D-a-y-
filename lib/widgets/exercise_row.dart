@@ -12,6 +12,7 @@ class ExerciseRow extends StatelessWidget {
   final TextStyle? style;
   final EdgeInsetsGeometry? margin;
   final BorderRadius? borderRadius;
+  final bool shrinkWrap;
 
   const ExerciseRow({
     super.key,
@@ -23,7 +24,8 @@ class ExerciseRow extends StatelessWidget {
     this.flexRight = 7,
     this.style,
     this.margin,
-    this.borderRadius
+    this.borderRadius,
+    this.shrinkWrap = false
   });
 
   final double _widthOfField = 44;
@@ -32,7 +34,7 @@ class ExerciseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      height: double.maxFinite,
+      // height: double.maxFinite,
       decoration: BoxDecoration(
         // color: Theme.of(context).cardColor,
         // color: Color(0x921c1001),
@@ -57,6 +59,7 @@ class ExerciseRow extends StatelessWidget {
           SizedBox(
             height: _height,
             child: ListView(
+              shrinkWrap: shrinkWrap,
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 children: [

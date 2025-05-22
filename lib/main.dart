@@ -430,6 +430,9 @@ class _MyHomePageState extends State<MyHomePage>{
                 else if(!showWelcomeScreen)
                   const ScreenStatistics(),
 
+                if(cnBottomMenu.index == 2)
+                  const NewExercisePanel(),
+
                 const StandardPopUp(),
 
                 if(showWelcomeScreen)

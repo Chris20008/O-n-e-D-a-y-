@@ -230,6 +230,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
           minValue: cnScreenStatistics.heightExerciseLineChartMin,
           maxValue: cnScreenStatistics.heightExerciseLineChartMax,
           controller: cnScreenStatistics.scrollController.controller,
+          withMinValueStop: true,
           curve: Curves.easeOut,
           builder: (context, value, percent) {
             return Column(

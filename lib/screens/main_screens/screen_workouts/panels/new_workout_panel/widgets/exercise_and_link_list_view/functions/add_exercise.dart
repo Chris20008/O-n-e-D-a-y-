@@ -10,17 +10,17 @@ void addExercise({
   required int currentTutorialStep
 }){
     if(!tutorialIsRunning && cnNewWorkout.panelController.panelPosition > 0.99){
-      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
+      cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
     }
     else if(tutorialIsRunning && cnNewWorkout.panelController.isPanelOpen){
       if(currentTutorialStep < 2){
         FocusScope.of(context).unfocus();
       }
       else{
-        cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
+        cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
       }
     }
     else{
-      cnNewExercisePanel.openPanel(workout: cnNewWorkout.workout, onConfirm: cnNewWorkout.confirmAddExercise);
+      cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
     }
   }

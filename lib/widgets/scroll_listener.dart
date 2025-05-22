@@ -9,6 +9,7 @@ class ScrollListener extends StatefulWidget {
   final bool inverted;
   final Widget Function(BuildContext context, double value, double percent) builder;
   final Curve? curve;
+  final bool withMinValueStop;
 
   const ScrollListener({
     super.key,
@@ -19,7 +20,8 @@ class ScrollListener extends StatefulWidget {
     this.maxOffset,
     required this.builder,
     this.inverted = false,
-    this.curve = Curves.linear
+    this.curve = Curves.linear,
+    this.withMinValueStop = false
   }) :
   // Ensure that the value range is valid
         assert(minValue < maxValue,
@@ -53,13 +55,14 @@ class _ScrollListenerState extends State<ScrollListener> {
   late final _linearFactor = (widget.maxValue-widget.minValue) / ((widget.maxOffset?? widget.maxValue) - widget.minOffset);
   late double value;
   late double percent;
+  double nonClampedValue = 0;
+  double previousNonClampedValue = 0;
+  bool canJump = true;
   late final _area = widget.maxValue-widget.minValue;
 
   @override
   void initState() {
     super.initState();
-    // percent = _calcPercentNew();
-    // value = _calcValueNew();
     value = _calcCurrentValue();
     percent = _calcPercent();
     widget.controller.addListener(_listener);
@@ -69,12 +72,60 @@ class _ScrollListenerState extends State<ScrollListener> {
     final newValue = _calcCurrentValue();
 
     if(newValue != value){
+
       setState(() {
         value = newValue;
         percent = _calcPercent();
         _applyCurve();
       });
+
+      _handleMinValueStop();
     }
+    else{
+      canJump = true;
+    }
+  }
+
+  void _handleMinValueStop(){
+    if(!widget.withMinValueStop || !widget.controller.hasClients){
+      return;
+    }
+
+    if(_doStopScrollDown()){
+      widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
+      canJump = false;
+    }
+    else if(!canJump){
+      if(previousNonClampedValue > widget.minValue){
+        canJump = true;
+      }
+      return;
+    }
+    else if(_doStopScrollUp()){
+      // nonClampedValue = previousNonClampedValue;
+      // previousNonClampedValue = nonClampedValue;
+      widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
+      // nonClampedValue = previousNonClampedValue;
+      // previousNonClampedValue = nonClampedValue;
+      canJump = false;
+    }
+  }
+
+  bool _doStopScrollDown(){
+    if(widget.inverted){
+      return value == widget.maxValue;
+    }
+    return value == widget.minValue;
+  }
+
+  bool _doStopScrollUp(){
+    /// ToDo implement inverted
+    // if(widget.inverted){
+    //   return previousNonClampedValue > widget.maxValue  /// previous pos was bigger than max value means that the user is scrolling up
+    //       && widget.maxValue >= nonClampedValue;
+    // }
+    return previousNonClampedValue < widget.minValue    /// previous pos was bigger than max value means that the user is scrolling up
+        && widget.minValue < nonClampedValue;
   }
 
   void _applyCurve(){
@@ -88,6 +139,7 @@ class _ScrollListenerState extends State<ScrollListener> {
   }
 
   double _calcCurrentValue(){
+    previousNonClampedValue = nonClampedValue;
 
     /// either initialScrollOffset or current scrollPosition
     final offset = widget.controller.hasClients
@@ -95,14 +147,15 @@ class _ScrollListenerState extends State<ScrollListener> {
         : widget.controller.initialScrollOffset;
 
     final currPosition = (offset - widget.minOffset) * _linearFactor;
-    final tempVal = (widget.maxValue - currPosition).clamp(widget.minValue, widget.maxValue);
+    nonClampedValue = (widget.maxValue - currPosition);
+
+    final tempVal = nonClampedValue.clamp(widget.minValue, widget.maxValue);
     return widget.inverted? widget.maxValue + widget.minValue - tempVal : tempVal;
   }
 
   double _calcPercent(){
     final tempPercent = (value-widget.minValue) / (widget.maxValue - widget.minValue);
     return tempPercent.clamp(0, 1);
-    // return widget.inverted? 1 - tempPercent : tempPercent;
   }
 
   @override

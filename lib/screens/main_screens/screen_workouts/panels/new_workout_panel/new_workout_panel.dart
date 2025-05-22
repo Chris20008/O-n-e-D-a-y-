@@ -306,7 +306,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     }
 
     if(panelController.isPanelOpen){
-      cnNewExercisePanel.openPanel(workout: workout, exercise: exToEdit, onConfirm: confirmAddExercise);
+      cnNewExercisePanel.openPanel(exercise: exToEdit, onConfirm: confirmAddExercise);
     }
   }
 

@@ -82,7 +82,7 @@ class Exercise{
       description: ex.description
   );
 
-  ObExercise toObExercise(){
+  ObExercise toObExercise({bool withId = false}){
     List<double> weights = [];
     List<int> amounts = [];
     List<int> setTypes = [];
@@ -93,6 +93,7 @@ class Exercise{
       setTypes.add(set.setType?? 0);
     }
     return ObExercise(
+        id: withId? id : 0,
         name: name,
         weights: weights,
         amounts: amounts,

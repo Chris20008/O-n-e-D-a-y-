@@ -5,6 +5,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/objects/exercise.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/exercise_line_chart/exercise_line_chart.dart';
+import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/exercises_list/exercises_list.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/header_screen_statistics/header_screen_statistics.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -14,7 +15,6 @@ import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:health/health.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -22,7 +22,6 @@ import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../util/persistent_scroll_controller.dart';
-import '../../../widgets/scroll_listener.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings/screen_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,9 +37,6 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
   late CnScreenStatistics cnScreenStatistics;
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   bool initOrientation = true;
-
-  List<ObExercise> obExs = [];
-  List<Exercise> exs = [];
 
   @override
   void initState() {
@@ -85,87 +81,22 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
 
     cnScreenStatistics.scrollController.resume();
 
-    // if(!cnScreenStatistics.scrollController.controller.hasClients){
-    //   cnScreenStatistics.scrollController.controller.dispose();
-    //   cnScreenStatistics.scrollController.controller = ScrollController(initialScrollOffset: 150);
-    // }
-
-    final tempMap = cnScreenStatistics.getSelectedExerciseHistory();
-    obExs = tempMap?.values.toList().reversed.toList()?? [];
-    exs = obExs.map((obEx) => Exercise.fromObExercise(obEx)).toList();
-
-    return Stack(
+    return const Stack(
       children: [
         InitialAnimatedScreen(
           animationControllerName: "ScreenStatistics",
           child: SafeArea(
             bottom: false,
             child: Column(
-              // physics: const BouncingScrollPhysics(),
-              // shrinkWrap: false,
-              // padding: const EdgeInsets.symmetric(horizontal: 5),
               children: [
-                const HeaderScreenStatistics(),
-                const ExerciseLineChart(),
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    margin: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        gradient:  const LinearGradient(
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                            colors: [
-                              Color(0xff2a1a0a),
-                              Color(0xff633e14),
-                            ]
-                        )
-                    ),
-                    child: ListView.builder(
-                      physics: const BouncingScrollPhysics(),
-                        controller: cnScreenStatistics.scrollController.controller,
-                        itemCount: exs.length + 1,
-                        itemBuilder: (context, index){
-                          if (index == 0){
-                            return ScrollListener(
-                                minValue: 0,
-                                maxValue: cnScreenStatistics.heightExerciseLineChartMax,
-                                controller: cnScreenStatistics.scrollController.controller,
-                                inverted: true,
-                                builder: (context, value, percent) {
-                                  return SizedBox(height: value);
-                              }
-                            );
-                          }
-                          final maxWeight = max(exs[index-1].sets.map((s) => s.weightAsTrimmedDouble?? 0))?? 0;
-                          return Container(
-                            padding: const EdgeInsets.all(5),
-                            margin: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white.withValues(alpha: 0.05),
-                            ),
-                            child: Row(
-                              // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                const SizedBox(width: 50,),
-                                Expanded(child: Align(alignment: Alignment.centerRight, child: Text(DateFormat("dd MMM yy").format(tempMap!.keys.toList().reversed.toList()[index-1])))),
-                                Expanded(child: Align(alignment: Alignment.centerRight, child: Text("${maxWeight.toString()} kg"))),
-                                const Spacer()
-                              ],
-                            ),
-                          );
-                        }
-                    ),
-                  ),
-                ),
-                // SafeArea(top:false, child: SizedBox(height: 30,)),
+                HeaderScreenStatistics(),
+                ExerciseLineChart(),
+                ExercisesList()
               ],
             ),
           ),
         ),
-        const SettingsPanel(),
+        SettingsPanel(),
       ],
     );
   }

@@ -222,8 +222,11 @@ class CnBottomMenu extends ChangeNotifier {
   ///
   /// 1 = completely Visible
   void adjustHeight(double value){
-    positionYAxis = height * value;
-    refresh();
+    final newPositionYAxis = height * value;
+    if(newPositionYAxis != positionYAxis){
+      positionYAxis = newPositionYAxis;
+      refresh();
+    }
   }
 
   int get index => _selectedIndex;
