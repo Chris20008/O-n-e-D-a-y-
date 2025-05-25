@@ -125,7 +125,7 @@ class _SpotifyBarState extends State<SpotifyBar> with WidgetsBindingObserver {
                 child: SizedBox(
                   height: cnSpotifyBar.height,
                   width: cnSpotifyBar.width - paddingLeftRight*2,
-                  child: BlockSwipeBack(
+                  child: BlockGesture(
                     withPadding: true,
                     child: Stack(
                       children: [

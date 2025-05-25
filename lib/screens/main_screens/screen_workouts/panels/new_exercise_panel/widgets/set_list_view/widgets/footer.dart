@@ -22,12 +22,13 @@ class Footer extends StatelessWidget {
         const SizedBox(height: 15,),
 
         getRowButton(
-            key: cnNewExercise.addSetKey,
+            key: cnNewExercise.getKeyAddSet(context),
             context: context,
             minusWidth: 20,
             onPressed: () => cnNewExercise.addSet(
                 screenHeight: screenHeight,
-                insetsBottom: insetsBottom
+                insetsBottom: insetsBottom,
+                context: context
             )
         ),
 

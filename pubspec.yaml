@@ -110,7 +110,6 @@ flutter:
   assets:
     - lib/assets/
     - lib/assets/pictures/
-    - lib/assets/exercises/
     - dotenv.env
 
   fonts:

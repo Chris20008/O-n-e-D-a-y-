@@ -288,7 +288,8 @@ class _SetRowState extends State<SetRow>{
     );
 
     if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
-      child = BlockSwipeBack(
+      child = BlockGesture(
+        // withPadding: true,
         child: Slidable(
             key: set.slidableKey,
             endActionPane: ActionPane(

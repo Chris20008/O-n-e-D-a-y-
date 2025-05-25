@@ -31,7 +31,7 @@ class _BannerRunningWorkoutState extends State<BannerRunningWorkout> {
             return AnimatedCrossFade(
                 firstChild: const SizedBox(width: double.maxFinite),
                 secondChild: ClipRRect(
-                  child: BlockSwipeBack(
+                  child: BlockGesture(
                     child: BackdropFilter(
                       filter: ImageFilter.blur(
                           sigmaX: 10.0,

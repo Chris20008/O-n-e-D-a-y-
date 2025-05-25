@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/slidable_single_set/widgets/left_text_field/left_text_field.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/widgets/slidable_single_set/widgets/right_text_field/right_text_field.dart';
+import 'package:fitness_app/widgets/block_swipe_back.dart';
 import 'package:fitness_app/widgets/set_type_selector.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,42 +32,51 @@ class SlidableSingleSet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Slidable(
-        key: key,
-        endActionPane: buildSetEndActionPane(index: index, cnNewExercise: cnNewExercise),
+    return SizedBox(
+      height: cnNewExercise.heightSetWeightAmount + 4,
+      child: BlockGesture(
+        withPadding: true,
         child: Padding(
-          padding: const EdgeInsets.only(top: 3, bottom: 3),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              SetTypeSelector(
-                  index: index,
-                  newEx: cnNewExercise.exercise,
-                  width: 50,
-                  onConfirm: (){
-                    cnNewExercise.refresh();
-                  }
-              ),
+          padding: Platform.isAndroid? const EdgeInsets.symmetric(horizontal: 20) : EdgeInsets.zero,
+          child: Slidable(
+              key: key,
+              endActionPane: buildSetEndActionPane(index: index, cnNewExercise: cnNewExercise),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 3, bottom: 3),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    SetTypeSelector(
+                        index: index,
+                        newEx: cnNewExercise.exercise,
+                        width: 50,
+                        onConfirm: (){
+                          cnNewExercise.refresh();
+                        }
+                    ),
 
-              /// Weight
-              LeftTextField(
-                  index: index,
-                  insetsBottom: insetsBottom,
-                  screenHeight: screenHeight,
-                  cnNewExercise: cnNewExercise
-              ),
+                    /// Weight
+                    LeftTextField(
+                        index: index,
+                        insetsBottom: insetsBottom,
+                        screenHeight: screenHeight,
+                        cnNewExercise: cnNewExercise
+                    ),
 
-              /// Amount
-              RightTextField(
-                  index: index,
-                  insetsBottom: insetsBottom,
-                  screenHeight: screenHeight,
-                  cnHomepage: cnHomepage,
-                  cnNewExercise: cnNewExercise
-              ),
-            ],
+                    /// Amount
+                    RightTextField(
+                        index: index,
+                        insetsBottom: insetsBottom,
+                        screenHeight: screenHeight,
+                        cnHomepage: cnHomepage,
+                        cnNewExercise: cnNewExercise
+                    ),
+                  ],
+                ),
+              )
           ),
-        )
+        ),
+      ),
     );
   }
 }

@@ -153,7 +153,7 @@ extension DateOnlyCompare on DateTime {
   }
 }
 
-extension List_E on List {
+extension ListExtension on List {
   List getDuplicates(){
     List dupes = List.from(this);
     Set dupes2 = Set.from(this);
@@ -161,5 +161,35 @@ extension List_E on List {
       dupes.remove(element);
     }
     return dupes;
+  }
+}
+
+extension StringExtensions on String{
+  bool startsWithLatinLetter(){
+    if (length == 0) return false;
+
+    String char = this[0];
+
+    final normalized = char.toLowerCase().normalizeGermanUmlauts();
+
+    return normalized.codeUnitAt(0) >= 'a'.codeUnitAt(0) &&
+        normalized.codeUnitAt(0) <= 'z'.codeUnitAt(0);
+  }
+
+  String normalizeGermanUmlauts({bool trimmed = false}) {
+    if(trimmed){
+      return replaceAll('ä', 'a')
+          .replaceAll('ö', 'o')
+          .replaceAll('ü', 'u')
+          .replaceAll('Ä', 'A')
+          .replaceAll('Ö', 'O')
+          .replaceAll('Ü', 'U');
+    }
+    return replaceAll('ä', 'ae')
+        .replaceAll('ö', 'oe')
+        .replaceAll('ü', 'ue')
+        .replaceAll('Ä', 'Ae')
+        .replaceAll('Ö', 'Oe')
+        .replaceAll('Ü', 'Ue');
   }
 }

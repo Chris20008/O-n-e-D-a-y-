@@ -22,7 +22,7 @@ class _ExerciseOptionsSelectorsState extends State<ExerciseOptionsSelectors> {
     CnNewWorkOutPanel cnNewWorkOut = Provider.of<CnNewWorkOutPanel>(context);
 
     return CupertinoListSection.insetGrouped(
-      key: cnNewExercise.keyHeader,
+      key: cnNewExercise.getKeyHeader(context),
       decoration: BoxDecoration(
           color: Theme.of(context).cardColor
       ),

@@ -55,7 +55,7 @@ class _StopwatchWidgetState extends State<StopwatchWidget> {
                   color: Colors.black,
                   height: cnStopwatchWidget.heightOfTimer,
                   width: width - paddingLeftRight*2,
-                  child: BlockSwipeBack(
+                  child: BlockGesture(
                     withPadding: true,
                     child: Stack(
                       alignment: Alignment.center,

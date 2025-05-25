@@ -1,5 +1,5 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/header.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/new_exercise_header.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/set_list_view/set_list_view.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
@@ -14,6 +14,7 @@ import '../../../../../util/constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../../widgets/bottom_menu.dart';
+import '../../../../../widgets/exercise_context_id.dart';
 
 class NewExercisePanel extends StatefulWidget {
   const NewExercisePanel({super.key});
@@ -68,7 +69,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
                   onTap: () {
                     FocusManager.instance.primaryFocus?.unfocus();
                   },
-                  child: SetListView(listView: listView),
+                  child: const SetListView(),
                 ),
 
                 const NewExerciseHeader()
@@ -90,13 +91,16 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 class CnNewExercisePanel extends ChangeNotifier {
   final PanelController panelController = PanelController();
 
-  GlobalKey keyHeader = GlobalKey();
-  GlobalKey keyExerciseName = GlobalKey();
-  GlobalKey keySetRow = GlobalKey();
-  GlobalKey keySaveButton = GlobalKey();
-  GlobalKey addSetKey = GlobalKey();
+  final GlobalKey keyHeader = GlobalKey();
+  final GlobalKey keyExerciseName = GlobalKey();
+  final GlobalKey keySetRow = GlobalKey();
+  final GlobalKey keySaveButton = GlobalKey();
+  final GlobalKey keyAddSet = GlobalKey();
+  // final formKey = GlobalKey<FormState>();
+  final Map<String, GlobalKey<FormState>> _formKeys = {};
 
-  final formKey = GlobalKey<FormState>();
+  String defaultContextId = "panel";
+
   final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
   Exercise exercise = Exercise();
@@ -107,17 +111,41 @@ class CnNewExercisePanel extends ChangeNotifier {
   final int animationTime = 500;
   late TickerProvider vsync;
   double iconSize = 25;
-  double heightHeader = 130.0;
+  double heightHeader = 140.0;
   double widthSetWeightAmount = 55;
   double heightSetWeightAmount = 35;
-  bool useTutorialKey = true;
   final TextStyle _style = const TextStyle(color: Colors.white, fontSize: 18);
   int currentIndexFocus = 0;
   int currentIndexWeightOrAmount = 0;
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
-  late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+  // late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
   late List<List<FocusNode>> focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
+
+  GlobalKey<FormState> getFormKey(BuildContext context) {
+    final id = ExerciseContextId.of(context);
+    return _formKeys.putIfAbsent(id, () => GlobalKey<FormState>());
+  }
+
+  GlobalKey? getKeySaveButton(BuildContext context) {
+    return isDefaultContext(context)? keySaveButton : null;
+  }
+
+  GlobalKey? getKeyExerciseName(BuildContext context) {
+    return isDefaultContext(context)? keyExerciseName : null;
+  }
+
+  GlobalKey? getKeyHeader(BuildContext context) {
+    return isDefaultContext(context)? keyHeader : null;
+  }
+
+  GlobalKey? getKeyAddSet(BuildContext context) {
+    return isDefaultContext(context)? keyAddSet : null;
+  }
+
+  bool isDefaultContext(context){
+    return ExerciseContextId.of(context) == defaultContextId;
+  }
 
   CnNewExercisePanel(){
     clear();
@@ -129,23 +157,23 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   void onCancel(BuildContext context){
     closePanel(doClear: true, context: context);
-    formKey.currentState?.reset();
+    getFormKey(context).currentState?.reset();
     vibrateCancel();
   }
 
   void dismissSet(int index){
-    useTutorialKey = false;
     exercise.sets.removeAt(index);
     slidableKeys.removeAt(index);
     controllers.removeAt(index);
-    ensureVisibleKeys.removeAt(index);
+    // ensureVisibleKeys.removeAt(index);
     focusNodes.removeAt(index);
     refresh();
   }
 
   void addSet({
     required double insetsBottom ,
-    required double screenHeight
+    required double screenHeight,
+    required BuildContext context
   }){
     final previousSet = exercise.sets.last;
     exercise.addSet(weight: previousSet.weight, amount: previousSet.amount);
@@ -154,9 +182,9 @@ class CnNewExercisePanel extends ChangeNotifier {
       TextEditingController(text: controllers.last[0].text),
       TextEditingController(text: controllers.last[1].text)
     ]);
-    ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
+    // ensureVisibleKeys.add([GlobalKey(), GlobalKey()]);
     focusNodes.add([FocusNode(), FocusNode()]);
-    final RenderObject? renderObject = addSetKey.currentContext?.findRenderObject();
+    final RenderObject? renderObject = getKeyAddSet(context)?.currentContext?.findRenderObject();
     if (renderObject is RenderBox) {
       final Offset widgetPosition = renderObject.localToGlobal(Offset.zero);
       final Size widgetSize = renderObject.size;
@@ -172,7 +200,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     exercise = ex;
     slidableKeys = exercise.generateKeyForEachSet();
     controllers = exercise.sets.map((set) => ([TextEditingController(text: "${set.weightAsTrimmedDouble}"), TextEditingController(text: "${exercise.categoryIsReps()? (set.amount) : parseTextControllerAmountToTime(set.amount)[1]}")])).toList();
-    ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+    // ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     exerciseNameController = TextEditingController(text: exercise.name);
   }
@@ -189,7 +217,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void closePanelAndSaveExercise(BuildContext context) async{
-    if (formKey.currentState!.validate() && exercise.name.isNotEmpty) {
+    if (getFormKey(context).currentState!.validate() && exercise.name.isNotEmpty) {
       final copy = Exercise.copy(exercise);
       copy.removeEmptySets();
 
@@ -413,10 +441,13 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   void clear({bool withRefresh = true}){
     exercise = Exercise();
-    formKey.currentState?.reset();
+    for(MapEntry<String, GlobalKey<FormState>> e in _formKeys.entries){
+      e.value.currentState?.reset();
+    }
+    // formKey.currentState?.reset();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
-    ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
+    // ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     if(withRefresh){
       refresh();

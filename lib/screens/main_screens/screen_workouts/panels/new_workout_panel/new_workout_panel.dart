@@ -123,9 +123,6 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   void onPanelSlide(value){
     if(value == 0){
-      // if(cnNewWorkout.minPanelHeight == 0){
-      //   cnNewWorkout.clear(doRefresh: true);
-      // }
       cnNewWorkout.refresh();
     }
     else if(value == 1){

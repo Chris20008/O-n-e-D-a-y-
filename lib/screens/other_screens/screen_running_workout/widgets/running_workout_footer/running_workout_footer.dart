@@ -18,7 +18,7 @@ class RunningWorkoutFooter extends StatelessWidget {
     late CnSelectorExerciseToUpdate cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen: false);
 
     return ClipRRect(
-      child: BlockSwipeBack(
+      child: BlockGesture(
         child: BackdropFilter(
           filter: ImageFilter.blur(
               sigmaX: 10.0,

@@ -238,8 +238,6 @@ class _RunningWorkoutContentState extends State<RunningWorkoutContent> {
                 && groupedExerciseKey.contains(currentDraggingKey!))
             ? ValueKey(groupedExerciseKey)
             : UniqueKey(),
-        // key: key,
-        // key: ValueKey(groupedExerciseKey),
         child: child?? const SizedBox());
   }
 }

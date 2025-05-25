@@ -16,11 +16,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SetListView extends StatefulWidget {
-  final PanelListViewBuilder listView;
+  final ScrollController? controller;
 
   const SetListView({
     super.key,
-    required this.listView
+    this.controller
   });
 
   @override
@@ -35,6 +35,14 @@ class _SetListViewState extends State<SetListView> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
 
+  final sc = ScrollController();
+
+  @override
+  void dispose() {
+    sc.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -43,9 +51,9 @@ class _SetListViewState extends State<SetListView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return SlidableAutoCloseBehavior(
-      child: widget.listView(
-        padding: EdgeInsets.only(top: cnNewExercise.heightHeader),
-        controller: cnNewExercise.scrollController,
+      child: ListViewScope.of(context).listView(
+        padding: EdgeInsets.only(top: cnNewExercise.heightHeader - 10),
+        controller: cnNewExercise.isDefaultContext(context)? cnNewExercise.scrollController : widget.controller?? sc,
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         children: [
@@ -69,7 +77,7 @@ class _SetListViewState extends State<SetListView> {
             itemCount: cnNewExercise.exercise.sets.length,
             itemBuilder: (BuildContext context, int index) {
               return SlidableSingleSet(
-                  key: tutorialIsRunning && index == 0 && cnNewExercise.useTutorialKey? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
+                  key: tutorialIsRunning && index == 0 && cnNewExercise.isDefaultContext(context)? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
                   index: index,
                   insetsBottom: insetsBottom,
                   screenHeight: screenHeight,

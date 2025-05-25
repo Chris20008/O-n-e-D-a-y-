@@ -56,7 +56,7 @@ class Exercise{
       bodyWeightPercent: e.bodyWeightPercent
   );
 
-  /// Don't clone the original name
+  /// Don't copy the original id
   Exercise.copy(Exercise ex): this(
       name: ex.name,
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),

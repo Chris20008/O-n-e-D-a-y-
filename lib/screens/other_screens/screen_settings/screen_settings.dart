@@ -87,11 +87,9 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     cnBottomMenu.adjustHeight(value);
     if(value > 0 && !setOrientation){
       setOrientation = true;
-      // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     }
     else if (value == 0 && setOrientation){
       setOrientation = false;
-      // SystemChrome.setPreferredOrientations([]);
     }
   }
 

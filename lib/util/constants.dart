@@ -156,6 +156,12 @@ const trailingArrow = Icon(
   color: Colors.grey,
 );
 
+const trailingArrowBack = Icon(
+  Icons.arrow_back_ios,
+  size: 14,
+  color: Colors.grey,
+);
+
 Widget trailingChoice({double size = 16, Color color = Colors.grey}){
  return Stack(
    alignment: Alignment.center,
@@ -1457,13 +1463,14 @@ Offset getWidgetPosition(GlobalKey key) {
 
 Size getWidgetSize(GlobalKey key){
   Size size = const Size(0, 0);
-  // WidgetsBinding.instance.addPostFrameCallback((_) {
+  try{
     final RenderBox? renderBox =
     key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       size = renderBox.size;
     }
-  // });
+  }
+  catch (_) {}
   return size;
 }
 
@@ -1519,3 +1526,4 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
     overlayEntry.remove();
   });
 }
+

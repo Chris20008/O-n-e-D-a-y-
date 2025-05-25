@@ -54,7 +54,7 @@ class _CancelSaveRowState extends State<CancelSaveRow> {
                       : cnNewWorkout.isSickDays
                       ? AppLocalizations.of(context)!.statisticsSick
                       : " ", /// Due to Fitted Box the length must be greater than 0
-                  textScaler: const TextScaler.linear(1.3),
+                  style: const TextStyle(fontSize: 17),
                   // style: TextStyle(color: Colors.grey)
                 ),
               ),

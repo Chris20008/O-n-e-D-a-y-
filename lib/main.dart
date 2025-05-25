@@ -4,6 +4,7 @@ import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_w
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/selector_exercises_to_update.dart';
@@ -15,10 +16,10 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/util/objectbox/object_box.dart';
-import 'package:fitness_app/widgets/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
+import 'package:fitness_app/widgets/exercise_context_id.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/show_new_features_pop_up.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
@@ -421,9 +422,15 @@ class _MyHomePageState extends State<MyHomePage>{
 
                       const NewWorkOutPanel(),
 
-                      const NewExercisePanel(),
+                      ExerciseContextId(
+                          id: cnNewExercise.defaultContextId,
+                          child: const NewExercisePanel()
+                      ),
 
-                      // const AllExercisesPanel(),
+                      const ExerciseContextId(
+                          id: "newExercise",
+                          child: AllExercisesPanel()
+                      ),
                     ],
                   )
 
@@ -431,7 +438,10 @@ class _MyHomePageState extends State<MyHomePage>{
                   const ScreenStatistics(),
 
                 if(cnBottomMenu.index == 2)
-                  const NewExercisePanel(),
+                  ExerciseContextId(
+                      id: cnNewExercise.defaultContextId,
+                      child: const NewExercisePanel()
+                ),
 
                 const StandardPopUp(),
 
@@ -528,11 +538,7 @@ class _MyHomePageState extends State<MyHomePage>{
                 //   child: ElevatedButton(
                 //     child: Text("Test"),
                 //     onPressed: ()async{
-                //       Navigator.push(
-                //           context,
-                //           MaterialPageRoute(
-                //               builder: (context) => const LocalFilePicker()
-                //           ));
+                //       cnAllExercisesPanel.openPanel();
                 //     },
                 //   ),
                 // )

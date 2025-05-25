@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-class BlockSwipeBack extends StatelessWidget {
+class BlockGesture extends StatelessWidget {
   final Widget? child;
   final bool doBlock;
   final bool withPadding;
+  final String tag;
 
-  const BlockSwipeBack({
+  const BlockGesture({
     super.key,
     this.child,
     this.doBlock = true,
-    this.withPadding = false
+    this.withPadding = false,
+    this.tag = "blockSwipeBack"
   });
 
   @override
@@ -20,15 +23,14 @@ class BlockSwipeBack extends StatelessWidget {
 
     if(withPadding){
       return Stack(
-        // alignment: Alignment.center,
         children: [
           child?? const SizedBox(),
-          const Padding(
-            padding: EdgeInsets.only(left: 20),
+          Padding(
+            padding: const EdgeInsets.only(left: 20),
             child: MetaData(
-                metaData: "blockSwipeBack",
+                metaData: tag,
                 behavior: HitTestBehavior.translucent,
-                child: SizedBox(height: double.maxFinite, width: double.maxFinite,)
+                child: const SizedBox(height: double.maxFinite, width: double.maxFinite,)
             ),
           ),
         ],
@@ -36,7 +38,7 @@ class BlockSwipeBack extends StatelessWidget {
     }
 
     return MetaData(
-        metaData: "blockSwipeBack",
+        metaData: tag,
         behavior: HitTestBehavior.opaque,
         child: child?? const SizedBox(height: double.maxFinite, width: double.maxFinite,)
     );
