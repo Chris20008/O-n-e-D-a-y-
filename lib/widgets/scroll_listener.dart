@@ -57,7 +57,8 @@ class _ScrollListenerState extends State<ScrollListener> {
   late double percent;
   double nonClampedValue = 0;
   double previousNonClampedValue = 0;
-  bool canJump = true;
+  bool canJumpScrollUp = true;
+  bool canJumpScrollDown = true;
   late final _area = widget.maxValue-widget.minValue;
 
   @override
@@ -82,7 +83,8 @@ class _ScrollListenerState extends State<ScrollListener> {
       _handleMinValueStop();
     }
     else{
-      canJump = true;
+      canJumpScrollUp = true;
+      canJumpScrollDown = true;
     }
   }
 
@@ -91,23 +93,27 @@ class _ScrollListenerState extends State<ScrollListener> {
       return;
     }
 
-    if(_doStopScrollDown()){
+    if(canJumpScrollDown && _doStopScrollDown()){
       widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
-      canJump = false;
+      canJumpScrollUp = false;
+      canJumpScrollDown = false;
     }
-    else if(!canJump){
+    else if(!canJumpScrollUp){
       if(previousNonClampedValue > widget.minValue){
-        canJump = true;
+        canJumpScrollUp = true;
       }
       return;
     }
-    else if(_doStopScrollUp()){
-      // nonClampedValue = previousNonClampedValue;
-      // previousNonClampedValue = nonClampedValue;
+    else if(!canJumpScrollDown){
+      if(previousNonClampedValue > widget.minValue){
+        canJumpScrollDown = true;
+      }
+      return;
+    }
+    else if(canJumpScrollUp && _doStopScrollUp()){
       widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
-      // nonClampedValue = previousNonClampedValue;
-      // previousNonClampedValue = nonClampedValue;
-      canJump = false;
+      canJumpScrollUp = false;
+      canJumpScrollDown = false;
     }
   }
 

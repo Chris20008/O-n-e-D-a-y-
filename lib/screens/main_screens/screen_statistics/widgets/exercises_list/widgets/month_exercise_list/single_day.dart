@@ -57,7 +57,7 @@ class SingleDay extends StatelessWidget {
             builder: (context){
 
               return ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height * 0.2,
@@ -78,7 +78,10 @@ class SingleDay extends StatelessWidget {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(DateFormat("d. MMMM yyyy").format(exercise.date)),
+                              Text(
+                                DateFormat("d. MMMM yyyy").format(exercise.date),
+                                textScaler: const TextScaler.linear(1.2),
+                              ),
                               const SizedBox(height: 10,),
                               ExerciseRow(
                                 exercise: exercise.exercise,
