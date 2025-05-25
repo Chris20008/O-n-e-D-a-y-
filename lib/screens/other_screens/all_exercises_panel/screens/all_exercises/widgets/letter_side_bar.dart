@@ -12,7 +12,7 @@ class LetterSideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    const bottomPaddingForSearchBar = 90;
+    double bottomPaddingForSearchBar = MediaQuery.of(context).viewInsets.bottom > 50? 90 : 110;
 
     final double maxHeightSideBar = MediaQuery.of(context).size.height * 0.7;
     double minHeight = min(
@@ -22,7 +22,7 @@ class LetterSideBar extends StatelessWidget {
         - (Platform.isAndroid? 110 : 130)
         , maxHeightSideBar
     );
-    final double heightSideBar = (maxHeightSideBar - MediaQuery.of(context).viewInsets.bottom*0.85).clamp(minHeight, maxHeightSideBar);
+    final double heightSideBar = (maxHeightSideBar - MediaQuery.of(context).viewInsets.bottom*0.9).clamp(minHeight, maxHeightSideBar);
 
     final cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
     final characters = context.select<CnAllExercisesPanel, List<TileItem>>((cn) => cn.characters);

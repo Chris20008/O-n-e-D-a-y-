@@ -4,7 +4,6 @@ import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/al
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/letter_side_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../all_exercises_panel.dart';
 
 class AllExercises extends StatelessWidget {
@@ -14,30 +13,29 @@ class AllExercises extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    CnAllExercisesPanel cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
+    /// watch to update LetterSideBar on Panel 0 or larger 0
+    /// and listen to textController changes
+    CnAllExercisesPanel cnAllExercisesPanel = context.watch<CnAllExercisesPanel>();
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Theme.of(context).primaryColor,
-      body: SizedBox(
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            const AllExercisesList(),
+    return Container(
+      color: Theme.of(context).primaryColor,
+      height: MediaQuery.of(context).size.height,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const AllExercisesList(),
 
-            const HeaderAllExercises(),
+          const HeaderAllExercises(),
 
-            /// Search Bar
-            const AllExercisesSearchBar(),
+          /// Search Bar
+          const AllExercisesSearchBar(),
 
-            if(cnAllExercisesPanel.panelController.isAttached
-                && cnAllExercisesPanel.panelController.panelPosition > 0
-                && cnAllExercisesPanel.textController.text.isEmpty
-            )
-              const LetterSideBar()
-          ],
-        ),
+          if(cnAllExercisesPanel.panelController.isAttached
+              && cnAllExercisesPanel.panelController.panelPosition > 0
+              && cnAllExercisesPanel.textController.text.isEmpty
+          )
+            const LetterSideBar(),
+        ],
       ),
     );
   }

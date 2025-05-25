@@ -35,44 +35,40 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
     pr("Rebuild All Exercises panel");
 
     return PopScope(
-        child: Stack(
-          children: [
-            GestureDetector(
-              onTap: (){
-                FocusManager.instance.primaryFocus?.unfocus();
-              },
-              child: MySlideUpPanel(
-                bounce: false,
-                controller: cnAllExercisesPanel.panelController,
-                onPanelSlide: onPanelSlide,
-                animationControllerName: "AllExercisesPanel",
-                descendantAnimationControllerName: "NewWorkoutPanel",
-                panelBuilder: (context, listView){
+        child: GestureDetector(
+          onTap: (){
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MySlideUpPanel(
+            bounce: false,
+            controller: cnAllExercisesPanel.panelController,
+            onPanelSlide: onPanelSlide,
+            animationControllerName: "AllExercisesPanel",
+            descendantAnimationControllerName: "NewWorkoutPanel",
+            panelBuilder: (context, listView){
 
-                  if(panelIsClosed){
-                    return const SizedBox();
+              if(panelIsClosed){
+                return const SizedBox();
+              }
+
+              return Navigator(
+                key: cnAllExercisesPanel.navigatorKey,
+                initialRoute: '/allExercises',
+                onGenerateRoute: (RouteSettings settings) {
+                  final routes = <String, WidgetBuilder>{
+                    '/allExercises': (_) => const AllExercises(),
+                    '/singleExercise': (_) => const NewExercise(),
+                  };
+
+                  final builder = routes[settings.name];
+                  if (builder != null) {
+                    return MaterialPageRoute(builder: builder, settings: settings);
                   }
-
-                  return Navigator(
-                    key: cnAllExercisesPanel.navigatorKey,
-                    initialRoute: '/allExercises',
-                    onGenerateRoute: (RouteSettings settings) {
-                      final routes = <String, WidgetBuilder>{
-                        '/allExercises': (_) => const AllExercises(),
-                        '/singleExercise': (_) => const NewExercise(),
-                      };
-
-                      final builder = routes[settings.name];
-                      if (builder != null) {
-                        return MaterialPageRoute(builder: builder, settings: settings);
-                      }
-                      return null;
-                    },
-                  );
+                  return null;
                 },
-              ),
-            ),
-          ],
+              );
+            },
+          ),
         )
     );
   }

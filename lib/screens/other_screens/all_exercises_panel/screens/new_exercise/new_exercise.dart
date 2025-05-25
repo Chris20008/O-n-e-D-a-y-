@@ -11,10 +11,9 @@ class NewExercise extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Theme.of(context).primaryColor,
-      body: const Stack(
+    return Container(
+      color: Theme.of(context).primaryColor,
+      child: const Stack(
         children: [
           SetListView(),
           NewExerciseHeader(
