@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +7,8 @@ import 'package:provider/provider.dart';
 
 class AllExercisesSearchBar extends StatelessWidget {
   const AllExercisesSearchBar({super.key});
+
+  static double bottomPadding = Platform.isAndroid? 10 : 40;
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +18,10 @@ class AllExercisesSearchBar extends StatelessWidget {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: viewInsets-40.clamp(-10, viewInsets),
+      bottom: viewInsets-bottomPadding.clamp(-10, viewInsets),
       child: Container(
         color: Theme.of(context).primaryColor,
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: EdgeInsets.only(bottom: bottomPadding),
         child: Container(
           height: 60,
           width: double.maxFinite,

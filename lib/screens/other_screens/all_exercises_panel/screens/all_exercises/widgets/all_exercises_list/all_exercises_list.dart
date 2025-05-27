@@ -1,6 +1,7 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_list/all_exercises_separator.dart';
+import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_search_bar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +29,7 @@ class AllExercisesList extends StatelessWidget {
             cnAllExercisesPanel.callBackRefreshAllExercisesList = setModalState;
             return ListViewScope.of(context).listView(
               controller: cnAllExercisesPanel.scrollController,
-              padding: const EdgeInsets.only(left: 10, right: 25, top: PanelHeaderRow.height),
+              padding: EdgeInsets.only(left: 10, right: 25, top: PanelHeaderRow.height, bottom: AllExercisesSearchBar.bottomPadding),
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
               itemCount: filteredExercises.length,

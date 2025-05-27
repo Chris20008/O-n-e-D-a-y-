@@ -31,11 +31,11 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
-  late CnConfig cnConfig;
+  // late CnConfig cnConfig;
   late CnNewExercisePanel cnNewExercise;
   late CnAnimatedColumn cnAnimatedColumn;
   final TextEditingController _textController = TextEditingController();
-  late bool showSpotify = cnConfig.useSpotify;
+  late bool showSpotify;
   final double _iconSize = 25;
   final _style = const TextStyle(color: Colors.white, fontSize: 18);
   UniqueKey newExerciseKey = UniqueKey();
@@ -46,9 +46,10 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
   @override
   Widget build(BuildContext context) {
     cnAnimatedColumn = Provider.of<CnAnimatedColumn>(context);
-    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
-    cnConfig = Provider.of<CnConfig>(context);
-    showSpotify = cnConfig.useSpotify;
+    // cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    cnNewExercise = context.read<CnNewExercisePanel>();
+    // cnConfig = Provider.of<CnConfig>(context);
+    showSpotify = context.select<CnConfig, bool>((cn) => cn.useSpotify);
 
     pr("Animated Column");
 
@@ -86,10 +87,6 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 width: 54,
                 height: 54,
                 child: CupertinoButton(
-                    // iconSize: 30,
-                    // style: ButtonStyle(
-                    //   backgroundColor: WidgetStateProperty.all(Colors.transparent),
-                    // ),
                     onPressed: () {
                       cnAnimatedColumn.newEx = Exercise(blockLink: true);
                       showAddExercise(context);
@@ -417,16 +414,16 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
 }
 
 class CnAnimatedColumn extends ChangeNotifier {
-  bool isOpened = false;
-  bool isRunning = false;
-  bool isPaused = false;
-  int animationTimeStopwatch = 300;
+  // bool isOpened = false;
+  // bool isRunning = false;
+  // bool isPaused = false;
+  // int animationTimeStopwatch = 300;
   Exercise newEx = Exercise();
-  Widget popUpChild = Container();
+  // Widget popUpChild = Container();
 
-  void setPopUpChild(Widget child){
-    popUpChild = child;
-  }
+  // void setPopUpChild(Widget child){
+  //   popUpChild = child;
+  // }
 
   void refresh()async{
     notifyListeners();

@@ -431,7 +431,7 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   void openSettingsPanel(){
-    HapticFeedback.selectionClick();
+    // HapticFeedback.selectionClick();
     panelControllerSettings.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 500),

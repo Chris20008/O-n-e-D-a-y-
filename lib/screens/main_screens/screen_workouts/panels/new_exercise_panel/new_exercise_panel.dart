@@ -39,7 +39,9 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
   @override
   Widget build(BuildContext context) {
-    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    // cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    cnNewExercise = context.read<CnNewExercisePanel>();
+    bool panelIsClosed = context.select<CnNewExercisePanel, bool>((cn) => !cn.panelController.isAttached || cn.panelController.panelPosition == 0);
 
     pr("Exercise Panel");
 
@@ -63,6 +65,11 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
           animationControllerName: "NewExercisePanel",
           descendantAnimationControllerName: cnBottomMenu.index == 2? "ScreenStatistics" : "NewWorkoutPanel",
           panelBuilder: (context, listView) {
+
+            if(panelIsClosed){
+              return const SizedBox();
+            }
+
             return Stack(
               children: [
                 GestureDetector(
@@ -82,6 +89,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   void onPanelSlide(value){
+    if(value == 0){
+      cnNewExercise.refresh();
+    }
+
     if(cnNewWorkOutPanel.panelController.panelPosition < 0.1){
       cnBottomMenu.adjustHeight(value);
     }
@@ -352,7 +363,7 @@ class CnNewExercisePanel extends ChangeNotifier {
 
     return CupertinoButton(
         onPressed: (){
-          HapticFeedback.selectionClick();
+          // HapticFeedback.selectionClick();
           notificationPopUp(
               context: context,
               title: AppLocalizations.of(context)!.panelExChangeCategoryHeader,
@@ -397,7 +408,7 @@ class CnNewExercisePanel extends ChangeNotifier {
 
     return CupertinoButton(
         onPressed: (){
-          HapticFeedback.selectionClick();
+          // HapticFeedback.selectionClick();
           notificationPopUp(
               context: context,
               title: AppLocalizations.of(context)!.panelExChangeBodyWeightHeader,
@@ -416,13 +427,25 @@ class CnNewExercisePanel extends ChangeNotifier {
     }
 
     this.onConfirm = onConfirm;
-    HapticFeedback.selectionClick();
+    // HapticFeedback.selectionClick();
+    /// jump to minimal position to make initial build
+    /// so that the slide up is smooth
+    /// also allow the Panel to build it's content since it's a SizedBox()
+    /// when closed
+    await panelController.animatePanelToPosition(
+        0.001,
+        duration: const Duration(milliseconds: 0)
+    );
+    /// Trigger Rebuild only for
+    /// bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
+    refresh();
+    /// Wait 100 ms that the first build is fully done
+    await Future.delayed(const Duration(milliseconds: 100));
     await panelController.animatePanelToPosition(
         1,
         duration: Duration(milliseconds: animationTime),
         curve: Curves.fastEaseInToSlowEaseOut
     );
-    // refresh();
     return;
   }
 

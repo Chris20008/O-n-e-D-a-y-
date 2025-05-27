@@ -30,7 +30,7 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
   @override
   Widget build(BuildContext context) {
     cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
-    bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
+    bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => !cn.panelController.isAttached || cn.panelController.panelPosition == 0);
 
     pr("Rebuild All Exercises panel");
 
@@ -231,15 +231,13 @@ class CnAllExercisesPanel extends ChangeNotifier {
     /// Trigger Rebuild only for
     /// bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
     refresh();
-    /// Wait 300 ms that the first build is fully done
+    /// Wait 100 ms that the first build is fully done
     await Future.delayed(const Duration(milliseconds: 100));
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-      panelController.animatePanelToPosition(
-          1,
-          duration: Duration(milliseconds: animationTime),
-          curve: Curves.fastEaseInToSlowEaseOut
-      );
-    // });
+    await panelController.animatePanelToPosition(
+        1,
+        duration: Duration(milliseconds: animationTime),
+        curve: Curves.fastEaseInToSlowEaseOut
+    );
     return;
   }
 

@@ -43,6 +43,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
     cnBottomMenu = Provider.of<CnBottomMenu>(context);
     cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen:false);
     cnSelectorExerciseToUpdate = Provider.of<CnSelectorExerciseToUpdate>(context, listen:true);
+    bool panelIsClosed = context.select<CnSelectorExerciseToUpdate, bool>((cn) => !cn.panelController.isAttached || cn.panelController.panelPosition == 0);
 
     final List<Exercise> relevantExercises = cnSelectorExerciseToUpdate.relevantExercises;
     final List isCheckedList = cnSelectorExerciseToUpdate.isCheckedList;
@@ -56,6 +57,11 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
       backdropOpacity: 0.25,
       controller: cnSelectorExerciseToUpdate.panelController,
       panelBuilder: (context, listView){
+
+        if(panelIsClosed){
+          return const SizedBox();
+        }
+
         return BlockGesture(
           child: SafeArea(
             top: false,
@@ -282,6 +288,12 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
     return [tempTemplate, tempNew];
   }
+
+  void onPanelSlide(value){
+    if(value == 0){
+      cnSelectorExerciseToUpdate.refresh();
+    }
+  }
 }
 
 
@@ -331,6 +343,19 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
   }
 
   Future openPanel() async{
+    /// jump to minimal position to make initial build
+    /// so that the slide up is smooth
+    /// also allow the Panel to build it's content since it's a SizedBox()
+    /// when closed
+    await panelController.animatePanelToPosition(
+        0.001,
+        duration: const Duration(milliseconds: 0)
+    );
+    /// Trigger Rebuild only for
+    /// bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
+    refresh();
+    /// Wait 100 ms that the first build is fully done
+    await Future.delayed(const Duration(milliseconds: 100));
     await panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 500),

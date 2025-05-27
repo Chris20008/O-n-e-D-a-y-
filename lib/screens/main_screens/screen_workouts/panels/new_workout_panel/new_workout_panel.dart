@@ -57,7 +57,12 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
+    // cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
+    cnNewWorkout = context.read<CnNewWorkOutPanel>();
+
+    bool blockUi = context.select<CnNewWorkOutPanel, bool>((cn) => cn.blockUi);
+    double minPanelHeight = context.select<CnNewWorkOutPanel, double>((cn) => cn.minPanelHeight);
+    bool panelIsClosed = context.select<CnNewWorkOutPanel, bool>((cn) => !cn.panelController.isAttached || (cn.panelController.panelPosition == 0 && cn.minPanelHeight == 0));
 
     pr("Workout Panel");
 
@@ -73,16 +78,21 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
         }
       },
       child: AbsorbPointer(
-        absorbing: cnNewWorkout.blockUi,
+        absorbing: blockUi,
         child: MySlideUpPanel(
           controller: cnNewWorkout.panelController,
-          minHeight: cnNewWorkout.minPanelHeight,
+          minHeight: minPanelHeight,
           backdropEnabled: false,
           animationControllerName: "NewWorkoutPanel",
           descendantAnimationControllerName: "ScreenWorkouts",
           color: Theme.of(context).primaryColor,
           onPanelSlide: onPanelSlide,
           panelBuilder: (context, listView){
+
+            if(panelIsClosed){
+              return const SizedBox();
+            }
+
             return GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
@@ -309,9 +319,19 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
   Future openPanelWithRefresh() async{
     HapticFeedback.selectionClick();
-    // minPanelHeight = keepShowingPanelHeight;
-    // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+    /// jump to minimal position to make initial build
+    /// so that the slide up is smooth
+    /// also allow the Panel to build it's content since it's a SizedBox()
+    /// when closed
+    await panelController.animatePanelToPosition(
+        0.001,
+        duration: const Duration(milliseconds: 0)
+    );
+    /// Trigger Rebuild only for
+    /// bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
     refresh();
+    /// Wait 100 ms that the first build is fully done
+    await Future.delayed(const Duration(milliseconds: 100));
     await openPanel();
     minPanelHeight = keepShowingPanelHeight;
     /// is needed to move spotifyBar higher when panel is opened
