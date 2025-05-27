@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/header_all_exercises/widgets/top_header_letter.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
@@ -10,8 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-import '../../../../../../../objects/exercise.dart';
+import '../../../../../../../widgets/exercise_context_id.dart';
 
 class HeaderAllExercises extends StatelessWidget {
 
@@ -20,12 +18,11 @@ class HeaderAllExercises extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     CnNewExercisePanel cnNewExercisePanel = context.read<CnNewExercisePanel>();
-    CnNewWorkOutPanel cnNewWorkOutPanel = context.read<CnNewWorkOutPanel>();
     CnAllExercisesPanel cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
 
     return ClipRRect(
       child: ScrollListener(
-        controller: cnAllExercisesPanel.scrollController,
+        controller: cnAllExercisesPanel.getScrollController(context),
         minValue: 0,
         maxValue: 1,
         maxOffset: 15,
@@ -48,7 +45,7 @@ class HeaderAllExercises extends StatelessWidget {
                       flexRight: 15,
                       childLeft: CupertinoButtonText(
                           text: AppLocalizations.of(context)!.cancel,
-                          onPressed: () => cnAllExercisesPanel.closePanel()
+                          onPressed: () => cnAllExercisesPanel.closePanel(id: AllExercisePanelIds.values.firstWhere((value) => value.toString() == GlobalKeyContext.of(context, KeyContextId.allExercisePanel)))
                       ),
                       childMiddle: const Text(
                         "Übungen",
@@ -75,12 +72,11 @@ class HeaderAllExercises extends StatelessWidget {
                           ),
                           onPressed: (){
                             cnNewExercisePanel.clear(withRefresh: false);
-                            cnNewExercisePanel.onConfirm = (Exercise exercise){
-                              cnNewWorkOutPanel.confirmAddExercise(exercise);
-                              cnAllExercisesPanel.closePanel();
-                            };
-                            cnAllExercisesPanel.navigatorKey?.currentState?.pushNamed('/singleExercise')
-                                .then(cnAllExercisesPanel.callBackRefreshAllExercisesList());
+                            cnNewExercisePanel.linkedExercises = cnAllExercisesPanel.config.linkedExercises;
+                            cnNewExercisePanel.onConfirm = cnAllExercisesPanel.config.onConfirm;
+                            cnNewExercisePanel.exerciseNameFieldValidator = cnAllExercisesPanel.config.validator;
+                            cnAllExercisesPanel.getNavigatorKey(context)?.currentState?.pushNamed('/singleExercise')
+                                .then((_) => cnAllExercisesPanel.callBackRefreshAllExercisesList(() {}));
                           }
                       )
                   ),

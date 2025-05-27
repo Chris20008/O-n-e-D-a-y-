@@ -32,7 +32,10 @@ class AllExercisesSearchBar extends StatelessWidget {
             style: const TextStyle(color: Colors.white),
             backgroundColor: Theme.of(context).cardColor,
             onChanged: (value){
-              cnAllExercisesPanel.scrollController.jumpTo(0);
+              final sc = cnAllExercisesPanel.getScrollController(context);
+              if(sc.hasClients){
+                sc.jumpTo(0);
+              }
               cnAllExercisesPanel.filterExercises(value);
             },
           ),

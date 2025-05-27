@@ -42,6 +42,7 @@ class Exercise{
       sets = [];
       addSet();
     }
+    originalName = originalName?? name;
   }
 
   Exercise.fromObExercise(ObExercise e):this(
@@ -173,6 +174,7 @@ class Exercise{
       restInSeconds: data["restInSeconds"],
       seatLevel: data["seatLevel"],
       originalName: data["originalName"],
+      // originalName: data["name"],
       linkName: data["linkName"],
       category: data["category"]?? 1,
       blockLink: data['blockLink']?? false,

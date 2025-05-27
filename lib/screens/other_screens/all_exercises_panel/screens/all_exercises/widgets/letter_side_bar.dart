@@ -35,18 +35,18 @@ class LetterSideBar extends StatelessWidget {
           right: 0,
           child: Listener(
             onPointerDown: (details) {
-              cnAllExercisesPanel.jumpToLetter(details, heightSideBar);
+              cnAllExercisesPanel.jumpToLetter(details: details, heightSideBar: heightSideBar, context: context);
             },
             onPointerMove: (details){
-              cnAllExercisesPanel.jumpToLetter(details, heightSideBar);
+              cnAllExercisesPanel.jumpToLetter(details: details, heightSideBar: heightSideBar, context: context);
             },
             onPointerUp: (details){
-              cnAllExercisesPanel.jumpToLetter(details, heightSideBar);
+              cnAllExercisesPanel.jumpToLetter(details: details, heightSideBar: heightSideBar, context: context);
             },
             child: GestureDetector(
               onVerticalDragUpdate: (_){},
               child: Container(
-                  key: cnAllExercisesPanel.keySideBar,
+                  key: cnAllExercisesPanel.getSideBarKey(context),
                   color: Colors.transparent,
                   height: heightSideBar,
                   // height: double.maxFinite,

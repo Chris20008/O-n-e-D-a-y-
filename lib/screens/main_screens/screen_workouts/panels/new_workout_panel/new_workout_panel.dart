@@ -25,6 +25,7 @@ import '../../../screen_workout_history/screen_workout_history.dart';
 import '../../screen_workouts.dart';
 import '../new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/header/header.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class NewWorkOutPanel extends StatefulWidget {
   const NewWorkOutPanel({super.key});
@@ -313,8 +314,29 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     }
 
     if(panelController.isPanelOpen){
-      cnNewExercisePanel.openPanel(exercise: exToEdit, onConfirm: confirmAddExercise);
+      cnNewExercisePanel.openPanel(
+          exercise: exToEdit,
+          onConfirm: confirmAddExercise,
+          validator: exerciseNameFieldValidator
+      );
     }
+  }
+
+  String? exerciseNameFieldValidator ({
+    required BuildContext context,
+    required String? value,
+    required CnNewExercisePanel cnNewExercise
+  }) {
+    value = value?.trim();
+    if (value == null || value.isEmpty) {
+      return AppLocalizations.of(context)!.panelExEnterName;
+    }
+    else if(exerciseNameExistsInWorkout(workout: workout, exerciseName: cnNewExercise.exercise.name) &&
+        cnNewExercise.exercise.originalName?.toLowerCase() != cnNewExercise.exercise.name.toLowerCase()
+    ){
+      return AppLocalizations.of(context)!.panelExAlreadyExists;
+    }
+    return null;
   }
 
   Future openPanelWithRefresh() async{

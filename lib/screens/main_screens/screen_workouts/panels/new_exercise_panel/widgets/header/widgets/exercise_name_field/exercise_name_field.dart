@@ -1,8 +1,6 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/widgets/exercise_name_field/functions/exercise_name_field_validator.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/widgets/exercise_name_field/functions/on_exercise_name_field_submitted.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +12,6 @@ class ExerciseNameField extends StatelessWidget {
   Widget build(BuildContext context) {
 
     CnNewExercisePanel cnNewExercise = Provider.of<CnNewExercisePanel>(context, listen: false);
-    CnNewWorkOutPanel cnNewWorkOut = Provider.of<CnNewWorkOutPanel>(context, listen: false);
     CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
 
     // final formKey = GlobalKey<FormState>();
@@ -52,12 +49,22 @@ class ExerciseNameField extends StatelessWidget {
                         cnHomepage: cnHomepage,
                         cnNewExercise: cn
                     ),
-                    validator: (value) => exerciseNameFieldValidator(
-                        context: context,
-                        value: value,
-                        cnNewExercise: cn,
-                        cnNewWorkOut: cnNewWorkOut
-                    ),
+                    validator: (value){
+                      if(cnNewExercise.exerciseNameFieldValidator != null){
+                        return cnNewExercise.exerciseNameFieldValidator!(
+                            context: context,
+                            value: value,
+                            cnNewExercise: cn
+                        );
+                      }
+                      return null;
+                    },
+                    // validator: (value) => exerciseNameFieldValidator(
+                    //     context: context,
+                    //     value: value,
+                    //     cnNewExercise: cn,
+                    //     cnNewWorkOut: cnNewWorkOut
+                    // ),
                     style: const TextStyle(
                         fontSize: 20
                     ),

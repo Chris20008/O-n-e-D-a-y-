@@ -16,11 +16,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SetListView extends StatefulWidget {
-  final ScrollController? controller;
+  // final ScrollController? controller;
 
   const SetListView({
     super.key,
-    this.controller
+    // this.controller
   });
 
   @override
@@ -35,14 +35,6 @@ class _SetListViewState extends State<SetListView> {
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
 
-  final sc = ScrollController();
-
-  @override
-  void dispose() {
-    sc.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -53,7 +45,7 @@ class _SetListViewState extends State<SetListView> {
     return SlidableAutoCloseBehavior(
       child: ListViewScope.of(context).listView(
         padding: EdgeInsets.only(top: cnNewExercise.heightHeader - 10),
-        controller: cnNewExercise.isDefaultContext(context)? cnNewExercise.scrollController : widget.controller?? sc,
+        controller: cnNewExercise.getScrollController(context),
         physics: const BouncingScrollPhysics(),
         shrinkWrap: true,
         children: [

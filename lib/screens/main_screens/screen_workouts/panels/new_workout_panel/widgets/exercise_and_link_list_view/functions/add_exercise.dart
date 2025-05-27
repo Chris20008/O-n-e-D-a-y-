@@ -10,17 +10,26 @@ void addExercise({
   required int currentTutorialStep
 }){
     if(!tutorialIsRunning && cnNewWorkout.panelController.panelPosition > 0.99){
-      cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
+      cnNewExercisePanel.openPanel(
+          onConfirm: cnNewWorkout.confirmAddExercise,
+          validator: cnNewWorkout.exerciseNameFieldValidator
+      );
     }
     else if(tutorialIsRunning && cnNewWorkout.panelController.isPanelOpen){
       if(currentTutorialStep < 2){
         FocusScope.of(context).unfocus();
       }
       else{
-        cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
+        cnNewExercisePanel.openPanel(
+            onConfirm: cnNewWorkout.confirmAddExercise,
+            validator: cnNewWorkout.exerciseNameFieldValidator
+        );
       }
     }
     else{
-      cnNewExercisePanel.openPanel(onConfirm: cnNewWorkout.confirmAddExercise);
+      cnNewExercisePanel.openPanel(
+          onConfirm: cnNewWorkout.confirmAddExercise,
+          validator: cnNewWorkout.exerciseNameFieldValidator
+      );
     }
   }

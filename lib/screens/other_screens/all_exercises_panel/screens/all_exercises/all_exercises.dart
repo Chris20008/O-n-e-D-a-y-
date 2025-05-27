@@ -30,8 +30,8 @@ class AllExercises extends StatelessWidget {
           /// Search Bar
           const AllExercisesSearchBar(),
 
-          if(cnAllExercisesPanel.panelController.isAttached
-              && cnAllExercisesPanel.panelController.panelPosition > 0
+          if(cnAllExercisesPanel.getPanelController(context).isAttached
+              && cnAllExercisesPanel.getPanelController(context).panelPosition > 0
               && cnAllExercisesPanel.textController.text.isEmpty
           )
             const LetterSideBar(),

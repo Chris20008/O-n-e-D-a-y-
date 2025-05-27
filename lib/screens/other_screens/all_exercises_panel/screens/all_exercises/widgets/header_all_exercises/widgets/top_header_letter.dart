@@ -18,21 +18,23 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
   String currTopLetter = "A";
   double sizeListTile = 0;
   bool doBlur = false;
+  late final ScrollController sc;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(cnAllExercisesPanel.scrollController.hasClients){
-        cnAllExercisesPanel.scrollController.addListener(updateHeader);
+      sc = cnAllExercisesPanel.getScrollController(context);
+      if(sc.hasClients){
+        sc.addListener(updateHeader);
       }
     });
   }
 
   @override
   void dispose(){
+    sc.removeListener(updateHeader);
     super.dispose();
-    cnAllExercisesPanel.scrollController.removeListener(updateHeader);
   }
 
   updateHeader({bool withRefresh = true}){
@@ -42,7 +44,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
     }
     initSize();
     final index = (
-        (cnAllExercisesPanel.scrollController.position.pixels-10) ~/ (sizeListTile+ AllExercisesSeparator.height)
+        (cnAllExercisesPanel.getScrollController(context).position.pixels-10) ~/ (sizeListTile+ AllExercisesSeparator.height)
     ).clamp(0, cnAllExercisesPanel.filteredExercises.length-1);
 
     if(cnAllExercisesPanel.filteredExercises[index].name[0] != currTopLetter){
@@ -57,7 +59,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
 
   @override
   Widget build(BuildContext context) {
-    if(cnAllExercisesPanel.scrollController.hasClients){
+    if(cnAllExercisesPanel.getScrollController(context).hasClients){
       updateHeader(withRefresh: false);
     }
     Widget text = Align(
@@ -80,7 +82,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
 
   void initSize(){
     if(sizeListTile == 0){
-      sizeListTile = getWidgetSize(cnAllExercisesPanel.keyFirstListTile).height;
+      sizeListTile = getWidgetSize(cnAllExercisesPanel.getKeyFirstListTile(context)).height;
     }
   }
 }

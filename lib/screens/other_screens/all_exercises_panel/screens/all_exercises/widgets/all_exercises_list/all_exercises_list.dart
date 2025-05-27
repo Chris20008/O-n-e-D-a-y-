@@ -1,5 +1,4 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_list/all_exercises_separator.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_search_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -19,7 +18,6 @@ class AllExercisesList extends StatelessWidget {
 
     CnAllExercisesPanel cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
     CnNewExercisePanel cnNewExercisePanel = context.read<CnNewExercisePanel>();
-    CnNewWorkOutPanel cnNewWorkOutPanel = context.read<CnNewWorkOutPanel>();
     List<TileItem> filteredExercises = context.select<CnAllExercisesPanel, List<TileItem>>((cn) => cn.filteredExercises);
 
     return Padding(
@@ -28,7 +26,7 @@ class AllExercisesList extends StatelessWidget {
           builder: (modalContext, setModalState) {
             cnAllExercisesPanel.callBackRefreshAllExercisesList = setModalState;
             return ListViewScope.of(context).listView(
-              controller: cnAllExercisesPanel.scrollController,
+              controller: cnAllExercisesPanel.getScrollController(context),
               padding: EdgeInsets.only(left: 10, right: 25, top: PanelHeaderRow.height, bottom: AllExercisesSearchBar.bottomPadding),
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
@@ -41,7 +39,7 @@ class AllExercisesList extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(bottom: index == filteredExercises.length-1 ? 80 + MediaQuery.of(context).viewInsets.bottom : 0),
                   child: CupertinoButton(
-                    key: index == 0 ? cnAllExercisesPanel.keyFirstListTile : null,
+                    key: index == 0 ? cnAllExercisesPanel.getKeyFirstListTile(context) : null,
                     pressedOpacity: MediaQuery.of(context).viewInsets.bottom <= 0? 0.4 : 1,
                     padding: EdgeInsets.zero,
                     child: CupertinoListTile(
@@ -56,12 +54,15 @@ class AllExercisesList extends StatelessWidget {
                     ),
                     onPressed: (){
                       if(MediaQuery.of(context).viewInsets.bottom <= 0){
-                        cnNewExercisePanel.setExercise(Exercise.copy(filteredExercises[index].exercise!));
-                        cnNewExercisePanel.onConfirm = (Exercise exercise){
-                          cnNewWorkOutPanel.confirmAddExercise(exercise);
-                          cnAllExercisesPanel.closePanel();
-                        };
-                        cnAllExercisesPanel.navigatorKey?.currentState?.pushNamed('/singleExercise')
+                        cnNewExercisePanel.clear(withRefresh: false);
+                        final tempEx = Exercise.copy(filteredExercises[index].exercise!);
+                        tempEx.linkName = null;
+                        tempEx.blockLink = false;
+                        cnNewExercisePanel.setExercise(tempEx);
+                        cnNewExercisePanel.linkedExercises = cnAllExercisesPanel.config.linkedExercises;
+                        cnNewExercisePanel.onConfirm = cnAllExercisesPanel.config.onConfirm;
+                        cnNewExercisePanel.exerciseNameFieldValidator = cnAllExercisesPanel.config.validator;
+                        cnAllExercisesPanel.getNavigatorKey(context)?.currentState?.pushNamed('/singleExercise')
                             .then((_) => setModalState((){}));
                       }
                       else{

@@ -31,32 +31,31 @@ class _ExerciseOptionsSelectorsState extends State<ExerciseOptionsSelectors> {
         /// Rest in Seconds Row and Selector
         cnNewExercise.getRestInSecondsSelector(
             context: context,
-            exercise: cnNewExercise.exercise,
-            refresh: () => setState(() {})
+            // refresh: () => setState(() {})
         ),
 
         /// Seat Level Row and Selector
         cnNewExercise.getSeatLevelSelector(
             context: context,
-            exercise: cnNewExercise.exercise,
-            refresh: () => setState(() {})
+            // refresh: () => setState(() {})
         ),
 
         /// Exercise Category Selector
         cnNewExercise.getExerciseCategorySelector(
             context: context,
             isTemplate: cnNewExercise.exercise.isNewExercise(),
-            exercise: cnNewExercise.exercise,
-            refresh: cnNewExercise.refresh /// use refresh instead of setState to update set types, f.e. weight -> time
+            // refresh: cnNewExercise.refresh /// use refresh instead of setState to update set types, f.e. weight -> time
         ),
 
         /// Body Weight selector
         cnNewExercise.getBodyWeightPercentSelector(
             context: context,
             isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewWorkOut.workout.isTemplate,
-            exercise: cnNewExercise.exercise,
             refresh: () => setState(() {})
         ),
+
+        if(cnNewExercise.linkedExercises.isNotEmpty)
+          cnNewExercise.getSelectLink()
       ],
     );
   }

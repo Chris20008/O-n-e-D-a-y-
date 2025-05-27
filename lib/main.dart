@@ -19,7 +19,6 @@ import 'package:fitness_app/util/objectbox/object_box.dart';
 import 'package:fitness_app/widgets/background_image.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
-import 'package:fitness_app/widgets/exercise_context_id.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:fitness_app/widgets/show_new_features_pop_up.dart';
 import 'package:fitness_app/widgets/spotify_bar.dart';
@@ -422,15 +421,13 @@ class _MyHomePageState extends State<MyHomePage>{
 
                       const NewWorkOutPanel(),
 
-                      ExerciseContextId(
-                          id: cnNewExercise.defaultContextId,
-                          child: const NewExercisePanel()
-                      ),
+                      const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
 
-                      const ExerciseContextId(
-                          id: "newExercise",
-                          child: AllExercisesPanel()
-                      ),
+                      // const ExerciseContextId(
+                      //     id: "newExercise",
+                      //     child: AllExercisesPanel()
+                      // ),
+                      const AllExercisesPanel(id: AllExercisePanelIds.mainAllExercisesPanel)
                     ],
                   )
 
@@ -438,10 +435,7 @@ class _MyHomePageState extends State<MyHomePage>{
                   const ScreenStatistics(),
 
                 if(cnBottomMenu.index == 2)
-                  ExerciseContextId(
-                      id: cnNewExercise.defaultContextId,
-                      child: const NewExercisePanel()
-                ),
+                  const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
 
                 const StandardPopUp(),
 

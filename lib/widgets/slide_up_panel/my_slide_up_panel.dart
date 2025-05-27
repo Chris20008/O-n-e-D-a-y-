@@ -518,7 +518,6 @@ typedef PanelListViewBuilder = Widget Function({
 class ListViewScope extends InheritedWidget {
   final PanelListViewBuilder listView;
 
-
   const ListViewScope({
     required this.listView,
     required Widget child,

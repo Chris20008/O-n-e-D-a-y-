@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../../objects/exercise.dart';
 import '../../../../../util/constants.dart';
@@ -17,7 +18,12 @@ import '../../../../../widgets/bottom_menu.dart';
 import '../../../../../widgets/exercise_context_id.dart';
 
 class NewExercisePanel extends StatefulWidget {
-  const NewExercisePanel({super.key});
+  final String id;
+
+  const NewExercisePanel({
+    super.key,
+    required this.id
+  });
 
   @override
   State<NewExercisePanel> createState() => _NewExercisePanelState();
@@ -38,6 +44,12 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   @override
+  void dispose() {
+    cnNewExercise.onDispose(context);
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // cnNewExercise = Provider.of<CnNewExercisePanel>(context);
     cnNewExercise = context.read<CnNewExercisePanel>();
@@ -45,45 +57,48 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 
     pr("Exercise Panel");
 
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (doPop, res){
-        if (cnNewExercise.panelController.isPanelOpen){
-          cnNewExercise.closePanel(doClear: false, context: context);
-        }
-      },
-      child: GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
-        },
-        child: MySlideUpPanel(
-          key: cnNewExercise.key,
-          onPanelSlide: onPanelSlide,
-          controller: cnNewExercise.panelController,
-          backdropOpacity: 0.25,
-          color: Theme.of(context).primaryColor,
-          animationControllerName: "NewExercisePanel",
-          descendantAnimationControllerName: cnBottomMenu.index == 2? "ScreenStatistics" : "NewWorkoutPanel",
-          panelBuilder: (context, listView) {
-
-            if(panelIsClosed){
-              return const SizedBox();
-            }
-
-            return Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    FocusManager.instance.primaryFocus?.unfocus();
-                  },
-                  child: const SetListView(),
-                ),
-
-                const NewExerciseHeader()
-              ],
-            );
+    return GlobalKeyContext(
+      ids: {KeyContextId.newExercisePanel: widget.id},
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (doPop, res){
+          if (cnNewExercise.panelController.isPanelOpen){
+            cnNewExercise.closePanel(doClear: false, context: context);
           }
-        )
+        },
+        child: GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          child: MySlideUpPanel(
+            key: cnNewExercise.key,
+            onPanelSlide: onPanelSlide,
+            controller: cnNewExercise.panelController,
+            backdropOpacity: 0.25,
+            color: Theme.of(context).primaryColor,
+            animationControllerName: "NewExercisePanel",
+            descendantAnimationControllerName: cnBottomMenu.index == 2? "ScreenStatistics" : "NewWorkoutPanel",
+            panelBuilder: (context, listView) {
+
+              if(panelIsClosed){
+                return const SizedBox();
+              }
+
+              return Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                    },
+                    child: const SetListView(),
+                  ),
+
+                  const NewExerciseHeader()
+                ],
+              );
+            }
+          )
+        ),
       ),
     );
   }
@@ -109,16 +124,18 @@ class CnNewExercisePanel extends ChangeNotifier {
   final GlobalKey keyAddSet = GlobalKey();
   // final formKey = GlobalKey<FormState>();
   final Map<String, GlobalKey<FormState>> _formKeys = {};
+  final Map<String, ScrollController> _scrollControllers = {};
 
-  String defaultContextId = "panel";
+  static const String defaultContextId = "panel";
 
   final FocusNode focusNodeTextFieldExerciseName = FocusNode();
   Key key = UniqueKey();
   Exercise exercise = Exercise();
   TextEditingController exerciseNameController = TextEditingController();
-  ScrollController scrollController = ScrollController();
+  // ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function(Exercise ex)? onConfirm;
+  ExerciseNameValidator? exerciseNameFieldValidator;
   final int animationTime = 500;
   late TickerProvider vsync;
   double iconSize = 25;
@@ -128,14 +145,20 @@ class CnNewExercisePanel extends ChangeNotifier {
   final TextStyle _style = const TextStyle(color: Colors.white, fontSize: 18);
   int currentIndexFocus = 0;
   int currentIndexWeightOrAmount = 0;
+  List<String> linkedExercises = [];
 
   late List<List<TextEditingController>> controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
   // late List<List<GlobalKey>> ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
   late List<List<FocusNode>> focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
 
   GlobalKey<FormState> getFormKey(BuildContext context) {
-    final id = ExerciseContextId.of(context);
+    final id = GlobalKeyContext.of(context, KeyContextId.newExercisePanel);
     return _formKeys.putIfAbsent(id, () => GlobalKey<FormState>());
+  }
+
+  ScrollController getScrollController(BuildContext context) {
+    final id = GlobalKeyContext.of(context, KeyContextId.newExercisePanel);
+    return _scrollControllers.putIfAbsent(id, () => ScrollController());
   }
 
   GlobalKey? getKeySaveButton(BuildContext context) {
@@ -155,7 +178,13 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   bool isDefaultContext(context){
-    return ExerciseContextId.of(context) == defaultContextId;
+    return GlobalKeyContext.of(context, KeyContextId.newExercisePanel) == defaultContextId;
+  }
+
+  void onDispose(BuildContext context){
+    final sc = getScrollController(context);
+    sc.dispose();
+    _scrollControllers.remove(sc);
   }
 
   CnNewExercisePanel(){
@@ -182,7 +211,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void addSet({
-    required double insetsBottom ,
+    required double insetsBottom,
     required double screenHeight,
     required BuildContext context
   }){
@@ -201,7 +230,10 @@ class CnNewExercisePanel extends ChangeNotifier {
       final Size widgetSize = renderObject.size;
       final isVisible = widgetPosition.dy + widgetSize.height * 80 > 0 && widgetPosition.dy + 80 + insetsBottom < screenHeight;
       if(!isVisible){
-        scrollController.jumpTo(scrollController.position.pixels+41);
+        final sc = getScrollController(context);
+        if(sc.hasClients){
+          sc.jumpTo(sc.position.pixels+41);
+        }
       }
     }
     refresh();
@@ -256,8 +288,8 @@ class CnNewExercisePanel extends ChangeNotifier {
   /// SELECTORS
   Widget getRestInSecondsSelector({
     required BuildContext context,
-    required Exercise exercise,
-    required Function refresh
+    // required Exercise exercise,
+    // required Function refresh
   }) {
     return getSelectRestInSeconds(
         currentTime: exercise.restInSeconds,
@@ -298,8 +330,8 @@ class CnNewExercisePanel extends ChangeNotifier {
 
   Widget getSeatLevelSelector({
     required BuildContext context,
-    required Exercise exercise,
-    required Function refresh
+    // required Exercise exercise,
+    // required Function refresh
   }) {
     return getSelectSeatLevel(
         currentSeatLevel: exercise.seatLevel,
@@ -332,8 +364,8 @@ class CnNewExercisePanel extends ChangeNotifier {
   Widget getExerciseCategorySelector({
     required BuildContext context,
     required bool isTemplate,
-    required Exercise exercise,
-    required Function refresh
+    // required Exercise exercise,
+    // required Function refresh
   }) {
     Widget child = CupertinoListTile(
         leading: Icon(MyIcons.tags, size: iconSize-3),
@@ -378,7 +410,7 @@ class CnNewExercisePanel extends ChangeNotifier {
   Widget getBodyWeightPercentSelector({
     required BuildContext context,
     required bool isTemplate,
-    required Exercise exercise,
+    // required Exercise exercise,
     required Function refresh
   }) {
     Widget child = CupertinoListTile(
@@ -420,12 +452,66 @@ class CnNewExercisePanel extends ChangeNotifier {
     );
   }
 
-  Future openPanel({Exercise? exercise, Function(Exercise ex)? onConfirm})async{
+  Widget getSelectLink({
+    Key? key,
+    // required BuildContext context,
+  }) {
+    return PullDownButton(
+      key: key,
+      buttonAnchor: PullDownMenuAnchor.start,
+      routeTheme: routeTheme,
+      itemBuilder: (context) {
+        List linkNames = ["-"] + linkedExercises;
+        List<PullDownMenuItem> linkNameWidgets = List.generate(linkNames.length, (index) => PullDownMenuItem.selectable(
+            selected: exercise.linkName == linkNames[index] || index == 0 && exercise.linkName == null,
+            title: linkNames[index],
+            onTap: () {
+              HapticFeedback.selectionClick();
+              FocusManager.instance.primaryFocus?.unfocus();
+              Future.delayed(const Duration(milliseconds: 200), (){
+                exercise.linkName = linkNames[index] == "-"? null : linkNames[index];
+                exercise.blockLink = linkNames[index] == "-";
+                refresh();
+                // onConfirm(linkNames[index]);
+              });
+            })
+        );
+        return linkNameWidgets;
+      },
+      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+      buttonBuilder: (context, showMenu) => CupertinoButton(
+          onPressed: (){
+            HapticFeedback.selectionClick();
+            showMenu();
+          },
+          padding: EdgeInsets.zero,
+          child: CupertinoListTile(
+            leading: const Icon(Icons.link, size: 22),
+            title: Row(
+              children: [
+                Text(AppLocalizations.of(context)!.runningWorkoutGroup, style: _style),
+                const Spacer(),
+                Text(exercise.linkName?? "-", style: _style),
+                const SizedBox(width: 10),
+              ],
+            ),
+            trailing: trailingChoice(),
+          )
+      ),
+    );
+  }
+
+  Future openPanel({
+    Exercise? exercise,
+    Function(Exercise ex)? onConfirm,
+    ExerciseNameValidator? validator
+  })async{
     clear();
     if(exercise != null){
       setExercise(exercise);
     }
 
+    exerciseNameFieldValidator = validator;
     this.onConfirm = onConfirm;
     // HapticFeedback.selectionClick();
     /// jump to minimal position to make initial build
@@ -463,14 +549,14 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   void clear({bool withRefresh = true}){
+    exerciseNameFieldValidator = null;
+    linkedExercises = [];
     exercise = Exercise();
     for(MapEntry<String, GlobalKey<FormState>> e in _formKeys.entries){
       e.value.currentState?.reset();
     }
-    // formKey.currentState?.reset();
     controllers = exercise.sets.map((e) => ([TextEditingController(), TextEditingController()])).toList();
     exerciseNameController = TextEditingController();
-    // ensureVisibleKeys = exercise.sets.map((e) => ([GlobalKey(), GlobalKey()])).toList();
     focusNodes = exercise.sets.map((e) => ([FocusNode(), FocusNode()])).toList();
     if(withRefresh){
       refresh();
@@ -481,3 +567,9 @@ class CnNewExercisePanel extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+typedef ExerciseNameValidator = String? Function({
+  required BuildContext context,
+  required String? value,
+  required CnNewExercisePanel cnNewExercise,
+});

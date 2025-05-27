@@ -1,20 +1,36 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
-class ExerciseContextId extends InheritedWidget {
-  final String id;
+class GlobalKeyContext extends InheritedWidget {
+  // final String id;
+  final Map<KeyContextId, String> ids;
 
-  const ExerciseContextId({
-    required this.id,
+  const GlobalKeyContext({
+    required this.ids,
     required Widget child,
     super.key,
   }) : super(child: child);
 
-  static String of(BuildContext context) {
-    final result = context.dependOnInheritedWidgetOfExactType<ExerciseContextId>();
-    assert(result != null, 'No FormContextId found in context');
-    return result!.id;
+  // static String of(BuildContext context) {
+  //   final result = context.dependOnInheritedWidgetOfExactType<GlobalKeyId>();
+  //   assert(result != null, 'No FormContextId found in context');
+  //   return result!.id;
+  // }
+
+  static String of(BuildContext context, KeyContextId id) {
+    final result = context.dependOnInheritedWidgetOfExactType<GlobalKeyContext>();
+    assert(result != null, 'No KeyContext found in context');
+    return result!.ids[id]!;
   }
 
+  // @override
+  // bool updateShouldNotify(GlobalKeyId oldWidget) => id != oldWidget.id;
+
   @override
-  bool updateShouldNotify(ExerciseContextId oldWidget) => id != oldWidget.id;
+  bool updateShouldNotify(GlobalKeyContext oldWidget) => !mapEquals(ids, oldWidget.ids);
+}
+
+enum KeyContextId {
+  newExercisePanel,
+  allExercisePanel
 }

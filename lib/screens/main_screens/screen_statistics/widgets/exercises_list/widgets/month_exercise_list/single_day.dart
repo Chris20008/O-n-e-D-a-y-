@@ -35,6 +35,7 @@ class SingleDay extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 40),
       child: GestureDetector(
         onLongPress: (){
+          final originalName = exercise.exercise.name;
           cnNewExercisePanel.openPanel(
               exercise: exercise.exercise,
               onConfirm: (Exercise ex){
@@ -45,6 +46,16 @@ class SingleDay extends StatelessWidget {
                   cnScreenStatistics.refresh();
                   saveCurrentData(cnConfig);
                 }
+              },
+              validator: ({
+                required BuildContext context,
+                required String? value,
+                required CnNewExercisePanel cnNewExercise
+              }){
+                if(originalName != cnNewExercise.exercise.name){
+                  return "Du kannst den Namen in dieser Ansicht nicht bearbeiten";
+                }
+                return null;
               }
           );
         },

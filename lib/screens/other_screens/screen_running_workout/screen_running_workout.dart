@@ -19,6 +19,7 @@ import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../util/constants.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
+import '../all_exercises_panel/all_exercises_panel.dart';
 import 'widgets/animated_column.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -140,6 +141,8 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
             //       ),
             //     ),
             //   ),
+
+            const AllExercisesPanel(id: AllExercisePanelIds.runningWorkoutAllExercisesPanel),
 
             const SelectorExercisesToUpdate(),
 
@@ -407,38 +410,63 @@ class CnRunningWorkout extends ChangeNotifier {
   void addExercise(
       Exercise ex,
       BuildContext context,
-      {double? additionalScrollPosition}
+      {double? additionalScrollPosition, Exercise? exTemplate}
       ){
-    SingleSet newSet = ex.sets.first;
-    NamedSet newNamedSet = NamedSet(
-        set: newSet,
-        name: ex.name,
-        index: 0,
-        ex: ex,
-        weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
-        amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
-    );
+    List<NamedSet> namedSets = [];
+    (ex.sets).forEachIndexed((index, set){
+      NamedSet newNamedSet = NamedSet(
+          set: set,
+          name: ex.name,
+          index: index,
+          ex: ex,
+          // weightController: TextEditingController(text: (set.weightAsTrimmedDouble?? "").toString()),
+          // amountController: TextEditingController(text: (set.getAmountAsText(ex.category)?? "").toString())
+          weightController: TextEditingController(text: ("").toString()),
+          amountController: TextEditingController(text: ("").toString())
+      );
+      namedSets.add(newNamedSet);
+    });
+    // SingleSet newSet = ex.sets.first;
+    // NamedSet newNamedSet = NamedSet(
+    //     set: newSet,
+    //     name: ex.name,
+    //     index: 0,
+    //     ex: ex,
+    //     weightController: TextEditingController(text: (newSet.weightAsTrimmedDouble?? "").toString()),
+    //     amountController: TextEditingController(text: (newSet.getAmountAsText(ex.category)?? "").toString())
+    // );
     double maxScrollExtend = getMaxScrollExtend(context, additionalScrollPosition: additionalScrollPosition);
     if(ex.linkName == null){
-      workoutTemplateModifiable.exercises.add(Exercise.copy(ex));
+      workoutTemplateModifiable.exercises.add(Exercise.copy(exTemplate?? ex));
       workout.exercises.add(ex);
       newExNames.add(ex.name);
       exerciseOrder.add(ex.name);
       groupedExercises[ex.name] = ex;
-      groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
+      namedSets.forEachIndexed((index, set){
+        groupedExercises[getSetKeyName(ex.name, index)] = set;
+      });
+      // groupedExercises[getSetKeyName(ex.name, 0)] = newNamedSet;
 
       /// Add one set row and Exercise size
       if(maxScrollExtend > 0){
-        maxScrollExtend = maxScrollExtend + 40 + 133;
+        maxScrollExtend = maxScrollExtend + 40*namedSets.length.clamp(1, 10) + 133;
       }
       scrollController.animateTo(maxScrollExtend, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     } else{
       final insertIndex = workout.exercises.lastIndexWhere((e) => e.linkName == ex.linkName) + 1;
-      workoutTemplateModifiable.exercises.insert(insertIndex, Exercise.copy(ex));
+      workoutTemplateModifiable.exercises.insert(insertIndex, Exercise.copy(exTemplate?? ex));
       workout.exercises.insert(insertIndex ,ex);
       newExNames.add(ex.name);
       (groupedExercises[ex.linkName!] as GroupedExercise).add(ex);
-      (groupedExercises[getSetKeyName(ex.linkName!, 0)] as GroupedSet).add(newNamedSet);
+      namedSets.forEachIndexed((index, set){
+        final key = getSetKeyName(ex.linkName!, index);
+        if(groupedExercises.containsKey(key)){
+          (groupedExercises[key] as GroupedSet).add(set);
+        } else{
+          groupedExercises[key] = GroupedSet(set: set);
+        }
+      });
+      // (groupedExercises[getSetKeyName(ex.linkName!, 0)] as GroupedSet).add(newNamedSet);
 
       final lastIndex = groupedExercises.keys.toList().indexWhere((element) => element == getSetKeyName(ex.linkName!, 0));
       List<MapEntry<String, dynamic>> tempGroupedExercises = groupedExercises.entries.whereIndexed((index, element) => index <= lastIndex).toList();
