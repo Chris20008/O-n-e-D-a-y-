@@ -3,9 +3,11 @@ import 'package:fitness_app/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'animation_controller_name.dart';
+
 class InitialAnimatedScreen extends StatefulWidget {
 
-  final String animationControllerName;
+  final AnimationControllerName animationControllerName;
   final Widget child;
   final bool backDropEnabled;
   final BoxDecoration? decoration;
@@ -41,13 +43,13 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
   @override
   void initState() {
     super.initState();
-    cnHomepage.animationControllers[widget.animationControllerName] = animationController;
+    cnHomepage.animationControllers[widget.animationControllerName.value] = animationController;
   }
 
   @override
   void dispose() {
     super.dispose();
-    cnHomepage.animationControllers.remove(widget.animationControllerName);
+    cnHomepage.animationControllers.remove(widget.animationControllerName.value);
   }
 
   @override

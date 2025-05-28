@@ -17,6 +17,8 @@ import '../../util/config.dart';
 import '../../util/constants.dart';
 import 'dart:io';
 
+import '../../widgets/slide_up_panel/animation_controller_name.dart';
+
 class WelcomeScreen extends StatefulWidget {
   final Function(bool) onFinish;
   const WelcomeScreen({
@@ -52,7 +54,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       children: [
         InitialAnimatedScreen(
           decoration: null,
-          animationControllerName: "ScreenWelcome",
+          animationControllerName: AnimationControllerName.screenWelcome,
           child: Container(
             color: Theme.of(context).primaryColor,
             child: Stack(
@@ -74,8 +76,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
         MySlideUpPanel(
           controller: controllerExplainBackups,
-          animationControllerName: "ExplainBackups",
-          descendantAnimationControllerName: "ScreenWelcome",
+          animationControllerName: AnimationControllerName.explainBackups,
+          descendantAnimationControllerName: AnimationControllerName.screenWelcome,
           // backdropEnabled: false,
           // backdropColor: Colors.blue,
           // backdropOpacity: 1,

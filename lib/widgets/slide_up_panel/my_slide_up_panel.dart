@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import 'animation_controller_name.dart';
+
 class MySlideUpPanel extends StatefulWidget {
   final PanelController? controller;
   final PanelState defaultPanelState;
@@ -19,8 +21,8 @@ class MySlideUpPanel extends StatefulWidget {
   final bool backdropEnabled;
   final Color backdropColor;
   final double backdropOpacity;
-  final String? animationControllerName;
-  final String? descendantAnimationControllerName;
+  final AnimationControllerName? animationControllerName;
+  final AnimationControllerName? descendantAnimationControllerName;
   final bool isTouchingListView;
   final bool bounce;
   final Widget Function(
@@ -92,16 +94,16 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
     super.initState();
     if(widget.descendantAnimationControllerName != null){
-      descendantAnimationController = cnHomepage.animationControllers[widget.descendantAnimationControllerName!];
+      descendantAnimationController = cnHomepage.animationControllers[widget.descendantAnimationControllerName!.value];
     }
     if(widget.animationControllerName != null){
-      cnHomepage.animationControllers[widget.animationControllerName!] = animationController;
+      cnHomepage.animationControllers[widget.animationControllerName!.value] = animationController;
       if(descendantAnimationController != null){
-        cnHomepage.animationControllers["${widget.animationControllerName!}2"] = descendantAnimationController!;
+        cnHomepage.animationControllers["${widget.animationControllerName!.value}2"] = descendantAnimationController!;
       }
     }
     if(widget.descendantAnimationControllerName != null){
-      descendantAnimationController2 = cnHomepage.animationControllers["${widget.descendantAnimationControllerName}2"];
+      descendantAnimationController2 = cnHomepage.animationControllers["${widget.descendantAnimationControllerName!.value}2"];
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {

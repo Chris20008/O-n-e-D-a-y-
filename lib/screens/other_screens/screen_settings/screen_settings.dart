@@ -16,6 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../main.dart';
 import '../../../util/config.dart';
 import '../../../util/constants.dart';
+import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 
 class SettingsPanel extends StatefulWidget {
   const SettingsPanel({
@@ -108,8 +109,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
             MySlideUpPanel(
               controller: cnScreenStatistics.panelControllerSettings,
               onPanelSlide: onPanelSlide,
-              descendantAnimationControllerName: "ScreenStatistics",
-              animationControllerName: "ScreenSettings",
+              descendantAnimationControllerName: AnimationControllerName.screenStatistics,
+              animationControllerName: AnimationControllerName.screenSettings,
               /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
               /// when swiping down in  ListView
               panelBuilder: (context, listView){

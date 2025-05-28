@@ -16,6 +16,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../../widgets/bottom_menu.dart';
 import '../../../../../widgets/exercise_context_id.dart';
+import '../../../../../widgets/slide_up_panel/animation_controller_name.dart';
 
 class NewExercisePanel extends StatefulWidget {
   final String id;
@@ -76,8 +77,10 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
             controller: cnNewExercise.panelController,
             backdropOpacity: 0.25,
             color: Theme.of(context).primaryColor,
-            animationControllerName: "NewExercisePanel",
-            descendantAnimationControllerName: cnBottomMenu.index == 2? "ScreenStatistics" : "NewWorkoutPanel",
+            animationControllerName: AnimationControllerName.newExercisePanel,
+            descendantAnimationControllerName: cnBottomMenu.index == 2
+                ? AnimationControllerName.screenStatistics
+                : AnimationControllerName.newWorkoutPanel,
             panelBuilder: (context, listView) {
 
               if(panelIsClosed){

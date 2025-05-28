@@ -20,6 +20,7 @@ import '../../../../../objects/workout.dart';
 import '../../../../../util/constants.dart';
 import '../../../../../util/objectbox/ob_workout.dart';
 import '../../../../../widgets/bottom_menu.dart';
+import '../../../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../../../../widgets/standard_popup.dart';
 import '../../../screen_workout_history/screen_workout_history.dart';
 import '../../screen_workouts.dart';
@@ -84,8 +85,8 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
           controller: cnNewWorkout.panelController,
           minHeight: minPanelHeight,
           backdropEnabled: false,
-          animationControllerName: "NewWorkoutPanel",
-          descendantAnimationControllerName: "ScreenWorkouts",
+          animationControllerName: AnimationControllerName.newWorkoutPanel,
+          descendantAnimationControllerName: AnimationControllerName.screenWorkouts,
           color: Theme.of(context).primaryColor,
           onPanelSlide: onPanelSlide,
           panelBuilder: (context, listView){

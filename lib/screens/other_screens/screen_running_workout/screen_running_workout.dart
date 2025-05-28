@@ -18,6 +18,7 @@ import 'dart:io';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
 import '../../../util/constants.dart';
+import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
 import '../all_exercises_panel/all_exercises_panel.dart';
 import 'widgets/animated_column.dart';
@@ -61,7 +62,7 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
           children: [
             InitialAnimatedScreen(
               backDropEnabled: true,
-              animationControllerName: "ScreenRunningWorkout",
+              animationControllerName: AnimationControllerName.screenRunningWorkout,
               child: Scaffold(
                 backgroundColor: Theme.of(context).primaryColor,
                 extendBody: true,
@@ -142,7 +143,10 @@ class _ScreenRunningWorkoutState extends State<ScreenRunningWorkout>{
             //     ),
             //   ),
 
-            const AllExercisesPanel(id: AllExercisePanelIds.runningWorkoutAllExercisesPanel),
+            const AllExercisesPanel(
+              id: AllExercisePanelIds.runningWorkoutAllExercisesPanel,
+              descendantAnimationControllerName: AnimationControllerName.screenRunningWorkout,
+            ),
 
             const SelectorExercisesToUpdate(),
 

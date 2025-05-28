@@ -22,6 +22,7 @@ import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../util/persistent_scroll_controller.dart';
+import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings/screen_settings.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -84,7 +85,7 @@ class _ScreenStatisticsState extends State<ScreenStatistics> with WidgetsBinding
     return const Stack(
       children: [
         InitialAnimatedScreen(
-          animationControllerName: "ScreenStatistics",
+          animationControllerName: AnimationControllerName.screenStatistics,
           child: SafeArea(
             bottom: false,
             child: Column(

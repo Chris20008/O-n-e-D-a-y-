@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
+import '../../../../../widgets/slide_up_panel/animation_controller_name.dart';
+
 class ExplainBackupPanel extends StatelessWidget {
   final PanelController controllerExplainBackups;
   final ScrollController scrollControllerBackups;
@@ -19,8 +21,8 @@ class ExplainBackupPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return MySlideUpPanel(
       controller: controllerExplainBackups,
-      animationControllerName: "ExplainBackups",
-      descendantAnimationControllerName: "ScreenSettings",
+      animationControllerName: AnimationControllerName.explainBackups,
+      descendantAnimationControllerName: AnimationControllerName.screenSettings,
       panelBuilder: (context, listView){
         return Column(
           children: [

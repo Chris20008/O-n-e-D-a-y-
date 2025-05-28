@@ -13,14 +13,17 @@ import'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../util/objectbox/ob_exercise.dart';
+import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 
 class AllExercisesPanel extends StatefulWidget {
   final AllExercisePanelIds id;
+  final AnimationControllerName descendantAnimationControllerName;
 
   const AllExercisesPanel({
     super.key,
-    required this.id
+    required this.id,
+    required this.descendantAnimationControllerName
   });
 
   @override
@@ -73,8 +76,9 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
             bounce: false,
             controller: panelController,
             onPanelSlide: onPanelSlide,
-            animationControllerName: "AllExercisesPanel",
+            animationControllerName: AnimationControllerName.allExercisesPanel,
             // descendantAnimationControllerName: "NewWorkoutPanel",
+            descendantAnimationControllerName: widget.descendantAnimationControllerName,
             panelBuilder: (context, listView){
 
               if(panelIsClosed){
@@ -135,15 +139,11 @@ class CnAllExercisesPanel extends ChangeNotifier {
     onConfirm: (_){}
   );
 
-  // GlobalKey keyFirstListTile = GlobalKey();
-  // GlobalKey<NavigatorState>? navigatorKey = GlobalKey();
-  // GlobalKey keySideBar = GlobalKey();
   final Map<String, GlobalKey> _keysSideBar = {};
   final Map<String, GlobalKey<NavigatorState>?> _keysNavigator = {};
   final Map<String, GlobalKey> _keysFirstListTile = {};
   final Map<String, ScrollController> _scrollControllers = {};
   final Map<String, PanelController> _panelControllers = {};
-  // final PanelController panelController = PanelController();
 
   /// padding Side Bar that it scrolls up and down like the panel while sliding
   ValueNotifier<double> verticalPaddingSideBar = ValueNotifier(0);
@@ -183,7 +183,6 @@ class CnAllExercisesPanel extends ChangeNotifier {
 
   PanelController getPanelControllerById(AllExercisePanelIds id) {
     return _panelControllers.putIfAbsent(id.toString(), () => PanelController());
-
   }
 
   void onDispose(BuildContext context){

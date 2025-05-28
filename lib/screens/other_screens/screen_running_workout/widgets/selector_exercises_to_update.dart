@@ -16,6 +16,8 @@ import '../../../../objects/workout.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
+import '../../../../widgets/slide_up_panel/animation_controller_name.dart';
+
 class SelectorExercisesToUpdate extends StatefulWidget {
 
   const SelectorExercisesToUpdate({
@@ -51,8 +53,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
     return MySlideUpPanel(
       key: cnSelectorExerciseToUpdate.key,
-      animationControllerName: cnSelectorExerciseToUpdate.animationControllerName,
-      descendantAnimationControllerName: cnSelectorExerciseToUpdate.descendantNameExerciseToUpdate,
+      animationControllerName: AnimationControllerName.selectorExerciseToUpdate,
+      descendantAnimationControllerName: AnimationControllerName.screenRunningWorkout,
       backdropEnabled: true,
       backdropOpacity: 0.25,
       controller: cnSelectorExerciseToUpdate.panelController,
@@ -298,8 +300,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
 
 
 class CnSelectorExerciseToUpdate extends ChangeNotifier {
-  final String animationControllerName = "SelectorExerciseToUpdate";
-  final String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
+  // final String animationControllerName = "SelectorExerciseToUpdate";
+  // final String descendantNameExerciseToUpdate = "ScreenRunningWorkout";
   PanelController panelController = PanelController();
   List<bool> isCheckedList = [];
   List<Exercise> relevantExercises = [];
