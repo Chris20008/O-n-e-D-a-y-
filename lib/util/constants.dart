@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
@@ -1527,3 +1528,10 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
   });
 }
 
+Future<void> waitForNextFrame() {
+  final completer = Completer<void>();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    completer.complete();
+  });
+  return completer.future;
+}

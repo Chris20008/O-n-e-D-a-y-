@@ -45,75 +45,72 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
     panelController = cnAllExercisesPanel.getPanelControllerById(widget.id);
   }
 
-  // @override
-  // void dispose() {
-  //   cnAllExercisesPanel._panelControllers.remo
-  //   super.dispose();
-  // }
-
   @override
   Widget build(BuildContext context) {
     cnAllExercisesPanel = context.read<CnAllExercisesPanel>();
-    bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => !panelController.isAttached || panelController.panelPosition == 0);
 
-    pr("Rebuild All Exercises panel");
+    return ValueListenableBuilder(
+        valueListenable: cnAllExercisesPanel.showContent,
+        builder: (context, showContent, _){
+          if(!showContent){
+            return const SizedBox();
+          }
 
-    return PopScope(
-      // canPop: false,
-      // onPopInvokedWithResult: (_, __){
-      //   cnAllExercisesPanel.closePanel(id: widget.id);
-      // },
-      child: GlobalKeyContext(
-        ids: {
-          KeyContextId.allExercisePanel: widget.id.toString(),
-          KeyContextId.newExercisePanel: "${widget.id}_newExercise"
-        },
-        child: GestureDetector(
-          onTap: (){
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: MySlideUpPanel(
-            bounce: false,
-            controller: panelController,
-            onPanelSlide: onPanelSlide,
-            animationControllerName: AnimationControllerName.allExercisesPanel,
-            // descendantAnimationControllerName: "NewWorkoutPanel",
-            descendantAnimationControllerName: widget.descendantAnimationControllerName,
-            panelBuilder: (context, listView){
+          pr("Rebuild All Exercises panel");
 
-              if(panelIsClosed){
-                return const SizedBox();
-              }
+          return PopScope(
+            // canPop: false,
+            // onPopInvokedWithResult: (_, __){
+            //   cnAllExercisesPanel.closePanel(id: widget.id);
+            // },
+            child: GlobalKeyContext(
+              ids: {
+                KeyContextId.allExercisePanel: widget.id.toString(),
+                KeyContextId.newExercisePanel: "${widget.id}_newExercise"
+              },
+              child: GestureDetector(
+                onTap: (){
+                  FocusManager.instance.primaryFocus?.unfocus();
+                },
+                child: MySlideUpPanel(
+                  bounce: false,
+                  controller: panelController,
+                  onPanelSlide: onPanelSlide,
+                  animationControllerName: AnimationControllerName.allExercisesPanel,
+                  descendantAnimationControllerName: widget.descendantAnimationControllerName,
+                  panelBuilder: (context, listView){
 
-              return PopScope(
-                canPop: false,
-                child: Navigator(
-                  key: cnAllExercisesPanel.getNavigatorKey(context),
-                  initialRoute: '/allExercises',
-                  onGenerateRoute: (RouteSettings settings) {
-                    final routes = <String, WidgetBuilder>{
-                      '/allExercises': (_) => const AllExercises(),
-                      '/singleExercise': (_) => const NewExercise(),
-                    };
+                    return PopScope(
+                      canPop: false,
+                      child: Navigator(
+                        key: cnAllExercisesPanel.getNavigatorKey(context),
+                        initialRoute: '/allExercises',
+                        onGenerateRoute: (RouteSettings settings) {
+                          final routes = <String, WidgetBuilder>{
+                            '/allExercises': (_) => const AllExercises(),
+                            '/singleExercise': (_) => const NewExercise(),
+                          };
 
-                    final builder = routes[settings.name];
-                    if (builder != null) {
-                      return MaterialPageRoute(builder: builder, settings: settings);
-                    }
-                    return null;
+                          final builder = routes[settings.name];
+                          if (builder != null) {
+                            return MaterialPageRoute(builder: builder, settings: settings);
+                          }
+                          return null;
+                        },
+                      ),
+                    );
                   },
                 ),
-              );
-            },
-          ),
-        ),
-      ),
+              ),
+            ),
+          );
+        }
     );
   }
 
   void onPanelSlide(value){
     if(value == 0){
-      cnAllExercisesPanel.refresh();
+      cnAllExercisesPanel.showContent.value = false;
     }
     if(value == 1){
       cnAllExercisesPanel.refresh();
@@ -125,6 +122,7 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
 }
 
 class CnAllExercisesPanel extends ChangeNotifier {
+  ValueNotifier<bool> showContent = ValueNotifier(false);
   List<Exercise> exercises = [];
   List<TileItem> filteredExercises = [];
   List<TileItem> characters = [];
@@ -307,6 +305,8 @@ class CnAllExercisesPanel extends ChangeNotifier {
   }) async{
     reset();
     this.config = config;
+    showContent.value = true;
+    await waitForNextFrame();
     final pc = getPanelControllerById(id);
     if(!pc.isAttached){
       return;

@@ -424,10 +424,6 @@ class _MyHomePageState extends State<MyHomePage>{
 
                       const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
 
-                      // const ExerciseContextId(
-                      //     id: "newExercise",
-                      //     child: AllExercisesPanel()
-                      // ),
                       const AllExercisesPanel(
                         id: AllExercisePanelIds.mainAllExercisesPanel,
                         descendantAnimationControllerName: AnimationControllerName.newWorkoutPanel,

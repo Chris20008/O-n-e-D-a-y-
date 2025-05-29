@@ -168,7 +168,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
       scrollController?.removeListener(_listener);
     }
     animationController.dispose();
-    cnHomepage.animationControllers.remove(widget.descendantAnimationControllerName!.value);
+    cnHomepage.animationControllers.remove(widget.animationControllerName.value);
     cnHomepage.animationControllers.remove("${widget.animationControllerName.value}2");
   }
 

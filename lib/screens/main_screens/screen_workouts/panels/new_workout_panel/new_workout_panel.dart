@@ -8,6 +8,7 @@ import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -66,83 +67,87 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    // cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context);
     cnNewWorkout = context.read<CnNewWorkOutPanel>();
 
-    bool blockUi = context.select<CnNewWorkOutPanel, bool>((cn) => cn.blockUi);
-    double minPanelHeight = context.select<CnNewWorkOutPanel, double>((cn) => cn.minPanelHeight);
-    bool panelIsClosed = context.select<CnNewWorkOutPanel, bool>((cn) => !cn.panelController.isAttached || (cn.panelController.panelPosition == 0 && cn.minPanelHeight == 0));
+    return ValueListenableBuilder(
+        valueListenable: cnNewWorkout.showContent,
+        builder: (context, showContent, _){
 
-    pr("Workout Panel");
+          if(!showContent){
+            return const SizedBox();
+          }
 
-    return PopScope(
-      canPop: false,
-        onPopInvokedWithResult: (doPop, res){
-        if (cnNewWorkout.panelController.isPanelOpen
-            && !cnNewExercisePanel.panelController.isPanelOpen
-            && !tutorialIsRunning
-            && !cnNewWorkout.blockUi
-        ){
-          cnNewWorkout.panelController.close();
-        }
-      },
-      child: AbsorbPointer(
-        absorbing: blockUi,
-        child: MySlideUpPanel(
-          controller: cnNewWorkout.panelController,
-          minHeight: minPanelHeight,
-          backdropEnabled: false,
-          animationControllerName: AnimationControllerName.newWorkoutPanel,
-          descendantAnimationControllerName: AnimationControllerName.screenWorkouts,
-          color: Theme.of(context).primaryColor,
-          onPanelSlide: onPanelSlide,
-          panelBuilder: (context, listView){
+          bool blockUi = context.select<CnNewWorkOutPanel, bool>((cn) => cn.blockUi);
+          double minPanelHeight = context.select<CnNewWorkOutPanel, double>((cn) => cn.minPanelHeight);
 
-            if(panelIsClosed){
-              return const SizedBox();
-            }
+          pr("Workout Panel");
 
-            return GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () {
-                FocusScope.of(context).unfocus();
-                if(cnNewWorkout.panelController.isPanelClosed){
-                  HapticFeedback.selectionClick();
-                  cnNewWorkout.openPanel();
+          return PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (doPop, res){
+                if (cnNewWorkout.panelController.isPanelOpen
+                    && !cnNewExercisePanel.panelController.isPanelOpen
+                    && !tutorialIsRunning
+                    && !cnNewWorkout.blockUi
+                ){
+                  cnNewWorkout.panelController.close();
                 }
               },
-              child: Stack(
-                children: [
-                  SizedBox(
-                    height: double.maxFinite,
-                    width: double.maxFinite,
-                    child: Stack(
-                      children: [
-                        Listener(
-                          onPointerDown: (details){
-                            cnNewWorkout.lastPointerPosition = details.position;
-                          },
-                          child: ExerciseAndLinkListView(listView: listView),
+              child: AbsorbPointer(
+                absorbing: blockUi,
+                child: MySlideUpPanel(
+                    controller: cnNewWorkout.panelController,
+                    minHeight: minPanelHeight,
+                    backdropEnabled: false,
+                    animationControllerName: AnimationControllerName.newWorkoutPanel,
+                    descendantAnimationControllerName: AnimationControllerName.screenWorkouts,
+                    color: Theme.of(context).primaryColor,
+                    onPanelSlide: onPanelSlide,
+                    panelBuilder: (context, listView){
+
+                      return GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onTap: () {
+                          FocusScope.of(context).unfocus();
+                          if(cnNewWorkout.panelController.isPanelClosed){
+                            HapticFeedback.selectionClick();
+                            cnNewWorkout.openPanel();
+                          }
+                        },
+                        child: Stack(
+                          children: [
+                            SizedBox(
+                              height: double.maxFinite,
+                              width: double.maxFinite,
+                              child: Stack(
+                                children: [
+                                  Listener(
+                                    onPointerDown: (details){
+                                      cnNewWorkout.lastPointerPosition = details.position;
+                                    },
+                                    child: ExerciseAndLinkListView(listView: listView),
+                                  ),
+                                  NewWorkoutHeader(
+                                      tutorialIsRunning: tutorialIsRunning,
+                                      currentTutorialStep: currentTutorialStep
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        NewWorkoutHeader(
-                          tutorialIsRunning: tutorialIsRunning,
-                          currentTutorialStep: currentTutorialStep
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-        ),
-      )
+                      );
+                    }
+                ),
+              )
+          );
+        }
     );
   }
 
   void onPanelSlide(value){
-    if(value == 0){
-      cnNewWorkout.refresh();
+    if(value == 0 && cnNewWorkout.minPanelHeight == 0){
+      cnNewWorkout.showContent.value = false;
     }
     else if(value == 1){
       cnNewWorkout.panelHasFullyOpened = true;
@@ -153,6 +158,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 }
 
 class CnNewWorkOutPanel extends ChangeNotifier{
+  ValueNotifier<bool> showContent = ValueNotifier(false);
   final GlobalKey keyAddLink = GlobalKey();
   final GlobalKey keyAddExercise = GlobalKey();
   final GlobalKey keyTextFieldWorkoutName = GlobalKey();
@@ -348,7 +354,8 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   }
 
   Future openPanelWithRefresh() async{
-    HapticFeedback.selectionClick();
+    showContent.value = true;
+    await waitForNextFrame();
     /// jump to minimal position to make initial build
     /// so that the slide up is smooth
     /// also allow the Panel to build it's content since it's a SizedBox()
@@ -400,6 +407,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     cnNewExercisePanel.clear();
     formKey.currentState?.reset();
     if(panelController.panelPosition < 0.05){
+      showContent.value = false;
       cnBottomMenu.refresh();
     }
   }

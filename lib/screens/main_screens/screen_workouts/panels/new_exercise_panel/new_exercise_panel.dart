@@ -47,61 +47,66 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   @override
   Widget build(BuildContext context) {
     cnNewExercise = context.read<CnNewExercisePanel>();
-    bool panelIsClosed = context.select<CnNewExercisePanel, bool>((cn) => !cn.panelController.isAttached || cn.panelController.panelPosition == 0);
 
-    pr("Exercise Panel");
+    return ValueListenableBuilder(
+        valueListenable: cnNewExercise.showContent,
+        builder: (context, showContent, _){
 
-    return GlobalKeyContext(
-      ids: {KeyContextId.newExercisePanel: widget.id},
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (doPop, res){
-          if (cnNewExercise.panelController.isPanelOpen){
-            cnNewExercise.closePanel(doClear: false, context: context);
+          if(!showContent){
+            return const SizedBox();
           }
-        },
-        child: GestureDetector(
-          onTap: () {
-            FocusManager.instance.primaryFocus?.unfocus();
-          },
-          child: MySlideUpPanel(
-            key: cnNewExercise.key,
-            onPanelSlide: onPanelSlide,
-            controller: cnNewExercise.panelController,
-            backdropOpacity: 0.25,
-            color: Theme.of(context).primaryColor,
-            animationControllerName: AnimationControllerName.newExercisePanel,
-            descendantAnimationControllerName: cnBottomMenu.index == 2
-                ? AnimationControllerName.screenStatistics
-                : AnimationControllerName.newWorkoutPanel,
-            panelBuilder: (context, listView) {
 
-              if(panelIsClosed){
-                return const SizedBox();
-              }
+          pr("Exercise Panel");
 
-              return Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      FocusManager.instance.primaryFocus?.unfocus();
-                    },
-                    child: const SetListView(),
-                  ),
+          return GlobalKeyContext(
+            ids: {KeyContextId.newExercisePanel: widget.id},
+            child: PopScope(
+              canPop: false,
+              onPopInvokedWithResult: (doPop, res){
+                if (cnNewExercise.panelController.isPanelOpen){
+                  cnNewExercise.closePanel(doClear: false, context: context);
+                }
+              },
+              child: GestureDetector(
+                  onTap: () {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                  },
+                  child: MySlideUpPanel(
+                      key: cnNewExercise.key,
+                      onPanelSlide: onPanelSlide,
+                      controller: cnNewExercise.panelController,
+                      backdropOpacity: 0.25,
+                      color: Theme.of(context).primaryColor,
+                      animationControllerName: AnimationControllerName.newExercisePanel,
+                      descendantAnimationControllerName: cnBottomMenu.index == 2
+                          ? AnimationControllerName.screenStatistics
+                          : AnimationControllerName.newWorkoutPanel,
+                      panelBuilder: (context, listView) {
 
-                  const NewExerciseHeader()
-                ],
-              );
-            }
-          )
-        ),
-      ),
+                        return Stack(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                FocusManager.instance.primaryFocus?.unfocus();
+                              },
+                              child: const SetListView(),
+                            ),
+
+                            const NewExerciseHeader()
+                          ],
+                        );
+                      }
+                  )
+              ),
+            ),
+          );
+        }
     );
   }
 
   void onPanelSlide(value){
     if(value == 0){
-      cnNewExercise.refresh();
+      cnNewExercise.showContent.value = false;
     }
 
     if(cnNewWorkOutPanel.panelController.panelPosition < 0.1){
@@ -111,6 +116,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
 }
 
 class CnNewExercisePanel extends ChangeNotifier {
+  ValueNotifier<bool> showContent = ValueNotifier(false);
   final PanelController panelController = PanelController();
 
   final GlobalKey keyHeader = GlobalKey();
@@ -510,7 +516,8 @@ class CnNewExercisePanel extends ChangeNotifier {
 
     exerciseNameFieldValidator = validator;
     this.onConfirm = onConfirm;
-    // HapticFeedback.selectionClick();
+    showContent.value = true;
+    await waitForNextFrame();
     /// jump to minimal position to make initial build
     /// so that the slide up is smooth
     /// also allow the Panel to build it's content since it's a SizedBox()
