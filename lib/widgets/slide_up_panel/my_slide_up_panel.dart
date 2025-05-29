@@ -59,7 +59,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   final double minBorderRadius = 15;
   final double maxBorderRadius = Platform.isAndroid? 30 : 50;
   final double minScale = Platform.isAndroid? 0.85 : 0.8;
-  final double maxTopPadding = Platform.isAndroid? -40 : -52;
+  final double maxTopPadding = Platform.isAndroid? -40 : -48;
 
   late final AnimationController animationController = AnimationController(
     vsync: this,

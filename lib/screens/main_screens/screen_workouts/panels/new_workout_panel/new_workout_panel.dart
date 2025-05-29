@@ -8,7 +8,6 @@ import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_exercise.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
