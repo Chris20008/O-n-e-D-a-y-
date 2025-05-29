@@ -143,20 +143,33 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if(scrollController != null && scrollController!.hasClients){
-        scrollController?.addListener(() {
-          if(scrollController!.offset > 30 || scrollController!.offset < -15){
-            isScrolling = true;
-          }
-          else{
-            isScrolling = false;
-          }
-        });
+        scrollController?.addListener(_listener);
       }
     });
 
     if(widget.panelBuilder == null){
       bounceAllowed = true && widget.bounce;
     }
+  }
+
+  void _listener(){
+    if(scrollController!.offset > 30 || scrollController!.offset < -15){
+      isScrolling = true;
+    }
+    else{
+      isScrolling = false;
+    }
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
+    if(scrollController != null && scrollController!.hasClients){
+      scrollController?.removeListener(_listener);
+    }
+    animationController.dispose();
+    cnHomepage.animationControllers.remove(widget.descendantAnimationControllerName!.value);
+    cnHomepage.animationControllers.remove("${widget.animationControllerName.value}2");
   }
 
   Future animateScrollControllerToDelta()async{

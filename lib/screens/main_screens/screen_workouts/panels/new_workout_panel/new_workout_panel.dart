@@ -46,15 +46,23 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       cnNewWorkout.initVsync(this);
-      cnNewWorkout.scrollController.addListener(() {
-        for (SlidableExerciseOrLink item in cnNewWorkout.exercisesAndLinks) {
-          SlidableController controller = item.slidableController;
-          if(controller.animation.value > 0 && !controller.closing){
-            controller.close();
-          }
-        }
-      });
+      cnNewWorkout.scrollController.addListener(_listener);
     });
+  }
+
+  void _listener(){
+    for (SlidableExerciseOrLink item in cnNewWorkout.exercisesAndLinks) {
+      SlidableController controller = item.slidableController;
+      if(controller.animation.value > 0 && !controller.closing){
+        controller.close();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    cnNewWorkout.scrollController.removeListener(_listener);
+    super.dispose();
   }
 
   @override
