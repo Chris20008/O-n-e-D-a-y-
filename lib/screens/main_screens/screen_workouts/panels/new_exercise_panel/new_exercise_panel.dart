@@ -45,14 +45,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
   }
 
   @override
-  void dispose() {
-    cnNewExercise.onDispose(context);
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // cnNewExercise = Provider.of<CnNewExercisePanel>(context);
     cnNewExercise = context.read<CnNewExercisePanel>();
     bool panelIsClosed = context.select<CnNewExercisePanel, bool>((cn) => !cn.panelController.isAttached || cn.panelController.panelPosition == 0);
 
@@ -135,7 +128,6 @@ class CnNewExercisePanel extends ChangeNotifier {
   Key key = UniqueKey();
   Exercise exercise = Exercise();
   TextEditingController exerciseNameController = TextEditingController();
-  // ScrollController scrollController = ScrollController();
   late List<Key> slidableKeys = exercise.generateKeyForEachSet();
   Function(Exercise ex)? onConfirm;
   ExerciseNameValidator? exerciseNameFieldValidator;
@@ -184,10 +176,12 @@ class CnNewExercisePanel extends ChangeNotifier {
     return GlobalKeyContext.of(context, KeyContextId.newExercisePanel) == defaultContextId;
   }
 
-  void onDispose(BuildContext context){
-    final sc = getScrollController(context);
-    sc.dispose();
-    _scrollControllers.remove(sc);
+  void disposeScrollController(String contextId){
+    final sc = _scrollControllers[contextId];
+    if(sc != null){
+      sc.dispose();
+      _scrollControllers.remove(contextId);
+    }
   }
 
   CnNewExercisePanel(){

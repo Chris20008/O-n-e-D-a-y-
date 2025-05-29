@@ -14,17 +14,16 @@ class TopHeaderLetter extends StatefulWidget {
 }
 
 class _TopHeaderLetterState extends State<TopHeaderLetter> {
-  late CnAllExercisesPanel cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context, listen: true);
+  late CnAllExercisesPanel cnAllExercisesPanel = context.watch<CnAllExercisesPanel>();
   String currTopLetter = "A";
   double sizeListTile = 0;
   bool doBlur = false;
-  late final ScrollController sc;
+  late final ScrollController sc = cnAllExercisesPanel.getScrollController(context);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      sc = cnAllExercisesPanel.getScrollController(context);
       if(sc.hasClients){
         sc.addListener(updateHeader);
       }
@@ -44,7 +43,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
     }
     initSize();
     final index = (
-        (cnAllExercisesPanel.getScrollController(context).position.pixels-10) ~/ (sizeListTile+ AllExercisesSeparator.height)
+        (sc.position.pixels-10) ~/ (sizeListTile+ AllExercisesSeparator.height)
     ).clamp(0, cnAllExercisesPanel.filteredExercises.length-1);
 
     if(cnAllExercisesPanel.filteredExercises[index].name[0] != currTopLetter){
@@ -59,7 +58,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
 
   @override
   Widget build(BuildContext context) {
-    if(cnAllExercisesPanel.getScrollController(context).hasClients){
+    if(sc.hasClients){
       updateHeader(withRefresh: false);
     }
     Widget text = Align(

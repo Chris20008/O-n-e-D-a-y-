@@ -15,6 +15,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../../../../../widgets/exercise_context_id.dart';
+
 class SetListView extends StatefulWidget {
   // final ScrollController? controller;
 
@@ -34,11 +36,28 @@ class _SetListViewState extends State<SetListView> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnStandardPopUp cnStandardPopUp = Provider.of<CnStandardPopUp>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+  late final String contextId; // = GlobalKeyContext.of(context, KeyContextId.newExercisePanel);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      contextId = GlobalKeyContext.of(context, KeyContextId.newExercisePanel);
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      cnNewExercise.disposeScrollController(contextId);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    cnNewExercise = context.read<CnNewExercisePanel>();
     double insetsBottom = MediaQuery.of(context).viewInsets.bottom;
     double screenHeight = MediaQuery.of(context).size.height;
 

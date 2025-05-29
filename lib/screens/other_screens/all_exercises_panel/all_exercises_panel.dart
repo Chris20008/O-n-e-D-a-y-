@@ -185,12 +185,6 @@ class CnAllExercisesPanel extends ChangeNotifier {
     return _panelControllers.putIfAbsent(id.toString(), () => PanelController());
   }
 
-  void onDispose(BuildContext context){
-    final sc = getScrollController(context);
-    sc.dispose();
-    _scrollControllers.remove(sc);
-  }
-
   Future initExercises()async{
     exercises.clear();
     final tempExercisesAdded = [];
