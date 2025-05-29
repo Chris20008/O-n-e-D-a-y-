@@ -21,7 +21,7 @@ class MySlideUpPanel extends StatefulWidget {
   final bool backdropEnabled;
   final Color backdropColor;
   final double backdropOpacity;
-  final AnimationControllerName? animationControllerName;
+  final AnimationControllerName animationControllerName;
   final AnimationControllerName? descendantAnimationControllerName;
   final bool isTouchingListView;
   final bool bounce;
@@ -44,7 +44,7 @@ class MySlideUpPanel extends StatefulWidget {
     this.backdropEnabled = false,
     this.backdropColor = Colors.black,
     this.backdropOpacity = 0.5,
-    this.animationControllerName,
+    required this.animationControllerName,
     this.descendantAnimationControllerName,
     this.isTouchingListView = false,
     this.panelBuilder,
@@ -56,14 +56,51 @@ class MySlideUpPanel extends StatefulWidget {
 }
 
 class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStateMixin{
+  final double minBorderRadius = 15;
+  final double maxBorderRadius = Platform.isAndroid? 30 : 50;
+  final double minScale = Platform.isAndroid? 0.85 : 0.8;
+  final double maxTopPadding = Platform.isAndroid? -40 : -52;
+
   late final AnimationController animationController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 400),
   );
+
+  /// Scale
+  late final Animation<double> scaleAnim = Tween<double>(begin: 1.0, end: minScale)
+      .animate(animationController);
+
+  /// Opacity
+  late final Animation<double> opacityAnim = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 0.0, end: 0.25), weight: 0.5),
+    TweenSequenceItem(tween: Tween(begin: 0.25, end: 0.0), weight: 0.5),
+  ]).animate(animationController);
+
+  /// BorderRadius
+  late final borderRadiusAnim = Tween<double>(begin: maxBorderRadius, end: minBorderRadius).animate(
+    CurvedAnimation(
+      parent: animationController,
+      curve: const Interval(
+        0.0, 0.5,
+        curve: Curves.linear,
+      ),
+    ),
+  );
+
+  /// Top Padding
+  late final Animation<double> topPaddingAnim = TweenSequence<double>([
+    TweenSequenceItem(tween: Tween(begin: 0.0, end: maxTopPadding), weight: 0.5),
+    TweenSequenceItem(tween: Tween(begin: maxTopPadding, end: 0.0), weight: 0.5),
+  ]).animate(animationController);
+
+  // /// Top Padding
+  // late final Animation<double> topPaddingAnim = Tween<double>(begin: 0, end: 0)
+  //     .animate(animationController);
+
+
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   AnimationController? descendantAnimationController;
   AnimationController? descendantAnimationController2;
-  final maxTopPadding = Platform.isAndroid? -45 : -52;
   late Color color = widget.color?? Theme.of(context).primaryColor;
   double overScrollOffset = 0;
   late PanelController panelController = widget.controller?? PanelController();
@@ -96,11 +133,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
     if(widget.descendantAnimationControllerName != null){
       descendantAnimationController = cnHomepage.animationControllers[widget.descendantAnimationControllerName!.value];
     }
-    if(widget.animationControllerName != null){
-      cnHomepage.animationControllers[widget.animationControllerName!.value] = animationController;
-      if(descendantAnimationController != null){
-        cnHomepage.animationControllers["${widget.animationControllerName!.value}2"] = descendantAnimationController!;
-      }
+    cnHomepage.animationControllers[widget.animationControllerName.value] = animationController;
+    if(descendantAnimationController != null){
+      cnHomepage.animationControllers["${widget.animationControllerName.value}2"] = descendantAnimationController!;
     }
     if(widget.descendantAnimationControllerName != null){
       descendantAnimationController2 = cnHomepage.animationControllers["${widget.descendantAnimationControllerName!.value}2"];
@@ -332,23 +367,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
               }
             },
             onPointerMove: (details) {
-              if(/*!bounceAllowed || */recognizedLongPress){
+              if(recognizedLongPress){
                 return;
               }
-
-              // final result = HitTestResult();
-              // WidgetsBinding.instance.hitTest(result, details.position);
-              //
-              // /// when metadata is blockPanelGestures, ignore this pointer
-              // for(final entry in result.path){
-              //   final target = entry.target;
-              //   if(target is RenderMetaData){
-              //     final meta = target.metaData;
-              //     if(meta == "blockPanelGestures"){
-              //       return;
-              //     }
-              //   }
-              // }
 
               /// Recognize horizontal or vertical drag
               if(isDraggingVertical == null){
@@ -451,55 +472,29 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
         }
     );
 
-    if(widget.animationControllerName != null){
-      return AnimatedBuilder(
-          animation: animationController,
-          builder: (context, child){
-            double scale = 1.0 - (animationController.value * (Platform.isAndroid? 0.15 : 0.2));
-            double topPadding = animationController.value*(maxTopPadding*2 + 10);
-            topPadding = topPadding > 0 ? 0 : topPadding;
-            if(topPadding < maxTopPadding){
-              topPadding = maxTopPadding - (topPadding - maxTopPadding);
-            }
-            double opacity = animationController.value;
-            /// Scales the opacity from 0 -> 0.5 when animationController is between 0 - 0.5
-            /// And back from 0.5 - > 0 when animationController is between 0.5 - 1
-            /// We do that, because on exercise panel the backdropEnabled is True, so we don't
-            /// need this anymore when exercise panel is opened because it would become to dark
-            /// with backdrop AND this AnimatedBuilder together
-            opacity = opacity > 0.5 ? 1 - opacity : opacity;
-            opacity = opacity * 0.5;
+    return AnimatedBuilder(
+      animation: animationController,
+      builder: (context, child){
 
-            return Stack(
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 0),
-                  transform: Matrix4.translationValues(0, topPadding, 0),
-                  child: Transform.scale(
-                    scale: scale,
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30 -  (scale*10-9)*25),
-                        child: Container(
-                            child: child
-                        )
-                    ),
-                  ),
-                ),
-                if(animationController.value > 0)
-                  IgnorePointer(
-                      ignoring: opacity > 0 ? false : true,
-                      child: Container(
-                        color: Colors.black.withValues(alpha: opacity),
-                      )
-                  )
-              ],
-            );
-          },
-          child: panel,
-      );
-    }
+        final matrix = Matrix4.identity()
+          ..translate(0.0, topPaddingAnim.value)
+          ..scale(scaleAnim.value);
 
-    return panel;
+        return Transform(
+          transform: matrix,
+          alignment: Alignment.center,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              child ?? const SizedBox(),
+              if(opacityAnim.value > 0)
+                Container(color: Color.fromRGBO(0, 0, 0, opacityAnim.value)),
+            ],
+          ),
+        );
+      },
+      child: panel,
+    );
   }
 }
 

@@ -34,11 +34,35 @@ class InitialAnimatedScreen extends StatefulWidget {
 }
 
 class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with TickerProviderStateMixin{
+
+  final double minBorderRadius = 15;
+  final double maxBorderRadius = Platform.isAndroid? 30 : 50;
+  final double minScale = Platform.isAndroid? 0.85 : 0.755;
+  late CnHomepage cnHomepage = context.read<CnHomepage>();
+
   late final AnimationController animationController = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 300),
+    duration: const Duration(milliseconds: 400),
   );
-  late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
+
+  /// Opacity
+  late final opacityAnim = Tween<double>(begin: 0.0, end: 1.0)
+      .animate(animationController);
+
+  /// BorderRadius
+  late final borderRadiusAnim = Tween<double>(begin: maxBorderRadius, end: minBorderRadius).animate(
+    CurvedAnimation(
+      parent: animationController,
+      curve: const Interval(
+        0.0, 0.5,
+        curve: Curves.linear,
+      ),
+    ),
+  );
+
+  /// Scale
+  late final scaleAnim = Tween<double>(begin: 1.0, end: minScale)
+      .animate(animationController);
 
   @override
   void initState() {
@@ -49,68 +73,43 @@ class _InitialAnimatedScreenState extends State<InitialAnimatedScreen> with Tick
   @override
   void dispose() {
     super.dispose();
+    animationController.dispose();
     cnHomepage.animationControllers.remove(widget.animationControllerName.value);
   }
 
   @override
   Widget build(BuildContext context) {
+
     return AnimatedBuilder(
       animation: animationController,
       builder: (context, child) {
 
-        /// Scale
-        const iOSValue = 0.245;
-        const androidValue = 0.15;
-        final platformValue = animationController.value * (Platform.isAndroid? androidValue : iOSValue);
-        double scale = 1.0 - (platformValue);
-
         /// BorderRadius
-        const double minBorderRadius = 15;
-        final double maxBorderRadius = Platform.isAndroid? 30 : 50;
-        final double multiplier = (maxBorderRadius - minBorderRadius) / 0.5;
-        double borderRadius = (maxBorderRadius - multiplier * animationController.value).clamp(minBorderRadius, maxBorderRadius);
-        if (borderRadius == maxBorderRadius){
-          borderRadius = 0;
-        }
-
-        /// Opacity
-        double opacity = (animationController.value * 1.1).clamp(0, 1);
-        if(!widget.backDropEnabled){
-          opacity = 0;
-        }
+        final double borderRadius = borderRadiusAnim.value == maxBorderRadius ? 0 : borderRadiusAnim.value;
 
         /// Transform y position
         double y = animationController.value * 10;
 
+        final matrix = Matrix4.identity()
+          ..translate(0.0, y)
+          ..scale(scaleAnim.value);
+
         return Transform(
-          transform: Matrix4.translationValues(
-            ///x
-            0,
-            ///y
-            y,
-            ///z
-            0),
-          child: Transform.scale(
-            scale: scale,
-            child: ClipRRect(
-                borderRadius: BorderRadius.circular(borderRadius),
-                child: Container(
-                  decoration: widget.decoration,
-                  child: Stack(
-                    children: [
-                      child?? const SizedBox(),
-                      if(opacity > 0)
-                        IgnorePointer(
-                            ignoring: opacity > 0 ? false : true,
-                            child: Container(
-                              color: Colors.black.withValues(alpha: opacity),
-                              // color: Color.alphaBlend(Colors.black.withValues(alpha: 0.2), Theme.of(context).primaryColor).withValues(alpha: opacity),
-                            )
-                        )
-                    ],
-                  ),
-                )
-            ),
+          transform: matrix,
+          alignment: Alignment.center,
+          child: ClipRRect(
+              borderRadius: BorderRadius.circular(borderRadius),
+              child: Container(
+                decoration: widget.decoration,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    child ?? const SizedBox(),
+                    if(opacityAnim.value > 0 && widget.backDropEnabled)
+                      Container(color: Color.fromRGBO(0, 0, 0, opacityAnim.value)),
+                  ],
+                ),
+              )
           ),
         );
       },
