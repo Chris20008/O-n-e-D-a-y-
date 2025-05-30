@@ -345,6 +345,9 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
   }
 
   Future openPanel() async{
+    if(!panelController.isAttached){
+      return;
+    }
     /// jump to minimal position to make initial build
     /// so that the slide up is smooth
     /// also allow the Panel to build it's content since it's a SizedBox()

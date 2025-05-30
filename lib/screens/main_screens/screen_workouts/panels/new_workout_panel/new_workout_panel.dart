@@ -356,6 +356,9 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   Future openPanelWithRefresh() async{
     showContent.value = true;
     await waitForNextFrame();
+    if(!panelController.isAttached){
+      return;
+    }
     /// jump to minimal position to make initial build
     /// so that the slide up is smooth
     /// also allow the Panel to build it's content since it's a SizedBox()
@@ -379,6 +382,9 @@ class CnNewWorkOutPanel extends ChangeNotifier{
   }
 
   Future<void> openPanel() async{
+    if(!panelController.isAttached){
+      return;
+    }
     await panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 500),
@@ -662,6 +668,9 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     }
     minPanelHeight = 0;
     refresh();
+    if(!panelController.isAttached){
+      return;
+    }
     await Future.delayed(const Duration(milliseconds: 50), () async{
       await panelController.animatePanelToPosition(
           0,

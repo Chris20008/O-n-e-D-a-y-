@@ -518,6 +518,9 @@ class CnNewExercisePanel extends ChangeNotifier {
     this.onConfirm = onConfirm;
     showContent.value = true;
     await waitForNextFrame();
+    if(!panelController.isAttached){
+      return;
+    }
     /// jump to minimal position to make initial build
     /// so that the slide up is smooth
     /// also allow the Panel to build it's content since it's a SizedBox()
@@ -540,15 +543,21 @@ class CnNewExercisePanel extends ChangeNotifier {
   }
 
   Future closePanel({bool doClear = false, required BuildContext context}) async {
-    if(MediaQuery.of(context).viewInsets.bottom > 0){
-      FocusManager.instance.primaryFocus?.unfocus();
-      await Future.delayed(const Duration(milliseconds: 300));
+    try{
+      if(MediaQuery.of(context).viewInsets.bottom > 0){
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 300));
+      }
+      if(!panelController.isAttached){
+        return;
+      }
+      await panelController.animatePanelToPosition(
+          0,
+          duration: Duration(milliseconds: animationTime-150),
+          curve: Curves.decelerate
+      );
     }
-    await panelController.animatePanelToPosition(
-        0,
-        duration: Duration(milliseconds: animationTime-150),
-        curve: Curves.decelerate
-    );
+    catch (_) {}
     return;
   }
 
