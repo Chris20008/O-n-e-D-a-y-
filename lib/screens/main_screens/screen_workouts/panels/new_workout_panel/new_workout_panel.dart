@@ -112,7 +112,7 @@ class _NewWorkOutPanelState extends State<NewWorkOutPanel> with TickerProviderSt
                           FocusScope.of(context).unfocus();
                           if(cnNewWorkout.panelController.isPanelClosed){
                             HapticFeedback.selectionClick();
-                            cnNewWorkout.openPanel();
+                            cnNewWorkout.openPanel(context);
                           }
                         },
                         child: Stack(
@@ -299,15 +299,19 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     refresh();
   }
 
-  Future openPanelAsTemplate() async{
+  Future openPanelAsTemplate(BuildContext context) async{
     if(isUpdating){
       clear();
     }
     workout.isTemplate = true;
-    await openPanelWithRefresh();
+    await openPanelWithRefresh(context);
   }
 
-  void openExercise(Exercise ex, {bool copied = false, required CnNewExercisePanel cnNewExercisePanel}){
+  void openExercise(Exercise ex, {
+    bool copied = false,
+    required CnNewExercisePanel cnNewExercisePanel,
+    required BuildContext context
+  }){
     // CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
 
     /// Clone exercise to prevent directly change settings in original exercise before saving
@@ -332,7 +336,8 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       cnNewExercisePanel.openPanel(
           exercise: exToEdit,
           onConfirm: confirmAddExercise,
-          validator: exerciseNameFieldValidator
+          validator: exerciseNameFieldValidator,
+          context: context
       );
     }
   }
@@ -354,7 +359,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     return null;
   }
 
-  Future openPanelWithRefresh() async{
+  Future openPanelWithRefresh(BuildContext context) async{
     showContent.value = true;
     await waitForNextFrame();
     if(!panelController.isAttached){
@@ -373,7 +378,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     refresh();
     /// Wait 100 ms that the first build is fully done
     await Future.delayed(const Duration(milliseconds: 100));
-    await openPanel();
+    await openPanel(context);
     minPanelHeight = keepShowingPanelHeight;
     /// is needed to move spotifyBar higher when panel is opened
     cnHomepage.refresh();
@@ -382,15 +387,17 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     cnWorkoutHistory.refresh();
   }
 
-  Future<void> openPanel() async{
+  Future<void> openPanel(BuildContext context) async{
     if(!panelController.isAttached){
       return;
     }
+    OverlayEntry ov = blockUserInput(context, duration: null)!;
     await panelController.animatePanelToPosition(
         1,
         duration: const Duration(milliseconds: 500),
         curve: Curves.fastEaseInToSlowEaseOut
     );
+    ov.remove();
   }
 
   void dismissExercise(SlidableExerciseOrLink ex){
@@ -709,14 +716,15 @@ class CnNewWorkOutPanel extends ChangeNotifier{
 
   Future editWorkout({
     Workout? workout,
-    ObSickDays? sickDays
+    ObSickDays? sickDays,
+    required BuildContext context
   }) async{
     if (workout != null){
       isSickDays = false;
       Workout w = Workout.clone(workout);
       /// When same workout
       if(isUpdating && this.workout.id == w.id){
-        await openPanelWithRefresh();
+        await openPanelWithRefresh(context);
       }
       /// When different workout
       else{
@@ -726,7 +734,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         updateExercisesAndLinksList();
         insertLinksAtPlace();
         orderExercises();
-        await openPanelWithRefresh();
+        await openPanelWithRefresh(context);
       }
     }
     else if(sickDays != null){
@@ -734,7 +742,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       isSickDays = true;
       isUpdating = true;
       this.sickDays = sickDays;
-      await openPanelWithRefresh();
+      await openPanelWithRefresh(context);
       minPanelHeight = keepShowingPanelHeightSickDays;
     }
 

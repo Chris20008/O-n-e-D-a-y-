@@ -13,7 +13,8 @@ Widget getExerciseOrLinkChild({
   required CnNewWorkOutPanel cnNewWorkout,
   required CnNewExercisePanel cnNewExercisePanel,
   required bool isTotalLastItem,
-  required bool isLastItemInGroup
+  required bool isLastItemInGroup,
+  required BuildContext context
 }){
   final bool withSpacer = isTotalLastItem || isLastItemInGroup || !item.hasLink;
 
@@ -30,10 +31,19 @@ Widget getExerciseOrLinkChild({
         cnNewWorkout.dismissExercise(item);
       },
       onTap: (){
-        cnNewWorkout.openExercise(item.exercise!, cnNewExercisePanel: cnNewExercisePanel);
+        cnNewWorkout.openExercise(
+            item.exercise!,
+            cnNewExercisePanel: cnNewExercisePanel,
+            context: context
+        );
       },
       onTapCopy: (){
-        cnNewWorkout.openExercise(item.exercise!, copied: true, cnNewExercisePanel: cnNewExercisePanel);
+        cnNewWorkout.openExercise(
+            item.exercise!,
+            copied: true,
+            cnNewExercisePanel: cnNewExercisePanel,
+            context: context
+        );
       },
       onTapChangeLinkState: () async{
         await tapChangeLinkState(

@@ -133,7 +133,7 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                             backgroundColor: WidgetStateProperty.all(Colors.transparent),
                           ),
                           onPressed: () {
-                            cnNewWorkout.openPanelAsTemplate();
+                            cnNewWorkout.openPanelAsTemplate(context);
                           },
                           icon: Icon(
                               Icons.add,

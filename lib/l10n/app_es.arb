@@ -43,7 +43,7 @@
   "createdBackupFailed": "No se pudo crear la copia de seguridad",
   "savedDataForSync": "Datos guardados para sincronizar",
   "accessDenied": "Acceso denegado",
-  "accessDeniedHealth": "El acceso a tus datos de salud ha sido denegado. Puedes activarlo en cualquier momento en la configuración del dispositivo bajo Salud.",
+  "accessDeniedHealth": "Se denegó el acceso a tus datos de salud o no hay datos disponibles. Puedes activarlo en cualquier momento en los ajustes del dispositivo, en Salud. Si ya está activado, comprueba si hay datos en la app Salud.",
   "other": "Otros",
 
   "settings": "Configuraciones",

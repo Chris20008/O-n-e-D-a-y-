@@ -1,6 +1,7 @@
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_list/all_exercises_separator.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/screens/all_exercises/widgets/all_exercises_search_bar.dart';
+import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -40,7 +41,7 @@ class AllExercisesList extends StatelessWidget {
                   padding: EdgeInsets.only(bottom: index == filteredExercises.length-1 ? 80 + MediaQuery.of(context).viewInsets.bottom : 0),
                   child: CupertinoButton(
                     key: index == 0 ? cnAllExercisesPanel.getKeyFirstListTile(context) : null,
-                    pressedOpacity: MediaQuery.of(context).viewInsets.bottom <= 0? 0.4 : 1,
+                    pressedOpacity: isExercise? 0.4 : 1,
                     padding: EdgeInsets.zero,
                     child: CupertinoListTile(
                         padding: padding,
@@ -52,8 +53,16 @@ class AllExercisesList extends StatelessWidget {
                           textScaler: TextScaler.linear(isExercise? 1 : 0.8),
                         )
                     ),
-                    onPressed: (){
-                      if(MediaQuery.of(context).viewInsets.bottom <= 0){
+                    onPressed: ()async {
+                      if(!isExercise){
+                        return;
+                      }
+                      if(MediaQuery.of(context).viewInsets.bottom > 0) {
+                        OverlayEntry ov = blockUserInput(context, duration: null)!;
+                        FocusScope.of(context).unfocus();
+                        await Future.delayed(const Duration(milliseconds: 400));
+                        ov.remove();
+                      }
                         cnNewExercisePanel.clear(withRefresh: false);
                         final tempEx = Exercise.copy(filteredExercises[index].exercise!);
                         tempEx.linkName = null;
@@ -66,10 +75,10 @@ class AllExercisesList extends StatelessWidget {
                         cnNewExercisePanel.exerciseNameFieldValidator = cnAllExercisesPanel.config.validator;
                         cnAllExercisesPanel.getNavigatorKey(context)?.currentState?.pushNamed('/singleExercise')
                             .then((_) => setModalState((){}));
-                      }
-                      else{
-                        FocusScope.of(context).unfocus();
-                      }
+                      // }
+                      // else{
+                      //   FocusScope.of(context).unfocus();
+                      // }
                     },
                   ),
                 );

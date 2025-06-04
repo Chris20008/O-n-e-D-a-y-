@@ -12,7 +12,8 @@ void addExercise({
     if(!tutorialIsRunning && cnNewWorkout.panelController.panelPosition > 0.99){
       cnNewExercisePanel.openPanel(
           onConfirm: cnNewWorkout.confirmAddExercise,
-          validator: cnNewWorkout.exerciseNameFieldValidator
+          validator: cnNewWorkout.exerciseNameFieldValidator,
+          context: context
       );
     }
     else if(tutorialIsRunning && cnNewWorkout.panelController.isPanelOpen){
@@ -22,14 +23,16 @@ void addExercise({
       else{
         cnNewExercisePanel.openPanel(
             onConfirm: cnNewWorkout.confirmAddExercise,
-            validator: cnNewWorkout.exerciseNameFieldValidator
+            validator: cnNewWorkout.exerciseNameFieldValidator,
+            context: context
         );
       }
     }
     else{
       cnNewExercisePanel.openPanel(
           onConfirm: cnNewWorkout.confirmAddExercise,
-          validator: cnNewWorkout.exerciseNameFieldValidator
+          validator: cnNewWorkout.exerciseNameFieldValidator,
+          context: context
       );
     }
   }

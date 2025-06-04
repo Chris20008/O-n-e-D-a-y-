@@ -66,8 +66,9 @@ class _ExerciseAndLinkListViewState extends State<ExerciseAndLinkListView> {
         autoScroll: !cnNewWorkout.blockUi,
         children: [
           ...getReorderableExercisesAndLinks(
-            cnNewWorkout: cnNewWorkout,
-            cnNewExercisePanel: cnNewExercisePanel
+              cnNewWorkout: cnNewWorkout,
+              cnNewExercisePanel: cnNewExercisePanel,
+              context: context
           ),
           ...bottomButtons
         ]
@@ -123,7 +124,8 @@ class _ExerciseAndLinkListViewState extends State<ExerciseAndLinkListView> {
             },
             children: getReorderableExercisesAndLinks(
                 cnNewWorkout: cnNewWorkout,
-                cnNewExercisePanel: cnNewExercisePanel
+                cnNewExercisePanel: cnNewExercisePanel,
+                context: context
             ),
           ),
 

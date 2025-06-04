@@ -125,7 +125,11 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
                 width: 54,
                 height: 54,
                 child: CupertinoButton(
-                    onPressed: () => cnAllExercisesPanel.openPanel(config: config, id: AllExercisePanelIds.runningWorkoutAllExercisesPanel),
+                    onPressed: () => cnAllExercisesPanel.openPanel(
+                        config: config,
+                        id: AllExercisePanelIds.runningWorkoutAllExercisesPanel,
+                        context: context
+                    ),
                     child: const Icon(Icons.add, size: 30,)
                 ),
               ),

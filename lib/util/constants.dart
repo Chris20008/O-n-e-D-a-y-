@@ -1522,7 +1522,7 @@ Widget getRowButton({
   );
 }
 
-void blockUserInput(BuildContext context, {int duration = 1000}) {
+OverlayEntry? blockUserInput(BuildContext context, {int? duration = 1000}) {
   OverlayEntry overlayEntry = OverlayEntry(
     builder: (context) => Positioned.fill(
       child: AbsorbPointer(
@@ -1535,9 +1535,16 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
 
   Overlay.of(context).insert(overlayEntry);
 
-  Future.delayed(Duration(milliseconds: duration), () {
-    overlayEntry.remove();
-  });
+  if(duration != null){
+    Future.delayed(Duration(milliseconds: duration), () {
+      overlayEntry.remove();
+    });
+    return null;
+  }
+  else{
+    return overlayEntry;
+  }
+
 }
 
 Future<void> waitForNextFrame() {
@@ -1546,4 +1553,19 @@ Future<void> waitForNextFrame() {
     completer.complete();
   });
   return completer.future;
+}
+
+double mapValueClamped(
+    double value,
+    double fromMin,
+    double fromMax,
+    double toMin,
+    double toMax
+    ) {
+  double t = (value - fromMin) / (fromMax - fromMin);
+  double result = toMin + t * (toMax - toMin);
+
+  double lower = toMin < toMax ? toMin : toMax;
+  double upper = toMax > toMin ? toMax : toMin;
+  return result.clamp(lower, upper);
 }

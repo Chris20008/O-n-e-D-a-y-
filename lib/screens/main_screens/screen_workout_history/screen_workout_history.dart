@@ -399,7 +399,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
               padding: const EdgeInsets.only(right: 50),
               child: IconButton(
                   onPressed: () {
-                    cnNewWorkout.editWorkout(sickDays: sickDay);
+                    cnNewWorkout.editWorkout(sickDays: sickDay, context: context);
                   },
                   icon: Icon(Icons.edit,
                     color: Colors.grey.withValues(alpha: 0.4),

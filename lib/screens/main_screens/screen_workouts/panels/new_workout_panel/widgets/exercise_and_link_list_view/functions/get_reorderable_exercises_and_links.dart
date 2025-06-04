@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 List<Widget> getReorderableExercisesAndLinks({
   required CnNewWorkOutPanel cnNewWorkout,
   required CnNewExercisePanel cnNewExercisePanel,
+  required BuildContext context
 }){
 
   List <Widget> children = [];
@@ -25,7 +26,8 @@ List<Widget> getReorderableExercisesAndLinks({
         cnNewWorkout: cnNewWorkout,
         cnNewExercisePanel: cnNewExercisePanel,
         isTotalLastItem: index+1 == cnNewWorkout.exercisesAndLinks.length,
-        isLastItemInGroup: nextExercise == null || nextExercise.linkName != cnNewWorkout.exercisesAndLinks[index].linkName
+        isLastItemInGroup: nextExercise == null || nextExercise.linkName != cnNewWorkout.exercisesAndLinks[index].linkName,
+        context: context
     );
 
     if(index == 0 && tutorialIsRunning){

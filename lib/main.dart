@@ -5,6 +5,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
+import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/selector_exercises_to_update.dart';
@@ -472,63 +473,7 @@ class _MyHomePageState extends State<MyHomePage>{
                       );
                     },
                   ),
-                if(cnHomepage.isSyncingWithCloud)
-                  IgnorePointer(
-                    child: SafeArea(
-                      child: Column(
-                        children: [
-                          Selector<CnBannerRunningWorkout, bool>(
-                              selector: (_, cn) => cn.showBanner,
-                              builder: (_, showBanner, __){
-                              return AnimatedContainer(
-                                height: showBanner && cnBottomMenu.index == 1? 55 : (Platform.isAndroid? 10 : 0),
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeOut,
-                              );
-                            }
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Colors.black.withValues(alpha: 0.4)
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(width: 5),
-                                Text(cnHomepage.msg, style: const TextStyle(color: CupertinoColors.white)),
-                                const SizedBox(width: 5),
-                                if(cnHomepage.percent != null)
-                                  Text("${(cnHomepage.percent! * 100).round()}%", style: const TextStyle(color: CupertinoColors.white)),
-                                if(cnHomepage.percent != null)
-                                const SizedBox(width: 5),
-                                if(!cnHomepage.syncWithCloudCompleted)
-                                  SizedBox(
-                                      height: 15,
-                                      width: 15,
-                                      child: Center(
-                                        child: CupertinoActivityIndicator(
-                                            radius: 8.0,
-                                            color: Colors.amber[800]
-                                        ),
-                                      ),
-                                      // child: Center(child: CircularProgressIndicator(color: Colors.white, strokeWidth: 1,))
-                                  )
-                                else
-                                  const Icon(
-                                    Icons.check_circle,
-                                    size: 15,
-                                    color: Colors.green
-                                  ),
-                                const SizedBox(width: 5)
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                const SyncWithCloudBar()
                 // Center(
                 //   child: ElevatedButton(
                 //     child: Text("Test"),

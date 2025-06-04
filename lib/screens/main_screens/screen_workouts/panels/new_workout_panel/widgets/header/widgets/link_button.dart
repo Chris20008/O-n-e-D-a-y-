@@ -27,7 +27,7 @@ class LinkButton extends StatelessWidget {
         onPressed: ()async{
           if(cnNewWorkout.panelController.isPanelClosed){
             HapticFeedback.selectionClick();
-            await cnNewWorkout.openPanel();
+            await cnNewWorkout.openPanel(context);
           }
           cnStandardPopUp.open(
               context: context,

@@ -43,7 +43,7 @@
   "createdBackupFailed": "Could not create a Backup",
   "savedDataForSync": "Saved data for sync.",
   "accessDenied": "Access denied",
-  "accessDeniedHealth": "Access to your health data was denied. You can enable it anytime in the device settings under Health.",
+  "accessDeniedHealth": "Access to your health data was denied or no data is available. You can enable it anytime in the device settings under Health. If it is enabled, check whether there is any data in the Health app.",
   "other": "Other",
 
   "settings": "Settings",

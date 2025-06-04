@@ -38,7 +38,7 @@ class WorkoutNameField extends StatelessWidget {
     return null;
   }
 
-  void onTap(CnNewWorkOutPanel cnNewWorkout) async{
+  void onTap(CnNewWorkOutPanel cnNewWorkout, BuildContext context) async{
     if(cnNewWorkout.panelController.isPanelClosed){
       Future.delayed(const Duration(milliseconds: 300), (){
         HapticFeedback.selectionClick();
@@ -46,7 +46,7 @@ class WorkoutNameField extends StatelessWidget {
         /// panel method, the keyboard gets dismissed (unfocused) by onPanelSlide() cause for some reason
         /// our methods triggers an exact 0.0 value and the normal panelController.open() methode does not.
         /// Maybe due to speed of opening the panel
-        cnNewWorkout.openPanel();
+        cnNewWorkout.openPanel(context);
       });
     }
   }
@@ -75,7 +75,7 @@ class WorkoutNameField extends StatelessWidget {
             keyboardAppearance: Brightness.dark,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) => validateTextInput(value, cnNewWorkout, context),
-            onTap: () => onTap(cnNewWorkout),
+            onTap: () => onTap(cnNewWorkout, context),
             style: const TextStyle(
                 fontSize: 20
             ),

@@ -1,7 +1,7 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/other_screens/local_file_picker/widgets/local_backups_list_view/local_backups_list_view.dart';
-import 'package:fitness_app/screens/other_screens/local_file_picker/widgets/sync_with_cloud_bar.dart';
+import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

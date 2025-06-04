@@ -1,13 +1,25 @@
+import 'dart:io';
+
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'banner_running_workout.dart';
+
 class SyncWithCloudBar extends StatelessWidget {
-  const SyncWithCloudBar({super.key});
+
+  final double topPadding;
+
+  const SyncWithCloudBar({
+    super.key,
+    this.topPadding = 45
+  });
 
   @override
   Widget build(BuildContext context) {
+
     return Selector<CnHomepage, bool>(
       selector: (_, cn) => cn.isSyncingWithCloud,
       builder: (context, isSyncing, child) {
@@ -18,7 +30,17 @@ class SyncWithCloudBar extends StatelessWidget {
             child: SafeArea(
               child: Column(
                 children: [
-                  const SizedBox(height: 45),
+                  Selector2<CnBannerRunningWorkout, CnBottomMenu, (bool, int)>(
+                      selector: (_, cn, cn2) => (cn.showBanner, cn2.index),
+                      builder: (_, values, __){
+                        final (showBanner, index) = values;
+                        return AnimatedContainer(
+                          height: showBanner && index == 1? 55 : (Platform.isAndroid? 10 : 0),
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeOut,
+                        );
+                      }
+                  ),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
@@ -30,7 +52,7 @@ class SyncWithCloudBar extends StatelessWidget {
                       children: [
                         const SizedBox(width: 5),
           
-                        /// 🔹 Selector für msg
+                        /// Selector for msg
                         RepaintBoundary(
                           child: Selector<CnHomepage, String>(
                             selector: (_, cn) => cn.msg,
@@ -43,7 +65,7 @@ class SyncWithCloudBar extends StatelessWidget {
           
                         const SizedBox(width: 5),
           
-                        /// 🔹 Selector für percent
+                        /// Selector for percent
                         RepaintBoundary(
                           child: Selector<CnHomepage, double?>(
                             selector: (_, cn) => cn.percent,
@@ -60,7 +82,7 @@ class SyncWithCloudBar extends StatelessWidget {
                           ),
                         ),
           
-                        /// 🔹 Selector für syncWithCloudCompleted
+                        /// Selector for syncWithCloudCompleted
                         RepaintBoundary(
                           child: Selector<CnHomepage, bool>(
                             selector: (_, cn) => cn.syncWithCloudCompleted,

@@ -43,7 +43,7 @@
   "createdBackupFailed": "Nie udało się utworzyć kopii zapasowej",
   "savedDataForSync": "Dane do synchronizacji zapisane",
   "accessDenied": "Dostęp odmówiony",
-  "accessDeniedHealth": "Dostęp do Twoich danych zdrowotnych został odmówiony. Możesz go włączyć w ustawieniach urządzenia w sekcji Zdrowie.",
+  "accessDeniedHealth": "Dostęp do Twoich danych zdrowotnych został odrzucony lub brak dostępnych danych. Możesz go włączyć w każdej chwili w ustawieniach urządzenia w sekcji Zdrowie. Jeśli jest już włączony, sprawdź, czy w aplikacji Zdrowie są dane.",
   "other": "Inne",
 
   "settings": "Ustawienia",

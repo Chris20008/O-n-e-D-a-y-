@@ -48,6 +48,7 @@ class _TopHeaderLetterState extends State<TopHeaderLetter> {
 
     if(cnAllExercisesPanel.filteredExercises[index].name[0] != currTopLetter){
       currTopLetter = cnAllExercisesPanel.filteredExercises[index].name[0].normalizeGermanUmlauts(trimmed: true).toUpperCase();
+      // cnAllExercisesPanel.lastJumpedLetter.value = currTopLetter;
       doRefresh = true;
     }
 

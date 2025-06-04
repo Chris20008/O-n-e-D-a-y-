@@ -66,7 +66,11 @@ class AddExerciseButton extends StatelessWidget {
             await Future.delayed(const Duration(milliseconds: 300));
           }
           if(context.mounted){
-            cnAllExercisesPanel.openPanel(config: config, id: AllExercisePanelIds.mainAllExercisesPanel);
+            cnAllExercisesPanel.openPanel(
+                config: config,
+                id: AllExercisePanelIds.mainAllExercisesPanel,
+                context: context
+            );
           }
         },
       ),

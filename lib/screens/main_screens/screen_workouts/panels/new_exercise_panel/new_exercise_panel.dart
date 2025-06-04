@@ -507,13 +507,15 @@ class CnNewExercisePanel extends ChangeNotifier {
   Future openPanel({
     Exercise? exercise,
     Function(Exercise ex)? onConfirm,
-    ExerciseNameValidator? validator
+    ExerciseNameValidator? validator,
+    required BuildContext context
   })async{
     clear();
     if(exercise != null){
       setExercise(exercise);
     }
 
+    OverlayEntry ov = blockUserInput(context, duration: null)!;
     exerciseNameFieldValidator = validator;
     this.onConfirm = onConfirm;
     showContent.value = true;
@@ -539,6 +541,7 @@ class CnNewExercisePanel extends ChangeNotifier {
         duration: Duration(milliseconds: animationTime),
         curve: Curves.fastEaseInToSlowEaseOut
     );
+    ov.remove();
     return;
   }
 

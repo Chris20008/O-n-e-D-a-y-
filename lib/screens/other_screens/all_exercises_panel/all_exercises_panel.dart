@@ -10,6 +10,7 @@ import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/exercise_context_id.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../util/objectbox/ob_exercise.dart';
@@ -126,6 +127,7 @@ class CnAllExercisesPanel extends ChangeNotifier {
   List<Exercise> exercises = [];
   List<TileItem> filteredExercises = [];
   List<TileItem> characters = [];
+  ValueNotifier<String> lastJumpedLetter = ValueNotifier("");
 
   final int animationTime = 500;
 
@@ -143,11 +145,8 @@ class CnAllExercisesPanel extends ChangeNotifier {
   final Map<String, ScrollController> _scrollControllers = {};
   final Map<String, PanelController> _panelControllers = {};
 
-  /// padding Side Bar that it scrolls up and down like the panel while sliding
-  ValueNotifier<double> verticalPaddingSideBar = ValueNotifier(0);
-
   CnAllExercisesPanel() {
-    initExercises();
+    refreshExercises();
   }
 
   GlobalKey getSideBarKey(BuildContext context) {
@@ -183,13 +182,13 @@ class CnAllExercisesPanel extends ChangeNotifier {
     return _panelControllers.putIfAbsent(id.toString(), () => PanelController());
   }
 
-  Future initExercises()async{
+  Future refreshExercises()async{
     exercises.clear();
     final tempExercisesAdded = [];
 
     final builder = objectbox.exerciseBox.query();
     builder.backlinkMany(ObWorkout_.exercises, ObWorkout_.isTemplate.equals(true));
-    final obExercises = await builder.order(ObExercise_.id, flags: Order.descending).build().findAsync();
+    final obExercises = builder.order(ObExercise_.id, flags: Order.descending).build().find();
 
     for(ObExercise ex in obExercises){
       if(tempExercisesAdded.contains(ex.name)){
@@ -284,13 +283,18 @@ class CnAllExercisesPanel extends ChangeNotifier {
     /// Transform local position to letter
     final int index = (localPosition.dy ~/ (heightSideBar/characters.length)).clamp(0, characters.length-1);
     final String letter = characters[index].name;
+    if(letter == lastJumpedLetter.value){
+      return;
+    }
 
     /// Get Index of first item from list which starts with this letter
     final allExercisesIndex = filteredExercises.indexWhere((element) => element.name[0].toUpperCase() == letter);
 
     /// calculate jump position and jump
     double position = (allExercisesIndex * sizeListTile + (allExercisesIndex * 0.25) + 15).clamp(0, sc.position.maxScrollExtent);
+    HapticFeedback.selectionClick();
     sc.jumpTo(position);
+    lastJumpedLetter.value = letter;
   }
 
   void initSize(BuildContext context){
@@ -301,8 +305,11 @@ class CnAllExercisesPanel extends ChangeNotifier {
 
   Future openPanel({
     required AllExercisePanelConfig config,
-    required AllExercisePanelIds id
+    required AllExercisePanelIds id,
+    required BuildContext context
   }) async{
+    OverlayEntry ov = blockUserInput(context, duration: null)!;
+    await refreshExercises();
     reset();
     this.config = config;
     showContent.value = true;
@@ -329,6 +336,7 @@ class CnAllExercisesPanel extends ChangeNotifier {
         duration: Duration(milliseconds: animationTime),
         curve: Curves.fastEaseInToSlowEaseOut
     );
+    ov.remove();
     return;
   }
 

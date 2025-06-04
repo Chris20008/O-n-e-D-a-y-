@@ -43,7 +43,7 @@
   "createdBackupFailed": "Impossibile creare il backup",
   "savedDataForSync": "Dati salvati per la sincronizzazione",
   "accessDenied": "Accesso negato",
-  "accessDeniedHealth": "L'accesso ai tuoi dati sulla salute è stato negato. Puoi attivarlo in qualsiasi momento nelle impostazioni del dispositivo sotto Salute.",
+  "accessDeniedHealth": "L'accesso ai tuoi dati sanitari è stato negato o non sono disponibili dati. Puoi attivarlo in qualsiasi momento nelle impostazioni del dispositivo sotto Salute. Se è già attivo, verifica se ci sono dati nell'app Salute.",
   "other": "Altro",
 
   "settings": "Impostazioni",

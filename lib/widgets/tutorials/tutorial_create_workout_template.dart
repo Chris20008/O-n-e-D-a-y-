@@ -507,7 +507,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
       switch(target.identify){
 
         case "Add Workout":{
-          cnNewWorkOutPanel.openPanelAsTemplate();
+          cnNewWorkOutPanel.openPanelAsTemplate(context);
           blockUserInput(context, duration: 1500);
         }
 
@@ -518,7 +518,8 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
         case "Add Exercise":{
           cnNewExercisePanel.openPanel(
               onConfirm: cnNewWorkOutPanel.confirmAddExercise,
-              validator: cnNewWorkOutPanel.exerciseNameFieldValidator
+              validator: cnNewWorkOutPanel.exerciseNameFieldValidator,
+              context: context
           );
           blockUserInput(context, duration: 1500);
         }

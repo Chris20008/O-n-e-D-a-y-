@@ -56,7 +56,8 @@ class SingleDay extends StatelessWidget {
                   return "Du kannst den Namen in dieser Ansicht nicht bearbeiten";
                 }
                 return null;
-              }
+              },
+              context: context
           );
         },
         child: CupertinoButton(

@@ -328,7 +328,7 @@ class CnScreenStatistics extends ChangeNotifier {
     }
     Map<DateTime, double> oneRepMaxPerDate = {};
     for(MapEntry<DateTime, ObExercise> entry in exercises.entries){
-      double oneRepMax = 0;
+      double? oneRepMax;
       if(healthData.isNotEmpty && (
           (selectedExerciseTemplate != null && selectedExerciseTemplate!.bodyWeightPercent > 0.0) ||
           (selectedExerciseTemplate == null && selectedExerciseLast.bodyWeightPercent > 0)
@@ -343,11 +343,13 @@ class CnScreenStatistics extends ChangeNotifier {
           continue;
         }
         final tempOneRepMax = calcEpley(weight: set[0], reps: set[1], bodyWeight: bodyWeight);
-        if(tempOneRepMax > oneRepMax){
+        if(tempOneRepMax >= (oneRepMax?? 0)){
           oneRepMax = tempOneRepMax;
         }
       }
-      oneRepMaxPerDate[entry.key] = oneRepMax;
+      if(oneRepMax != null){
+        oneRepMaxPerDate[entry.key] = oneRepMax;
+      }
     }
     return oneRepMaxPerDate;
   }

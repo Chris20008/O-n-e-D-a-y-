@@ -43,7 +43,7 @@
   "createdBackupFailed": "Kon geen backup maken",
   "savedDataForSync": "Gegevens voor sync opgeslagen",
   "accessDenied": "Toegang geweigerd",
-  "accessDeniedHealth": "De toegang tot je gezondheidsgegevens is geweigerd. Je kunt deze op elk moment inschakelen in de apparaatinstellingen onder Gezondheid.",
+  "accessDeniedHealth": "Toegang tot je gezondheidsgegevens is geweigerd of er zijn geen gegevens beschikbaar. Je kunt dit op elk moment inschakelen in de apparaatinstellingen onder Gezondheid. Als het is ingeschakeld, controleer dan of er gegevens in de Gezondheid-app staan.",
   "other": "Overige",
 
   "settings": "Instellingen",
