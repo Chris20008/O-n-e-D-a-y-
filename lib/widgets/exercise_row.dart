@@ -1,4 +1,5 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/background_single_set.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
@@ -76,7 +77,7 @@ class ExerciseRow extends StatelessWidget {
                             children: [
 
                               /// Background of single set
-                              backgroundSingleSet,
+                              const BackgroundSingleSet(),
 
                               /// One Column for each set (weight / amount)
                               dataSingleSet(set, exercise)

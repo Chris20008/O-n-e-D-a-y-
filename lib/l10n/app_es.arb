@@ -28,6 +28,7 @@
   "template": "Plantilla",
   "clear": "Limpiar",
   "custom": "Personalizado",
+  "newExercise": "Nuevo ejercicio",
   "woAlreadyRunning": "El entrenamiento {currentWorkoutName} ya está en curso",
   "woAlreadyRunningDelete": "¿Quieres detener el entrenamiento actual y empezar {newWorkoutName}?",
   "spotifyPleaseLogin": "Debes iniciar sesión en Spotify",

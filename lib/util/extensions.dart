@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 
@@ -83,8 +84,8 @@ extension DateOnlyCompare on DateTime {
     return addSafe(Duration(days: delta));
   }
 
-  String formatAsFirstLastDayOfWeek(){
-    return "${DateFormat("d.MMM").format(getFirstDayOfWeek())} - ${DateFormat("d.MMM").format(getLastDayOfWeek())}";
+  String formatAsFirstLastDayOfWeek(BuildContext context){
+    return "${DateFormat("d.MMM", Localizations.localeOf(context).languageCode).format(getFirstDayOfWeek())} - ${DateFormat("d.MMM", Localizations.localeOf(context).languageCode).format(getLastDayOfWeek())}";
   }
 
   Duration differenceSafe(DateTime other){

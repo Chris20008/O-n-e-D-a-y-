@@ -25,12 +25,14 @@ class BlockGesture extends StatelessWidget {
       return Stack(
         children: [
           child?? const SizedBox(),
-          Padding(
-            padding: const EdgeInsets.only(left: 20),
-            child: MetaData(
-                metaData: tag,
-                behavior: HitTestBehavior.translucent,
-                child: const SizedBox(height: double.maxFinite, width: double.maxFinite,)
+          Positioned.fill(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: MetaData(
+                  metaData: tag,
+                  behavior: HitTestBehavior.translucent,
+                  child: const SizedBox()
+              ),
             ),
           ),
         ],

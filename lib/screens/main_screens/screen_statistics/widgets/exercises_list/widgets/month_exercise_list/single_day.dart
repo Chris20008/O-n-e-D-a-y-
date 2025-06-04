@@ -90,7 +90,7 @@ class SingleDay extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                DateFormat("d. MMMM yyyy").format(exercise.date),
+                                DateFormat("d. MMMM yyyy", Localizations.localeOf(context).languageCode).format(exercise.date),
                                 textScaler: const TextScaler.linear(1.2),
                               ),
                               const SizedBox(height: 10,),
@@ -123,7 +123,7 @@ class SingleDay extends StatelessWidget {
                     child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          DateFormat("dd MMM yy").format(exercise.date),
+                          DateFormat("dd MMM yy", Localizations.localeOf(context).languageCode).format(exercise.date),
                           style: const TextStyle(
                               fontWeight: FontWeight.w300,
                               color: Colors.white

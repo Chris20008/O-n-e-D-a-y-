@@ -73,36 +73,46 @@ class _SetListViewState extends State<SetListView> {
 
           const SizedBox(height: 15,),
 
-          Row(
-            children: [
-              Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
-              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
-              Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
-            ],
+          Selector<CnNewExercisePanel, int>(
+              selector: (_, cn) => cn.exercise.category,
+              builder: (_, __, ___){
+              return Row(
+                children: [
+                  Expanded(child: Center(child: OverflowSafeText(AppLocalizations.of(context)!.set, maxLines: 1))),
+                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getLeftTitle(context), maxLines: 1))),
+                  Expanded(child: Center(child: OverflowSafeText(cnNewExercise.exercise.getRightTitle(context), maxLines: 1))),
+                ],
+              );
+            }
           ),
 
-          ReorderableListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(top: 10),
-            shrinkWrap: true,
-            itemCount: cnNewExercise.exercise.sets.length,
-            itemBuilder: (BuildContext context, int index) {
-              return SlidableSingleSet(
-                  key: tutorialIsRunning && index == 0 && cnNewExercise.isDefaultContext(context)? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
-                  index: index,
-                  insetsBottom: insetsBottom,
-                  screenHeight: screenHeight,
-                  cnHomepage: cnHomepage,
-                  cnNewExercise: cnNewExercise
+          Selector<CnNewExercisePanel, int>(
+              selector: (_, cn) => cn.exercise.sets.length,
+              builder: (_, length, ___){
+              return ReorderableListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(top: 10),
+                shrinkWrap: true,
+                itemCount: length,
+                itemBuilder: (BuildContext context, int index) {
+                  return SlidableSingleSet(
+                      key: tutorialIsRunning && index == 0 && cnNewExercise.isDefaultContext(context)? cnNewExercise.keySetRow : cnNewExercise.slidableKeys[index],
+                      index: index,
+                      insetsBottom: insetsBottom,
+                      screenHeight: screenHeight,
+                      cnHomepage: cnHomepage,
+                      cnNewExercise: cnNewExercise
+                  );
+                },
+                proxyDecorator: (Widget child, int index, Animation<double> animation) =>
+                    SlidableSingleSetProxyDecorator(
+                        index: index,
+                        animation: animation,
+                        child: child
+                    ),
+                onReorder: (int oldIndex, int newIndex) => onReorder(oldIndex, newIndex, setState, cnNewExercise),
               );
-            },
-            proxyDecorator: (Widget child, int index, Animation<double> animation) =>
-                SlidableSingleSetProxyDecorator(
-                    index: index,
-                    animation: animation,
-                    child: child
-                ),
-            onReorder: (int oldIndex, int newIndex) => onReorder(oldIndex, newIndex, setState, cnNewExercise),
+            }
           ),
 
           const Footer()

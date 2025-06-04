@@ -126,6 +126,7 @@ class MyAppState extends State<MyApp>{
             }),
             cardColor: const Color(0xFF2C2C2E),
             primaryColor: const Color(0xFF1C1C1E),
+            highlightColor: const Color(0xFFFF9A19),
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber[800] ?? Colors.amber),
             // colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             // useMaterial3: true,

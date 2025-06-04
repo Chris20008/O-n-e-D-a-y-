@@ -18,7 +18,7 @@ class _ExerciseOptionsSelectorsState extends State<ExerciseOptionsSelectors> {
   @override
   Widget build(BuildContext context) {
 
-    cnNewExercise = Provider.of<CnNewExercisePanel>(context);
+    cnNewExercise = context.read<CnNewExercisePanel>();
     CnNewWorkOutPanel cnNewWorkOut = Provider.of<CnNewWorkOutPanel>(context);
 
     return CupertinoListSection.insetGrouped(
@@ -29,33 +29,57 @@ class _ExerciseOptionsSelectorsState extends State<ExerciseOptionsSelectors> {
       backgroundColor: Colors.transparent,
       children: [
         /// Rest in Seconds Row and Selector
-        cnNewExercise.getRestInSecondsSelector(
-            context: context,
-            // refresh: () => setState(() {})
+        Selector<CnNewExercisePanel, int>(
+            selector: (_, cn) => cn.exercise.restInSeconds,
+            builder: (_, __, ___){
+            return cnNewExercise.getRestInSecondsSelector(
+                context: context,
+                // refresh: () => setState(() {})
+            );
+          }
         ),
 
         /// Seat Level Row and Selector
-        cnNewExercise.getSeatLevelSelector(
-            context: context,
-            // refresh: () => setState(() {})
+        Selector<CnNewExercisePanel, int?>(
+            selector: (_, cn) => cn.exercise.seatLevel,
+            builder: (_, __, ___){
+            return cnNewExercise.getSeatLevelSelector(
+                context: context,
+                // refresh: () => setState(() {})
+            );
+          }
         ),
 
         /// Exercise Category Selector
-        cnNewExercise.getExerciseCategorySelector(
-            context: context,
-            isTemplate: cnNewExercise.exercise.isNewExercise(),
-            // refresh: cnNewExercise.refresh /// use refresh instead of setState to update set types, f.e. weight -> time
+        Selector<CnNewExercisePanel, int>(
+            selector: (_, cn) => cn.exercise.category,
+            builder: (_, __, ___){
+            return cnNewExercise.getExerciseCategorySelector(
+                context: context,
+                isTemplate: cnNewExercise.exercise.isNewExercise(),
+            );
+          }
         ),
 
         /// Body Weight selector
-        cnNewExercise.getBodyWeightPercentSelector(
-            context: context,
-            isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewWorkOut.workout.isTemplate,
-            refresh: () => setState(() {})
+        Selector<CnNewExercisePanel, double>(
+            selector: (_, cn) => cn.exercise.bodyWeightPercent,
+            builder: (_, __, ___){
+            return cnNewExercise.getBodyWeightPercentSelector(
+                context: context,
+                isTemplate: cnNewExercise.exercise.isNewExercise() || cnNewWorkOut.workout.isTemplate,
+                refresh: () => setState(() {})
+            );
+          }
         ),
 
         if(cnNewExercise.linkedExercises.isNotEmpty)
-          cnNewExercise.getSelectLink()
+          Selector<CnNewExercisePanel, String?>(
+              selector: (_, cn) => cn.exercise.linkName,
+              builder: (_, __, ___){
+              return cnNewExercise.getSelectLink();
+            }
+          )
       ],
     );
   }

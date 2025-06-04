@@ -28,6 +28,7 @@
   "template": "Template",
   "clear": "Clear",
   "custom": "Custom",
+  "newExercise": "New Exercise",
   "woAlreadyRunning": "Workout {currentWorkoutName} is already Running",
   "woAlreadyRunningDelete": "Do you want to stop the current workout and start workout {newWorkoutName}?",
   "spotifyPleaseLogin": "Please Login to Spotify",

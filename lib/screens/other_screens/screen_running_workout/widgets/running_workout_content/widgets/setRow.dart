@@ -86,7 +86,7 @@ class _SetRowState extends State<SetRow>{
             /// Set
             SetTypeSelector(
                 index: set.index,
-                newEx: set.ex,
+                set: set.set,
                 width: _widthOfTextField,
                 onConfirm: (){
                   cnRunningWorkout.cache();
@@ -289,7 +289,7 @@ class _SetRowState extends State<SetRow>{
 
     if(set.ex.sets.length > 1 && cnRunningWorkout.contentIsActive){
       child = BlockGesture(
-        // withPadding: true,
+        withPadding: true,
         child: Slidable(
             key: set.slidableKey,
             endActionPane: ActionPane(

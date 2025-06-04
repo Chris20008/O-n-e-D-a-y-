@@ -26,8 +26,9 @@ class WorkoutOrSickDaysPicker extends StatelessWidget {
         routeTheme: routeTheme,
         itemBuilder: (context) {
           return [
-            PullDownMenuItem(
+            PullDownMenuItem.selectable(
               title: "Workout",
+              selected: !cnNewWorkout.isSickDays,
               onTap: () {
                 cnNewWorkout.isSickDays = false;
                 cnNewWorkout.minPanelHeight = cnNewWorkout.keepShowingPanelHeight;
@@ -36,8 +37,9 @@ class WorkoutOrSickDaysPicker extends StatelessWidget {
                 cnHomepage.refresh();
               },
             ),
-            PullDownMenuItem(
+            PullDownMenuItem.selectable(
               title: AppLocalizations.of(context)!.statisticsSick,
+              selected: cnNewWorkout.isSickDays,
               onTap: () {
                 cnNewWorkout.isSickDays = true;
                 cnNewWorkout.minPanelHeight = cnNewWorkout.keepShowingPanelHeightSickDays;

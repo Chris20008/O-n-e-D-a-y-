@@ -28,6 +28,7 @@
   "template": "Vorlage",
   "clear": "Löschen",
   "custom": "Benutzerdefiniert",
+  "newExercise": "Neue Übung",
   "woAlreadyRunning": "Workout {currentWorkoutName} läuft bereits",
   "woAlreadyRunningDelete": "Möchtest du das aktuelle Workout stoppen und dafür {newWorkoutName} starten?",
   "spotifyPleaseLogin": "Du musst bei Spotify eingeloggt sein",

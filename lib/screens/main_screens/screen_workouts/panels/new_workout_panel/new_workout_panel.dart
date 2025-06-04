@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/exercise_and_link_list_view/exercise_and_link_list_view.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/widgets/slidable_exercise_or_link.dart';
@@ -448,7 +449,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       if(applyNameChanges){
         changeSameNameWorkouts();
       }
-      if(hasChangedBodyWeight()){
+      if(await hasChangedBodyWeight()){
         changeSameNameExercisesBodyWeight();
       }
       if(cnBottomMenu.index == 0){
@@ -472,10 +473,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         }
       }
       Workout woToSave = Workout.clone(workout);
+      await closePanel(doClear: true, context: context);
+
       woToSave.saveToDatabase();
       await cnWorkouts.refreshAllWorkouts();
       await cnWorkoutHistory.refreshAllWorkouts();
-      await closePanel(doClear: true, context: context);
 
       cnNewExercisePanel.clear();
       saveCurrentData(cnConfig);
@@ -536,7 +538,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     }
   }
 
-  bool hasChangedBodyWeight(){
+  Future<bool> hasChangedBodyWeight() async{
     if(!workout.isTemplate){
       return false;
     }
@@ -548,6 +550,23 @@ class CnNewWorkOutPanel extends ChangeNotifier{
                 && ex.bodyWeightPercent != exercise.bodyWeightPercent
         )
     ).toList();
+
+    /// Check for entirely new exercises if this exercise already exists in database
+    /// and if so, if the bodyWeight is different from the database ones
+    final allExerciseNames = originalWorkout.exercises.map((e) => e.name).toList();
+    final newExercises = workout.exercises.whereNot((ex) => allExerciseNames.contains(ex.name));
+
+    for(Exercise ex in newExercises){
+      final existingObEx = await objectbox.exerciseBox.query(ObExercise_.name.equals(ex.name)).build().findFirstAsync();
+      /// entirely new exercise, not exists in database yet
+      if(existingObEx == null){
+        changedExercises.add(ex);
+      }
+      /// Different bodyweight than database
+      else if(existingObEx.bodyWeightPercent != ex.bodyWeightPercent){
+        changedExercises.add(ex);
+      }
+    }
 
     exerciseNewBodyWeight = changedExercises;
 

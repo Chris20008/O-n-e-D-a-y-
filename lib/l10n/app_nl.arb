@@ -28,6 +28,7 @@
   "template": "Sjabloon",
   "clear": "Wissen",
   "custom": "Aangepast",
+  "newExercise": "Nieuwe oefening",
   "woAlreadyRunning": "Workout {currentWorkoutName} is al bezig",
   "woAlreadyRunningDelete": "Wil je de huidige workout stoppen en {newWorkoutName} starten?",
   "spotifyPleaseLogin": "Je moet ingelogd zijn bij Spotify",

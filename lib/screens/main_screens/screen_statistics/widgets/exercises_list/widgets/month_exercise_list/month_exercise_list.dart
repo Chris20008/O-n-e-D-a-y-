@@ -40,7 +40,7 @@ class MonthExerciseList extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(5.0),
             child: Text(
-              DateFormat("MMMM y").format(groupedExercises.exercises.first.date),
+              DateFormat("MMMM y", Localizations.localeOf(context).languageCode).format(groupedExercises.exercises.first.date),
               textScaler: const TextScaler.linear(1.1),
             ),
           ),

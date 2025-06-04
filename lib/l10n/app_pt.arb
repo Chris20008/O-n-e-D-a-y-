@@ -28,6 +28,7 @@
   "template": "Modelo",
   "clear": "Limpar",
   "custom": "Personalizado",
+  "newExercise": "Novo exercício",
   "woAlreadyRunning": "Treino {currentWorkoutName} já está em andamento",
   "woAlreadyRunningDelete": "Deseja parar o treino atual e iniciar {newWorkoutName}?",
   "spotifyPleaseLogin": "Você precisa estar logado no Spotify",

@@ -29,6 +29,8 @@ class _CancelSaveRowState extends State<CancelSaveRow> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
+
+          /// Cancel Button
           Expanded(
               flex: 10,
               child: Align(
@@ -40,26 +42,41 @@ class _CancelSaveRowState extends State<CancelSaveRow> {
                   )
               )
           ),
+
+          /// Workout or SickDays Picker
           Expanded(
             flex: 11,
             child: Align(
               alignment: Alignment.center,
               child: FittedBox(
                 fit: BoxFit.scaleDown,
-                child: cnNewWorkout.workout.isTemplate && cnNewWorkout.workout.isEmpty() && MediaQuery.of(context).viewInsets.bottom == 0
-                    ?const WorkoutOrSickDaysPicker()
-                    :Text(
-                  cnNewWorkout.workout.isTemplate
-                      ? AppLocalizations.of(context)!.panelWoWorkoutTemplate
-                      : cnNewWorkout.isSickDays
-                      ? AppLocalizations.of(context)!.statisticsSick
-                      : " ", /// Due to Fitted Box the length must be greater than 0
-                  style: const TextStyle(fontSize: 17),
-                  // style: TextStyle(color: Colors.grey)
+                child: Selector<CnNewWorkOutPanel, bool>(
+                    selector: (_, cn) => cn.workout.isTemplate,
+                    builder: (_, isTemplate, __) {
+                      if(isTemplate && cnNewWorkout.workout.isEmpty() && MediaQuery.of(context).viewInsets.bottom == 0){
+                        return const WorkoutOrSickDaysPicker();
+                      }
+                      String t;
+                      if(isTemplate){
+                        t = AppLocalizations.of(context)!.panelWoWorkoutTemplate;
+                      }
+                      else if(cnNewWorkout.isSickDays){
+                        t = AppLocalizations.of(context)!.statisticsSick;
+                      }
+                      else{
+                        t = " "; /// Due to Fitted Box the length must be greater than 0
+                      }
+                      return Text(
+                        t,
+                        style: const TextStyle(fontSize: 17),
+                      );
+                    }
                 ),
               ),
             ),
           ),
+
+          /// Save Button
           Expanded(
             flex: 10,
             child: Align(

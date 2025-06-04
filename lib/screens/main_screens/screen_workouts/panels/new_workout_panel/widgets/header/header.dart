@@ -20,8 +20,9 @@ class NewWorkoutHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
-    final CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
+
+    final isSickDays = context.select<CnNewWorkOutPanel, bool>((cn) => cn.isSickDays);
+    final isTemplate = context.select<CnNewWorkOutPanel, bool>((cn) => cn.workout.isTemplate);
 
     return Stack(
       children: [
@@ -32,24 +33,24 @@ class NewWorkoutHeader extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height:50),
-              if (!cnNewWorkout.isSickDays)
+              if (!isSickDays)
                 Row(
                   children: [
                     const Expanded(
                       child: WorkoutNameField()
                     ),
                     const SizedBox(width: 5,),
-                    if(cnNewWorkout.workout.isTemplate)
+                    if(isTemplate)
                       const LinkButton()
                   ],
                 )
-              else if(cnNewWorkout.isSickDays)
+              else if(isSickDays)
                 const SickdaysDatePicker(),
 
-              if(!cnNewWorkout.workout.isTemplate && !cnNewWorkout.isSickDays)
+              if(!isTemplate && !isSickDays)
                 const WorkoutDatePicker(),
 
-              if(cnNewWorkout.workout.isTemplate)
+              if(isTemplate)
                 Container(
                   height: 25,
                   color: Theme.of(context).primaryColor

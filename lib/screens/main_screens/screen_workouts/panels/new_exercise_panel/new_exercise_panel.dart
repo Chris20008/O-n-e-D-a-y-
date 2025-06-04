@@ -109,7 +109,7 @@ class _NewExercisePanelState extends State<NewExercisePanel> with TickerProvider
       cnNewExercise.showContent.value = false;
     }
 
-    if(cnNewWorkOutPanel.panelController.panelPosition < 0.1){
+    if(!cnNewWorkOutPanel.panelController.isAttached || cnNewWorkOutPanel.panelController.panelPosition < 0.1){
       cnBottomMenu.adjustHeight(value);
     }
   }

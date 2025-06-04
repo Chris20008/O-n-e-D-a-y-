@@ -16,6 +16,8 @@ class WorkoutDatePicker extends StatelessWidget {
     final CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
     DateTime? date = context.select<CnNewWorkOutPanel, DateTime?>((cn) => cn.workout.date);
 
+    print("--- Rebuild Workout DatePicker");
+
     return Padding(
         padding: const EdgeInsets.only(left: 10.0, right: 10, top: 10),
         child: Row(

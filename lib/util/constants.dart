@@ -52,13 +52,25 @@ TextStyle cupButtonTextStyleOnlyFontSize = const TextStyle(fontSize: 17);
 
 const Color activeColor = Color(0xffdb7b01);
 
-Widget backgroundSingleSet = Container(
-  decoration: BoxDecoration(
-    // color: Colors.grey[500]!.withValues(alpha: 0.2),
-    color: Colors.white.withValues(alpha: 0.15),
-    borderRadius: BorderRadius.circular(5),
-  ),
-);
+// Widget backgroundSingleSet(BuildContext context){
+//   return Container(
+//     decoration: BoxDecoration(
+//       // color: Colors.grey[500]!.withValues(alpha: 0.2),
+//       color: Theme.of(context).cardColor,
+//       // color: Colors.white.withValues(alpha: 0.15),
+//       borderRadius: BorderRadius.circular(5),
+//     ),
+//   );
+// }
+
+// Widget backgroundSingleSet = Container(
+//   decoration: BoxDecoration(
+//     // color: Colors.grey[500]!.withValues(alpha: 0.2),
+//     color: Theme.of(context).cardColor,
+//     // color: Colors.white.withValues(alpha: 0.15),
+//     borderRadius: BorderRadius.circular(5),
+//   ),
+// );
 
 void pr(Object? s) {
   if (kDebugMode || kProfileMode) {

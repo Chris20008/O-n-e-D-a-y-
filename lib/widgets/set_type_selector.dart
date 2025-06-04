@@ -9,7 +9,8 @@ import '../util/constants.dart' show routeTheme;
 class SetTypeSelector extends StatelessWidget {
 
   final int index;
-  final Exercise newEx;
+  // final Exercise newEx;
+  final SingleSet set;
   final double width;
   final Function onConfirm;
   final double height;
@@ -17,7 +18,8 @@ class SetTypeSelector extends StatelessWidget {
   const SetTypeSelector({
     super.key,
     required this.index,
-    required this.newEx,
+    // required this.newEx,
+    required this.set,
     required this.width,
     required this.onConfirm,
     this.height = 30,
@@ -25,7 +27,7 @@ class SetTypeSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SingleSet s = newEx.sets[index];
+    // final SingleSet s = newEx.sets[index];
 
     return SizedBox(
       height: height,
@@ -35,19 +37,19 @@ class SetTypeSelector extends StatelessWidget {
         itemBuilder: (context) {
           return [
             PullDownMenuItem.selectable(
-              selected: s.setType == 0,
+              selected: set.setType == 0,
               title: 'Working Set',
               onTap: () {
                 // HapticFeedback.selectionClick();
                 FocusManager.instance.primaryFocus?.unfocus();
                 Future.delayed(const Duration(milliseconds: 200), (){
-                  s.setType = 0;
+                  set.setType = 0;
                   onConfirm();
                 });
               },
             ),
             PullDownMenuItem.selectable(
-              selected: s.setType == 1,
+              selected: set.setType == 1,
               title: 'Warm-Up Set',
               icon: Icons.circle,
               iconColor: Colors.blue,
@@ -55,7 +57,7 @@ class SetTypeSelector extends StatelessWidget {
                 // HapticFeedback.selectionClick();
                 FocusManager.instance.primaryFocus?.unfocus();
                 Future.delayed(const Duration(milliseconds: 200), (){
-                  s.setType = 1;
+                  set.setType = 1;
                   onConfirm();
                 });
               },
@@ -87,7 +89,7 @@ class SetTypeSelector extends StatelessWidget {
             child: Stack(
               // alignment: Alignment.center,
               children: [
-                if(s.setType == 1)
+                if(set.setType == 1)
                   Center(
                     child: Container(
                       margin: const EdgeInsets.only(left: 1.5),
@@ -110,13 +112,13 @@ class SetTypeSelector extends StatelessWidget {
                     style: const TextStyle(color: Colors.white),
                   ),
                 ),
-                if(s.setType != null && s.setType! > 10)
+                if(set.setType != null && set.setType! > 10)
                   Align(
                       alignment: Alignment.bottomRight,
                       child:Padding(
-                        padding: EdgeInsets.only(right: index < 10? (s.setType == 20? 5 : 10) : (s.setType == 20? 0 : 5)),
+                        padding: EdgeInsets.only(right: index < 10? (set.setType == 20? 5 : 10) : (set.setType == 20? 0 : 5)),
                         child: Text(
-                          "${s.setType!-10}",
+                          "${set.setType!-10}",
                           textScaler: const TextScaler.linear(0.7),
                           style: const TextStyle(
                               fontWeight: FontWeight.w700

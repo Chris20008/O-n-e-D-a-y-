@@ -28,6 +28,7 @@
   "template": "Szablon",
   "clear": "Wyczyść",
   "custom": "Niestandardowy",
+  "newExercise": "Nowe ćwiczenie",
   "woAlreadyRunning": "Trening {currentWorkoutName} już działa",
   "woAlreadyRunningDelete": "Czy chcesz zatrzymać bieżący trening i rozpocząć {newWorkoutName}?",
   "spotifyPleaseLogin": "Musisz być zalogowany na Spotify",

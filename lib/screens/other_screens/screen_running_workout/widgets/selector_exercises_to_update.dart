@@ -51,6 +51,8 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
     final List isCheckedList = cnSelectorExerciseToUpdate.isCheckedList;
     final Workout workout = cnSelectorExerciseToUpdate.workout;
 
+    final allOriginalExerciseNames = cnRunningWorkout.workoutTemplateNotModifiable.exercises.map((e) => e.name);
+
     return MySlideUpPanel(
       key: cnSelectorExerciseToUpdate.key,
       animationControllerName: AnimationControllerName.selectorExerciseToUpdate,
@@ -78,7 +80,7 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                     child: listView(
                         controller: cnSelectorExerciseToUpdate.sc,
                         physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.only(bottom: cnBottomMenu.height+10, top: 100),
+                        padding: EdgeInsets.only(bottom: cnBottomMenu.height+20, top: 105),
                         shrinkWrap: true,
                         separatorBuilder: (context, index){
                           return Padding(
@@ -103,6 +105,17 @@ class _SelectorExercisesToUpdateState extends State<SelectorExercisesToUpdate> {
                               },
                               child: Column(
                                 children: [
+                                  if(!allOriginalExerciseNames.contains(relevantExercises[index].name))
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text(
+                                        AppLocalizations.of(context)!.newExercise,
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Theme.of(context).highlightColor,
+                                        ),
+                                      ),
+                                    ),
                                   Row(
                                     children: [
                                       ConstrainedBox(
