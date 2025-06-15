@@ -20,7 +20,7 @@ class LoginSection extends StatelessWidget {
       backgroundColor: Colors.transparent,
       header: Padding(
         padding: const EdgeInsets.only(left: 10),
-        child: Text(AppLocalizations.of(context)!.settingsAbout, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+        child: Text("Login", style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
       ),
       children: [
         StreamBuilder(
