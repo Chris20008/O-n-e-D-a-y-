@@ -3,7 +3,8 @@ import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_w
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/1_general_settings/general_settings.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/2_backup_options/backup_options.dart';
-import 'package:fitness_app/screens/other_screens/screen_settings/widgets/3_about_section/about_section.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/3_Login/login.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/4_about_section/about_section.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/panels/explain_backup_panel.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
 import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
@@ -144,6 +145,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                                 cnHomepage: cnHomepage,
                                 refresh: refresh
                             ),
+
+                            const LoginSection(),
 
                             /// About
                             const AboutSection(),

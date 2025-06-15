@@ -1,9 +1,8 @@
-import 'package:fitness_app/screens/other_screens/screen_settings/widgets/3_about_section/widgets/selector_contact_button.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/4_about_section/widgets/selector_contact_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 
 class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
