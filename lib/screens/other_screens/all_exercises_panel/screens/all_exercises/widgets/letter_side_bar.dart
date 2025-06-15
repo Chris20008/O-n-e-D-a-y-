@@ -15,7 +15,7 @@ class LetterSideBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    double bottomPaddingForSearchBar = MediaQuery.of(context).viewInsets.bottom > 50? 70 : 90;
+    double bottomPaddingForSearchBar = 70;
 
     final double maxHeightSideBar = MediaQuery.of(context).size.height * 0.7;
     double minHeight = min(

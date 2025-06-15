@@ -20,20 +20,40 @@ class LoginSection extends StatelessWidget {
       backgroundColor: Colors.transparent,
       header: Padding(
         padding: const EdgeInsets.only(left: 10),
-        child: Text("Login", style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+        child: Text("Account", style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
       ),
       children: [
         StreamBuilder(
           stream: authService.authStateChanges(),
           builder: (context, snapshot) {
             if(snapshot.connectionState == ConnectionState.active){
-              CupertinoButton(
-                  child: const Text("Logout"),
-                  onPressed: () => authService.signOut()
+              final user = snapshot.data;
+
+              if(user == null){
+                return SignInWithAppleButton(
+                    onPressed: () => authService.signInWithApple()
+                );
+              }
+
+              return CupertinoListTile(
+                onTap: () => authService.signOut(),
+                leading: const Icon(Icons.logout, color: Colors.white),
+                trailing: trailingArrow,
+                title:const Text("Logout", style: TextStyle(color: Colors.white)),
               );
+
+              // return CupertinoButton(
+              //     child: const Text("Logout"),
+              //     onPressed: () => authService.signOut()
+              // );
             }
-            return SignInWithAppleButton(
-                onPressed: () => authService.signInWithApple()
+
+            return CupertinoListTile(
+              onTap: () {},
+              title: CupertinoActivityIndicator(
+                  radius: 8.0,
+                  color: Colors.amber[800]
+              ),
             );
           }
         )

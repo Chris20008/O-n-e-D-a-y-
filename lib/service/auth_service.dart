@@ -22,10 +22,14 @@ class AuthService{
         ]
       );
 
+      print(appleCredential);
+
       final oAuthCredential = OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode
       );
+
+      print(oAuthCredential);
 
       return await _firebase_auth.signInWithCredential(oAuthCredential);
     }
