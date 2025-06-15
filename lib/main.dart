@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:fitness_app/firebase_options.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_workout_history.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
@@ -45,10 +47,12 @@ int currentTutorialStep = 0;
 String pictureAssetPath = "lib/assets/pictures/";
 Color buttonTextColor = const Color(0xffdb7b01);
 
-void main() {
+void main() async{
 
   // debugRepaintRainbowEnabled = true;
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: "dotenv.env");
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
     DeviceOrientation.portraitUp,
@@ -226,7 +230,6 @@ class _MyHomePageState extends State<MyHomePage>{
     objectbox = await ObjectBox.create();
     await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
-    await dotenv.load(fileName: "dotenv.env");
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
       if(context.mounted){
