@@ -68,9 +68,7 @@ Future<File?> getBackupFromFilePicker({CnHomepage? cnHomepage}) async{
 }
 
 Future<bool> loadBackupFromFile(File file, {CnHomepage? cnHomepage}) async{
-  print("Load Backup from File");
   final content = await file.readAsString();
-  print("Got file as string");
   return await loadBackupFromString(content: content, cnHomepage: cnHomepage);
 }
 
@@ -83,7 +81,6 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
   allWorkoutsAsListString.removeWhere((element) => element.trim() == "");
   final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
   List<ObWorkout> allObWorkouts = [];
-  print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   for (Map w in allWorkouts){
     ObWorkout? workout = ObWorkout.fromMap(workoutMap: w, withId: true);
     if(workout != null){
@@ -92,7 +89,6 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
       allObWorkouts.add(workout);
     }
   }
-  print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 
   objectbox.sickDaysBox.removeAll();
   if (result.length > 1){
@@ -102,8 +98,6 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
     await objectbox.sickDaysBox.putManyAsync(allObSickDays);
   }
-
-  print("cccccccccccccccccccccccccccccccccccccccccccccc");
 
   final hadDifferences = await loadDifferencesWorkouts(allObWorkouts, cnHomepage: cnHomepage);
   return hadDifferences;
@@ -130,8 +124,6 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
     hashMapSmall[key] = obWorkout;
   }
   final length = workouts.length;
-
-  print("In differences load workouts");
 
   for(ObWorkout wo in workouts){
 
@@ -176,11 +168,7 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
 
       existingWorkout = wo;
 
-      print("Before save async");
       await wo.saveAsync();
-      print("After save async");
-      // await objectbox.workoutBox.putAsync(wo);
-      // await objectbox.exerciseBox.putManyAsync(wo.exercises);
       hadDifferences = true;
       // continue;
     }
@@ -192,7 +180,6 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
     /// ################################################################################################################
 
     else{
-      print("IN ELSE LESE ");
       /// If not it means the id does not exists, but maybe the workout itself exists because objectbox entries
       /// on different devices can have different id's
       /// So we check just for equal through the bigHash
@@ -203,11 +190,7 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
       if(existingWorkout == null){
         hadDifferences = true;
         wo.id = 0;
-        print("Before save async 2");
         await wo.saveAsync();
-        print("After save async 2");
-        // await objectbox.workoutBox.putAsync(wo);
-        // await objectbox.exerciseBox.putManyAsync(wo.exercises);
         /// Add it to the HashMap in case there is an exact same workout
         hashMapBig[woHashBig] = wo;
       }
@@ -296,7 +279,6 @@ Future<File?> saveBackup({
     return file;
   }
   catch (e) {
-    print("FOUND ERROR: $e");
     return null;
   }
 }
@@ -316,7 +298,6 @@ List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
   final allObSickDays = objectbox.sickDaysBox.getAll();
   for(ObWorkout wo in allObWorkouts){
-    print("Exercisees NOW");
     wo.exercises.forEach((ex){
       print(ex.asMap());
       print(ex.checksumString);

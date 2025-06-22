@@ -89,7 +89,7 @@ class CnSyncManager extends ChangeNotifier {
         /// ToDo: when newWo is null, the map couldn't be parsed
         /// so we have to delete this workout from server database
         else{
-          print("Error in parsing map");
+          pr("Error in parsing map");
         }
       }
 

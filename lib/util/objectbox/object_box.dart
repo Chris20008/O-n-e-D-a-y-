@@ -2,7 +2,6 @@ import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import '../../objectbox.g.dart';
-import '../../service/database_service.dart';
 import 'ob_exercise.dart';
 import 'ob_workout.dart';
 
@@ -29,7 +28,6 @@ class ObjectBox{
             .or(ObWorkout_.checksum.equals("")
             .or(ObWorkout_.checksum.isNull())
         )).build().find();
-    print(" ----------------- FOUND ${woToFillChecksums.length} workouts to fill checksum");
     for(ObWorkout wo in woToFillChecksums){
       wo.save(onlyWorkout: true);
     }

@@ -35,7 +35,6 @@ class ObWorkout{
   int id;
 
   String uuid;
-
   String name;
   @Property(type: PropertyType.date)
   DateTime date;
@@ -49,7 +48,6 @@ class ObWorkout{
 
   String get currentChecksum {
     final hash = sha256.convert(utf8.encode(checksumString));
-    print("----CHEKSUM in current: ${hash.toString()}");
     return hash.toString();
   }
 
@@ -65,10 +63,6 @@ class ObWorkout{
     buffer.write(isTemplate);
     buffer.write(linkedExercises.toString());
     buffer.write(exs.toString());
-
-    print("BUFFER STRING: ${buffer.toString()}");
-    print("Workout als Map: ${asMap()}");
-    print("Länge exercises: ${exercises.length}");
 
     return buffer.toString();
   }
@@ -87,12 +81,8 @@ class ObWorkout{
         linkedExercises: List.from(workoutMap["linkedExercises"])
       );
 
-      print("Created workout");
-
       if (withExercises && workoutMap["exercises"] != null) {
-        print("Add exercises to workout");
         final List<ObExercise> exercises = List<ObExercise>.from(workoutMap["exercises"].map((data) => ObExercise.fromMap(data)));
-        print("created list");
         workout.exercises.addAll(exercises);
       }
       return workout;
@@ -123,63 +113,32 @@ class ObWorkout{
 
   Future save({bool onlyWorkout = false}) async{
     updateLastUpdated();
-    // updateChecksum();
     final oldChecksum = checksum;
-    // print("All Exercises 1");
-    // exercises.forEach((e){print(e.asMap());});
-    // exerciseChecksumSkipIds = exercises.map((ex) => ex.id).toList();
     if(!onlyWorkout){
       objectbox.exerciseBox.putMany(exercises);
     }
-    // print("All Exercises 2");
-    // exercises.forEach((e){print(e.asMap());});
-    // updateChecksum();
     final newId = objectbox.workoutBox.put(this);
-    // print("All Exercises 3");
-    // exercises.forEach((e){print(e.asMap());});
 
     final newWorkout = objectbox.workoutBox.get(newId);
-    // print("All Exercises 4");
-    // newWorkout?.exercises.forEach((e){print(e.asMap());});
-    print("EVAL CHECKSUM");
-    print(oldChecksum);
-    print(checksum);
     if(newWorkout != null){
       newWorkout.updateChecksum();
       objectbox.workoutBox.putAsync(newWorkout);
       if(newWorkout.checksum != oldChecksum){
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }
-      // newWorkout.updateChecksum();
-      // objectbox.workoutBox.putAsync(newWorkout);
-      // CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
     }
     // exerciseChecksumSkipIds.clear();
   }
 
   Future saveAsync({bool onlyWorkout = false}) async{
     updateLastUpdated();
-    // updateChecksum();
     final oldChecksum = checksum;
-    // print("All Exercises 1");
-    // exercises.forEach((e){print(e.asMap());});
-    // exerciseChecksumSkipIds = exercises.map((ex) => ex.id).toList();
     if(!onlyWorkout){
       await objectbox.exerciseBox.putManyAsync(exercises);
     }
-    // print("All Exercises 2");
-    // exercises.forEach((e){print(e.asMap());});
-    // updateChecksum();
     final newId = await objectbox.workoutBox.putAsync(this);
-    // print("All Exercises 3");
-    // exercises.forEach((e){print(e.asMap());});
 
     final newWorkout = objectbox.workoutBox.get(newId);
-    // print("All Exercises 4");
-    // newWorkout?.exercises.forEach((e){print(e.asMap());});
-    print("EVAL CHECKSUM");
-    print(oldChecksum);
-    print(checksum);
     if(newWorkout != null){
       newWorkout.updateChecksum();
       objectbox.workoutBox.putAsync(newWorkout);
@@ -187,7 +146,6 @@ class ObWorkout{
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }
     }
-    // exerciseChecksumSkipIds.clear();
   }
 
   void updateLastUpdated(){
@@ -195,10 +153,7 @@ class ObWorkout{
   }
 
   void updateChecksum(){
-    print("Update checksum");
-    print("Old $checksum");
     checksum = currentChecksum;
-    print("new $checksum");
   }
 
   int getHash(){

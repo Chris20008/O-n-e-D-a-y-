@@ -20,12 +20,9 @@ class DatabaseService{
     final DocumentSnapshot dc = await userCollection.doc(uid).get();
     final data = dc.data() as Map<String, dynamic>?;
     if (data != null && data.containsKey("workoutChecksums")) {
-      print("Received Data: $data");
       final checksums = data["workoutChecksums"];
       final lastUpdated = data["lastUpdated"];
       if (checksums is List && lastUpdated is Timestamp) {
-        print("LAST UPDATED: $lastUpdated");
-        print("LAST UPDATED To DATE: ${lastUpdated.toDate()}");
         return ServerChecksums(
             checksums: List<String>.from(checksums),
             lastUpdated: lastUpdated.toDate()

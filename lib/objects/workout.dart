@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:quiver/iterables.dart';
 import 'package:uuid/uuid.dart';
@@ -100,7 +97,6 @@ class Workout{
       for (ObExercise ex in template.exercises){
         /// Check if the current exercise exists in the new exercises list
         if(exercises.map((e) => e.name).toList().contains(ex.name)) {
-          print("Do Update now");
           /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
           /// Update relevant fields of the existing exercise in the template
@@ -119,7 +115,6 @@ class Workout{
       /// Add new exercises to the template
       for (Exercise ex in newExercises){
 
-        print("FOUND DIFFERENCES IN EXERCISES");
         /// Convert Exercise to ObExercise
         ObExercise obExercise = ex.toObExercise();
 
@@ -177,11 +172,12 @@ class Workout{
   }
 
   void addOrUpdateExercise(Exercise exercise){
+    print("Add or update exercise");
     List<String> existingExercises = exercises.map((e) => e.name).toList();
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       final index = existingExercises.indexOf(exercise.originalName!);
       exercises[index] = exercise;
-      List<String> existingExercises2 = exercises.map((e) => e.name).toList();
+      // List<String> existingExercises2 = exercises.map((e) => e.name).toList();
     }
     else{
       exercises.add(
@@ -235,33 +231,17 @@ class Workout{
       existingObWorkout.linkedExercises = List.from(linkedExercises);
     }
 
-    print("All Exercises");
-    exercises.forEach((ex){
-      print(ex.id);
-      print(ex.asMap());
-    });
-
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toEmptyObWorkout();
-    // newObWorkout.exercises.clear();
     newObWorkout.exercises.addAll(newObExercises);
-    print("All Exercises - 2");
-    newObWorkout.exercises.forEach((ex){
-      print(ex.asMap());
-    });
     newObWorkout.save();
     return newObWorkout;
-    // objectbox.workoutBox.put(newObWorkout);
-    // objectbox.exerciseBox.putMany(newObExercises);
   }
 
   Future deleteFromDatabase() async{
     ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(id)).build().findUnique();
     if(w != null){
       await w.delete();
-      // List<ObExercise> obExercises = w.exercises;
-      // objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
-      // objectbox.workoutBox.remove(w.id);
     }
   }
   

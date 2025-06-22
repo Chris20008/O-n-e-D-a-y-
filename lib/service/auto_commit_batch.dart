@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../util/constants.dart';
-
 class AutoCommitBatch {
   late final FirebaseFirestore firestore;
   WriteBatch? _batch;
@@ -61,7 +59,6 @@ class AutoCommitBatch {
   Future<void> commit() async {
     if(_waitingForCommit){
       while (_waitingForCommit) {
-        print("-------------- Is waiting for commit");
         await Future.delayed(const Duration(milliseconds: 50));
       }
     }
@@ -71,7 +68,6 @@ class AutoCommitBatch {
     try{
       final batchToCommit = _batch;
       _batch = null;
-      print("----------- Do Commit for $_counter operations. of which are writes: $_writes and deletes: $_deletes");
       _counter = 0;
       _writes = 0;
       _deletes = 0;
@@ -80,7 +76,6 @@ class AutoCommitBatch {
 
       if (batchToCommit != null) {
         await batchToCommit.commit();
-        print("----------- Finished Commit");
       }
     }
     finally{

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../util/constants.dart';
+
 class AuthService{
   final FirebaseAuth _firebase_auth = FirebaseAuth.instance;
 
@@ -16,7 +18,6 @@ class AuthService{
   /// Apple Login Method
   Future<UserCredential?> signInWithApple() async{
     try{
-      print("Try");
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes:[
           AppleIDAuthorizationScopes.email,
@@ -24,19 +25,15 @@ class AuthService{
         ]
       );
 
-      print(appleCredential);
-
       final oAuthCredential = OAuthProvider("apple.com").credential(
         idToken: appleCredential.identityToken,
         accessToken: appleCredential.authorizationCode
       );
 
-      print(oAuthCredential);
-
       return await _firebase_auth.signInWithCredential(oAuthCredential);
     }
     catch(e){
-      print("Error during sign in with apple");
+      pr("Error during sign in with apple");
       return null;
     }
   }

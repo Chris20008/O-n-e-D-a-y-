@@ -457,15 +457,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       }
       workout.removeEmptyLinksFromWorkout();
       if(applyNameChanges){
-        print("Start change saem naem wwokrouts");
         changeSameNameWorkouts();
-
-        print("finished change saem naem wwokrouts");
       }
       if(hasChangedBodyWeight()){
         changeSameNameExercisesBodyWeight();
       }
-      print("NEXT STEP  1");
       if(cnBottomMenu.index == 0){
         int? index;
         String key = "${workout.date?.year}${workout.date?.month}${workout.date?.day}";
@@ -487,13 +483,9 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         }
       }
 
-      print("NEXT STEP  2");
       Workout woToSave = Workout.clone(workout);
 
-      print("NEXT STEP  3");
       await closePanel(doClear: true, context: context);
-
-      print("NEXT STEP  4");
 
       woToSave.saveToDatabase();
       await cnWorkouts.refreshAllWorkouts();
@@ -548,14 +540,12 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     final currentObWorkouts = objectbox.workoutBox.query(ObWorkout_.name.equals(originalWorkout.name)).build().find();
 
     for(ObWorkout wo in currentObWorkouts){
-      print("Change same name workouts");
       wo.name = workout.name;
       for(MapEntry mapping in exerciseNewNameMapping.entries){
         if(wo.exercises.map((e) => e.name).contains(mapping.key)){
           wo.exercises.firstWhere((e) => e.name == mapping.key).name = mapping.value;
         }
       }
-      print("Start save");
       wo.save();
     }
   }

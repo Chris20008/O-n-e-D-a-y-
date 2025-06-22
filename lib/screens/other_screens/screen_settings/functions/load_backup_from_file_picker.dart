@@ -47,7 +47,6 @@ Future<bool> loadBackupFromFilePicker({
     setLoadingIndicator(true);
     try{
       await loadBackupFromFile(file, cnHomepage: cnHomepage);
-      print("Saved backup from file finished");
       await saveCurrentData(cnConfig);
       tutorialIsRunning = false;
       currentTutorialStep = maxTutorialStep;

@@ -57,9 +57,7 @@ class ObExercise{
   }
 
   factory ObExercise.fromMap(Map data){
-    print("Try creating weight");
     final weights = List<double>.from(List.from(data["weights"]?? [0.0]).map((w) => double.parse(w.toString())));
-    print("Created weights");
     return ObExercise(
         name:data["name"],
         weights: weights,
