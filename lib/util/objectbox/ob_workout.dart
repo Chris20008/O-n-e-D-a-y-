@@ -25,7 +25,7 @@ class ObWorkout{
     if(linkedExercises.isEmpty){
       linkedExercises = [];
     }
-    if(uuid == "-1") {
+    if(uuid == "-1" || uuid.isEmpty) {
       uuid = const Uuid().v4();
     }
     lastUpdated ??= date;
