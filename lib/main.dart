@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fitness_app/firebase_options.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
@@ -205,6 +206,7 @@ class _MyHomePageState extends State<MyHomePage>{
   bool showWelcomeScreen = false;
   bool closeWelcomeScreen = true;
   bool mainIsInitialized = false;
+  final AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -309,9 +311,9 @@ class _MyHomePageState extends State<MyHomePage>{
 
     pr("Homepage");
 
-    cnConfig  = Provider.of<CnConfig>(context);
-    cnHomepage = Provider.of<CnHomepage>(context);
-    cnSyncManager = context.watch<CnSyncManager>();
+    cnConfig = context.read<CnConfig>();
+    cnHomepage = context.read<CnHomepage>();
+    cnSyncManager = context.read<CnSyncManager>();
 
     /// Screen to bee shown until 'await cnConfig.initData();' is finished
     /// So the config data is been initialized
@@ -319,14 +321,18 @@ class _MyHomePageState extends State<MyHomePage>{
     /// !cnConfig.isInitialized seems unimportant since, mainIsInitialized can only be true when
     /// cnConfig.isInitialized is also true, however deleting it leads some to a crash
     if(!cnConfig.isInitialized || !mainIsInitialized){
-      return StreamBuilder(
-          stream: AuthService().authStateChanges(),
+      return StreamBuilder<User?>(
+          stream: authService.authStateChanges(),
           builder: (context, snapshot) {
 
             if(snapshot.connectionState == ConnectionState.active){
               final uid = Platform.isAndroid? "54671382937413" : snapshot.data?.uid;
               cnSyncManager.setUserId(uid);
-              cnSyncManager.doSyncWithFireStore();
+              if(ObjectBox.initialized){
+                cnSyncManager.doSyncWithFireStore();
+              }
+            } else{
+              cnSyncManager.setUserId(null);
             }
 
             return Scaffold(
@@ -403,132 +409,153 @@ class _MyHomePageState extends State<MyHomePage>{
       cnHomepage.tutorial = showTutorialCreateWorkoutTemplate(context);
     }
 
-    return Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      bottomNavigationBar: const BottomMenu(),
-      body: PopScope(
-        canPop: false,
-        child: Container(
-          color: Colors.black,
-            child: Stack(
-              alignment: Alignment.topCenter,
-              children: [
+    return StreamBuilder<User?>(
+      stream: authService.authStateChanges(),
+      builder: (context, snapshot) {
 
-                if(cnBottomMenu.index != 2 && !showWelcomeScreen)
-                  Stack(
-                    children: [
-                      InitialAnimatedScreen(
-                          animationControllerName: AnimationControllerName.screenWorkouts,
-                          child: AnimatedCrossFade(
-                              firstChild: const ScreenWorkoutHistory(),
-                              secondChild: const ScreenWorkout(),
-                              crossFadeState: cnBottomMenu.index == 0?
-                              CrossFadeState.showFirst:
-                              CrossFadeState.showSecond,
-                              duration: const Duration(milliseconds: 100)
-                          ),
-                      ),
+        if(snapshot.connectionState == ConnectionState.active){
+          final uid = Platform.isAndroid? "54671382937413" : snapshot.data?.uid;
+          cnSyncManager.setUserId(uid);
+          if(ObjectBox.initialized){
+            cnSyncManager.doSyncWithFireStore();
+          }
+        } else{
+          cnSyncManager.setUserId(null);
+        }
 
-                      if(cnConfig.useSpotify)
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                          curve: Curves.easeInOut,
-                          child: const SafeArea(
-                            top: false,
-                            child: Hero(
-                                transitionOnUserGestures: true,
-                                tag: "SpotifyBar",
-                                child: SpotifyBar()
-                            ),
-                          ),
-                        ),
-
-                      const NewWorkOutPanel(),
-
-                      const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
-
-                      const AllExercisesPanel(
-                        id: AllExercisePanelIds.mainAllExercisesPanel,
-                        descendantAnimationControllerName: AnimationControllerName.newWorkoutPanel,
-                      )
-                    ],
-                  )
-
-                else if(!showWelcomeScreen)
-                  const ScreenStatistics(),
-
-                if(cnBottomMenu.index == 2)
-                  const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
-
-                const StandardPopUp(),
-
-                if(showWelcomeScreen)
-                  AnimatedCrossFade(
-                    duration: const Duration(milliseconds: 500),
-                    firstChild: WelcomeScreen(
-                      onFinish: onFinishWelcomeScreen
-                    ),
-                    /// Use transparent Container instead of SizedBox to prevent user inputs
-                    /// until tutorial is loaded
-                    secondChild: Container(
-                      color: Colors.transparent,
-                    ),
-                    crossFadeState: closeWelcomeScreen?
-                    CrossFadeState.showSecond :
-                    CrossFadeState.showFirst,
-                    layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+        return Scaffold(
+          extendBody: true,
+          resizeToAvoidBottomInset: false,
+          bottomNavigationBar: const BottomMenu(),
+          body: PopScope(
+            canPop: false,
+            child: Container(
+              color: Colors.black,
+                child: Selector<CnBottomMenu, int>(
+                    selector: (_, cn) => cn.index,
+                    builder: (_, index, __) {
                       return Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          Positioned(
-                            key: bottomChildKey,
-                            // top: 0.0,
-                            child: bottomChild,
-                          ),
-                          Positioned(
-                            key: topChildKey,
-                            child: topChild,
-                          ),
+                        alignment: Alignment.topCenter,
+                        children: [
+
+                          if(index != 2 && !showWelcomeScreen)
+                            Stack(
+                              children: [
+                                InitialAnimatedScreen(
+                                    animationControllerName: AnimationControllerName.screenWorkouts,
+                                    child: AnimatedCrossFade(
+                                        firstChild: const ScreenWorkoutHistory(),
+                                        secondChild: const ScreenWorkout(),
+                                        crossFadeState: index == 0?
+                                        CrossFadeState.showFirst:
+                                        CrossFadeState.showSecond,
+                                        duration: const Duration(milliseconds: 100)
+                                    ),
+                                ),
+
+                                if(cnConfig.useSpotify)
+                                  AnimatedContainer(
+                                    duration: const Duration(milliseconds: 300),
+                                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
+                                    curve: Curves.easeInOut,
+                                    child: const SafeArea(
+                                      top: false,
+                                      child: Hero(
+                                          transitionOnUserGestures: true,
+                                          tag: "SpotifyBar",
+                                          child: SpotifyBar()
+                                      ),
+                                    ),
+                                  ),
+
+                                const NewWorkOutPanel(),
+
+                                const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
+
+                                const AllExercisesPanel(
+                                  id: AllExercisePanelIds.mainAllExercisesPanel,
+                                  descendantAnimationControllerName: AnimationControllerName.newWorkoutPanel,
+                                )
+                              ],
+                            )
+
+                          else if(!showWelcomeScreen)
+                            const ScreenStatistics(),
+
+                          if(index == 2)
+                            const NewExercisePanel(id: CnNewExercisePanel.defaultContextId),
+
+                          const StandardPopUp(),
+
+                          if(showWelcomeScreen)
+                            AnimatedCrossFade(
+                              duration: const Duration(milliseconds: 500),
+                              firstChild: WelcomeScreen(
+                                onFinish: onFinishWelcomeScreen
+                              ),
+                              /// Use transparent Container instead of SizedBox to prevent user inputs
+                              /// until tutorial is loaded
+                              secondChild: Container(
+                                color: Colors.transparent,
+                              ),
+                              crossFadeState: closeWelcomeScreen?
+                              CrossFadeState.showSecond :
+                              CrossFadeState.showFirst,
+                              layoutBuilder: (Widget topChild, Key topChildKey, Widget bottomChild, Key bottomChildKey) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.center,
+                                  children: <Widget>[
+                                    Positioned(
+                                      key: bottomChildKey,
+                                      // top: 0.0,
+                                      child: bottomChild,
+                                    ),
+                                    Positioned(
+                                      key: topChildKey,
+                                      child: topChild,
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          const SyncWithCloudBar(),
+
+                          // Center(
+                          //   child: ElevatedButton(
+                          //     child: const Text("Test"),
+                          //     onPressed: ()async{
+                          //       final db = DatabaseService(uid: "54671382937413");
+                          //       final res = await db.getAllWorkoutChecksums();
+                          //
+                          //       final obWorkouts = objectbox.workoutBox.getAll();
+                          //       final allShas = [];
+                          //       for(ObWorkout wo in obWorkouts){
+                          //         final checksum = wo.checksum;
+                          //         allShas.add(checksum);
+                          //         if(!res.contains(checksum)){
+                          //           print("Checksum: $checksum does not exist yet - add do FireStore");
+                          //           await db.addWorkout(wo: wo, checksum: checksum);
+                          //         } else{
+                          //           print("Checksum $checksum already conatined in db");
+                          //         }
+                          //       }
+                          //       // for(final l in res){
+                          //       //   print(l);
+                          //       //   print(l.runtimeType);
+                          //       // }
+                          //       // print(res);
+                          //     },
+                          //   ),
+                          // )
                         ],
                       );
-                    },
-                  ),
-                const SyncWithCloudBar(),
-                
-                // Center(
-                //   child: ElevatedButton(
-                //     child: const Text("Test"),
-                //     onPressed: ()async{
-                //       final db = DatabaseService(uid: "54671382937413");
-                //       final res = await db.getAllWorkoutChecksums();
-                //
-                //       final obWorkouts = objectbox.workoutBox.getAll();
-                //       final allShas = [];
-                //       for(ObWorkout wo in obWorkouts){
-                //         final checksum = wo.checksum;
-                //         allShas.add(checksum);
-                //         if(!res.contains(checksum)){
-                //           print("Checksum: $checksum does not exist yet - add do FireStore");
-                //           await db.addWorkout(wo: wo, checksum: checksum);
-                //         } else{
-                //           print("Checksum $checksum already conatined in db");
-                //         }
-                //       }
-                //       // for(final l in res){
-                //       //   print(l);
-                //       //   print(l.runtimeType);
-                //       // }
-                //       // print(res);
-                //     },
-                //   ),
-                // )
-              ],
+                  }
+                ),
             ),
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 

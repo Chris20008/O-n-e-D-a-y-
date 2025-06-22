@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitness_app/objectbox.g.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
@@ -11,6 +12,7 @@ class CnSyncManager extends ChangeNotifier {
   String? userId;
   static DatabaseService? database;
   static List<String> localeChecksums = [];
+  bool _isSyncing = false;
 
   CnSyncManager({this.userId}){
     setUserId(userId);
@@ -29,15 +31,24 @@ class CnSyncManager extends ChangeNotifier {
   }
 
   Future doSyncWithFireStore() async{
-    if(database == null){
+    if(database == null || _isSyncing){
       return;
     }
-    final serverChecksumsFuture = database!.getServerChecksums();
+    try{
+      _isSyncing = true;
+      if(await isOnline()){
+        await FirebaseFirestore.instance.waitForPendingWrites();
+      }
+      final serverChecksumsFuture = database!.getServerChecksums();
 
-    localeChecksums = objectbox.workoutBox.getAll().map((w) => w.checksum).toList();
-    final ServerChecksums serverChecksums = await serverChecksumsFuture;
+      localeChecksums = objectbox.workoutBox.getAll().map((w) => w.checksum).toList();
+      final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
-    await syncChecksums(serverChecksums: serverChecksums);
+      await syncChecksums(serverChecksums: serverChecksums);
+    }
+    finally{
+      _isSyncing = false;
+    }
   }
 
   Future syncChecksums({required ServerChecksums serverChecksums}) async {

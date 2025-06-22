@@ -29,7 +29,6 @@ class AddExerciseButton extends StatelessWidget {
           required BuildContext context,
           required String? value
         }){
-          print("-----------------  VALIDATE");
           if (value == null || value.isEmpty) {
             return AppLocalizations.of(context)!.panelExEnterName;
           }

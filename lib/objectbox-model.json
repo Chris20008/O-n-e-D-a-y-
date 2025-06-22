@@ -69,7 +69,7 @@
     },
     {
       "id": "3:6190945827968541021",
-      "lastPropertyId": "9:5589418646293440542",
+      "lastPropertyId": "10:7911241795309993017",
       "name": "ObWorkout",
       "properties": [
         {
@@ -112,6 +112,11 @@
           "id": "9:5589418646293440542",
           "name": "checksum",
           "type": 9
+        },
+        {
+          "id": "10:7911241795309993017",
+          "name": "exerciseChecksumSkipIds",
+          "type": 27
         }
       ],
       "relations": [

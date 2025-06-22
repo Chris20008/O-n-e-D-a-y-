@@ -88,7 +88,7 @@ class ObWorkout{
       return workout;
     }
     catch (e) {
-      print(e);
+      // print(e);
       return null;
     }
 
@@ -111,7 +111,7 @@ class ObWorkout{
     await CnSyncManager.database?.deleteWorkout(wo: this);
   }
 
-  Future save({bool onlyWorkout = false}) async{
+  Future save({bool onlyWorkout = false, bool onlyLocal = false}) async{
     updateLastUpdated();
     final oldChecksum = checksum;
     if(!onlyWorkout){
@@ -123,7 +123,7 @@ class ObWorkout{
     if(newWorkout != null){
       newWorkout.updateChecksum();
       objectbox.workoutBox.putAsync(newWorkout);
-      if(newWorkout.checksum != oldChecksum){
+      if(newWorkout.checksum != oldChecksum && !onlyLocal){
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }
     }

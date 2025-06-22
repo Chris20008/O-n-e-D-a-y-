@@ -73,9 +73,9 @@ const Color activeColor = Color(0xffdb7b01);
 // );
 
 void pr(Object? s) {
-  // if (kDebugMode || kProfileMode) {
+  if (kDebugMode || kProfileMode) {
     print(s);
-  // }
+  }
 }
 
 Widget dataSingleSet(SingleSet set, Exercise exercise){

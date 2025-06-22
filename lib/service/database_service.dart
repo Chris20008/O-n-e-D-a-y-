@@ -47,6 +47,9 @@ class DatabaseService{
   }
 
   Future<void> addWorkout({required ObWorkout wo, String? oldChecksum}) async{
+    print("User ID in add workout: $uid");
+    print(wo.uuid);
+    print(userCollection.toString());
     // final batch = FirebaseFirestore.instance.batch();
     final workoutData = wo.asMap(withChecksum: true);
 

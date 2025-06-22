@@ -15,46 +15,29 @@ class AccountSection extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final CnSettings cnSettings = context.read<CnSettings>();
+    final authService = AuthService();
 
-    final AuthService authService = AuthService();
-
-    return StreamBuilder(
-        stream: authService.authStateChanges(),
-        builder: (context, snapshot) {
+    return StatefulBuilder(
+        builder: (context, setModalState) {
+          final String? uid = authService.getUid();
 
           Widget? loginState;
 
-          if(snapshot.connectionState == ConnectionState.active){
-            final user = snapshot.data;
-
-            if(user == null){
-              loginState = Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SignInWithAppleButton(
-                    onPressed: () => authService.signInWithApple()
-                ),
-              );
-            }
-
-            else{
-              loginState = CupertinoListTile(
-               onTap: () => authService.signOut(),
-               leading: const Icon(Icons.logout, color: Colors.white),
-               trailing: trailingArrow,
-               title:const Text("Logout", style: TextStyle(color: Colors.white)),
-             );
-            }
+          if(uid == null){
+            loginState = Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: SignInWithAppleButton(
+                  onPressed: () async => await authService.signInWithApple().then((_) => setModalState((){}))
+              ),
+            );
           }
           else{
             loginState = CupertinoListTile(
-              onTap: () {},
-              title: Center(
-                child: CupertinoActivityIndicator(
-                    radius: 8.0,
-                    color: Colors.amber[800]
-                ),
-              ),
-            );
+             onTap: () async => await authService.signOut().then((_) => setModalState((){})),
+             leading: const Icon(Icons.logout, color: Colors.white),
+             trailing: trailingArrow,
+             title:const Text("Logout", style: TextStyle(color: Colors.white)),
+           );
           }
 
           Widget child = CupertinoListSection.insetGrouped(

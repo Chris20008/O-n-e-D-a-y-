@@ -11,6 +11,7 @@ class ObjectBox{
   late final Box<ObWorkout> workoutBox;
   late final Box<ObExercise> exerciseBox;
   late final Box<ObSickDays> sickDaysBox;
+  static bool initialized = false;
 
   ObjectBox._create(this.store){
     workoutBox = Box<ObWorkout>(store);
@@ -29,7 +30,7 @@ class ObjectBox{
             .or(ObWorkout_.checksum.isNull())
         )).build().find();
     for(ObWorkout wo in woToFillChecksums){
-      wo.save(onlyWorkout: true);
+      await wo.save(onlyWorkout: true, onlyLocal: true);
     }
   }
 
@@ -37,6 +38,7 @@ class ObjectBox{
     final String? dic = directory == null? null: (await defaultStoreDirectory()).path + directory;
     // Future<store> openStore() {...} is defined in the generated objectbox.g.dart
     final store = await openStore(directory: dic);
+    initialized = true;
     return ObjectBox._create(store);
   }
 

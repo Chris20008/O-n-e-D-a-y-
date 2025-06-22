@@ -89,7 +89,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 6190945827968541021),
       name: 'ObWorkout',
-      lastPropertyId: const obx_int.IdUid(9, 5589418646293440542),
+      lastPropertyId: const obx_int.IdUid(10, 7911241795309993017),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -131,6 +131,11 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(9, 5589418646293440542),
             name: 'checksum',
             type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(10, 7911241795309993017),
+            name: 'exerciseChecksumSkipIds',
+            type: 27,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[
@@ -315,7 +320,9 @@ obx_int.ModelDefinition getObjectBoxModel() {
               .toList(growable: false));
           final uuidOffset = fbb.writeString(object.uuid);
           final checksumOffset = fbb.writeString(object.checksum);
-          fbb.startTable(10);
+          final exerciseChecksumSkipIdsOffset =
+              fbb.writeListInt64(object.exerciseChecksumSkipIds);
+          fbb.startTable(11);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addInt64(2, object.date.millisecondsSinceEpoch);
@@ -324,6 +331,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addOffset(6, uuidOffset);
           fbb.addInt64(7, object.lastUpdated?.millisecondsSinceEpoch);
           fbb.addOffset(8, checksumOffset);
+          fbb.addOffset(9, exerciseChecksumSkipIdsOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -359,7 +367,10 @@ obx_int.ModelDefinition getObjectBoxModel() {
               date: dateParam,
               isTemplate: isTemplateParam,
               linkedExercises: linkedExercisesParam,
-              lastUpdated: lastUpdatedParam);
+              lastUpdated: lastUpdatedParam)
+            ..exerciseChecksumSkipIds =
+                const fb.ListReader<int>(fb.Int64Reader(), lazy: false)
+                    .vTableGet(buffer, rootOffset, 22, []);
           obx_int.InternalToManyAccess.setRelInfo<ObWorkout>(object.exercises,
               store, obx_int.RelInfo<ObWorkout>.toMany(3, object.id));
           return object;
@@ -479,6 +490,10 @@ class ObWorkout_ {
   /// see [ObWorkout.checksum]
   static final checksum =
       obx.QueryStringProperty<ObWorkout>(_entities[1].properties[7]);
+
+  /// see [ObWorkout.exerciseChecksumSkipIds]
+  static final exerciseChecksumSkipIds =
+      obx.QueryIntegerVectorProperty<ObWorkout>(_entities[1].properties[8]);
 
   /// see [ObWorkout.exercises]
   static final exercises =

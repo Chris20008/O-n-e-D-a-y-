@@ -297,12 +297,6 @@ Future<File?> saveCurrentData(CnConfig cnConfig) async{
 List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
   final allObSickDays = objectbox.sickDaysBox.getAll();
-  for(ObWorkout wo in allObWorkouts){
-    wo.exercises.forEach((ex){
-      print(ex.asMap());
-      print(ex.checksumString);
-    });
-  }
   final allWorkouts = List<String>.from(allObWorkouts.map((workout) => jsonEncode(workout.asMap())));
   final allSickDays = List<String>.from(allObSickDays.map((sickDay) => jsonEncode(sickDay.asMap())));
 

@@ -26,7 +26,6 @@ class BackupsScreen extends StatelessWidget {
               controller: cnSettings.scrollControllerBackupsScreen,
               child: const Column(
                 children: [
-
                   BackupOptions(),
                 ],
               ),

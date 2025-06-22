@@ -147,7 +147,6 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                 Selector<CnSettings, bool>(
                     selector: (_, cn) => cn.showLoadingIndicator,
                     builder: (_, showLoadingIndicator, ___){
-                      print("------------------------ REBUILD");
                       if(showLoadingIndicator){
                         return Container(
                           color: Colors.black.withValues(alpha: 0.5),
@@ -186,13 +185,11 @@ class CnSettings extends ChangeNotifier{
 
 
   void doRefreshListViewInitialSettings(){
-    print("RESFREH LIST VIEW INITIAL SCREEN");
     refreshListViewInitialSettings += 1;
     refresh();
   }
 
   void setLoadingIndicator(bool value){
-    print("SET LOADING INDICATOR");
     showLoadingIndicator = value;
     refresh();
   }
