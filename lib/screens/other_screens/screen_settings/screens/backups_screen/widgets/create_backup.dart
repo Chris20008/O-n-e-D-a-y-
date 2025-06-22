@@ -29,7 +29,6 @@ class CreateBackup extends StatelessWidget {
       title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodSave, style: const TextStyle(color: Colors.white),),
       onTap: () {
         HapticFeedback.selectionClick();
-        print("SHOULD REFRESH");
         cnSettings.setLoadingIndicator(true);
         Future.delayed(const Duration(milliseconds: 100), () async{
           File? result = await saveBackup(withCloud: cnConfig.connectWithCloud, cnConfig: cnConfig, automatic: false);

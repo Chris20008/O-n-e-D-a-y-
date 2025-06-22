@@ -96,7 +96,6 @@ class LocalBackupsListView extends StatelessWidget {
 
                       /// When result true close local backup screen
                       if (result && currentContext.mounted){
-                        print("Do Pop wionevfa");
                         cnSettings.navigatorKey.currentState?.pop();
                         // Navigator.of(currentContext).pop();
                       }

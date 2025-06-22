@@ -47,10 +47,6 @@ class DatabaseService{
   }
 
   Future<void> addWorkout({required ObWorkout wo, String? oldChecksum}) async{
-    print("User ID in add workout: $uid");
-    print(wo.uuid);
-    print(userCollection.toString());
-    // final batch = FirebaseFirestore.instance.batch();
     final workoutData = wo.asMap(withChecksum: true);
 
     await batch.set(workoutCollection.doc(wo.uuid), workoutData);
@@ -59,7 +55,6 @@ class DatabaseService{
     if(oldChecksum != null){
       await deleteWorkoutChecksum(oldChecksum, batch: batch);
     }
-    // batch.commit();
   }
 
   Future<void> _addWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async{
@@ -79,10 +74,8 @@ class DatabaseService{
   }
 
   Future<void> deleteWorkout({required ObWorkout wo}) async {
-    // final batch = FirebaseFirestore.instance.batch();
     await batch.delete(workoutCollection.doc(wo.uuid));
     await deleteWorkoutChecksum(wo.currentChecksum, batch: batch);
-    // batch.commit();
   }
 
   Future<void> deleteWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async {
