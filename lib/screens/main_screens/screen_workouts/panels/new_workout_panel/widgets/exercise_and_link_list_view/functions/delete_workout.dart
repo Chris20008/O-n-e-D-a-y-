@@ -7,9 +7,9 @@ import 'package:fitness_app/util/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
-void deleteWorkout({
+Future deleteWorkout({
   required BuildContext context
-}){
+}) async{
   CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   CnWorkoutHistory cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context, listen: false);
   CnNewWorkOutPanel cnNewWorkout = Provider.of<CnNewWorkOutPanel>(context, listen: false);
@@ -20,7 +20,7 @@ void deleteWorkout({
     cnNewWorkout.sickDays.delete();
   }
   else{
-    cnNewWorkout.workout.deleteFromDatabase();
+    await cnNewWorkout.workout.deleteFromDatabase();
     cnWorkouts.refreshAllWorkouts();
   }
   cnWorkoutHistory.refreshAllWorkouts();

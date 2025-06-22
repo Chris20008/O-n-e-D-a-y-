@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
@@ -12,9 +10,13 @@ class AuthService{
   /// Get User Email
   String? getUserEmail() => _firebase_auth.currentUser?.email;
 
+  /// Get User Id
+  String? getUid() => _firebase_auth.currentUser?.uid;
+
   /// Apple Login Method
   Future<UserCredential?> signInWithApple() async{
     try{
+      print("Try");
       final appleCredential = await SignInWithApple.getAppleIDCredential(
         scopes:[
           AppleIDAuthorizationScopes.email,

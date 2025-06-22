@@ -18,9 +18,9 @@ class LoginSection extends StatelessWidget {
           color: Theme.of(context).cardColor
       ),
       backgroundColor: Colors.transparent,
-      header: Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: Text("Account", style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+      header: const Padding(
+        padding: EdgeInsets.only(left: 10),
+        child: Text("Account", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
       ),
       children: [
         StreamBuilder(

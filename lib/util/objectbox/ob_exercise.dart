@@ -2,6 +2,21 @@ import 'package:objectbox/objectbox.dart';
 
 @Entity()
 class ObExercise{
+
+  ObExercise({
+    this.id = 0,
+    required this.name,
+    required this.weights,
+    required this.amounts,
+    required this.restInSeconds,
+    required this.setTypes,
+    this.seatLevel,
+    this.linkName,
+    this.category = 1,
+    this.blockLink = false,
+    this.bodyWeightPercent = 0.0
+  });
+
   @Id()
   int id;
 
@@ -20,33 +35,42 @@ class ObExercise{
   bool blockLink;
   double bodyWeightPercent;
 
-  ObExercise({
-    this.id = 0,
-    required this.name,
-    required this.weights,
-    required this.amounts,
-    required this.restInSeconds,
-    required this.setTypes,
-    this.seatLevel,
-    this.linkName,
-    this.category = 1,
-    this.blockLink = false,
-    this.bodyWeightPercent = 0.0
-  });
+  String get checksumString{
+    if(id <= 0){
+      return "";
+    }
+    final buffer = StringBuffer();
 
-  factory ObExercise.fromMap(Map w){
-    final weights = List<double>.from(List.from(w["weights"]?? [0.0]).map((w) => double.parse(w.toString())));
+    buffer.write(name);
+    // buffer.write(id);
+    buffer.write(weights.toString());
+    buffer.write(amounts.toString());
+    buffer.write(setTypes.toString());
+    buffer.write(category);
+    buffer.write(seatLevel);
+    buffer.write(linkName);
+    buffer.write(restInSeconds);
+    buffer.write(blockLink);
+    buffer.write(bodyWeightPercent);
+
+    return buffer.toString();
+  }
+
+  factory ObExercise.fromMap(Map data){
+    print("Try creating weight");
+    final weights = List<double>.from(List.from(data["weights"]?? [0.0]).map((w) => double.parse(w.toString())));
+    print("Created weights");
     return ObExercise(
-        name:w["name"],
+        name:data["name"],
         weights: weights,
-        amounts: List<int>.from(List.from(w["amounts"]?? List.generate(weights.length, (item) => 0)).map((a) => int.parse(a.toString()))),
-        setTypes: List<int>.from(List.from(w["setTypes"]?? List.generate(weights.length, (item) => 0)).map((a) => int.parse(a.toString()))),
-        restInSeconds: w["restInSeconds"]?? 0,
-        seatLevel: w["seatLevel"],
-        linkName: w["linkName"],
-        category: w["category"]?? 1,
-        blockLink: w["blockLink"]?? false,
-        bodyWeightPercent: w["bodyWeightPercent"]?? 0.0
+        amounts: List<int>.from(List.from(data["amounts"]?? List.generate(weights.length, (item) => 0)).map((a) => int.parse(a.toString()))),
+        setTypes: List<int>.from(List.from(data["setTypes"]?? List.generate(weights.length, (item) => 0)).map((a) => int.parse(a.toString()))),
+        restInSeconds: data["restInSeconds"]?? 0,
+        seatLevel: data["seatLevel"],
+        linkName: data["linkName"],
+        category: data["category"]?? 1,
+        blockLink: data["blockLink"]?? false,
+        bodyWeightPercent: data["bodyWeightPercent"]?? 0.0
     );
   }
 

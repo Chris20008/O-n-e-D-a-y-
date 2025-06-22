@@ -751,7 +751,7 @@ Widget OverflowSafeText(
   );
 }
 
-Future<bool> hasInternet()async{
+Future<bool> isOnline()async{
   final conRes = await Connectivity().checkConnectivity();
   List<ConnectivityResult> options = [
     ConnectivityResult.mobile,

@@ -16,8 +16,8 @@ Future askDeleteWorkout(BuildContext context) async {
           /// a destructive action such as delete or exit and turns
           /// the action's text color to red.
           isDestructiveAction: true,
-          onPressed: () {
-            deleteWorkout(context: context);
+          onPressed: () async {
+            await deleteWorkout(context: context);
             Navigator.pop(context);
           },
           child: Text(AppLocalizations.of(context)!.delete, style: cupButtonTextStyleOnlyFontSize),

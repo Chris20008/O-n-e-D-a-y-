@@ -29,11 +29,12 @@ class AddExerciseButton extends StatelessWidget {
           required BuildContext context,
           required String? value
         }){
+          print("-----------------  VALIDATE");
           if (value == null || value.isEmpty) {
             return AppLocalizations.of(context)!.panelExEnterName;
           }
-          else if(exerciseNameExistsInWorkout(workout: cnNewWorkout.workout, exerciseName: value) &&
-              cnNewExercise.exercise.originalName?.toLowerCase() != value
+          else if(exerciseNameExistsInWorkout(workout: cnNewWorkout.workout, exerciseName: value)
+              // && cnNewExercise.exercise.originalName?.toLowerCase() != value ///commented 20250616 because it was possible to add an existing exercise to the current workout
           ){
             return AppLocalizations.of(context)!.panelExAlreadyExists;
           }

@@ -69,7 +69,7 @@
     },
     {
       "id": "3:6190945827968541021",
-      "lastPropertyId": "6:8375506305716248786",
+      "lastPropertyId": "9:5589418646293440542",
       "name": "ObWorkout",
       "properties": [
         {
@@ -97,6 +97,21 @@
           "id": "6:8375506305716248786",
           "name": "linkedExercises",
           "type": 30
+        },
+        {
+          "id": "7:1523441836966544723",
+          "name": "uuid",
+          "type": 9
+        },
+        {
+          "id": "8:3469161128757874577",
+          "name": "lastUpdated",
+          "type": 10
+        },
+        {
+          "id": "9:5589418646293440542",
+          "name": "checksum",
+          "type": 9
         }
       ],
       "relations": [

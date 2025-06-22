@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -162,6 +163,10 @@ extension ListExtension on List {
       dupes.remove(element);
     }
     return dupes;
+  }
+
+  List without(List l){
+    return whereNot((e) => l.contains(e)).toList();
   }
 }
 

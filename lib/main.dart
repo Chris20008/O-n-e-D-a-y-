@@ -7,6 +7,10 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
+import 'package:fitness_app/service/auth_service.dart';
+import 'package:fitness_app/service/database_service.dart';
+import 'package:fitness_app/service/sync_manager.dart';
+import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -40,6 +44,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 late ObjectBox objectbox;
 bool tutorialIsRunning = false;
@@ -53,6 +58,9 @@ void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: "dotenv.env");
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+  // await FirebaseFirestore.instance.waitForPendingWrites();
+  final s = AuthService().getUid();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
     DeviceOrientation.portraitUp,
@@ -95,6 +103,7 @@ class MyAppState extends State<MyApp>{
     pr("Main");
     return MultiProvider(
       providers:[
+        ChangeNotifierProvider(create: (context) => CnSyncManager("54671382937413")),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnBannerRunningWorkout()),
@@ -191,6 +200,7 @@ class _MyHomePageState extends State<MyHomePage>{
   late CnStopwatchWidget cnStopwatchWidget = Provider.of<CnStopwatchWidget>(context, listen: false);
   late CnAllExercisesPanel cnAllExercisesPanel = Provider.of<CnAllExercisesPanel>(context, listen: false);
   late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
+  late CnSyncManager cnSyncManager;
   late CnConfig cnConfig;
   late CnHomepage cnHomepage;
   bool showWelcomeScreen = false;
@@ -199,13 +209,6 @@ class _MyHomePageState extends State<MyHomePage>{
 
   @override
   void initState() {
-    /// Init Shader for PageRoute
-    // Navigator.of(context).push(
-    //     MaterialPageRoute(
-    //         builder: (context) => const ScreenRunningWorkout()
-    //     )
-    // );
-    // Navigator.of(context).pop();
     initMain();
     super.initState();
   }
@@ -228,6 +231,11 @@ class _MyHomePageState extends State<MyHomePage>{
 
   void initMain() async{
     objectbox = await ObjectBox.create();
+    if(await isOnline()){
+      await FirebaseFirestore.instance.waitForPendingWrites();
+    }
+    await ObjectBox.fillMissingChecksums(objectbox.workoutBox);
+    await cnSyncManager.startSyncService();
     await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
     if(cnConfig.config.settings["languageCode"] == null){
@@ -304,6 +312,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
     cnConfig  = Provider.of<CnConfig>(context);
     cnHomepage = Provider.of<CnHomepage>(context);
+    cnSyncManager = context.watch<CnSyncManager>();
 
     /// Screen to bee shown until 'await cnConfig.initData();' is finished
     /// So the config data is been initialized
@@ -476,12 +485,32 @@ class _MyHomePageState extends State<MyHomePage>{
                       );
                     },
                   ),
-                const SyncWithCloudBar()
+                const SyncWithCloudBar(),
+                
                 // Center(
                 //   child: ElevatedButton(
-                //     child: Text("Test"),
+                //     child: const Text("Test"),
                 //     onPressed: ()async{
-                //       cnAllExercisesPanel.openPanel();
+                //       final db = DatabaseService(uid: "54671382937413");
+                //       final res = await db.getAllWorkoutChecksums();
+                //
+                //       final obWorkouts = objectbox.workoutBox.getAll();
+                //       final allShas = [];
+                //       for(ObWorkout wo in obWorkouts){
+                //         final checksum = wo.checksum;
+                //         allShas.add(checksum);
+                //         if(!res.contains(checksum)){
+                //           print("Checksum: $checksum does not exist yet - add do FireStore");
+                //           await db.addWorkout(wo: wo, checksum: checksum);
+                //         } else{
+                //           print("Checksum $checksum already conatined in db");
+                //         }
+                //       }
+                //       // for(final l in res){
+                //       //   print(l);
+                //       //   print(l.runtimeType);
+                //       // }
+                //       // print(res);
                 //     },
                 //   ),
                 // )
@@ -496,7 +525,7 @@ class _MyHomePageState extends State<MyHomePage>{
     cnHomepage.isSyncingWithCloud = true;
     cnHomepage.msg = "Sync with Google Drive";
     if(Platform.isAndroid){
-      if(await hasInternet()){
+      if(await isOnline()){
         cnHomepage.refresh();
         await loadNewestDataGoogleDrive(
             cnConfig,

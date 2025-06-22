@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:collection/collection.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/service/sync_manager.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -67,7 +68,9 @@ Future<File?> getBackupFromFilePicker({CnHomepage? cnHomepage}) async{
 }
 
 Future<bool> loadBackupFromFile(File file, {CnHomepage? cnHomepage}) async{
+  print("Load Backup from File");
   final content = await file.readAsString();
+  print("Got file as string");
   return await loadBackupFromString(content: content, cnHomepage: cnHomepage);
 }
 
@@ -80,12 +83,16 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
   allWorkoutsAsListString.removeWhere((element) => element.trim() == "");
   final allWorkouts = allWorkoutsAsListString.map((e) => jsonDecode(e));
   List<ObWorkout> allObWorkouts = [];
+  print("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
   for (Map w in allWorkouts){
-    ObWorkout workout = ObWorkout.fromMap(workoutMap: w, withId: true);
-    final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
-    workout.addExercises(exs);
-    allObWorkouts.add(workout);
+    ObWorkout? workout = ObWorkout.fromMap(workoutMap: w, withId: true);
+    if(workout != null){
+      final List<ObExercise> exs = List.from(w["exercises"].map((ex) => ObExercise.fromMap(ex)));
+      workout.addExercises(exs);
+      allObWorkouts.add(workout);
+    }
   }
+  print("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
 
   objectbox.sickDaysBox.removeAll();
   if (result.length > 1){
@@ -95,6 +102,8 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
     final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
     await objectbox.sickDaysBox.putManyAsync(allObSickDays);
   }
+
+  print("cccccccccccccccccccccccccccccccccccccccccccccc");
 
   final hadDifferences = await loadDifferencesWorkouts(allObWorkouts, cnHomepage: cnHomepage);
   return hadDifferences;
@@ -121,6 +130,8 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
     hashMapSmall[key] = obWorkout;
   }
   final length = workouts.length;
+
+  print("In differences load workouts");
 
   for(ObWorkout wo in workouts){
 
@@ -165,8 +176,11 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
 
       existingWorkout = wo;
 
-      await objectbox.workoutBox.putAsync(wo);
-      await objectbox.exerciseBox.putManyAsync(wo.exercises);
+      print("Before save async");
+      await wo.saveAsync();
+      print("After save async");
+      // await objectbox.workoutBox.putAsync(wo);
+      // await objectbox.exerciseBox.putManyAsync(wo.exercises);
       hadDifferences = true;
       // continue;
     }
@@ -178,6 +192,7 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
     /// ################################################################################################################
 
     else{
+      print("IN ELSE LESE ");
       /// If not it means the id does not exists, but maybe the workout itself exists because objectbox entries
       /// on different devices can have different id's
       /// So we check just for equal through the bigHash
@@ -188,8 +203,11 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
       if(existingWorkout == null){
         hadDifferences = true;
         wo.id = 0;
-        await objectbox.workoutBox.putAsync(wo);
-        await objectbox.exerciseBox.putManyAsync(wo.exercises);
+        print("Before save async 2");
+        await wo.saveAsync();
+        print("After save async 2");
+        // await objectbox.workoutBox.putAsync(wo);
+        // await objectbox.exerciseBox.putManyAsync(wo.exercises);
         /// Add it to the HashMap in case there is an exact same workout
         hashMapBig[woHashBig] = wo;
       }
@@ -224,6 +242,9 @@ Future<bool> loadDifferencesWorkouts(List<ObWorkout> workouts, {CnHomepage? cnHo
 
   objectbox.exerciseBox.removeMany(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
   objectbox.workoutBox.removeMany(allCurrentWorkouts.map((w) => w.id).toList());
+  for(ObWorkout wo in allCurrentWorkouts){
+    await CnSyncManager.database?.deleteWorkout(wo: wo);
+  }
   if(cnHomepage != null){
     cnHomepage.finishSync();
   }
@@ -274,7 +295,8 @@ Future<File?> saveBackup({
 
     return file;
   }
-  catch (_) {
+  catch (e) {
+    print("FOUND ERROR: $e");
     return null;
   }
 }
@@ -293,6 +315,13 @@ Future<File?> saveCurrentData(CnConfig cnConfig) async{
 List getWorkoutsAsStringList(){
   final allObWorkouts = objectbox.workoutBox.getAll();
   final allObSickDays = objectbox.sickDaysBox.getAll();
+  for(ObWorkout wo in allObWorkouts){
+    print("Exercisees NOW");
+    wo.exercises.forEach((ex){
+      print(ex.asMap());
+      print(ex.checksumString);
+    });
+  }
   final allWorkouts = List<String>.from(allObWorkouts.map((workout) => jsonEncode(workout.asMap())));
   final allSickDays = List<String>.from(allObSickDays.map((sickDay) => jsonEncode(sickDay.asMap())));
 

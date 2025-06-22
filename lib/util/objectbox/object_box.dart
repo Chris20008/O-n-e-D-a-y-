@@ -2,6 +2,7 @@ import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:objectbox_flutter_libs/objectbox_flutter_libs.dart';
 
 import '../../objectbox.g.dart';
+import '../../service/database_service.dart';
 import 'ob_exercise.dart';
 import 'ob_workout.dart';
 
@@ -20,6 +21,18 @@ class ObjectBox{
 
   void closeStore(){
     store.close();
+  }
+
+  static Future fillMissingChecksums(Box<ObWorkout> workoutBox) async{
+    final List<ObWorkout> woToFillChecksums = workoutBox.query(
+        ObWorkout_.checksum.equals("-1")
+            .or(ObWorkout_.checksum.equals("")
+            .or(ObWorkout_.checksum.isNull())
+        )).build().find();
+    print(" ----------------- FOUND ${woToFillChecksums.length} workouts to fill checksum");
+    for(ObWorkout wo in woToFillChecksums){
+      wo.save(onlyWorkout: true);
+    }
   }
 
   static Future<ObjectBox> create({String? directory}) async {

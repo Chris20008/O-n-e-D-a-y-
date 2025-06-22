@@ -210,7 +210,9 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     for(ObWorkout w in workouts){
       bool contains = false;
       DateTime? keyDate;
-      workout.date = workout.date?.toDate();
+      // workout.date = workout.date?.toDate();
+
+      w.date = w.date.toDate();
 
       for(final k in dates.keys){
         if(k.isSameDate(w.date)){
@@ -326,6 +328,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     if(copied) {
       /// If copied means a copy of the original exercise is made to create a completely new exercise
       exToEdit.name = "";
+      exToEdit.originalName = "";
     } else {
       /// Otherwise the user is editing the exercise so we keep track of the original name in case
       /// the user changes the exercises name
@@ -454,11 +457,15 @@ class CnNewWorkOutPanel extends ChangeNotifier{
       }
       workout.removeEmptyLinksFromWorkout();
       if(applyNameChanges){
+        print("Start change saem naem wwokrouts");
         changeSameNameWorkouts();
+
+        print("finished change saem naem wwokrouts");
       }
-      if(await hasChangedBodyWeight()){
+      if(hasChangedBodyWeight()){
         changeSameNameExercisesBodyWeight();
       }
+      print("NEXT STEP  1");
       if(cnBottomMenu.index == 0){
         int? index;
         String key = "${workout.date?.year}${workout.date?.month}${workout.date?.day}";
@@ -479,8 +486,14 @@ class CnNewWorkOutPanel extends ChangeNotifier{
           }
         }
       }
+
+      print("NEXT STEP  2");
       Workout woToSave = Workout.clone(workout);
+
+      print("NEXT STEP  3");
       await closePanel(doClear: true, context: context);
+
+      print("NEXT STEP  4");
 
       woToSave.saveToDatabase();
       await cnWorkouts.refreshAllWorkouts();
@@ -535,17 +548,19 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     final currentObWorkouts = objectbox.workoutBox.query(ObWorkout_.name.equals(originalWorkout.name)).build().find();
 
     for(ObWorkout wo in currentObWorkouts){
+      print("Change same name workouts");
       wo.name = workout.name;
       for(MapEntry mapping in exerciseNewNameMapping.entries){
         if(wo.exercises.map((e) => e.name).contains(mapping.key)){
           wo.exercises.firstWhere((e) => e.name == mapping.key).name = mapping.value;
         }
       }
+      print("Start save");
       wo.save();
     }
   }
 
-  Future<bool> hasChangedBodyWeight() async{
+  bool hasChangedBodyWeight() {
     if(!workout.isTemplate){
       return false;
     }
@@ -564,7 +579,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     final newExercises = workout.exercises.whereNot((ex) => allExerciseNames.contains(ex.name));
 
     for(Exercise ex in newExercises){
-      final existingObEx = await objectbox.exerciseBox.query(ObExercise_.name.equals(ex.name)).build().findFirstAsync();
+      final existingObEx = objectbox.exerciseBox.query(ObExercise_.name.equals(ex.name)).build().findFirst();
       /// entirely new exercise, not exists in database yet
       if(existingObEx == null){
         changedExercises.add(ex);

@@ -578,7 +578,7 @@ class CnSpotifyBar extends ChangeNotifier {
     if(isTryingToConnect) {
       return;
     }
-    else if(!await hasInternet()){
+    else if(!await isOnline()){
       Fluttertoast.cancel();
       Fluttertoast.showToast(
           msg: "Offline",
