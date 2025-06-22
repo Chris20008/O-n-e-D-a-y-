@@ -1,5 +1,6 @@
 import 'package:fitness_app/screens/other_screens/screen_settings/functions/load_backup_from_file_picker.dart';
 import 'package:fitness_app/util/extensions.dart';
+import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
@@ -9,7 +10,9 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
+import '../../../../screen_settings.dart';
 import 'functions/get_date_from_file_name.dart';
 import 'functions/get_file_size_text.dart';
 
@@ -29,6 +32,8 @@ class LocalBackupsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    CnSettings cnSettings = context.read<CnSettings>();
 
     return Expanded(
       child: FutureBuilder(
@@ -57,7 +62,8 @@ class LocalBackupsListView extends StatelessWidget {
             }
 
             /// local files list view
-            return ListView.separated(
+            return ListViewScope.of(context).listView(
+                controller: ScrollController(),
                 physics: const BouncingScrollPhysics(),
                 separatorBuilder: (context, index){
                   return Padding(
@@ -84,12 +90,15 @@ class LocalBackupsListView extends StatelessWidget {
                           cnHomepage: cnHomepage,
                           cnConfig: cnConfig,
                           cnScreenStatistics: cnScreenStatistics,
-                          file: file
+                          file: file,
+                          cnSettings: cnSettings
                       );
 
                       /// When result true close local backup screen
                       if (result && currentContext.mounted){
-                        Navigator.of(currentContext).pop();
+                        print("Do Pop wionevfa");
+                        cnSettings.navigatorKey.currentState?.pop();
+                        // Navigator.of(currentContext).pop();
                       }
                     },
                     child: Container(

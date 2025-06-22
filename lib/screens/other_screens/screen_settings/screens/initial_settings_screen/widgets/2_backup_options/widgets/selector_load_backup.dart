@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/screens/other_screens/local_file_picker/local_file_picker.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/functions/load_backup_from_file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/backup_helper/backup_functions.dart';
@@ -11,25 +10,23 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+
+import '../../../../../screen_settings.dart';
 
 class SelectorLoadBackup extends StatelessWidget {
 
-  final Function(bool value) setLoadingIndicator;
-  final CnScreenStatistics cnScreenStatistics;
-  final CnConfig cnConfig;
-  final CnHomepage cnHomepage;
-
-  const SelectorLoadBackup({
-    super.key,
-    required this.setLoadingIndicator,
-    required this.cnScreenStatistics,
-    required this.cnConfig,
-    required this.cnHomepage,
-  });
+  const SelectorLoadBackup({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final CnSettings cnSettings = context.read<CnSettings>();
+    final CnScreenStatistics cnScreenStatistics = context.read<CnScreenStatistics>();
+    final CnConfig cnConfig = context.read<CnConfig>();
+    final CnHomepage cnHomepage = context.read<CnHomepage>();
+
     return PullDownButton(
       onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
@@ -41,9 +38,9 @@ class SelectorLoadBackup extends StatelessWidget {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), () async {
                 if(context.mounted){
-                  setLoadingIndicator(true);
+                  cnSettings.setLoadingIndicator(true);
                   File? file = await getBackupFromFilePicker(cnHomepage: cnHomepage);
-                  setLoadingIndicator(false);
+                  cnSettings.setLoadingIndicator(false);
 
                   if(!context.mounted || file == null){
                     return;
@@ -52,12 +49,13 @@ class SelectorLoadBackup extends StatelessWidget {
                   await loadBackupFromFilePicker(
                     context: context,
                     setLoadingIndicator: (bool value) {
-                      setLoadingIndicator(value);
+                      cnSettings.setLoadingIndicator(value);
                     },
                     cnHomepage: cnHomepage,
                     cnConfig: cnConfig,
                     cnScreenStatistics: cnScreenStatistics,
-                    file: file
+                    file: file,
+                    cnSettings: cnSettings
                   );
                 }
               });
@@ -68,17 +66,7 @@ class SelectorLoadBackup extends StatelessWidget {
             onTap: () {
               HapticFeedback.selectionClick();
               Future.delayed(const Duration(milliseconds: 200), () async{
-                // final localFiles = await getLocalBackupFiles();
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //         builder: (context) => const LocalFilePicker()
-                //     ));
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LocalFilePicker()
-                    ));
+                cnSettings.navigatorKey.currentState?.pushNamed('/localFilePicker');
               });
             },
           ),

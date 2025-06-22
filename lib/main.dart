@@ -7,10 +7,9 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
 import 'package:fitness_app/service/auth_service.dart';
-import 'package:fitness_app/service/database_service.dart';
 import 'package:fitness_app/service/sync_manager.dart';
-import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -60,7 +59,6 @@ void main() async{
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
   // await FirebaseFirestore.instance.waitForPendingWrites();
-  final s = AuthService().getUid();
   SystemChrome.setPreferredOrientations([
     // DeviceOrientation.landscapeLeft,
     DeviceOrientation.portraitUp,
@@ -103,7 +101,7 @@ class MyAppState extends State<MyApp>{
     pr("Main");
     return MultiProvider(
       providers:[
-        ChangeNotifierProvider(create: (context) => CnSyncManager("54671382937413")),
+        ChangeNotifierProvider(create: (context) => CnSyncManager()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnBannerRunningWorkout()),
@@ -113,6 +111,7 @@ class MyAppState extends State<MyApp>{
         ChangeNotifierProvider(create: (context) => CnWorkouts()),
         ChangeNotifierProvider(create: (context) => CnBottomMenu()),
         ChangeNotifierProvider(create: (context) => CnConfig()),
+        ChangeNotifierProvider(create: (context) => CnSettings()),
         ChangeNotifierProvider(create: (context) => CnSelectorExerciseToUpdate()),
         ChangeNotifierProvider(create: (context) => CnAllExercisesPanel()),
         ChangeNotifierProvider(create: (context) => CnScreenStatistics(context)),
@@ -235,7 +234,7 @@ class _MyHomePageState extends State<MyHomePage>{
       await FirebaseFirestore.instance.waitForPendingWrites();
     }
     await ObjectBox.fillMissingChecksums(objectbox.workoutBox);
-    await cnSyncManager.startSyncService();
+    await cnSyncManager.doSyncWithFireStore();
     await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
     if(cnConfig.config.settings["languageCode"] == null){
@@ -279,7 +278,7 @@ class _MyHomePageState extends State<MyHomePage>{
 
     /// sign in and sync with cloud
     await cnConfig.signInCloud();
-    if(!showWelcomeScreen && cnConfig.syncMultipleDevices){
+    if(!showWelcomeScreen && cnConfig.connectWithCloud){
       trySyncWithCloud();
     }
 
@@ -320,64 +319,76 @@ class _MyHomePageState extends State<MyHomePage>{
     /// !cnConfig.isInitialized seems unimportant since, mainIsInitialized can only be true when
     /// cnConfig.isInitialized is also true, however deleting it leads some to a crash
     if(!cnConfig.isInitialized || !mainIsInitialized){
-      return Scaffold(
-        body: Container(
-          // color: Theme.of(context).primaryColor,
-          height: double.maxFinite,
-          width: double.maxFinite,
-          decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
-                    Color(0xffc26a0e),
-                    Color(0xbb110a02)
-                  ]
-              )
-          ),
-          child: Center(
-            child: Stack(
-              children: [
-                Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 250, maxHeight: 250),
-                    child: Image.asset(
-                        // scale: 0.01,
-                        "${pictureAssetPath}Logo removed HD only dumbell.png"
-                    ),
-                  ),
+      return StreamBuilder(
+          stream: AuthService().authStateChanges(),
+          builder: (context, snapshot) {
+
+            if(snapshot.connectionState == ConnectionState.active){
+              final uid = Platform.isAndroid? "54671382937413" : snapshot.data?.uid;
+              cnSyncManager.setUserId(uid);
+              cnSyncManager.doSyncWithFireStore();
+            }
+
+            return Scaffold(
+              body: Container(
+                // color: Theme.of(context).primaryColor,
+                height: double.maxFinite,
+                width: double.maxFinite,
+                decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                        colors: [
+                          Color(0xffc26a0e),
+                          Color(0xbb110a02)
+                        ]
+                    )
                 ),
-                const Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 125),
-                    child: Text(
-                        "OneDay",
-                        textScaler: TextScaler.linear(4),
-                        style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white)
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 100),
-                    child: SizedBox(
-                        height: 100,
-                        width: 100,
-                        child: Center(
-                          child: CupertinoActivityIndicator(
-                              radius: 20.0,
-                              color: Colors.amber[800]
+                child: Center(
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 250, maxHeight: 250),
+                          child: Image.asset(
+                              // scale: 0.01,
+                              "${pictureAssetPath}Logo removed HD only dumbell.png"
                           ),
                         ),
-                        // child: Center(child: CircularProgressIndicator())
-                    ),
+                      ),
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 125),
+                          child: Text(
+                              "OneDay",
+                              textScaler: TextScaler.linear(4),
+                              style: TextStyle(decoration: TextDecoration.lineThrough, color: Colors.white)
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 100),
+                          child: SizedBox(
+                              height: 100,
+                              width: 100,
+                              child: Center(
+                                child: CupertinoActivityIndicator(
+                                    radius: 20.0,
+                                    color: Colors.amber[800]
+                                ),
+                              ),
+                              // child: Center(child: CircularProgressIndicator())
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
+                ),
+              ),
+            );
+        }
       );
     }
 
@@ -582,7 +593,7 @@ class _MyHomePageState extends State<MyHomePage>{
         }
         showWelcomeScreen = false;
       });
-      if(cnConfig.syncMultipleDevices /*&& !doShowTutorial*/){
+      if(cnConfig.connectWithCloud /*&& !doShowTutorial*/){
         trySyncWithCloud();
       }
     });

@@ -13,11 +13,9 @@ import 'package:fitness_app/util/objectbox/ob_sick_days.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/charts/sz_controller.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:health/health.dart';
 import 'package:provider/provider.dart';
 import 'package:quiver/iterables.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../util/config.dart';
 import '../../../util/objectbox/ob_exercise.dart';
 import '../../../util/objectbox/ob_workout.dart';
@@ -167,9 +165,6 @@ class CnScreenStatistics extends ChangeNotifier {
   late CnConfig cnConfig;
   final health = Health();
   List<HealthDataPointWrapper> healthData = [];
-
-  /// Settings variables
-  final PanelController panelControllerSettings = PanelController();
 
   CnScreenStatistics(BuildContext context){
     cnConfig = Provider.of<CnConfig>(context, listen: false);
@@ -433,14 +428,14 @@ class CnScreenStatistics extends ChangeNotifier {
     selectedExerciseTemplate = null;
   }
 
-  void openSettingsPanel(){
-    // HapticFeedback.selectionClick();
-    panelControllerSettings.animatePanelToPosition(
-        1,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.fastEaseInToSlowEaseOut
-    );
-  }
+  // void openSettingsPanel(){
+  //   // HapticFeedback.selectionClick();
+  //   panelControllerSettings.animatePanelToPosition(
+  //       1,
+  //       duration: const Duration(milliseconds: 500),
+  //       curve: Curves.fastEaseInToSlowEaseOut
+  //   );
+  // }
 
   void saveCurrentFilterState(){
     selectedWorkoutNameLast = selectedWorkoutName;

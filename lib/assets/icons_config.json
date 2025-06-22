@@ -65,6 +65,18 @@
       "css": "weight",
       "code": 62614,
       "src": "fontawesome5"
+    },
+    {
+      "uid": "0d749cf72c49dee694eb3ba04c0aa4df",
+      "css": "shield_alt",
+      "code": 62445,
+      "src": "fontawesome5"
+    },
+    {
+      "uid": "backupshare_custom_2025",
+      "css": "backup_share",
+      "code": 59649,
+      "src": "custom"
     }
   ]
 }

@@ -11,26 +11,21 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../screen_settings.dart';
 
 class GeneralSettings extends StatelessWidget {
 
-  final Function(bool value) setLoadingIndicator;
-  final CnConfig cnConfig;
-  final CnScreenStatistics cnScreenStatistics;
-  final CnHomepage cnHomepage;
-  final Function(Function) refresh;
-
-  const GeneralSettings({
-    super.key,
-    required this.setLoadingIndicator,
-    required this.cnConfig,
-    required this.cnScreenStatistics,
-    required this.cnHomepage,
-    required this.refresh,
-  });
+  const GeneralSettings({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final CnSettings cnSettings = context.read<CnSettings>();
+    final CnScreenStatistics cnScreenStatistics = context.read<CnScreenStatistics>();
+    final CnConfig cnConfig = context.read<CnConfig>();
+
     return CupertinoListSection.insetGrouped(
       decoration: BoxDecoration(
           color: Theme.of(context).cardColor
@@ -161,12 +156,12 @@ class GeneralSettings extends StatelessWidget {
               value: cnConfig.useSpotify,
               activeTrackColor: activeColor,
               onChanged: (value) async{
-                refresh(() {
-                  if(Platform.isAndroid){
-                    HapticFeedback.selectionClick();
-                  }
-                  cnConfig.setSpotify(value);
-                });
+                if(Platform.isAndroid){
+                  HapticFeedback.selectionClick();
+                }
+                await cnConfig.setSpotify(value);
+                cnSettings.refresh();
+
               }
           ),
         ),
@@ -238,12 +233,11 @@ class GeneralSettings extends StatelessWidget {
               value: cnConfig.useHealthData,
               activeTrackColor: activeColor,
               onChanged: (value) async{
-                refresh(() {
-                  if(Platform.isAndroid){
-                    HapticFeedback.selectionClick();
-                  }
-                  cnConfig.setHealth(value);
-                });
+                if(Platform.isAndroid){
+                  HapticFeedback.selectionClick();
+                }
+                cnConfig.setHealth(value);
+                cnSettings.refresh();
                 await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
                 if(!value){
                   await Future.delayed(const Duration(milliseconds: 500), (){

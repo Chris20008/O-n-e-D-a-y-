@@ -284,7 +284,7 @@ Future<File?> saveBackup({
 }
 
 Future<File?> saveCurrentData(CnConfig cnConfig) async{
-  if(cnConfig.syncMultipleDevices) {
+  if(cnConfig.connectWithCloud) {
     return await saveBackup(
         withCloud: true,
         cnConfig: cnConfig,

@@ -270,8 +270,8 @@ class CnConfig extends ChangeNotifier {
   bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
-  bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
-  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
+  // bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
+  // bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
   bool get useHealthData => config.settings["useHealthData"]?? false;

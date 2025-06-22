@@ -8,17 +8,27 @@ import '../util/constants.dart';
 import 'database_service.dart';
 
 class CnSyncManager extends ChangeNotifier {
-  final String? userId;
+  String? userId;
   static DatabaseService? database;
   static List<String> localeChecksums = [];
 
-  CnSyncManager(this.userId){
+  CnSyncManager({this.userId}){
+    setUserId(userId);
+    // if(userId != null){
+    //   database = DatabaseService(uid: userId!);
+    // }
+  }
+
+  void setUserId(String? uid){
+    userId = uid;
     if(userId != null){
       database = DatabaseService(uid: userId!);
+    } else{
+      database = null;
     }
   }
 
-  Future startSyncService() async{
+  Future doSyncWithFireStore() async{
     if(database == null){
       return;
     }

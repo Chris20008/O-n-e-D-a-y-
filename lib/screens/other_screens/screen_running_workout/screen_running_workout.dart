@@ -361,7 +361,7 @@ class CnRunningWorkout extends ChangeNotifier {
       }
 
       if(cnConfig.automaticBackups){
-        await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig) != null;
+        await saveBackup(withCloud: cnConfig.connectWithCloud, cnConfig: cnConfig) != null;
       }
 
       await saveCurrentData(cnConfig) != null;

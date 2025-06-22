@@ -153,6 +153,9 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
   }
 
   void _listener(){
+    if(!scrollController!.hasClients){
+      return;
+    }
     if(scrollController!.offset > 30 || scrollController!.offset < -15){
       isScrolling = true;
     }
@@ -415,6 +418,7 @@ class _MySlideUpPanelState extends State<MySlideUpPanel> with TickerProviderStat
 
               /// Drag panel while touching list View
               else if(scrollController != null &&
+                  scrollController!.hasClients &&
                   scrollController!.offset <= 0 &&
                   initialPanelPosition > 0.1 &&
                   (isDraggingVertical?? false)
@@ -544,159 +548,3 @@ class ListViewScope extends InheritedWidget {
   bool updateShouldNotify(ListViewScope oldWidget) =>
       oldWidget.listView != listView;
 }
-
-// class ResponsiveListView extends StatelessWidget {
-//
-//   final ScrollPhysics? physics = const BouncingScrollPhysics();
-//   final EdgeInsets padding = EdgeInsets.zero;
-//   final bool shrinkWrap = true;
-//   final bool autoScroll = true;
-//   final Widget? child;
-//   final List<Widget>? children;
-//   final Widget? Function(BuildContext context, int index)? itemBuilder;
-//   final Widget Function(BuildContext context, int index)? separatorBuilder;
-//   final ScrollController controller;
-//   final int? itemCount;
-//   final BuildContext? context;
-//
-//   const ResponsiveListView({
-//     super.key,
-//     this.child,
-//     this.children,
-//     this.itemBuilder,
-//     this.separatorBuilder,
-//     required this.controller,
-//     this.itemCount,
-//     this.context
-//   });
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     assert((child != null) ^ (children != null) ^ (itemBuilder != null), "Either child or children or itemBuilder must be given. They can't all be null or not null at the same time");
-//     assert(itemBuilder == null || itemCount != null, "itemCount must be provided if itemBuilder is provided");
-//
-//     context = (context?? this.context)!;
-//
-//     scrollController = controller;
-//     bounceAllowed = widget.bounce;
-//
-//     Widget getDynamicListView(){
-//       if(child != null){
-//         return SingleChildScrollView(
-//           controller: controller,
-//           physics: physics,
-//           // shrinkWrap: shrinkWrap,
-//           padding: padding,
-//           child: child,
-//         );
-//       }
-//       else if(children != null){
-//         return ListView(
-//           controller: controller,
-//           physics: physics,
-//           shrinkWrap: shrinkWrap,
-//           padding: padding,
-//           children: children!,
-//         );
-//       }
-//       else if(itemBuilder != null){
-//         return ListView.separated(
-//             controller: controller,
-//             physics: physics,
-//             shrinkWrap: shrinkWrap,
-//             padding: padding,
-//             itemBuilder: itemBuilder!,
-//             separatorBuilder: separatorBuilder?? (context, index){
-//               return const SizedBox();
-//             },
-//             itemCount: itemCount?? 0
-//         );
-//       }
-//       return const SizedBox();
-//     }
-//
-//     return Listener(
-//         onPointerDown: (details){
-//           isTouchingListView = controller.position.maxScrollExtent > 0;
-//
-//           /// Recognize Long Press after 500 milliseconds, if the time was not cancelled
-//           /// This will disable dragging panel and bouncing panel
-//           longPressTimer = Timer(const Duration(milliseconds: 500), (){
-//             recognizedLongPress = true;
-//           });
-//
-//         },
-//         onPointerMove: (details){
-//           /// Recognize long press
-//           if(longPressTimer?.isActive?? false){
-//             const th = 5;
-//             final dx = (details.position.dx - initialPointerDownEvent.position.dx).abs();
-//             final dy = (details.position.dy - initialPointerDownEvent.position.dy).abs();
-//             if(dx > th || dy > th) {
-//               recognizedLongPress = false;
-//               longPressTimer?.cancel();
-//             }
-//           }
-//
-//           /// do autoScroll while dragging
-//           if(recognizedLongPress && autoScroll){
-//             final screenHeight = MediaQuery.of(context!).size.height;
-//             if(details.position.dy > screenHeight * 0.25 && details.position.dy < screenHeight * 0.9){
-//               delta = 0;
-//             }
-//             else{
-//               if(details.position.dy < screenHeight * 0.15){
-//                 if(delta == 0){
-//                   delta = -8;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = -8;
-//               }
-//               else if(details.position.dy < screenHeight * 0.2){
-//                 if(delta == 0){
-//                   delta = -4;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = -4;
-//               }
-//               else if(details.position.dy < screenHeight * 0.25){
-//                 if(delta == 0){
-//                   delta = -2;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = -2;
-//               }
-//               else if(details.position.dy > screenHeight * 0.98){
-//                 if(delta == 0){
-//                   delta = 8;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = 8;
-//               }
-//               else if(details.position.dy > screenHeight * 0.95){
-//                 if(delta == 0){
-//                   delta = 4;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = 4;
-//               }
-//               else if(details.position.dy > screenHeight * 0.9){
-//                 if(delta == 0){
-//                   delta = 2;
-//                   animateScrollControllerToDelta();
-//                 }
-//                 delta = 2;
-//               }
-//             }
-//           }
-//         },
-//         onPointerUp: (details){
-//           isTouchingListView = false;
-//           recognizedLongPress = false;
-//           delta = 0;
-//           longPressTimer?.cancel();
-//         },
-//         child: getDynamicListView()
-//     );
-//   }
-// }

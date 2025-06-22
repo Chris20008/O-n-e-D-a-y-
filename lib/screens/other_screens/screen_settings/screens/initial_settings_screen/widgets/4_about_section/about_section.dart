@@ -1,4 +1,4 @@
-import 'package:fitness_app/screens/other_screens/screen_settings/widgets/4_about_section/widgets/selector_contact_button.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/4_about_section/widgets/selector_contact_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';

@@ -59,49 +59,43 @@ class _AllExercisesPanelState extends State<AllExercisesPanel> {
 
           pr("Rebuild All Exercises panel");
 
-          return PopScope(
-            // canPop: false,
-            // onPopInvokedWithResult: (_, __){
-            //   cnAllExercisesPanel.closePanel(id: widget.id);
-            // },
-            child: GlobalKeyContext(
-              ids: {
-                KeyContextId.allExercisePanel: widget.id.toString(),
-                KeyContextId.newExercisePanel: "${widget.id}_newExercise"
+          return GlobalKeyContext(
+            ids: {
+              KeyContextId.allExercisePanel: widget.id.toString(),
+              KeyContextId.newExercisePanel: "${widget.id}_newExercise"
+            },
+            child: GestureDetector(
+              onTap: (){
+                FocusManager.instance.primaryFocus?.unfocus();
               },
-              child: GestureDetector(
-                onTap: (){
-                  FocusManager.instance.primaryFocus?.unfocus();
+              child: MySlideUpPanel(
+                bounce: false,
+                controller: panelController,
+                onPanelSlide: onPanelSlide,
+                animationControllerName: AnimationControllerName.allExercisesPanel,
+                descendantAnimationControllerName: widget.descendantAnimationControllerName,
+                panelBuilder: (context, listView){
+
+                  return PopScope(
+                    canPop: false,
+                    child: Navigator(
+                      key: cnAllExercisesPanel.getNavigatorKey(context),
+                      initialRoute: '/allExercises',
+                      onGenerateRoute: (RouteSettings settings) {
+                        final routes = <String, WidgetBuilder>{
+                          '/allExercises': (_) => const AllExercises(),
+                          '/singleExercise': (_) => const NewExercise(),
+                        };
+
+                        final builder = routes[settings.name];
+                        if (builder != null) {
+                          return MaterialPageRoute(builder: builder, settings: settings);
+                        }
+                        return null;
+                      },
+                    ),
+                  );
                 },
-                child: MySlideUpPanel(
-                  bounce: false,
-                  controller: panelController,
-                  onPanelSlide: onPanelSlide,
-                  animationControllerName: AnimationControllerName.allExercisesPanel,
-                  descendantAnimationControllerName: widget.descendantAnimationControllerName,
-                  panelBuilder: (context, listView){
-
-                    return PopScope(
-                      canPop: false,
-                      child: Navigator(
-                        key: cnAllExercisesPanel.getNavigatorKey(context),
-                        initialRoute: '/allExercises',
-                        onGenerateRoute: (RouteSettings settings) {
-                          final routes = <String, WidgetBuilder>{
-                            '/allExercises': (_) => const AllExercises(),
-                            '/singleExercise': (_) => const NewExercise(),
-                          };
-
-                          final builder = routes[settings.name];
-                          if (builder != null) {
-                            return MaterialPageRoute(builder: builder, settings: settings);
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  },
-                ),
               ),
             ),
           );
@@ -168,10 +162,6 @@ class CnAllExercisesPanel extends ChangeNotifier {
     final id = GlobalKeyContext.of(context, KeyContextId.allExercisePanel);
     return _scrollControllers.putIfAbsent(id, () => ScrollController());
   }
-
-  // ScrollController getScrollControllerById(String id) {
-  //   return _scrollControllers.putIfAbsent(id, () => ScrollController());
-  // }
 
   PanelController getPanelController(BuildContext context) {
     final id = GlobalKeyContext.of(context, KeyContextId.allExercisePanel);
@@ -316,6 +306,7 @@ class CnAllExercisesPanel extends ChangeNotifier {
     await waitForNextFrame();
     final pc = getPanelControllerById(id);
     if(!pc.isAttached){
+      ov.remove();
       return;
     }
     /// jump to minimal position to make initial build
@@ -327,7 +318,6 @@ class CnAllExercisesPanel extends ChangeNotifier {
         duration: const Duration(milliseconds: 0)
     );
     /// Trigger Rebuild only for
-    /// bool panelIsClosed = context.select<CnAllExercisesPanel, bool>((cn) => cn.panelController.isAttached && cn.panelController.panelPosition == 0);
     refresh();
     /// Wait 100 ms that the first build is fully done
     await Future.delayed(const Duration(milliseconds: 100));

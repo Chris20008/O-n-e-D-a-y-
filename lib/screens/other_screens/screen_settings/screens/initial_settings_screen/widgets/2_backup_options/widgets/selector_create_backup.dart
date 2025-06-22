@@ -7,21 +7,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
+
+import '../../../../../screen_settings.dart';
 
 class SelectorCreateBackup extends StatelessWidget {
 
-  final Function(bool value) setLoadingIndicator;
-  final CnConfig cnConfig;
-
-  const SelectorCreateBackup({
-    super.key,
-    required this.setLoadingIndicator,
-    required this.cnConfig,
-  });
+  const SelectorCreateBackup({super.key,});
 
   @override
   Widget build(BuildContext context) {
+
+    final CnConfig cnConfig = context.read<CnConfig>();
+    final CnSettings cnSettings = context.read<CnSettings>();
+
     return PullDownButton(
       onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
@@ -31,11 +31,11 @@ class SelectorCreateBackup extends StatelessWidget {
             title: AppLocalizations.of(context)!.settingsBackupSaveManualMethodSave,
             onTap: () {
               HapticFeedback.selectionClick();
-              setLoadingIndicator(true);
+              cnSettings.setLoadingIndicator(true);
               Future.delayed(const Duration(milliseconds: 300), () async{
-                File? result = await saveBackup(withCloud: cnConfig.saveBackupCloud, cnConfig: cnConfig, automatic: false);
+                File? result = await saveBackup(withCloud: cnConfig.connectWithCloud, cnConfig: cnConfig, automatic: false);
                 await saveCurrentData(cnConfig);
-                setLoadingIndicator(false);
+                cnSettings.setLoadingIndicator(false);
                 if(result != null){
                   Fluttertoast.showToast(
                       msg: "${AppLocalizations.of(context)!.createdManualBackup} ✅️",

@@ -73,11 +73,9 @@ const Color activeColor = Color(0xffdb7b01);
 // );
 
 void pr(Object? s) {
-  if (kDebugMode || kProfileMode) {
-    if (kDebugMode) {
-      print(s);
-    }
-  }
+  // if (kDebugMode || kProfileMode) {
+    print(s);
+  // }
 }
 
 Widget dataSingleSet(SingleSet set, Exercise exercise){
@@ -1198,84 +1196,84 @@ Widget getCloudOptionsColumn({
             ),
           ),
         ),
-        AnimatedCrossFade(
-            firstChild: Column(
-              children: [
-
-                /// Save Backup in Cloud
-                CupertinoListTile(
-                  leading: const Icon(
-                    Icons.cloud_upload,
-                    color: Colors.white,
-                  ),
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.saveBackupCloud,
-                      activeTrackColor: activeColor,
-                      onChanged: (value) async{
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                        }
-                        cnConfig.setSaveBackupCloud(value);
-                        refresh();
-                      }
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: OverflowSafeText(
-                            maxLines: 1,
-                            Platform.isAndroid
-                                ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
-                                : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                /// Sync Multiple Devices
-                CupertinoListTile(
-                  leading: iconSyncMultipleDevices,
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.syncMultipleDevices,
-                      activeTrackColor: activeColor,
-                      onChanged: (value)async{
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                        }
-                        cnConfig.setSyncMultipleDevices(value);
-                        refresh();
-                      }
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: OverflowSafeText(
-                            maxLines: 1,
-                            AppLocalizations.of(context)!.settingsSyncMultipleDevices,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            secondChild: const Row(),
-            crossFadeState: cnConfig.showMoreSettingCloud
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 300)
-        )
+        // AnimatedCrossFade(
+        //     firstChild: Column(
+        //       children: [
+        //
+        //         /// Save Backup in Cloud
+        //         CupertinoListTile(
+        //           leading: const Icon(
+        //             Icons.cloud_upload,
+        //             color: Colors.white,
+        //           ),
+        //           trailing: CupertinoSwitch(
+        //               value: cnConfig.saveBackupCloud,
+        //               activeTrackColor: activeColor,
+        //               onChanged: (value) async{
+        //                 if(Platform.isAndroid){
+        //                   HapticFeedback.selectionClick();
+        //                 }
+        //                 cnConfig.setSaveBackupCloud(value);
+        //                 refresh();
+        //               }
+        //           ),
+        //           title: Padding(
+        //             padding: const EdgeInsets.only(right: 5),
+        //             child: Row(
+        //               // crossAxisAlignment: CrossAxisAlignment.end,
+        //               children: [
+        //                 Expanded(
+        //                   child: OverflowSafeText(
+        //                     maxLines: 1,
+        //                     Platform.isAndroid
+        //                         ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
+        //                         : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
+        //                     style: const TextStyle(color: Colors.white),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //
+        //         /// Sync Multiple Devices
+        //         CupertinoListTile(
+        //           leading: iconSyncMultipleDevices,
+        //           trailing: CupertinoSwitch(
+        //               value: cnConfig.syncMultipleDevices,
+        //               activeTrackColor: activeColor,
+        //               onChanged: (value)async{
+        //                 if(Platform.isAndroid){
+        //                   HapticFeedback.selectionClick();
+        //                 }
+        //                 cnConfig.setSyncMultipleDevices(value);
+        //                 refresh();
+        //               }
+        //           ),
+        //           title: Padding(
+        //             padding: const EdgeInsets.only(right: 5),
+        //             child: Row(
+        //               // crossAxisAlignment: CrossAxisAlignment.end,
+        //               children: [
+        //                 Expanded(
+        //                   child: OverflowSafeText(
+        //                     maxLines: 1,
+        //                     AppLocalizations.of(context)!.settingsSyncMultipleDevices,
+        //                     style: const TextStyle(color: Colors.white),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //     secondChild: const Row(),
+        //     crossFadeState: cnConfig.showMoreSettingCloud
+        //         ? CrossFadeState.showFirst
+        //         : CrossFadeState.showSecond,
+        //     duration: const Duration(milliseconds: 300)
+        // )
       ],
     );
 }

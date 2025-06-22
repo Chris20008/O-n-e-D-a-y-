@@ -3,24 +3,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../../widgets/slide_up_panel/animation_controller_name.dart';
+import '../screen_settings.dart';
 
 class ExplainBackupPanel extends StatelessWidget {
-  final PanelController controllerExplainBackups;
-  final ScrollController scrollControllerBackups;
 
-  const ExplainBackupPanel({
-    super.key,
-    required this.controllerExplainBackups,
-    required this.scrollControllerBackups,
-  });
+  const ExplainBackupPanel({super.key,});
 
   @override
   Widget build(BuildContext context) {
+
+    final CnSettings cnSettings = context.read<CnSettings>();
+
     return MySlideUpPanel(
-      controller: controllerExplainBackups,
+      controller: cnSettings.controllerExplainBackups,
       animationControllerName: AnimationControllerName.explainBackups,
       descendantAnimationControllerName: AnimationControllerName.screenSettings,
       panelBuilder: (context, listView){
@@ -32,7 +30,7 @@ class ExplainBackupPanel extends StatelessWidget {
             Expanded(
               child: listView(
                 padding: EdgeInsets.zero,
-                controller: scrollControllerBackups,
+                controller: cnSettings.scrollControllerExplainBackups,
                 children: [
                   CupertinoListTile(
                     leading: const Icon(

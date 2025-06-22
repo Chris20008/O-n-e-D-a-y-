@@ -1,4 +1,5 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/header_screen_statistics/exercise_selector.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
 import 'package:fitness_app/widgets/scroll_listener.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +12,9 @@ class HeaderScreenStatistics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final CnSettings cnSettings = context.read<CnSettings>();
+
     CnScreenStatistics cnScreenStatistics = context.read<CnScreenStatistics>();
     return Stack(
       children: [
@@ -45,7 +49,7 @@ class HeaderScreenStatistics extends StatelessWidget {
             IconButton(
               // color: Colors.amber[200]!,
                 color: Colors.white,
-                onPressed: () => cnScreenStatistics.openSettingsPanel(),
+                onPressed: () => cnSettings.openPanel(context),
                 icon: const Icon(
                   Icons.settings,
                 )

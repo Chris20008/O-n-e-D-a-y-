@@ -9,11 +9,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../screen_settings.dart';
+
 Future<bool> loadBackupFromFilePicker({
   required BuildContext context,
   required Function(bool value) setLoadingIndicator,
   required CnHomepage cnHomepage,
   required CnConfig cnConfig,
+  required CnSettings cnSettings,
   required CnScreenStatistics cnScreenStatistics,
   required File file
 }) async{
@@ -44,6 +47,7 @@ Future<bool> loadBackupFromFilePicker({
   );
 
   if(confirm){
+    final ov = blockUserInput(cnSettings.navigatorKey.currentContext!, duration: null);
     setLoadingIndicator(true);
     try{
       await loadBackupFromFile(file, cnHomepage: cnHomepage);
@@ -70,11 +74,9 @@ Future<bool> loadBackupFromFilePicker({
           textColor: Colors.white,
           fontSize: 16.0
       );
-      setLoadingIndicator(false);
       success = true;
     }
     catch (_){
-      setLoadingIndicator(false);
       if(previousContext.mounted){
         await Fluttertoast.showToast(
             msg: AppLocalizations.of(previousContext)!.backupLoadNotSuccess,
@@ -86,6 +88,10 @@ Future<bool> loadBackupFromFilePicker({
             fontSize: 16.0
         );
       }
+    }
+    finally{
+      ov?.remove();
+      setLoadingIndicator(false);
     }
   }
   return success;
