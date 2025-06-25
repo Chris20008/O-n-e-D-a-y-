@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../../widgets/slide_up_panel/my_slide_up_panel.dart';
 import '../../screen_settings.dart';
 import '../initial_settings_screen/widgets/2_backup_options/backup_options.dart';
+import '../local_file_picker/widgets/local_backups_list_view/local_backups_list_view.dart';
 
 class BackupsScreen extends StatelessWidget {
   const BackupsScreen({super.key});
@@ -24,9 +25,11 @@ class BackupsScreen extends StatelessWidget {
             child: ListViewScope.of(context).listView(
               physics: const BouncingScrollPhysics(),
               controller: cnSettings.scrollControllerBackupsScreen,
-              child: const Column(
+              child: Column(
                 children: [
-                  BackupOptions(),
+                  const BackupOptions(),
+                  const SizedBox(height: 20,),
+                  const LocalBackupsListView(),
                 ],
               ),
             ),

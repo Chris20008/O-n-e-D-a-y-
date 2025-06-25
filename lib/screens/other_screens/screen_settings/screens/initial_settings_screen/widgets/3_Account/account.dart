@@ -1,3 +1,4 @@
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
-import '../../../../../../../assets/custom_icons/my_icons_icons.dart';
 import '../../../../screen_settings.dart';
 
 class AccountSection extends StatelessWidget {
@@ -34,7 +34,8 @@ class AccountSection extends StatelessWidget {
           else{
             loginState = CupertinoListTile(
              onTap: () async => await authService.signOut().then((_) => setModalState((){})),
-             leading: const Icon(Icons.logout, color: Colors.white),
+             // leading: const Icon(Icons.logout, color: Colors.white),
+            leading: const SettingsIcon(iconPath: "logout.png"),
              trailing: trailingArrow,
              title:const Text("Logout", style: TextStyle(color: Colors.white)),
            );
@@ -52,7 +53,8 @@ class AccountSection extends StatelessWidget {
             children: [
               CupertinoListTile(
                 onTap: () => cnSettings.navigatorKey.currentState?.pushNamed("/backupScreen").then((_) => cnSettings.doRefreshListViewInitialSettings()),
-                leading: Icon(MyIcons.shield_alt, color: Colors.white),
+                // leading: Icon(MyIcons.shield_alt, color: Colors.white),
+                leading: const SettingsIcon(iconPath: "backups.png"),
                 trailing: trailingArrow,
                 title:const Text("Backups", style: TextStyle(color: Colors.white)),
               ),

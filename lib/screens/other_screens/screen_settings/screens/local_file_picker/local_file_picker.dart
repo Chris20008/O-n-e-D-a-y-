@@ -1,6 +1,5 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/screens/other_screens/screen_settings/screens/local_file_picker/widgets/local_backups_list_view/local_backups_list_view.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -42,12 +41,12 @@ class _LocalFilePickerState extends State<LocalFilePicker> {
                 const SizedBox(height: 20),
                 Text(AppLocalizations.of(context)!.localBackups, textScaler: const TextScaler.linear(1.3),),
                 const SizedBox(height: 20),
-                LocalBackupsListView(
-                    setLoadingIndicator: setLoadingIndicator,
-                    cnScreenStatistics: cnScreenStatistics,
-                    cnConfig: cnConfig,
-                    cnHomepage: cnHomepage
-                ),
+                // LocalBackupsListView(
+                //     setLoadingIndicator: setLoadingIndicator,
+                //     cnScreenStatistics: cnScreenStatistics,
+                //     cnConfig: cnConfig,
+                //     cnHomepage: cnHomepage
+                // ),
                 // const SizedBox(height: 20,)
               ],
             ),

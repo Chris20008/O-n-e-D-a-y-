@@ -1,15 +1,14 @@
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/selectors/select_language_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
-import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:provider/provider.dart';
 
@@ -38,10 +37,11 @@ class GeneralSettings extends StatelessWidget {
       children: [
         /// Language
         CupertinoListTile(
-            leading:  const Icon(
-              Icons.language,
-              color: Colors.white,
-            ),
+            // leading:  const Icon(
+            //   Icons.language,
+            //   color: Colors.white,
+            // ),
+            leading: const SettingsIcon(iconPath: "language.png"),
             title: SelectLanguageButton(
                 cnConfig: cnConfig,
                 buttonChild: Row(
@@ -61,62 +61,62 @@ class GeneralSettings extends StatelessWidget {
                 )
             )
         ),
-        /// Tutorial
-        CupertinoListTile(
-          onTap: (){
-            if(currentTutorialStep != 0){
-              showCupertinoModalPopup<void>(
-                context: context,
-                builder: (BuildContext context) => CupertinoActionSheet(
-                  cancelButton: getActionSheetCancelButton(
-                      context,
-                      text: AppLocalizations.of(context)!.yes,
-                      onPressed: (){
-                        cnConfig.setCurrentTutorialStep(0);
-                        currentTutorialStep = 0;
-                        tutorialIsRunning = false;
-                        Fluttertoast.showToast(
-                            msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
-                            toastLength: Toast.LENGTH_LONG,
-                            gravity: ToastGravity.SNACKBAR,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
-                            textColor: Colors.white,
-                            fontSize: 16.0
-                        );
-                      }
-                  ),
-                  title: Column(
-                    children: [
-                      Text("${AppLocalizations.of(context)!.settingsTutorialReset}?", textScaler: const TextScaler.linear(1.2)),
-                    ],
-                  ),
-                  actions: <CupertinoActionSheetAction>[
-                    CupertinoActionSheetAction(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      isDefaultAction: false,
-                      child: Text(AppLocalizations.of(context)!.no, style: cupButtonTextStyleOnlyFontSize),
-                    ),
-                  ],
-                ),
-              );
-            }
-          },
-          leading: const Icon(
-            Icons.school,
-            color: Colors.white,
-          ),
-          trailing: trailingArrow,
-          title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
-        ),
+        // /// Tutorial
+        // CupertinoListTile(
+        //   onTap: (){
+        //     if(currentTutorialStep != 0){
+        //       showCupertinoModalPopup<void>(
+        //         context: context,
+        //         builder: (BuildContext context) => CupertinoActionSheet(
+        //           cancelButton: getActionSheetCancelButton(
+        //               context,
+        //               text: AppLocalizations.of(context)!.yes,
+        //               onPressed: (){
+        //                 cnConfig.setCurrentTutorialStep(0);
+        //                 currentTutorialStep = 0;
+        //                 tutorialIsRunning = false;
+        //                 Fluttertoast.showToast(
+        //                     msg: AppLocalizations.of(context)!.settingsTutorialHasBeenReset,
+        //                     toastLength: Toast.LENGTH_LONG,
+        //                     gravity: ToastGravity.SNACKBAR,
+        //                     timeInSecForIosWeb: 1,
+        //                     backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
+        //                     textColor: Colors.white,
+        //                     fontSize: 16.0
+        //                 );
+        //               }
+        //           ),
+        //           title: Column(
+        //             children: [
+        //               Text("${AppLocalizations.of(context)!.settingsTutorialReset}?", textScaler: const TextScaler.linear(1.2)),
+        //             ],
+        //           ),
+        //           actions: <CupertinoActionSheetAction>[
+        //             CupertinoActionSheetAction(
+        //               onPressed: () {
+        //                 Navigator.pop(context);
+        //               },
+        //               isDefaultAction: false,
+        //               child: Text(AppLocalizations.of(context)!.no, style: cupButtonTextStyleOnlyFontSize),
+        //             ),
+        //           ],
+        //         ),
+        //       );
+        //     }
+        //   },
+        //   leading: const Icon(
+        //     Icons.school,
+        //     color: Colors.white,
+        //   ),
+        //   trailing: trailingArrow,
+        //   title: Text(AppLocalizations.of(context)!.settingsTutorialReset, style: const TextStyle(color: Colors.white)),
+        // ),
         /// Connect to Spotify
         CupertinoListTile(
           leading: const Icon(
             MyIcons.spotify,
-            color: Colors.white,
-            // color: Color(0xff1ed560)
+            // color: Colors.white,
+            color: Color(0xff1ed560)
           ),
           title: Row(
             children: [
@@ -168,33 +168,34 @@ class GeneralSettings extends StatelessWidget {
 
         /// Use Health Data
         CupertinoListTile(
-          leading: Stack(
-            children: [
-              Container(
-                height: 25,
-                width: 25,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 1,
-                    ),
-                    borderRadius: BorderRadius.circular(6)
-                ) ,
-                child: Padding(
-                  padding: const EdgeInsets.all(2),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Icon(
-                      MyIcons.heart,
-                      color: Colors.black.withValues(alpha: 0.8),
-                      size: 15,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+          leading: const SettingsIcon(iconPath: "apple_health.png"),
+          // leading: Stack(
+          //   children: [
+          //     Container(
+          //       height: 25,
+          //       width: 25,
+          //       decoration: BoxDecoration(
+          //           color: Colors.white,
+          //           border: Border.all(
+          //             color: Colors.white,
+          //             width: 1,
+          //           ),
+          //           borderRadius: BorderRadius.circular(6)
+          //       ) ,
+          //       child: Padding(
+          //         padding: const EdgeInsets.all(2),
+          //         child: Align(
+          //           alignment: Alignment.topRight,
+          //           child: Icon(
+          //             MyIcons.heart,
+          //             color: Colors.black.withValues(alpha: 0.8),
+          //             size: 15,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
           title: Row(
             children: [
               Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),

@@ -11,6 +11,7 @@ import '../../../../../../util/backup_helper/backup_functions.dart';
 import '../../../../../../util/config.dart';
 import '../../../../../../util/constants.dart';
 import '../../../screen_settings.dart';
+import '../../../widgets/settings_icon.dart';
 
 class CreateBackup extends StatelessWidget {
   const CreateBackup({super.key});
@@ -22,10 +23,11 @@ class CreateBackup extends StatelessWidget {
     final CnSettings cnSettings = context.read<CnSettings>();
 
     return CupertinoListTile(
-      leading: const Icon(
-        Icons.upload,
-        color: Colors.white,
-      ),
+      // leading: const Icon(
+      //   Icons.upload,
+      //   color: Colors.white,
+      // ),
+      leading: const SettingsIcon(iconPath: "create_backup.png"),
       title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodSave, style: const TextStyle(color: Colors.white),),
       onTap: () {
         HapticFeedback.selectionClick();
@@ -33,6 +35,7 @@ class CreateBackup extends StatelessWidget {
         Future.delayed(const Duration(milliseconds: 100), () async{
           File? result = await saveBackup(withCloud: cnConfig.connectWithCloud, cnConfig: cnConfig, automatic: false);
           await saveCurrentData(cnConfig);
+          cnSettings.refreshLocalBackups();
           cnSettings.setLoadingIndicator(false);
           final currentContext = cnSettings.navigatorKey.currentContext?? context;
           if(!currentContext.mounted){

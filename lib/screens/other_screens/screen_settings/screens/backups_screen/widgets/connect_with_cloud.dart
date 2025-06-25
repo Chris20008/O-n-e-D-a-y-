@@ -7,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../../../util/config.dart';
 import '../../../../../../util/constants.dart';
+import '../../../widgets/settings_icon.dart';
 
 class ConnectWithCloud extends StatelessWidget {
   const ConnectWithCloud({super.key});
@@ -19,10 +20,11 @@ class ConnectWithCloud extends StatelessWidget {
     return StatefulBuilder(
         builder: (context, setModalState){
           return CupertinoListTile(
-            leading: const Icon(
-                Icons.cloud_done,
-                color: Colors.white
-            ),
+            // leading: const Icon(
+            //     Icons.cloud_done,
+            //     color: Colors.white
+            // ),
+            leading: const SettingsIcon(iconPath: "connect_icloud.png"),
             trailing: CupertinoSwitch(
                 value: cnConfig.connectWithCloud,
                 activeTrackColor: activeColor,

@@ -173,6 +173,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
 
 class CnSettings extends ChangeNotifier{
   ValueNotifier<bool> showContent = ValueNotifier(false);
+  final ValueNotifier<int> _reloadLocalBackups = ValueNotifier(0);
   bool showLoadingIndicator = false;
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   PanelController controllerExplainBackups = PanelController();
@@ -183,6 +184,11 @@ class CnSettings extends ChangeNotifier{
   int refreshListViewInitialSettings = 0;
   final int animationTime = 500;
 
+  ValueNotifier<int> get reloadLocalBackups => _reloadLocalBackups;
+
+  void refreshLocalBackups(){
+    _reloadLocalBackups.value += 1;
+  }
 
   void doRefreshListViewInitialSettings(){
     refreshListViewInitialSettings += 1;

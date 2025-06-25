@@ -13,6 +13,7 @@ import '../../../../../../util/config.dart';
 import '../../../../../../util/constants.dart';
 import '../../../functions/load_backup_from_file_picker.dart';
 import '../../../screen_settings.dart';
+import '../../../widgets/settings_icon.dart';
 
 class LoadExternalBackup extends StatelessWidget {
   const LoadExternalBackup({super.key});
@@ -26,10 +27,11 @@ class LoadExternalBackup extends StatelessWidget {
     final CnSettings cnSettings = context.read<CnSettings>();
 
     return CupertinoListTile(
-      leading: const Icon(
-        Icons.cloud_download,
-        color: Colors.white,
-      ),
+      // leading: const Icon(
+      //   Icons.cloud_download,
+      //   color: Colors.white,
+      // ),
+      leading: const SettingsIcon(iconPath: "backup_from_cloud.png"),
       title: Text(AppLocalizations.of(context)!.settingsBackupLoadExternal, style: const TextStyle(color: Colors.white),),
       onTap: () {
         HapticFeedback.selectionClick();

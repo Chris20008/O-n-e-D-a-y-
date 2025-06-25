@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 
 class AboutSection extends StatelessWidget {
   const AboutSection({super.key});
@@ -21,10 +22,11 @@ class AboutSection extends StatelessWidget {
       children: [
         /// Contact
         const CupertinoListTile(
-          leading: Icon(
-            Icons.help_outline,
-            color: Colors.white,
-          ),
+          // leading: Icon(
+          //   Icons.help_outline,
+          //   color: Colors.white,
+          // ),
+          leading: SettingsIcon(iconPath: "contact.png"),
           title: SelectorContactButton(),
         ),
         /// Github
@@ -44,10 +46,11 @@ class AboutSection extends StatelessWidget {
           onTap: () async{
             await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/terms-of-use");
           },
-          leading: const Icon(
-            Icons.my_library_books_rounded,
-            color: Colors.white,
-          ),
+          // leading: const Icon(
+          //   Icons.my_library_books_rounded,
+          //   color: Colors.white,
+          // ),
+          leading: const SettingsIcon(iconPath: "terms_of_use.png"),
           trailing: trailingArrow,
           title: Text(AppLocalizations.of(context)!.settingsTermsOfUse, style: const TextStyle(color: Colors.white)),
         ),
@@ -56,10 +59,11 @@ class AboutSection extends StatelessWidget {
           onTap: () async{
             await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/privacy-policy");
           },
-          leading: const Icon(
-            Icons.lock_outline,
-            color: Colors.white,
-          ),
+          // leading: const Icon(
+          //   Icons.lock_outline,
+          //   color: Colors.white,
+          // ),
+          leading: const SettingsIcon(iconPath: "data_policy.png"),
           trailing: trailingArrow,
           title: Text(AppLocalizations.of(context)!.settingsPrivacyPolicy, style: const TextStyle(color: Colors.white)),
         ),
@@ -68,7 +72,8 @@ class AboutSection extends StatelessWidget {
           onTap: () async{
             await openUrl("https://chris20008.github.io/O-n-e-D-a-y-Info/imprint");
           },
-          leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+          // leading: const Text("§", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 18)),
+          leading: const SettingsIcon(iconPath: "imprint.png"),
           trailing: trailingArrow,
           title: Text(AppLocalizations.of(context)!.settingsImprint, style: const TextStyle(color: Colors.white)),
         ),

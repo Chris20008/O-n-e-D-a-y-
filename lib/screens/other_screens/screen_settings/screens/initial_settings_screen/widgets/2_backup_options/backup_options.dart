@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 
 import '../../../../../../../util/backup_helper/backup_functions.dart';
 import '../../../../screen_settings.dart';
@@ -81,40 +82,47 @@ class BackupOptions extends StatelessWidget {
         const LoadExternalBackup(),
 
         /// Load Backup Local
-        CupertinoListTile(
-          leading: const Icon(
-            Icons.file_download,
-            color: Colors.white,
-          ),
-          title: Text(AppLocalizations.of(context)!.settingsBackupLoadLocal, style: const TextStyle(color: Colors.white),),
-          onTap: () {
-            HapticFeedback.selectionClick();
-            cnSettings.navigatorKey.currentState?.pushNamed('/localFilePicker');
-          },
-          trailing: trailingArrow,
-        ),
+        // CupertinoListTile(
+        //   // leading: const Icon(
+        //   //   Icons.file_download,
+        //   //   color: Colors.white,
+        //   // ),
+        //   leading: const SettingsIcon(iconPath: "logout.png"),
+        //   title: Text(AppLocalizations.of(context)!.settingsBackupLoadLocal, style: const TextStyle(color: Colors.white),),
+        //   onTap: () {
+        //     HapticFeedback.selectionClick();
+        //     cnSettings.navigatorKey.currentState?.pushNamed('/localFilePicker');
+        //   },
+        //   trailing: trailingArrow,
+        // ),
 
         /// Save Backup Automatic
         CupertinoListTile(
-          leading: const Icon(
-            Icons.sync,
-            color: Colors.white,
-          ),
+          // leading: const Icon(
+          //   Icons.sync,
+          //   color: Colors.white,
+          // ),
+          leading: const SettingsIcon(iconPath: "sync_with_cloud.png"),
           title: OverflowSafeText(
               maxLines: 1,
               AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
               style: const TextStyle(color: Colors.white)
           ),
-          trailing: CupertinoSwitch(
-              value: cnConfig.automaticBackups,
-              activeTrackColor: activeColor,
-              onChanged: (value){
-                if(Platform.isAndroid){
-                  HapticFeedback.selectionClick();
-                }
-                cnConfig.setAutomaticBackups(value);
-                cnSettings.refresh();
-              }
+          trailing: StatefulBuilder(
+            builder: (context, setModalState) {
+              return CupertinoSwitch(
+                  value: cnConfig.automaticBackups,
+                  activeTrackColor: activeColor,
+                  onChanged: (value){
+                    if(Platform.isAndroid){
+                      HapticFeedback.selectionClick();
+                    }
+                    cnConfig.setAutomaticBackups(value);
+                    setModalState((){});
+                    // cnSettings.refresh();
+                  }
+              );
+            }
           ),
         ),
 
