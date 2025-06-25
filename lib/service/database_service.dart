@@ -61,7 +61,7 @@ class DatabaseService{
     if(batch != null){
       await batch.set(userDocument, {
         "workoutChecksums": FieldValue.arrayUnion([checksum]),
-        "lastUpdated": FieldValue.serverTimestamp()
+        "lastUpdated": Timestamp.fromDate(DateTime.now())
       }, SetOptions(merge: true));
     }
     else{
