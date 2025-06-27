@@ -5,7 +5,6 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_content/running_workout_content.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/running_workout_footer/running_workout_footer.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/wrapper_screen_running_workout.dart';
-import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
@@ -17,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'dart:io';
 import '../../../objects/exercise.dart';
 import '../../../objects/workout.dart';
+import '../../../util/backup_helper/save_backup.dart';
+import '../../../util/backup_helper/save_current_data.dart';
 import '../../../util/constants.dart';
 import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';

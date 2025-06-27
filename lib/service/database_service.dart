@@ -10,7 +10,7 @@ class DatabaseService{
 
   late final CollectionReference workoutCollection = userCollection.doc(uid).collection("workouts");
   late final DocumentReference userDocument = userCollection.doc(uid);
-  final batch = AutoCommitBatch(firestore: firestore);
+  final writeBatch = AutoCommitBatch(firestore: firestore);
 
   final String uid;
 
@@ -46,14 +46,37 @@ class DatabaseService{
     return querySnapshot.docs.first.data();
   }
 
+  Future<List<Map<String, dynamic>>> getMultipleWorkoutsByChecksums(List<String> checksums) async {
+    const batchSize = 10;
+    final List<Map<String, dynamic>> allWorkouts = [];
+
+    for (var i = 0; i < checksums.length; i += batchSize) {
+      final batch = checksums.sublist(
+        i,
+        i + batchSize > checksums.length ? checksums.length : i + batchSize,
+      );
+
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(uid)
+          .collection("workouts")
+          .where("checksum", whereIn: batch)
+          .get();
+
+      allWorkouts.addAll(querySnapshot.docs.map((doc) => doc.data()));
+    }
+
+    return allWorkouts;
+  }
+
   Future<void> addWorkout({required ObWorkout wo, String? oldChecksum}) async{
     final workoutData = wo.asMap(withChecksum: true);
 
-    await batch.set(workoutCollection.doc(wo.uuid), workoutData);
+    await writeBatch.set(workoutCollection.doc(wo.uuid), workoutData);
 
-    await _addWorkoutChecksum(wo.checksum, batch: batch);
+    await _addWorkoutChecksum(wo.checksum, batch: writeBatch);
     if(oldChecksum != null){
-      await deleteWorkoutChecksum(oldChecksum, batch: batch);
+      await deleteWorkoutChecksum(oldChecksum, batch: writeBatch);
     }
   }
 
@@ -74,8 +97,8 @@ class DatabaseService{
   }
 
   Future<void> deleteWorkout({required ObWorkout wo}) async {
-    await batch.delete(workoutCollection.doc(wo.uuid));
-    await deleteWorkoutChecksum(wo.currentChecksum, batch: batch);
+    await writeBatch.delete(workoutCollection.doc(wo.uuid));
+    await deleteWorkoutChecksum(wo.currentChecksum, batch: writeBatch);
   }
 
   Future<void> deleteWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async {

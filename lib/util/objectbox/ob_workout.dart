@@ -5,6 +5,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/service/sync_manager.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:uuid/uuid.dart';
+import '../constants.dart';
 import 'ob_exercise.dart';
 
 
@@ -78,7 +79,8 @@ class ObWorkout{
             ? DateTime.parse(workoutMap["lastUpdated"])
             : null,
         isTemplate: workoutMap["isTemplate"],
-        linkedExercises: List.from(workoutMap["linkedExercises"])
+        linkedExercises: List.from(workoutMap["linkedExercises"]),
+        checksum: workoutMap["checksum"]?? '-1'
       );
 
       if (withExercises && workoutMap["exercises"] != null) {
@@ -88,7 +90,7 @@ class ObWorkout{
       return workout;
     }
     catch (e) {
-      // print(e);
+      pr(e);
       return null;
     }
 
@@ -112,6 +114,7 @@ class ObWorkout{
   }
 
   Future save({bool onlyWorkout = false, bool onlyLocal = false}) async{
+    pr("Save Workout");
     updateLastUpdated();
     final oldChecksum = checksum;
     if(!onlyWorkout){
@@ -123,6 +126,9 @@ class ObWorkout{
     if(newWorkout != null){
       newWorkout.updateChecksum();
       objectbox.workoutBox.putAsync(newWorkout);
+      pr("Old Checksum $oldChecksum");
+      pr("New Checksum ${newWorkout.checksum}");
+      pr("");
       if(newWorkout.checksum != oldChecksum && !onlyLocal){
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }

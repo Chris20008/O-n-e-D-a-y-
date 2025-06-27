@@ -39,12 +39,17 @@ class CnSyncManager extends ChangeNotifier {
       if(await isOnline()){
         await FirebaseFirestore.instance.waitForPendingWrites();
       }
+
       final serverChecksumsFuture = database!.getServerChecksums();
 
       localeChecksums = objectbox.workoutBox.getAll().map((w) => w.checksum).toList();
       final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
       await syncChecksums(serverChecksums: serverChecksums);
+    }
+    catch(e){
+      pr("Error during Sync with Firestore");
+      pr(e);
     }
     finally{
       _isSyncing = false;
@@ -58,8 +63,8 @@ class CnSyncManager extends ChangeNotifier {
     pr("serverChecksums: ${serverChecksums.checksums}");
     pr("");
 
-    final missingLocal = serverChecksums.checksums.without(localeChecksums);
-    final missingServer = localeChecksums.without(serverChecksums.checksums);
+    final List<String> missingLocal = serverChecksums.checksums.without(localeChecksums).whereType<String>().toList();
+    final List<String> missingServer = localeChecksums.without(serverChecksums.checksums).whereType<String>().toList();
 
     pr("");
     pr("MissingLocal: $missingLocal");
@@ -79,10 +84,7 @@ class CnSyncManager extends ChangeNotifier {
       /// so we add it to server backend
       if(woToDelete.lastUpdated?.isAfter(serverChecksums.lastUpdated) ?? false){
         pr("Workout: ${woToDelete.name} is missing on server side, but newer than last sync. Add it to Server");
-        print(woToDelete.lastUpdated);
-        print(serverChecksums.lastUpdated);
-        print(woToDelete.lastUpdated?.isAfter(serverChecksums.lastUpdated));
-        await database!.addWorkout(wo: woToDelete);
+        database?.addWorkout(wo: woToDelete);
       }
 
       /// Workout was last Updated before the last server update
@@ -95,17 +97,18 @@ class CnSyncManager extends ChangeNotifier {
       }
     }
 
-    /// Add missing Workouts from Server to local db
-    for (String checksum in missingLocal) {
-      pr("checksum: $checksum is missing on client, try to fetch it from server");
-      final workoutMap = await database!.getWorkoutByChecksum(checksum);
-      if(workoutMap != null){
-        final ObWorkout? newWo = ObWorkout.fromMap(workoutMap: workoutMap, withExercises: true);
+    if(missingLocal.isNotEmpty){
+      /// Add missing Workouts from Server to local db
+      List<Map<String, dynamic>> missingLocalMaps = await database!.getMultipleWorkoutsByChecksums(missingLocal);
+      List<String> foundWorkoutsChecksums = [];
 
-        if(newWo != null){
+      for(Map<String, dynamic> woMap in missingLocalMaps){
+        final ObWorkout? newWo = ObWorkout.fromMap(workoutMap: woMap, withExercises: true);
+        if(newWo != null && woMap["checksum"] != null){
           pr("Workout: ${newWo.name} was found on serve, add it to client");
           newWo.save();
-          localeChecksums.add(checksum);
+          localeChecksums.add(woMap["checksum"]);
+          foundWorkoutsChecksums.add(woMap["checksum"]);
         }
         /// ToDo: when newWo is null, the map couldn't be parsed
         /// so we have to delete this workout from server database
@@ -114,11 +117,10 @@ class CnSyncManager extends ChangeNotifier {
         }
       }
 
-      /// When no workout was found this checksum is old, so we remove it
-      else{
-        await database!.deleteWorkoutChecksum(checksum);
+      for(String checksum in missingLocal.without(foundWorkoutsChecksums)){
+        pr("Workout Checksum $checksum was not found on server, remove it");
+        database?.deleteWorkoutChecksum(checksum);
       }
-
     }
   }
 

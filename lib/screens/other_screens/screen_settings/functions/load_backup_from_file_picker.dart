@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../../../util/backup_helper/load_backup/load_backup_from_file.dart';
+import '../../../../util/backup_helper/save_current_data.dart';
 import '../screen_settings.dart';
 
 Future<bool> loadBackupFromFilePicker({

@@ -9,10 +9,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 
-import '../../../../../../../util/backup_helper/backup_functions.dart';
-import '../../../../screen_settings.dart';
-import '../../../backups_screen/widgets/create_backup.dart';
-import '../../../backups_screen/widgets/load_backup_external.dart';
+import '../../../../../../util/backup_helper/share_backup.dart';
+import '../../../screen_settings.dart';
+import 'create_backup.dart';
+import 'load_backup_external.dart';
 
 class BackupOptions extends StatelessWidget {
 
@@ -29,10 +29,6 @@ class BackupOptions extends StatelessWidget {
           color: Theme.of(context).cardColor
       ),
       backgroundColor: Colors.transparent,
-      // header: Padding(
-      //   padding: const EdgeInsets.only(left: 10),
-      //   child: Text(AppLocalizations.of(context)!.settingsBackup, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
-      // ),
       /// More Informations footer
       footer: GestureDetector(
         onTap: () async{
@@ -65,11 +61,6 @@ class BackupOptions extends StatelessWidget {
 
         /// Share backup
         CupertinoListTile(
-          // leadingSize: 28,
-          // leading: const Icon(
-          //   MyIcons.backup_share,
-          //   color: Colors.white,
-          // ),
           leading: Image.asset("lib/assets/pictures/share.png"),
           title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare, style: const TextStyle(color: Colors.white),),
           onTap: () async{
@@ -81,27 +72,8 @@ class BackupOptions extends StatelessWidget {
         /// Load Backup External
         const LoadExternalBackup(),
 
-        /// Load Backup Local
-        // CupertinoListTile(
-        //   // leading: const Icon(
-        //   //   Icons.file_download,
-        //   //   color: Colors.white,
-        //   // ),
-        //   leading: const SettingsIcon(iconPath: "logout.png"),
-        //   title: Text(AppLocalizations.of(context)!.settingsBackupLoadLocal, style: const TextStyle(color: Colors.white),),
-        //   onTap: () {
-        //     HapticFeedback.selectionClick();
-        //     cnSettings.navigatorKey.currentState?.pushNamed('/localFilePicker');
-        //   },
-        //   trailing: trailingArrow,
-        // ),
-
         /// Save Backup Automatic
         CupertinoListTile(
-          // leading: const Icon(
-          //   Icons.sync,
-          //   color: Colors.white,
-          // ),
           leading: const SettingsIcon(iconPath: "sync_with_cloud.png"),
           title: OverflowSafeText(
               maxLines: 1,
@@ -126,20 +98,8 @@ class BackupOptions extends StatelessWidget {
           ),
         ),
 
-        // AnimatedContainer(
-        //   height: cnConfig.showMoreSettingCloud? 5 : 0,
-        //   color: Theme.of(context).primaryColor.withValues(alpha: 0.5),
-        //   duration: const Duration(milliseconds: 300),
-        // ),
-
-
         /// Sync with Cloud
         const ConnectWithCloud()
-        // getCloudOptionsColumn(
-        //     cnConfig: cnConfig,
-        //     context: context,
-        //     refresh: cnSettings.refresh
-        // )
       ],
     );
   }

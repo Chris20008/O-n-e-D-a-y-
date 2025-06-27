@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../util/constants.dart';
+
 class AutoCommitBatch {
   late final FirebaseFirestore firestore;
   WriteBatch? _batch;
@@ -38,14 +40,12 @@ class AutoCommitBatch {
 
   Future set(DocumentReference ref, Map<String, dynamic> data, [SetOptions? options]) async{
     (await currentBatch).set(ref, data, options);
-    // _counter += data.length;
     _counter += 1;
     _writes += 1;
   }
 
   Future update(DocumentReference ref, Map<String, dynamic> data) async{
     (await currentBatch).update(ref, data);
-    // _counter += data.length;
     _counter += 1;
     _writes += 1;
   }
@@ -77,6 +77,9 @@ class AutoCommitBatch {
       if (batchToCommit != null) {
         await batchToCommit.commit();
       }
+    }
+    catch(e){
+      pr(e);
     }
     finally{
       _waitingForCommit = false;

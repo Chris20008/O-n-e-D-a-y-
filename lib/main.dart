@@ -11,6 +11,8 @@ import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exerci
 import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:fitness_app/service/sync_manager.dart';
+import 'package:fitness_app/util/backup_helper/google_drive/load_newest_data_google_drive.dart';
+import 'package:fitness_app/util/backup_helper/icloud/load_newset_data_icloud.dart';
 import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -18,7 +20,6 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/wrapper_screen_running_workout.dart';
 import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
-import 'package:fitness_app/util/backup_helper/backup_functions.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/language_config.dart';
@@ -51,6 +52,9 @@ bool tutorialIsRunning = false;
 int currentTutorialStep = 0;
 String pictureAssetPath = "lib/assets/pictures/";
 Color buttonTextColor = const Color(0xffdb7b01);
+
+String? androidDeveloperUid = "54671382937413";
+// const String? androidDeveloperUid = null;
 
 void main() async{
 
@@ -326,12 +330,13 @@ class _MyHomePageState extends State<MyHomePage>{
           builder: (context, snapshot) {
 
             if(snapshot.connectionState == ConnectionState.active){
-              final uid = Platform.isAndroid? "54671382937413" : snapshot.data?.uid;
+              final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
               cnSyncManager.setUserId(uid);
               if(ObjectBox.initialized){
                 cnSyncManager.doSyncWithFireStore();
               }
             } else{
+              pr("Set UID NULL");
               cnSyncManager.setUserId(null);
             }
 
@@ -414,12 +419,13 @@ class _MyHomePageState extends State<MyHomePage>{
       builder: (context, snapshot) {
 
         if(snapshot.connectionState == ConnectionState.active){
-          final uid = Platform.isAndroid? "54671382937413" : snapshot.data?.uid;
+          final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
           cnSyncManager.setUserId(uid);
           if(ObjectBox.initialized){
             cnSyncManager.doSyncWithFireStore();
           }
         } else{
+          pr("Set UID NULL");
           cnSyncManager.setUserId(null);
         }
 
@@ -523,28 +529,11 @@ class _MyHomePageState extends State<MyHomePage>{
 
                           // Center(
                           //   child: ElevatedButton(
-                          //     child: const Text("Test"),
+                          //     child: Text(androidDeveloperUid == null? "Connect" : "Disconnect"),
                           //     onPressed: ()async{
-                          //       final db = DatabaseService(uid: "54671382937413");
-                          //       final res = await db.getAllWorkoutChecksums();
-                          //
-                          //       final obWorkouts = objectbox.workoutBox.getAll();
-                          //       final allShas = [];
-                          //       for(ObWorkout wo in obWorkouts){
-                          //         final checksum = wo.checksum;
-                          //         allShas.add(checksum);
-                          //         if(!res.contains(checksum)){
-                          //           print("Checksum: $checksum does not exist yet - add do FireStore");
-                          //           await db.addWorkout(wo: wo, checksum: checksum);
-                          //         } else{
-                          //           print("Checksum $checksum already conatined in db");
-                          //         }
-                          //       }
-                          //       // for(final l in res){
-                          //       //   print(l);
-                          //       //   print(l.runtimeType);
-                          //       // }
-                          //       // print(res);
+                          //       androidDeveloperUid = androidDeveloperUid == null? "54671382937413" : null;
+                          //       cnSyncManager.setUserId(androidDeveloperUid);
+                          //       setState((){});
                           //     },
                           //   ),
                           // )

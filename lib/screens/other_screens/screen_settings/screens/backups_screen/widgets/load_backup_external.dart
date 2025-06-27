@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../../util/backup_helper/backup_functions.dart';
+import '../../../../../../util/backup_helper/get_backup_from_file_picker.dart';
 import '../../../../../../util/config.dart';
 import '../../../../../../util/constants.dart';
 import '../../../functions/load_backup_from_file_picker.dart';
@@ -38,7 +38,7 @@ class LoadExternalBackup extends StatelessWidget {
         Future.delayed(const Duration(milliseconds: 200), () async {
           if(context.mounted){
             cnSettings.setLoadingIndicator(true);
-            File? file = await getBackupFromFilePicker(cnHomepage: cnHomepage);
+            File? file = await getFileFromFilePicker(cnHomepage: cnHomepage);
             cnSettings.setLoadingIndicator(false);
 
             if(!context.mounted || file == null){
