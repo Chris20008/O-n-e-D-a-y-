@@ -133,10 +133,10 @@ class ObWorkout{
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }
     }
-    // exerciseChecksumSkipIds.clear();
   }
 
   Future saveAsync({bool onlyWorkout = false}) async{
+    pr("Save Workout");
     updateLastUpdated();
     final oldChecksum = checksum;
     if(!onlyWorkout){
@@ -148,6 +148,9 @@ class ObWorkout{
     if(newWorkout != null){
       newWorkout.updateChecksum();
       objectbox.workoutBox.putAsync(newWorkout);
+      pr("Old Checksum $oldChecksum");
+      pr("New Checksum ${newWorkout.checksum}");
+      pr("");
       if(newWorkout.checksum != oldChecksum){
         await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
       }

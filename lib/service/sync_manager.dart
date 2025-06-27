@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fitness_app/objectbox.g.dart';
+import 'package:fitness_app/util/backup_helper/save_current_data.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../main.dart';
+import '../screens/main_screens/screen_workout_history/screen_workout_history.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/screen_workouts.dart';
+import '../util/config.dart';
 import '../util/constants.dart';
 import 'database_service.dart';
 
@@ -14,11 +20,17 @@ class CnSyncManager extends ChangeNotifier {
   static List<String> localeChecksums = [];
   bool _isSyncing = false;
 
-  CnSyncManager({this.userId}){
+  late CnWorkoutHistory cnWorkoutHistory;
+  late CnNewWorkOutPanel cnNewWorkout;
+  late CnWorkouts cnWorkouts;
+  late CnConfig cnConfig;
+
+  CnSyncManager({this.userId, required BuildContext context}){
     setUserId(userId);
-    // if(userId != null){
-    //   database = DatabaseService(uid: userId!);
-    // }
+    cnWorkouts = context.read<CnWorkouts>();
+    cnWorkoutHistory = context.read<CnWorkoutHistory>();
+    cnNewWorkout = context.read<CnNewWorkOutPanel>();
+    cnConfig = context.read<CnConfig>();
   }
 
   void setUserId(String? uid){
@@ -102,13 +114,23 @@ class CnSyncManager extends ChangeNotifier {
       List<Map<String, dynamic>> missingLocalMaps = await database!.getMultipleWorkoutsByChecksums(missingLocal);
       List<String> foundWorkoutsChecksums = [];
 
+      int counter = 0;
+
       for(Map<String, dynamic> woMap in missingLocalMaps){
         final ObWorkout? newWo = ObWorkout.fromMap(workoutMap: woMap, withExercises: true);
         if(newWo != null && woMap["checksum"] != null){
           pr("Workout: ${newWo.name} was found on serve, add it to client");
-          newWo.save();
+          await newWo.saveAsync();
           localeChecksums.add(woMap["checksum"]);
           foundWorkoutsChecksums.add(woMap["checksum"]);
+          counter += 1;
+          if (counter % 10 == 0){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+            cnNewWorkout.refreshAllWorkoutDays();
+            cnWorkouts.refresh();
+            cnWorkoutHistory.refresh();
+          }
         }
         /// ToDo: when newWo is null, the map couldn't be parsed
         /// so we have to delete this workout from server database
@@ -121,6 +143,12 @@ class CnSyncManager extends ChangeNotifier {
         pr("Workout Checksum $checksum was not found on server, remove it");
         database?.deleteWorkoutChecksum(checksum);
       }
+      cnWorkouts.refreshAllWorkouts();
+      cnWorkoutHistory.refreshAllWorkouts();
+      cnNewWorkout.refreshAllWorkoutDays();
+      cnWorkouts.refresh();
+      cnWorkoutHistory.refresh();
+      saveCurrentData(cnConfig);
     }
   }
 

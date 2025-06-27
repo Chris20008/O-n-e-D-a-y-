@@ -106,7 +106,6 @@ class MyAppState extends State<MyApp>{
     pr("Main");
     return MultiProvider(
       providers:[
-        ChangeNotifierProvider(create: (context) => CnSyncManager()),
         ChangeNotifierProvider(create: (context) => CnNewExercisePanel()),
         ChangeNotifierProvider(create: (context) => CnWorkoutHistory()),
         ChangeNotifierProvider(create: (context) => CnBannerRunningWorkout()),
@@ -125,6 +124,7 @@ class MyAppState extends State<MyApp>{
         ChangeNotifierProvider(create: (context) => CnRunningWorkout(context)),
         ChangeNotifierProvider(create: (context) => CnHomepage(context)),
         ChangeNotifierProvider(create: (context) => CnNewWorkOutPanel(context)),
+        ChangeNotifierProvider(create: (context) => CnSyncManager(context: context)),
       ],
       child: MaterialApp(
         // showPerformanceOverlay: true,
