@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:collection/collection.dart';
+
 import '../../../main.dart';
 import '../../objectbox/ob_exercise.dart';
 import '../../objectbox/ob_sick_days.dart';
@@ -29,21 +31,29 @@ Future<bool> loadBackupFromString({required String content, CnHomepage? cnHomepa
   final hadDifferences = await syncIncomingWorkoutsWithLocal(allObWorkouts, cnHomepage: cnHomepage);
 
   /// Load Sick Days
-  /// Just overwrite because we don't expect a lot of sickDays entries
-  final allSickDays = objectbox.sickDaysBox.getAll();
-  for(ObSickDays sd in allSickDays){
-    sd.delete();
-  }
-  objectbox.sickDaysBox.removeAll();
+  final allCurrentSickDays = objectbox.sickDaysBox.getAll();
   if (result.length > 1){
+
+    List<String> allCurrentChecksums = allCurrentSickDays.map((sd) => sd.checksum).toList();
+
     final allSickDaysAsListString = result[1].split(";");
     allSickDaysAsListString.removeWhere((element) => element.trim() == "");
-    final allSickDays = allSickDaysAsListString.map((e) => jsonDecode(e));
-    final List<ObSickDays> allObSickDays = List.from(allSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
-    for(ObSickDays sd in allObSickDays){
+    final allNewSickDays = allSickDaysAsListString.map((e) => jsonDecode(e));
+    final List<ObSickDays> allNewObSickDays = List.from(allNewSickDays.map((m) => ObSickDays.fromMap(sickDaysMap: m)));
+    for(ObSickDays sd in allNewObSickDays){
+      if(allCurrentChecksums.contains(sd.currentChecksum)){
+        allCurrentChecksums.remove(sd.currentChecksum);
+        continue;
+      }
       await sd.save();
     }
-    // await objectbox.sickDaysBox.putManyAsync(allObSickDays);
+    for(String checksum in allCurrentChecksums){
+      allCurrentSickDays.firstWhereOrNull((sd) => sd.checksum == checksum)?.delete();
+    }
+  } else{
+    for(ObSickDays sd in allCurrentSickDays){
+      sd.delete();
+    }
   }
 
 

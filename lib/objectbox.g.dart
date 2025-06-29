@@ -146,7 +146,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(4, 3149227828482375570),
       name: 'ObSickDays',
-      lastPropertyId: const obx_int.IdUid(5, 3871109737338301020),
+      lastPropertyId: const obx_int.IdUid(6, 6067705989541804253),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -174,7 +174,12 @@ final _entities = <obx_int.ModelEntity>[
             name: 'checksum',
             type: 9,
             flags: 2048,
-            indexId: const obx_int.IdUid(2, 1686407197636823885))
+            indexId: const obx_int.IdUid(2, 1686407197636823885)),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 6067705989541804253),
+            name: 'lastUpdated',
+            type: 10,
+            flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[])
@@ -390,18 +395,21 @@ obx_int.ModelDefinition getObjectBoxModel() {
         objectToFB: (ObSickDays object, fb.Builder fbb) {
           final uuidOffset = fbb.writeString(object.uuid);
           final checksumOffset = fbb.writeString(object.checksum);
-          fbb.startTable(6);
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.startDate.millisecondsSinceEpoch);
           fbb.addInt64(2, object.endDate.millisecondsSinceEpoch);
           fbb.addOffset(3, uuidOffset);
           fbb.addOffset(4, checksumOffset);
+          fbb.addInt64(5, object.lastUpdated?.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
+          final lastUpdatedValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 14);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
           final uuidParam = const fb.StringReader(asciiOptimization: true)
@@ -412,12 +420,16 @@ obx_int.ModelDefinition getObjectBoxModel() {
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0));
           final endDateParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
+          final lastUpdatedParam = lastUpdatedValue == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(lastUpdatedValue);
           final object = ObSickDays(
               id: idParam,
               uuid: uuidParam,
               checksum: checksumParam,
               startDate: startDateParam,
-              endDate: endDateParam);
+              endDate: endDateParam,
+              lastUpdated: lastUpdatedParam);
 
           return object;
         })
@@ -533,4 +545,8 @@ class ObSickDays_ {
   /// see [ObSickDays.checksum]
   static final checksum =
       obx.QueryStringProperty<ObSickDays>(_entities[2].properties[4]);
+
+  /// see [ObSickDays.lastUpdated]
+  static final lastUpdated =
+      obx.QueryDateProperty<ObSickDays>(_entities[2].properties[5]);
 }

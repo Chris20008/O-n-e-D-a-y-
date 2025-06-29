@@ -130,7 +130,7 @@
     },
     {
       "id": "4:3149227828482375570",
-      "lastPropertyId": "5:3871109737338301020",
+      "lastPropertyId": "6:6067705989541804253",
       "name": "ObSickDays",
       "properties": [
         {
@@ -160,6 +160,11 @@
           "type": 9,
           "flags": 2048,
           "indexId": "2:1686407197636823885"
+        },
+        {
+          "id": "6:6067705989541804253",
+          "name": "lastUpdated",
+          "type": 10
         }
       ],
       "relations": []

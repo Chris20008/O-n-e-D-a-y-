@@ -28,8 +28,11 @@ class AutoCommitBatch {
   }
 
   Future<WriteBatch> get currentBatch async{
+    // while (_waitingForCommit) {
+    //   await Future.delayed(const Duration(milliseconds: 50));
+    // }
     if(_counter >= maxBatchSize){
-      await commit();
+      commit();
     }
     if (_batch == null) {
       _batch = firestore.batch();
@@ -57,13 +60,11 @@ class AutoCommitBatch {
   }
 
   Future<void> commit() async {
-    if(_waitingForCommit){
-      while (_waitingForCommit) {
-        await Future.delayed(const Duration(milliseconds: 50));
-      }
-    }
-
-    _waitingForCommit = true;
+    // if(_waitingForCommit){
+    //   while (_waitingForCommit) {
+    //     await Future.delayed(const Duration(milliseconds: 50));
+    //   }
+    // }
 
     try{
       final batchToCommit = _batch;
@@ -73,6 +74,14 @@ class AutoCommitBatch {
       _deletes = 0;
       _timer?.cancel();
       _timer = null;
+
+      if(_waitingForCommit){
+        while (_waitingForCommit) {
+          await Future.delayed(const Duration(milliseconds: 50));
+        }
+      }
+
+      _waitingForCommit = true;
 
       if (batchToCommit != null) {
         await batchToCommit.commit();

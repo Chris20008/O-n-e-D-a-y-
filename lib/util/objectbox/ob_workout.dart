@@ -158,7 +158,8 @@ class ObWorkout with Checksum implements FirebaseObject{
       pr("New Checksum ${newWorkout.checksum}");
       pr("");
       if(newWorkout.checksum != oldChecksum){
-        await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
+        // await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
+        await CnSyncManager.database?.addCollectionObject(ob: newWorkout, oldChecksum: oldChecksum);
       }
     }
   }
