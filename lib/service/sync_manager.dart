@@ -78,7 +78,8 @@ class CnSyncManager extends ChangeNotifier {
             cnNewWorkout.refreshAllWorkoutDays();
             cnWorkouts.refresh();
             cnWorkoutHistory.refresh();
-          }
+          },
+          box: objectbox.workoutBox
       );
 
       await _syncChecksums(
@@ -94,7 +95,8 @@ class CnSyncManager extends ChangeNotifier {
             cnNewWorkout.refreshAllWorkoutDays();
             cnWorkouts.refresh();
             cnWorkoutHistory.refresh();
-          }
+          },
+          box: objectbox.sickDaysBox
       );
     }
     catch(e){
@@ -113,7 +115,8 @@ class CnSyncManager extends ChangeNotifier {
     required Collection collection,
     required FirebaseObject? Function(Map<String, dynamic>) constructorFromMap,
     required FirebaseObject? Function(String) getLocalObjectByChecksum,
-    required Function refresh
+    required Function refresh,
+    required Box box
   }) async {
     pr("");
     pr("localChecksums: $localChecksums");
@@ -141,14 +144,14 @@ class CnSyncManager extends ChangeNotifier {
       /// so we add it to server backend
       if(objectToDelete.lastUpdated?.isAfter(serverLastUpdated) ?? false){
         pr("Object is missing on server side, but newer than last sync. Add it to Server");
-        database?.addCollectionObject(ob: objectToDelete);
+        await database?.addCollectionObject(ob: objectToDelete);
       }
 
       /// Workout was last Updated before the last server update
       /// So this workout is old, remove it from client side
       else{
         pr("Object is missing on server side and older than last sync, remove it from client");
-        objectbox.sickDaysBox.remove(objectToDelete.id);
+        box.remove(objectToDelete.id);
       }
     }
 
@@ -179,7 +182,7 @@ class CnSyncManager extends ChangeNotifier {
 
       for(String checksum in missingLocal.without(foundChecksums)){
         pr("Checksum $checksum was not found on server, remove it");
-        database?.deleteChecksum(checksum, collection: collection);
+        await database?.deleteChecksum(checksum, collection: collection);
       }
 
       refresh();
