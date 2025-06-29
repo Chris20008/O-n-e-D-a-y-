@@ -23,7 +23,8 @@ class ObjectBox{
     store.close();
   }
 
-  static Future fillMissingChecksums(Box<ObWorkout> workoutBox) async{
+  static Future fillMissingObjectBoxFields(Box<ObWorkout> workoutBox, Box<ObSickDays> sickDaysBox) async{
+    /// Workouts
     final List<ObWorkout> woToFillChecksums = workoutBox.query(
         ObWorkout_.checksum.equals("-1")
             .or(ObWorkout_.checksum.equals("")
@@ -32,7 +33,39 @@ class ObjectBox{
     for(ObWorkout wo in woToFillChecksums){
       await wo.save(onlyWorkout: true, onlyLocal: true);
     }
+
+    /// SickDays
+    final List<ObSickDays> sickDaysToFill = sickDaysBox.query(
+        ObSickDays_.checksum.equals("-1")
+            .or(ObSickDays_.checksum.equals("")
+            .or(ObSickDays_.checksum.isNull())
+        )).build().find();
+    for(ObSickDays sickDay in sickDaysToFill){
+      await sickDay.save();
+    }
   }
+
+  // static Future fillMissingChecksums(Box<ObWorkout> workoutBox) async{
+  //   final List<ObWorkout> woToFillChecksums = workoutBox.query(
+  //       ObWorkout_.checksum.equals("-1")
+  //           .or(ObWorkout_.checksum.equals("")
+  //           .or(ObWorkout_.checksum.isNull())
+  //       )).build().find();
+  //   for(ObWorkout wo in woToFillChecksums){
+  //     await wo.save(onlyWorkout: true, onlyLocal: true);
+  //   }
+  // }
+
+  // static Future fillMissingUuids(Box<ObSickDays> sickDaysBox) async{
+  //   final List<ObSickDays> woToFillChecksums = sickDaysBox.query(
+  //       ObSickDays_.uuid.equals("-1")
+  //           .or(ObSickDays_.uuid.equals("")
+  //           .or(ObSickDays_.uuid.isNull())
+  //       )).build().find();
+  //   for(ObSickDays sd in woToFillChecksums){
+  //     await sd.save();
+  //   }
+  // }
 
   static Future<ObjectBox> create({String? directory}) async {
     final String? dic = directory == null? null: (await defaultStoreDirectory()).path + directory;

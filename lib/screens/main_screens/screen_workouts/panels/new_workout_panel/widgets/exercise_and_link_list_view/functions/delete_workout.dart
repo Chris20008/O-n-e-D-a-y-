@@ -18,7 +18,7 @@ Future deleteWorkout({
   CnConfig cnConfig = Provider.of<CnConfig>(context, listen: false);
 
   if(cnNewWorkout.isSickDays){
-    cnNewWorkout.sickDays.delete();
+    await cnNewWorkout.sickDays.delete();
   }
   else{
     await cnNewWorkout.workout.deleteFromDatabase();

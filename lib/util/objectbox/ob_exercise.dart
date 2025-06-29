@@ -3,24 +3,15 @@ import 'package:objectbox/objectbox.dart';
 @Entity()
 class ObExercise{
 
-  ObExercise({
-    this.id = 0,
-    required this.name,
-    required this.weights,
-    required this.amounts,
-    required this.restInSeconds,
-    required this.setTypes,
-    this.seatLevel,
-    this.linkName,
-    this.category = 1,
-    this.blockLink = false,
-    this.bodyWeightPercent = 0.0
-  });
-
+  /// Id properties
   @Id()
   int id;
 
+  /// Indexed Fields
+  @Index()
   String name;
+
+  /// Data Fields
   List<double> weights;
   List<int> amounts;
   List<int> setTypes;
@@ -55,6 +46,21 @@ class ObExercise{
 
     return buffer.toString();
   }
+
+  /// Constructor
+  ObExercise({
+    this.id = 0,
+    required this.name,
+    required this.weights,
+    required this.amounts,
+    required this.restInSeconds,
+    required this.setTypes,
+    this.seatLevel,
+    this.linkName,
+    this.category = 1,
+    this.blockLink = false,
+    this.bodyWeightPercent = 0.0
+  });
 
   factory ObExercise.fromMap(Map data){
     final weights = List<double>.from(List.from(data["weights"]?? [0.0]).map((w) => double.parse(w.toString())));

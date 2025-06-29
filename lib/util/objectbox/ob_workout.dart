@@ -1,17 +1,41 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:fitness_app/main.dart';
+import 'package:fitness_app/service/database_service/collection.dart';
 import 'package:fitness_app/service/sync_manager.dart';
+import 'package:fitness_app/util/objectbox/abstract_class_firebase_object.dart';
 import 'package:objectbox/objectbox.dart';
 import 'package:uuid/uuid.dart';
 import '../constants.dart';
+import 'mixin_checksum.dart';
 import 'ob_exercise.dart';
 
 
 @Entity()
-class ObWorkout{
+class ObWorkout with Checksum implements FirebaseObject{
 
+  /// Id properties
+  @override
+  @Id()
+  int id;
+  @override
+  String uuid;
+
+  /// Indexed Fields
+  @Index()
+  String name;
+  @override
+  @Index()
+  String checksum;
+
+  /// Data Fields
+  @Property(type: PropertyType.date)
+  DateTime date;
+  @override
+  @Property(type: PropertyType.date)
+  DateTime? lastUpdated;
+  bool isTemplate;
+  List<String> linkedExercises;
+
+  /// Constructor
   ObWorkout({
     this.id = 0,
     this.uuid = '-1',
@@ -29,33 +53,14 @@ class ObWorkout{
     if(uuid == "-1" || uuid.isEmpty) {
       uuid = const Uuid().v4();
     }
-    lastUpdated ??= date;
+    updateLastUpdated();
   }
 
-  @Id()
-  int id;
-
-  String uuid;
-  String name;
-  @Property(type: PropertyType.date)
-  DateTime date;
-  @Property(type: PropertyType.date)
-  DateTime? lastUpdated;
-  bool isTemplate;
-  List<String> linkedExercises;
-  String checksum;
-
-  List<int> exerciseChecksumSkipIds = [];
-
-  String get currentChecksum {
-    final hash = sha256.convert(utf8.encode(checksumString));
-    return hash.toString();
-  }
-
+  @override
   String get checksumString {
     final buffer = StringBuffer();
 
-    final exs = List<String>.from(exercises.map((ex) => exerciseChecksumSkipIds.contains(ex.id)? "" : ex.checksumString));
+    final exs = List<String>.from(exercises.map((ex) => ex.checksumString));
     exs.removeWhere((result) => result.isEmpty);
 
     buffer.write(uuid);
@@ -113,6 +118,7 @@ class ObWorkout{
     await CnSyncManager.database?.deleteWorkout(wo: this);
   }
 
+  @override
   Future save({bool onlyWorkout = false, bool onlyLocal = false}) async{
     pr("Save Workout");
     updateLastUpdated();
@@ -175,18 +181,6 @@ class ObWorkout{
     return Object.hash(id, name, date);
   }
 
-  // static fromServerMap(Map data){
-  //   final obWorkout = ObWorkout(
-  //       id: data["id"],
-  //       uuid: data["uuid"],
-  //       name: data["name"],
-  //       date: DateTime.parse(data["date"]),
-  //       isTemplate: data["isTemplate"],
-  //       linkedExercises: List<String>.from(data["linkedExercises"])
-  //   );
-  //   return
-  // }
-
   Map<String, dynamic> asMap({withChecksum = false}){
     final exs = List<Map>.from(exercises.map((ex) => ex.asMap()));
     final result = {
@@ -203,5 +197,13 @@ class ObWorkout{
       result["checksum"] = currentChecksum;
     }
     return result;
+  }
+
+  @override
+  Collection get collection => Collection.workouts;
+
+  @override
+  ObWorkout? firebaseObjectConstructor(Map<String, dynamic> map) {
+    return ObWorkout.fromMap(workoutMap: map);
   }
 }

@@ -12,12 +12,18 @@ import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_wor
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import '../util/config.dart';
 import '../util/constants.dart';
-import 'database_service.dart';
+import '../util/objectbox/abstract_class_firebase_object.dart';
+import '../util/objectbox/ob_sick_days.dart';
+import 'database_service/collection.dart';
+import 'database_service/database_service.dart';
+import 'database_service/server_checksums.dart';
 
 class CnSyncManager extends ChangeNotifier {
-  String? userId;
   static DatabaseService? database;
-  static List<String> localeChecksums = [];
+
+  String? userId;
+  // List<String> _localChecksumsWorkouts = [];
+  // List<String> _localChecksumsSickDays = [];
   bool _isSyncing = false;
 
   late CnWorkoutHistory cnWorkoutHistory;
@@ -54,10 +60,42 @@ class CnSyncManager extends ChangeNotifier {
 
       final serverChecksumsFuture = database!.getServerChecksums();
 
-      localeChecksums = objectbox.workoutBox.getAll().map((w) => w.checksum).toList();
+      final localChecksumsWorkouts = objectbox.workoutBox.getAll().map((w) => w.checksum).toList();
+      final localChecksumsSickDays = objectbox.sickDaysBox.getAll().map((s) => s.checksum).toList();
       final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
-      await syncChecksums(serverChecksums: serverChecksums);
+      // await _syncChecksumsWorkouts(serverChecksums: serverChecksums, localChecksums: localChecksumsWorkouts);
+      await _syncChecksums(
+          serverChecksums: serverChecksums.workoutChecksums,
+          serverLastUpdated: serverChecksums.workoutChecksumsLastUpdated,
+          constructorFromMap: (Map<String, dynamic> map) => ObWorkout.fromMap(workoutMap: map),
+          collection: Collection.workouts,
+          localChecksums: localChecksumsWorkouts,
+          getLocalObjectByChecksum: (String checksum) => objectbox.workoutBox.query(ObWorkout_.checksum.equals(checksum)).build().findFirst(),
+          refresh: (){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+            cnNewWorkout.refreshAllWorkoutDays();
+            cnWorkouts.refresh();
+            cnWorkoutHistory.refresh();
+          }
+      );
+
+      await _syncChecksums(
+          serverChecksums: serverChecksums.sickDayChecksums,
+          serverLastUpdated: serverChecksums.sickDayChecksumsLastUpdated,
+          constructorFromMap: (Map<String, dynamic> map) => ObSickDays.fromMap(sickDaysMap: map),
+          collection: Collection.sickDays,
+          localChecksums: localChecksumsSickDays,
+          getLocalObjectByChecksum: (String checksum) => objectbox.sickDaysBox.query(ObSickDays_.checksum.equals(checksum)).build().findFirst(),
+          refresh: (){
+            cnWorkouts.refreshAllWorkouts();
+            cnWorkoutHistory.refreshAllWorkouts();
+            cnNewWorkout.refreshAllWorkoutDays();
+            cnWorkouts.refresh();
+            cnWorkoutHistory.refresh();
+          }
+      );
     }
     catch(e){
       pr("Error during Sync with Firestore");
@@ -68,15 +106,22 @@ class CnSyncManager extends ChangeNotifier {
     }
   }
 
-  Future syncChecksums({required ServerChecksums serverChecksums}) async {
-
+  Future _syncChecksums({
+    required List<String> serverChecksums,
+    required DateTime serverLastUpdated,
+    required List<String> localChecksums,
+    required Collection collection,
+    required FirebaseObject? Function(Map<String, dynamic>) constructorFromMap,
+    required FirebaseObject? Function(String) getLocalObjectByChecksum,
+    required Function refresh
+  }) async {
     pr("");
-    pr("localChecksums: $localeChecksums");
-    pr("serverChecksums: ${serverChecksums.checksums}");
+    pr("localChecksums: $localChecksums");
+    pr("serverChecksums: $serverChecksums");
     pr("");
 
-    final List<String> missingLocal = serverChecksums.checksums.without(localeChecksums).whereType<String>().toList();
-    final List<String> missingServer = localeChecksums.without(serverChecksums.checksums).whereType<String>().toList();
+    final List<String> missingLocal = serverChecksums.without(localChecksums).whereType<String>().toList();
+    final List<String> missingServer = localChecksums.without(serverChecksums).whereType<String>().toList();
 
     pr("");
     pr("MissingLocal: $missingLocal");
@@ -86,68 +131,58 @@ class CnSyncManager extends ChangeNotifier {
     /// Remove local workouts that are not on server db
     /// when the lastUpdated is larger than the workouts timestamp
     for (String checksum in missingServer) {
-      final woToDelete = objectbox.workoutBox.query(ObWorkout_.checksum.equals(checksum)).build().findFirst();
+      final FirebaseObject? objectToDelete = getLocalObjectByChecksum(checksum);
 
-      if(woToDelete == null){
+      if(objectToDelete == null){
         continue;
       }
 
       /// Workout was saved locally after last Server Update
       /// so we add it to server backend
-      if(woToDelete.lastUpdated?.isAfter(serverChecksums.lastUpdated) ?? false){
-        pr("Workout: ${woToDelete.name} is missing on server side, but newer than last sync. Add it to Server");
-        database?.addWorkout(wo: woToDelete);
+      if(objectToDelete.lastUpdated?.isAfter(serverLastUpdated) ?? false){
+        pr("Object is missing on server side, but newer than last sync. Add it to Server");
+        database?.addCollectionObject(ob: objectToDelete);
       }
 
       /// Workout was last Updated before the last server update
       /// So this workout is old, remove it from client side
       else{
-        pr("Workout: ${woToDelete.name} is missing on server side and older than last sync, remove it from client");
-        localeChecksums.remove(checksum);
-        objectbox.workoutBox.remove(woToDelete.id);
-        objectbox.exerciseBox.removeMany(woToDelete.exercises.map((ex) => ex.id).toList());
+        pr("Object is missing on server side and older than last sync, remove it from client");
+        objectbox.sickDaysBox.remove(objectToDelete.id);
       }
     }
 
     if(missingLocal.isNotEmpty){
-      /// Add missing Workouts from Server to local db
-      List<Map<String, dynamic>> missingLocalMaps = await database!.getMultipleWorkoutsByChecksums(missingLocal);
-      List<String> foundWorkoutsChecksums = [];
+      /// Add missing SickDays from Server to local db
+      List<Map<String, dynamic>> missingLocalMaps = await database!.getMultipleEntriesByChecksums(checksums: missingLocal, collection: collection);
+      List<String> foundChecksums = [];
 
       int counter = 0;
 
-      for(Map<String, dynamic> woMap in missingLocalMaps){
-        final ObWorkout? newWo = ObWorkout.fromMap(workoutMap: woMap, withExercises: true);
-        if(newWo != null && woMap["checksum"] != null){
-          pr("Workout: ${newWo.name} was found on serve, add it to client");
-          await newWo.saveAsync();
-          localeChecksums.add(woMap["checksum"]);
-          foundWorkoutsChecksums.add(woMap["checksum"]);
+      for(Map<String, dynamic> objectMap in missingLocalMaps){
+        final FirebaseObject? newObject = constructorFromMap(objectMap);
+        if(newObject != null && objectMap["checksum"] != null){
+          pr("Object was found on server, add it to client");
+          await newObject.save();
+          foundChecksums.add(objectMap["checksum"]);
           counter += 1;
           if (counter % 10 == 0){
-            cnWorkouts.refreshAllWorkouts();
-            cnWorkoutHistory.refreshAllWorkouts();
-            cnNewWorkout.refreshAllWorkoutDays();
-            cnWorkouts.refresh();
-            cnWorkoutHistory.refresh();
+            refresh();
           }
         }
-        /// ToDo: when newWo is null, the map couldn't be parsed
-        /// so we have to delete this workout from server database
+        /// ToDo: when newObject is null, the map couldn't be parsed
+        /// so we have to delete this newObject from server database
         else{
           pr("Error in parsing map");
         }
       }
 
-      for(String checksum in missingLocal.without(foundWorkoutsChecksums)){
-        pr("Workout Checksum $checksum was not found on server, remove it");
-        database?.deleteWorkoutChecksum(checksum);
+      for(String checksum in missingLocal.without(foundChecksums)){
+        pr("Checksum $checksum was not found on server, remove it");
+        database?.deleteChecksum(checksum, collection: collection);
       }
-      cnWorkouts.refreshAllWorkouts();
-      cnWorkoutHistory.refreshAllWorkouts();
-      cnNewWorkout.refreshAllWorkoutDays();
-      cnWorkouts.refresh();
-      cnWorkoutHistory.refresh();
+
+      refresh();
       saveCurrentData(cnConfig);
     }
   }

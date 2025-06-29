@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -155,18 +154,18 @@ extension DateOnlyCompare on DateTime {
   }
 }
 
-extension ListExtension on List {
-  List getDuplicates(){
-    List dupes = List.from(this);
-    Set dupes2 = Set.from(this);
-    for (var element in dupes2) {
+extension ListExtension<T> on List<T> {
+  List<T> getDuplicates() {
+    List<T> dupes = List.from(this);
+    Set<T> unique = Set.from(this);
+    for (var element in unique) {
       dupes.remove(element);
     }
     return dupes;
   }
 
-  List without(List l){
-    return whereNot((e) => l.contains(e)).toList();
+  List<T> without(List<T> l) {
+    return where((e) => !l.contains(e)).toList();
   }
 }
 

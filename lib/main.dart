@@ -239,7 +239,7 @@ class _MyHomePageState extends State<MyHomePage>{
     if(await isOnline()){
       await FirebaseFirestore.instance.waitForPendingWrites();
     }
-    await ObjectBox.fillMissingChecksums(objectbox.workoutBox);
+    await ObjectBox.fillMissingObjectBoxFields(objectbox.workoutBox, objectbox.sickDaysBox);
     await cnSyncManager.doSyncWithFireStore();
     await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
