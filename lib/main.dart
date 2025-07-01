@@ -241,7 +241,7 @@ class _MyHomePageState extends State<MyHomePage>{
     }
     await ObjectBox.fillMissingObjectBoxFields(objectbox.workoutBox, objectbox.sickDaysBox);
     await cnSyncManager.doSyncWithFireStore();
-    await Future.delayed(const Duration(milliseconds: 500));
+    // await Future.delayed(const Duration(milliseconds: 500));
     await cnConfig.initData();
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
