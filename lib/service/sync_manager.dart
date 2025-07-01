@@ -22,8 +22,6 @@ class CnSyncManager extends ChangeNotifier {
   static DatabaseService? database;
 
   String? userId;
-  // List<String> _localChecksumsWorkouts = [];
-  // List<String> _localChecksumsSickDays = [];
   bool _isSyncing = false;
 
   late CnWorkoutHistory cnWorkoutHistory;
@@ -64,11 +62,10 @@ class CnSyncManager extends ChangeNotifier {
       final localChecksumsSickDays = objectbox.sickDaysBox.getAll().map((s) => s.checksum).toList();
       final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
-      // await _syncChecksumsWorkouts(serverChecksums: serverChecksums, localChecksums: localChecksumsWorkouts);
       await _syncChecksums(
           serverChecksums: serverChecksums.workoutChecksums,
           serverLastUpdated: serverChecksums.workoutChecksumsLastUpdated,
-          constructorFromMap: (Map<String, dynamic> map) => ObWorkout.fromMap(workoutMap: map),
+          constructorFromMap: (Map<String, dynamic> map) => ObWorkout.fromMap(workoutMap: map, withExercises: true),
           collection: Collection.workouts,
           localChecksums: localChecksumsWorkouts,
           getLocalObjectByChecksum: (String checksum) => objectbox.workoutBox.query(ObWorkout_.checksum.equals(checksum)).build().findFirst(),
