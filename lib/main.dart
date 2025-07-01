@@ -236,13 +236,18 @@ class _MyHomePageState extends State<MyHomePage>{
 
   void initMain() async{
     objectbox = await ObjectBox.create();
-    if(await isOnline()){
-      await FirebaseFirestore.instance.waitForPendingWrites();
+
+    /// Parallelize futures
+    List<Future> futures = [];
+    if (await isOnline()) {
+      futures.add(FirebaseFirestore.instance.waitForPendingWrites());
     }
-    await ObjectBox.fillMissingObjectBoxFields(objectbox.workoutBox, objectbox.sickDaysBox);
+    futures.add(cnConfig.initData());
+    futures.add(ObjectBox.fillMissingObjectBoxFields(objectbox.workoutBox, objectbox.sickDaysBox));
+    await Future.wait(futures);
+    
     await cnSyncManager.doSyncWithFireStore();
     // await Future.delayed(const Duration(milliseconds: 500));
-    await cnConfig.initData();
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
       if(context.mounted){
