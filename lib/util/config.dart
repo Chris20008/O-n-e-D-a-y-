@@ -181,7 +181,11 @@ class CnConfig extends ChangeNotifier {
     showMoreSettingCloud = false;
   }
 
-  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics)async{
+  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics, {bool targetState = true})async{
+    if(!targetState){
+      await setHealth(false);
+      return false;
+    }
     bool? result = false;
     bool? permission = false;
     bool hadToWait = false;
@@ -197,7 +201,7 @@ class CnConfig extends ChangeNotifier {
       return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
     }
     isWaitingForHealthResponse = true;
-    await Future.delayed(const Duration(milliseconds: 500), ()async{
+    await Future.delayed(const Duration(milliseconds: 300), ()async{
       permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
       if(permission != true){
         result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
@@ -208,7 +212,7 @@ class CnConfig extends ChangeNotifier {
         if(!gotData){
           await setHealth(false);
           cnScreenStatistics.health.revokePermissions();
-          Future.delayed(const Duration(milliseconds: 500), (){
+          Future.delayed(const Duration(milliseconds: 300), (){
             refresh();
           });
         }
@@ -217,17 +221,23 @@ class CnConfig extends ChangeNotifier {
         if(!(permission?? false) && !(result?? false)){
           await setHealth(false);
           cnScreenStatistics.health.revokePermissions();
-          Future.delayed(const Duration(milliseconds: 500), (){
+          Future.delayed(const Duration(milliseconds: 300), (){
             refresh();
           });
         }
       }
     });
     isWaitingForHealthResponse = false;
-    return Platform.isIOS? gotData : (result?? false) || (permission?? false);
+    final finalResult = Platform.isIOS? gotData : (result?? false) || (permission?? false);
+    await setHealth(finalResult);
+    return finalResult;
   }
 
-  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context}) async{
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context, bool targetState = false}) async{
+    if(!targetState){
+      await setSpotify(false);
+      return false;
+    }
     isWaitingForSpotifyResponse = true;
     await Future.delayed(Duration(milliseconds: delayMilliseconds));
     final result = await canLaunchUrl(Uri.parse("spotify:"));
@@ -254,6 +264,7 @@ class CnConfig extends ChangeNotifier {
       failedSpotifyConnection = false;
       refresh();
     }
+    await setSpotify(result);
     return result;
   }
 
