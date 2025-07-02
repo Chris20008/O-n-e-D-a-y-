@@ -319,6 +319,8 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
   List<bool> isCheckedList = [];
   List<Exercise> relevantExercises = [];
   ScrollController sc = ScrollController();
+  /// Original workout
+  Workout workoutTemplateNotModified =  Workout();
   Workout workoutTemplate =  Workout();
   Workout workout = Workout();
   UniqueKey key = UniqueKey();
@@ -333,20 +335,24 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
 
   void initData({
     required Workout woT,
+    required Workout woNM,
     required Workout wo,
     bool withRefresh = true
   }){
+    workoutTemplateNotModified =  Workout.clone(woNM);
     workoutTemplate =  Workout.clone(woT);
     workout = Workout.clone(wo);
     workout.removeEmptyExercises();
     relevantExercises.clear();
-    final List<String> allExNamesTemplate = workoutTemplate.exercises.map((e) => e.name).toList();
+    final List<String> allExNamesTemplate = workoutTemplateNotModified.exercises.map((e) => e.name).toList();
     for(Exercise ex in workout.exercises){
+      /// A completely new exercises was added during runningWorkout
       if(!allExNamesTemplate.contains(ex.name)){
         relevantExercises.add(ex);
         continue;
       }
-      final tempEx = workoutTemplate.exercises.firstWhere((e) => ex.name == e.name);
+      final tempEx = workoutTemplateNotModified.exercises.firstWhere((e) => ex.name == e.name);
+      /// Exercise exists in template but sets are different, so add it
       if(!ex.equals(tempEx)){
         relevantExercises.add(ex);
       }
@@ -355,6 +361,8 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
     if(withRefresh){
       refresh();
     }
+
+    print("Final relevant exercises: $relevantExercises");
   }
 
   Future openPanel() async{

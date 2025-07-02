@@ -291,7 +291,8 @@ class CnRunningWorkout extends ChangeNotifier {
         cnSelectorExerciseToUpdate.reset();
         cnSelectorExerciseToUpdate.initData(
           wo: workout,
-          woT: workoutTemplateModifiable
+          woT: workoutTemplateModifiable,
+          woNM: workoutTemplateNotModifiable
         );
         Future.delayed(const Duration(milliseconds: (100)), (){
           FocusManager.instance.primaryFocus?.unfocus();
