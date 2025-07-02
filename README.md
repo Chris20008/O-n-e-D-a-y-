@@ -1,19 +1,19 @@
 # O-n-e-D-a-y-
 
-O-n-e-D-a-y-
+## Installation
 
-## Getting Started
+- create dotenv.env file in root. Should contain keys ICLOUD_CONTAINER_ID and SPOTIFY_CLIENT_ID if you want to use iCloud Containers or Spotify, but can be left completely blank.
 
-This project is a starting point for a Flutter application.
+- get google-service.json file from firebase console and save under root/android/app/google-services.json
 
-A few resources to get you started if this is your first Flutter project:
+- run: flutter pub get
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- run: flutter gen-l10n
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- run: flutter pub run build_runner build      (If asked for delete -> do delete)
+
+- run: flutter pub run flutter_launcher_icons
+
 
 ## Documentation
 
