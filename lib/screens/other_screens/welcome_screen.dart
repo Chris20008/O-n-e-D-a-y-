@@ -1,6 +1,8 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_health.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_spotify.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
@@ -525,60 +527,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 /// Connect to Spotify
-                CupertinoListTile(
-                  leading: const Icon(
-                      MyIcons.spotify,
-                      // color: Colors.amber[800],
-                      color: Color(0xff1ed560)
-                  ),
-                  title: Row(
-                    children: [
-                      Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
-                      const SizedBox(width: 5),
-                      if(cnConfig.useSpotify)
-                        FutureBuilder(
-                            future: cnConfig.isSpotifyInstalled(delayMilliseconds: 800, context: context),
-                            builder: (context, connected){
-                              if(!connected.hasData){
-                                return Center(
-                                  child: SizedBox(
-                                      height: 15,
-                                      width: 15,
-                                      child: CupertinoActivityIndicator(
-                                          radius: 8.0,
-                                          color: Colors.amber[800]
-                                      ),
-                                      // child: CircularProgressIndicator(strokeWidth: 2,)
-                                  ),
-                                );
-                              }
-                              return Icon(
-                                connected.data == true
-                                    ? Icons.check_circle
-                                    : Icons.close,
-                                size: 15,
-                                color: connected.data == true
-                                    ? Colors.green
-                                    : Colors.red,
-                              );
-                            }
-                        )
-                    ],
-                  ),
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.useSpotify,
-                      activeTrackColor: activeColor,
-                      onChanged: (value) async{
-                        setState(() {
-                          if(Platform.isAndroid){
-                            HapticFeedback.selectionClick();
-                          }
-                          cnConfig.setSpotify(value);
-                          cnWorkouts.refresh();
-                        });
-                      }
-                  ),
-                ),
+                const CupertinoListTileSwitchSpotify(),
                 Container(
                   height: 20,
                   padding: const EdgeInsets.only(left: 30),
@@ -661,7 +610,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
 
-          Expanded(
+          const Expanded(
             flex: 4,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -669,106 +618,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               children: [
 
                 /// Use Health Data
-                CupertinoListTile(
-                  leading: Stack(
-                    children: [
-                      Container(
-                        height: 25,
-                        width: 25,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1,
-                            ),
-                            borderRadius: BorderRadius.circular(6)
-                        ) ,
-                        child: const Padding(
-                          padding: EdgeInsets.all(2),
-                          child: Align(
-                            alignment: Alignment.topRight,
-                            child: Icon(
-                              MyIcons.heart,
-                              color: Colors.red,
-                              size: 15,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  title: Row(
-                    children: [
-                      Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
-                      const SizedBox(width: 5),
-                      if(cnConfig.useHealthData)
-                        FutureBuilder(
-                            future: cnConfig.isHealthDataAccessAllowed(cnScreenStatistics),
-                            builder: (context, connected){
-                              if(!connected.hasData){
-                                return Center(
-                                  child: SizedBox(
-                                    height: 15,
-                                    width: 15,
-                                    child: CupertinoActivityIndicator(
-                                        radius: 8.0,
-                                        color: Colors.amber[800]
-                                    ),
-                                    // child: CircularProgressIndicator(strokeWidth: 2,)
-                                  ),
-                                );
-                              }
-                              return Icon(
-                                connected.data == true
-                                    ? Icons.check_circle
-                                    : Icons.close,
-                                size: 15,
-                                color: connected.data == true
-                                    ? Colors.green
-                                    : Colors.red,
-                              );
-                            }
-                        )
-                    ],
-                  ),
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.useHealthData,
-                      activeTrackColor: activeColor,
-                      onChanged: (value) async{
-                        setState(() {
-                          if(Platform.isAndroid){
-                            HapticFeedback.selectionClick();
-                          }
-                          cnConfig.setHealth(value);
-                        });
-                        await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
-                        if(!value){
-                          await Future.delayed(const Duration(milliseconds: 500), (){
-                            cnScreenStatistics.health.revokePermissions();
-                          });
-                        }
-                        else{
-                          await cnScreenStatistics.refreshHealthData().then((value) async{
-                            if(value){
-                              cnScreenStatistics.selectedExerciseName = AppLocalizations.of(context)!.statisticsWeight;
-                              setState(() {});
-                            }
-                            else{
-                              notificationPopUp(
-                                  context: context,
-                                  title: AppLocalizations.of(context)!.accessDenied,
-                                  message: AppLocalizations.of(context)!.accessDeniedHealth
-                              );
-                            }
-                          });
-                        }
-                          // cnScreenStatistics.refresh();
-                          // setState(() {});
-                      }
-                  ),
-                ),
+                CupertinoListTileSwitchHealth(),
 
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
               ],
             ),
           ),
