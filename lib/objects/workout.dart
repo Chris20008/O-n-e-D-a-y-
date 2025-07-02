@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:quiver/iterables.dart';
+import 'package:uuid/uuid.dart';
 
 import '../main.dart';
 import '../objectbox.g.dart';
@@ -9,16 +10,25 @@ import 'exercise.dart';
 
 class Workout{
 
+  int id;
+  String uuid;
   String name;
   List<Exercise> exercises;
   DateTime? date;
-  int id;
   bool isTemplate;
   /// holds the names of exercise links/groups
   List<String> linkedExercises;
 
+  // String get checksum{
+  //   final normalizedJson = asMap();
+  //   final jsonStr = jsonEncode(normalizedJson);
+  //   final hash = sha256.convert(utf8.encode(jsonStr));
+  //   return hash.toString();
+  // }
+
   Workout({
     this.name = "",
+    this.uuid = "-1",
     this.exercises = const [],
     this.date,
     this.id = -100,
@@ -31,20 +41,24 @@ class Workout{
     if(linkedExercises.isEmpty){
       linkedExercises = [];
     }
+    if(uuid == "-1"){
+      uuid = const Uuid().v4();
+    }
     date ??= DateTime.now();
   }
 
   Workout.clone(Workout w): this(
+    uuid: w.uuid,
     name: w.name,
     exercises: w.exercises.map((e) => Exercise.clone(e)).toList(),
     date: w.date,
     linkedExercises: List.from(w.linkedExercises),
-
     id: w.id,
     isTemplate: w.isTemplate
   );
 
   Workout.copy(Workout w): this(
+      uuid: w.uuid,
       name: w.name,
       exercises: w.exercises.map((e) => Exercise.copy(e)).toList(),
       date: w.date,
@@ -52,6 +66,7 @@ class Workout{
   );
   
   Workout.fromObWorkout(ObWorkout w): this(
+      uuid: w.uuid,
       name: w.name,
       exercises: List.from(w.exercises.map((e) => Exercise(
           id: e.id,
@@ -84,7 +99,7 @@ class Workout{
         if(exercises.map((e) => e.name).toList().contains(ex.name)) {
           /// Find the corresponding new exercise
           ObExercise newExercise = exercises.where((element) => ex.name == element.name).first.toObExercise();
-          /// Update amounts and weights of the existing exercise in the template
+          /// Update relevant fields of the existing exercise in the template
           ex.amounts = newExercise.amounts;
           ex.weights = newExercise.weights;
           ex.setTypes = newExercise.setTypes;
@@ -94,11 +109,12 @@ class Workout{
           ex.blockLink = newExercise.blockLink;
           ex.bodyWeightPercent = newExercise.bodyWeightPercent;
           /// Put the updated exercise in the database
-          objectbox.exerciseBox.put(ex, mode: PutMode.update);
+          objectbox.exerciseBox.put(ex);
         }
       }
       /// Add new exercises to the template
       for (Exercise ex in newExercises){
+
         /// Convert Exercise to ObExercise
         ObExercise obExercise = ex.toObExercise();
 
@@ -113,7 +129,7 @@ class Workout{
           template.exercises.add(obExercise);
         }
         /// Put the new exercise in the database
-        objectbox.exerciseBox.put(obExercise);
+        // objectbox.exerciseBox.put(obExercise);
       }
 
       template.save();
@@ -160,6 +176,7 @@ class Workout{
     if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
       final index = existingExercises.indexOf(exercise.originalName!);
       exercises[index] = exercise;
+      // List<String> existingExercises2 = exercises.map((e) => e.name).toList();
     }
     else{
       exercises.add(
@@ -195,7 +212,7 @@ class Workout{
 
   }
 
-  void saveToDatabase(){
+  ObWorkout saveToDatabase(){
     removeEmptyLinksFromWorkout();
     /// checks if workout exists
     ObWorkout? existingObWorkout = objectbox.workoutBox.query(ObWorkout_.id.equals(id)).build().findUnique();
@@ -216,22 +233,21 @@ class Workout{
     List<ObExercise> newObExercises = exercises.map((e) => e.toObExercise()).toList();
     ObWorkout newObWorkout = existingObWorkout?? toEmptyObWorkout();
     newObWorkout.exercises.addAll(newObExercises);
-    objectbox.workoutBox.put(newObWorkout);
-    objectbox.exerciseBox.putMany(newObExercises);
+    newObWorkout.save();
+    return newObWorkout;
   }
 
-  void deleteFromDatabase(){
+  Future deleteFromDatabase() async{
     ObWorkout? w = objectbox.workoutBox.query(ObWorkout_.id.equals(id)).build().findUnique();
     if(w != null){
-      List<ObExercise> obExercises = w.exercises;
-      objectbox.exerciseBox.removeMany(obExercises.map((e) => e.id).toList());
-      objectbox.workoutBox.remove(w.id);
+      await w.delete();
     }
   }
   
-  Map asMap(){
+  Map<String, dynamic> asMap(){
     return {
       "id": id,
+      "uuid": uuid,
       "name": name,
       "date": date.toString(),
       "isTemplate": isTemplate,
@@ -252,6 +268,7 @@ class Workout{
     }
     return Workout(
       id: data["id"],
+      uuid: data["uuid"],
       name: data["name"],
       date: DateTime.parse(data["date"]),
       isTemplate: data["isTemplate"],

@@ -1,0 +1,224 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fitness_app/service/database_service/server_checksums.dart';
+import 'package:fitness_app/util/objectbox/abstract_class_firebase_object.dart';
+
+import '../../util/objectbox/ob_workout.dart';
+import '../auto_commit_batch.dart';
+import 'collection.dart';
+
+class DatabaseService{
+
+  static final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static final CollectionReference userCollection = firestore.collection('users');
+
+  late final CollectionReference<Map<String, dynamic>> workoutCollection = userCollection.doc(uid).collection("workouts");
+  late final CollectionReference<Map<String, dynamic>> sickDayCollection = userCollection.doc(uid).collection("sickDays");
+  late final DocumentReference userDocument = userCollection.doc(uid);
+
+  final writeBatch = AutoCommitBatch(firestore: firestore);
+  final String uid;
+
+  DatabaseService({required this.uid});
+
+  Future<ServerChecksums> getServerChecksums() async{
+    final DocumentSnapshot dc = await userCollection.doc(uid).get();
+    final data = dc.data() as Map<String, dynamic>?;
+    if (data != null && data.containsKey("workoutChecksums") && data.containsKey("sickDayChecksums")) {
+      final workoutChecksums = data["workoutChecksums"];
+      final sickDayChecksums = data["sickDayChecksums"];
+      final workoutChecksumsLastUpdated = data["workoutChecksumsLastUpdated"];
+      final sickDayChecksumsLastUpdated = data["sickDayChecksumsLastUpdated"];
+
+      if (workoutChecksums is List
+          && workoutChecksumsLastUpdated is Timestamp
+          && sickDayChecksums is List
+          && sickDayChecksumsLastUpdated is Timestamp
+      ) {
+        return ServerChecksums(
+            workoutChecksums: List<String>.from(workoutChecksums),
+            sickDayChecksums: List<String>.from(sickDayChecksums),
+            workoutChecksumsLastUpdated: workoutChecksumsLastUpdated.toDate(),
+            sickDayChecksumsLastUpdated: sickDayChecksumsLastUpdated.toDate()
+        );
+      }
+    }
+    return ServerChecksums(workoutChecksums: [], sickDayChecksums: []);
+  }
+
+  Future<Map<String, dynamic>?> getWorkoutByChecksum(String checksum) async{
+    final querySnapshot = await workoutCollection
+        .where("checksum", isEqualTo: checksum)
+        .limit(1)
+        .get();
+
+    if (querySnapshot.docs.isEmpty) return null;
+
+    return querySnapshot.docs.first.data();
+  }
+
+  CollectionReference<Map<String, dynamic>> getCollection(Collection collection){
+    if(collection == Collection.workouts){
+      return workoutCollection;
+    }
+    return sickDayCollection;
+  }
+
+  // Future<List<Map<String, dynamic>>> getMultipleWorkoutsByChecksums(List<String> checksums) async {
+  //   const batchSize = 10;
+  //   final List<Map<String, dynamic>> allWorkouts = [];
+  //
+  //   for (var i = 0; i < checksums.length; i += batchSize) {
+  //     final batch = checksums.sublist(
+  //       i,
+  //       i + batchSize > checksums.length ? checksums.length : i + batchSize,
+  //     );
+  //
+  //     final querySnapshot = await workoutCollection
+  //         .where("checksum", whereIn: batch)
+  //         .get();
+  //
+  //     allWorkouts.addAll(querySnapshot.docs.map((doc) => doc.data()));
+  //   }
+  //
+  //   return allWorkouts;
+  // }
+  //
+  // Future<List<Map<String, dynamic>>> getMultipleSickDaysByChecksums(List<String> checksums) async {
+  //   const batchSize = 10;
+  //   final List<Map<String, dynamic>> allSickDays = [];
+  //
+  //   for (var i = 0; i < checksums.length; i += batchSize) {
+  //     final batch = checksums.sublist(
+  //       i,
+  //       i + batchSize > checksums.length ? checksums.length : i + batchSize,
+  //     );
+  //
+  //     final querySnapshot = await sickDayCollection
+  //         .where("checksum", whereIn: batch)
+  //         .get();
+  //
+  //     allSickDays.addAll(querySnapshot.docs.map((doc) => doc.data()));
+  //   }
+  //
+  //   return allSickDays;
+  // }
+
+  Future<List<Map<String, dynamic>>> getMultipleEntriesByChecksums({
+    required List<String> checksums,
+    required Collection collection
+  }) async {
+    const batchSize = 10;
+    final List<Map<String, dynamic>> allSickDays = [];
+    final CollectionReference<Map<String, dynamic>> col = getCollection(collection);
+
+    for (var i = 0; i < checksums.length; i += batchSize) {
+      final batch = checksums.sublist(
+        i,
+        i + batchSize > checksums.length ? checksums.length : i + batchSize,
+      );
+
+      final querySnapshot = await col
+          .where("checksum", whereIn: batch)
+          .get();
+
+      allSickDays.addAll(querySnapshot.docs.map((doc) => doc.data()));
+    }
+
+    return allSickDays;
+  }
+
+  /// -------------------------------------------------------------------------------------
+  /// -------------------------------------- Workout --------------------------------------
+  /// -------------------------------------------------------------------------------------
+
+  Future<void> addWorkout({required ObWorkout wo, String? oldChecksum}) async{
+    final workoutData = wo.asMap(withChecksum: true);
+
+    await writeBatch.set(workoutCollection.doc(wo.uuid), workoutData);
+
+    await _addWorkoutChecksum(wo.checksum, batch: writeBatch);
+    if(oldChecksum != null){
+      await deleteWorkoutChecksum(oldChecksum, batch: writeBatch);
+    }
+  }
+
+  Future<void> _addWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async{
+    if(batch != null){
+      await batch.set(userDocument, {
+        "workoutChecksums": FieldValue.arrayUnion([checksum]),
+        "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
+      }, SetOptions(merge: true));
+    }
+    else{
+      await userDocument
+          .set({
+        "workoutChecksums": FieldValue.arrayUnion([checksum]),
+        "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
+      }, SetOptions(merge: true));
+    }
+  }
+
+  Future<void> deleteWorkout({required ObWorkout wo}) async {
+    await writeBatch.delete(workoutCollection.doc(wo.uuid));
+    await deleteWorkoutChecksum(wo.currentChecksum, batch: writeBatch);
+  }
+
+  Future<void> deleteWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async {
+    if(batch != null){
+      await batch.set(userDocument, {
+        "workoutChecksums": FieldValue.arrayRemove([checksum]),
+        "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
+      }, SetOptions(merge: true));
+    }
+    else{
+      await userDocument
+          .set({
+        "workoutChecksums": FieldValue.arrayRemove([checksum]),
+        "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
+      }, SetOptions(merge: true));
+    }
+  }
+
+  /// -------------------------------------------------------------------------------------
+  /// -------------------------------------- SickDay --------------------------------------
+  /// -------------------------------------------------------------------------------------
+
+  Future<void> addCollectionObject({required FirebaseObject ob, String? oldChecksum}) async{
+    final data = ob.asMap(withChecksum: true);
+    final col = getCollection(ob.collection);
+
+    await writeBatch.set(col.doc(ob.uuid), data);
+
+    await _addChecksum(ob.checksum, batch: writeBatch, collection: ob.collection);
+    if(oldChecksum != null){
+      await deleteChecksum(oldChecksum, batch: writeBatch, collection: ob.collection);
+    }
+  }
+
+  Future<void> _addChecksum(String checksum, {AutoCommitBatch? batch, required Collection collection}) async{
+    final map = collection.checksumMap(checksum, FieldValue.arrayUnion);
+    if(batch != null){
+      await batch.set(userDocument, map, SetOptions(merge: true));
+    }
+    else{
+      await userDocument.set(map, SetOptions(merge: true));
+    }
+  }
+
+  Future<void> deleteCollectionObject({required FirebaseObject ob}) async {
+    final col = getCollection(ob.collection);
+    await writeBatch.delete(col.doc(ob.uuid));
+    await deleteChecksum(ob.currentChecksum, batch: writeBatch, collection: ob.collection);
+  }
+
+  Future<void> deleteChecksum(String checksum, {AutoCommitBatch? batch, required Collection collection}) async {
+    final map = collection.checksumMap(checksum, FieldValue.arrayRemove);
+    if(batch != null){
+      await batch.set(userDocument, map, SetOptions(merge: true));
+    }
+    else{
+      await userDocument.set(map, SetOptions(merge: true));
+    }
+  }
+  
+}

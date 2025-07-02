@@ -1,15 +1,18 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/TextScrollCustomized.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:text_scroll/text_scroll.dart';
 import '../main.dart';
 import '../objects/exercise.dart';
 import '../objects/workout.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
-import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'banner_running_workout.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -38,6 +41,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
   late CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnBannerRunningWorkout cnBannerRunningWorkout = Provider.of<CnBannerRunningWorkout>(context, listen: false);
   late bool isOpened = widget.initiallyExpanded;
 
   @override
@@ -47,7 +51,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          color: Colors.black.withOpacity(0.5),
+          color: Colors.black.withValues(alpha: 0.5),
           // color: const Color(0x33939393),
           child: Theme(
             data: Theme.of(context).copyWith(
@@ -56,7 +60,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
               dividerColor: Colors.transparent,
             ),
             child: ExpansionTile(
-                tilePadding: const EdgeInsets.only(left: 10, right: 20),
+                tilePadding: const EdgeInsets.only(left: 4, right: 20),
                 onExpansionChanged: (bool isOpen) {
                   setState(() {
                     if(widget.onExpansionChange != null){
@@ -70,23 +74,30 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if(!widget.workout.isTemplate)
-                      Text(
-                        DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(widget.workout.date!),
-                        textScaler: const TextScaler.linear(0.8),
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w200
+                      Padding(
+                        padding: const EdgeInsets.only(left: 6),
+                        child: Text(
+                          DateFormat('EEEE d. MMMM', Localizations.localeOf(context).languageCode).format(widget.workout.date!),
+                          textScaler: const TextScaler.linear(0.8),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w200
+                          ),
                         ),
                       ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
-                            child: OverflowSafeText(
-                                widget.workout.name,
-                                maxLines: 1,
-                                fontSize: 26,
-                                minFontSize: 20
+                            child: TextScrollCustomized(
+                              text: widget.workout.name,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                              ),
+                              numberOfReps: null,
+                              pauseBetween: 4000,
+                              mode: TextScrollMode.endless,
                             )
                         ),
                         if(widget.workout.isTemplate)
@@ -95,7 +106,9 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                 if(!cnRunningWorkout.isRunning){
                                   cnRunningWorkout.isRunning = true;
                                   cnRunningWorkout.workout = Workout.copy(widget.workout);
-                                  cnWorkouts.refresh();
+                                  cnBannerRunningWorkout.onlyShow();
+                                  // cnRunningWorkout.refresh();
+                                  // cnWorkouts.refresh();
                                   HapticFeedback.selectionClick();
                                   // await cnNewWorkout.hidePanel(context);
                                   Future.delayed(const Duration(milliseconds: 300), (){
@@ -104,6 +117,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                 }
                                 else{
                                   if(cnRunningWorkout.workout.name == widget.workout.name){
+                                    cnBannerRunningWorkout.onlyShow();
                                     cnRunningWorkout.reopenRunningWorkout(context);
                                   }
                                   else{
@@ -111,20 +125,25 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                   }
                                 }
                               },
-                              icon: Icon(Icons.play_arrow,
-                                color: !cnRunningWorkout.isRunning
-                                    ? Colors.grey.withOpacity(0.4)
-                                    : cnRunningWorkout.workout.name == widget.workout.name
-                                      ? (Colors.amber[800]?? Colors.orange).withOpacity(0.8)
-                                      : Colors.grey.withOpacity(0.2)
+                              icon: Selector<CnBannerRunningWorkout, bool>(
+                                  selector: (_, cn) => cn.canOpenWorkout,
+                                  builder: (_, canOpenWorkout, __){
+                                    return Icon(Icons.play_arrow,
+                                        color: !canOpenWorkout
+                                            ? Colors.grey.withValues(alpha: 0.4)
+                                            : cnRunningWorkout.workout.name == widget.workout.name
+                                            ? (Colors.amber[800]?? Colors.orange).withValues(alpha: 0.8)
+                                            : Colors.grey.withValues(alpha: 0.2)
+                                    );
+                                  }
                               )
                           ),
                         IconButton(
                             onPressed: () {
-                              cnNewWorkout.editWorkout(workout: widget.workout);
+                              cnNewWorkout.editWorkout(workout: widget.workout, context: context);
                             },
                             icon: Icon(Icons.edit,
-                              color: Colors.grey.withOpacity(0.4),
+                              color: Colors.grey.withValues(alpha: 0.4),
                             )
                         )
                       ],
@@ -146,8 +165,8 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
-                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withOpacity(0.7), fontWeight: FontWeight.w400)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
+                                          // style: TextStyle(color: CupertinoColors.inactiveGray.withValues(alpha: 0.7), fontWeight: FontWeight.w400)
                                       )
                                     else
                                       OverflowSafeText(
@@ -155,7 +174,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                                           maxLines: 1,
                                           fontSize: 15,
                                           minFontSize: 15,
-                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withOpacity(0.6), fontWeight: FontWeight.w400)
+                                          style: TextStyle(color: CupertinoColors.extraLightBackgroundGray.withValues(alpha: 0.6), fontWeight: FontWeight.w400)
                                       )
                                 ],
                               ),
@@ -174,6 +193,7 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
                   MultipleExerciseRow(
                     exercises: widget.workout.exercises,
                     padding: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+                    fontSize: 15,
                   )
                 ]
             ),
@@ -197,13 +217,14 @@ class _WorkoutExpansionTileState extends State<WorkoutExpansionTile> {
             /// the action's text color to red.
             isDestructiveAction: true,
             onPressed: () {
+              cnBannerRunningWorkout.onlyShow();
               Future.delayed(const Duration(milliseconds: 200), (){
                 cnRunningWorkout.openRunningWorkout(context, Workout.copy(widget.workout));
               });
 
               Navigator.pop(context);
             },
-            child: Text(AppLocalizations.of(context)!.yes),
+            child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
           ),
         ],
       ),

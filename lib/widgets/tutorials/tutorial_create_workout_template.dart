@@ -1,15 +1,13 @@
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:page_indicator_plus/page_indicator_plus.dart';
@@ -491,7 +489,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
   tutorialIsRunning = true;
   bool continueAfterAnimatedFirstExerciseRow = false;
 
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   TutorialCoachMark tutorial = TutorialCoachMark(
     targets: targets, // List<TargetFocus>
     // colorShadow: Colors.black, // DEFAULT Colors.black
@@ -509,7 +507,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
       switch(target.identify){
 
         case "Add Workout":{
-          cnNewWorkOutPanel.openPanelAsTemplate();
+          cnNewWorkOutPanel.openPanelAsTemplate(context);
           blockUserInput(context, duration: 1500);
         }
 
@@ -519,8 +517,9 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
 
         case "Add Exercise":{
           cnNewExercisePanel.openPanel(
-              workout: cnNewWorkOutPanel.workout,
-              onConfirm: cnNewWorkOutPanel.confirmAddExercise
+              onConfirm: cnNewWorkOutPanel.confirmAddExercise,
+              validator: cnNewWorkOutPanel.exerciseNameFieldValidator,
+              context: context
           );
           blockUserInput(context, duration: 1500);
         }
@@ -618,8 +617,7 @@ TutorialCoachMark showTutorialCreateWorkoutTemplate(BuildContext context){
       cnNewWorkOutPanel.allowAnimateFirstExerciseDrag = false;
       currentTutorialStep = 999999;
       cnConfig.setCurrentTutorialStep(currentTutorialStep);
-      SystemChrome.setPreferredOrientations([]);
-      // print("finish");
+      // SystemChrome.setPreferredOrientations([]);
     },
   );
   tutorial.show(context: context);

@@ -28,6 +28,7 @@
   "template": "Sjabloon",
   "clear": "Wissen",
   "custom": "Aangepast",
+  "newExercise": "Nieuwe oefening",
   "woAlreadyRunning": "Workout {currentWorkoutName} is al bezig",
   "woAlreadyRunningDelete": "Wil je de huidige workout stoppen en {newWorkoutName} starten?",
   "spotifyPleaseLogin": "Je moet ingelogd zijn bij Spotify",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "Kon geen backup maken",
   "savedDataForSync": "Gegevens voor sync opgeslagen",
   "accessDenied": "Toegang geweigerd",
-  "accessDeniedHealth": "De toegang tot je gezondheidsgegevens is geweigerd. Je kunt deze op elk moment inschakelen in de apparaatinstellingen onder Gezondheid.",
+  "accessDeniedHealth": "Toegang tot je gezondheidsgegevens is geweigerd of er zijn geen gegevens beschikbaar. Je kunt dit op elk moment inschakelen in de apparaatinstellingen onder Gezondheid. Als het is ingeschakeld, controleer dan of er gegevens in de Gezondheid-app staan.",
+  "other": "Overige",
 
   "settings": "Instellingen",
   "settingsGeneral": "Algemeen",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Max. gewicht",
   "statisticsFilter": "Filter",
-  "statisticsFilter1RM": "Toon 1RM",
-  "statisticsFilterSickDays": "Toon ziektedagen",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Ziektedagen",
   "statisticsWeight": "Gewicht",
   "statisticsSick": "Ziek",
   "statisticsCurrentlyNotSupported": "De categorie van deze oefening wordt momenteel niet ondersteund voor statistieken",

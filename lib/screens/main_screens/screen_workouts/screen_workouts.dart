@@ -1,5 +1,5 @@
 import 'package:fitness_app/main.dart';
-import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/widgets/banner_running_workout.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../objectbox.g.dart';
 import '../../../objects/workout.dart';
+import '../../../util/constants.dart';
 import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
 import '../../other_screens/screen_running_workout/screen_running_workout.dart';
-
 class ScreenWorkout extends StatefulWidget {
   const ScreenWorkout({super.key});
 
@@ -26,14 +26,18 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
   late CnRunningWorkout cnRunningWorkout = Provider.of<CnRunningWorkout>(context, listen: false);
   late CnSpotifyBar cnSpotifyBar = Provider.of<CnSpotifyBar>(context, listen: false);
   late CnHomepage cnHomepage = Provider.of<CnHomepage>(context, listen: false);
-  late CnConfig cnConfig = Provider.of<CnConfig>(context);
-  late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context);
+  late CnConfig cnConfig;
+  late CnWorkouts cnWorkouts;
 
   bool isVisible = true;
 
   @override
   Widget build(BuildContext context) {
+    cnConfig = Provider.of<CnConfig>(context);
+    cnWorkouts = Provider.of<CnWorkouts>(context);
     final size = MediaQuery.of(context).size;
+
+    pr("Screen Workouts");
 
     return SafeArea(
       top: false,
@@ -73,9 +77,14 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          AnimatedContainer(
-                            duration: Duration(milliseconds: cnRunningWorkout.isRunning? 250 : 0),
-                            height: cnRunningWorkout.isRunning? 75 : 25,
+                          Selector<CnBannerRunningWorkout, bool>(
+                              selector: (_, cn) => cn.showBanner,
+                              builder: (_, showBanner, __){
+                                return AnimatedContainer(
+                                  duration: Duration(milliseconds: showBanner? 250 : 0),
+                                  height: showBanner? 75 : 25,
+                                );
+                              }
                           ),
                           WorkoutExpansionTile(
                             workout: cnWorkouts.workouts[index],
@@ -98,11 +107,8 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 }
             ),
             /// do not make const, should be updated by rebuild
-            const Hero(
-                transitionOnUserGestures: true,
-                tag: "Banner",
-                child: BannerRunningWorkout()
-            ),
+            const BannerRunningWorkout(),
+
             SafeArea(
               bottom: true,
               child: AnimatedContainer(
@@ -124,10 +130,10 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                           key: cnWorkouts.keyAddWorkout,
                           iconSize: 25,
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
                           ),
                           onPressed: () {
-                            cnNewWorkout.openPanelAsTemplate();
+                            cnNewWorkout.openPanelAsTemplate(context);
                           },
                           icon: Icon(
                               Icons.add,
@@ -138,6 +144,24 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
                 ),
               ),
             ),
+
+            // Center(
+            //   child: ElevatedButton(
+            //     child: Text("Test"),
+            //     onPressed: ()async{
+            //       pushRoute();
+            //       // HapticFeedback.selectionClick();
+            //       // Future.delayed(const Duration(milliseconds: 1000), () async{
+            //       //   // final localFiles = await getLocalBackupFiles();
+            //       //   Navigator.push(
+            //       //       context,
+            //       //       MaterialPageRoute(
+            //       //           builder: (context) => const LocalFilePicker()
+            //       //       ));
+            //       // });
+            //     },
+            //   ),
+            // )
           ],
         ),
       ),
@@ -153,7 +177,7 @@ class CnWorkouts extends ChangeNotifier {
   ScrollController scrollController = ScrollController();
   // late final AnimationController animationControllerWorkoutsScreen;
 
-  void refreshAllWorkouts() async{
+  Future refreshAllWorkouts() async{
     List<ObWorkout> obWorkouts = await objectbox.workoutBox.query(ObWorkout_.isTemplate.equals(true)).order(ObWorkout_.name).build().findAsync();
     workouts.clear();
 

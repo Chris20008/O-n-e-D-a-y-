@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
@@ -7,6 +8,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -17,7 +19,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
-import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 List<Color> linkColors = [
@@ -45,17 +47,36 @@ const List<int> predefinedTimes = [
 
 const int maxTutorialStep = 999999;
 
-TextStyle cupButtonTextStyle = TextStyle(color: Colors.amber[800]?? const Color(0xFFFF9A19));
+TextStyle cupButtonTextStyle = TextStyle(color: Colors.amber[800]?? const Color(0xFFFF9A19), fontSize: 17);
+TextStyle cupButtonTextStyleOnlyFontSize = const TextStyle(fontSize: 17);
 
 const Color activeColor = Color(0xffdb7b01);
 
-Widget backgroundSingleSet = Container(
-  decoration: BoxDecoration(
-    // color: Colors.grey[500]!.withOpacity(0.2),
-    color: Colors.white.withOpacity(0.15),
-    borderRadius: BorderRadius.circular(5),
-  ),
-);
+// Widget backgroundSingleSet(BuildContext context){
+//   return Container(
+//     decoration: BoxDecoration(
+//       // color: Colors.grey[500]!.withValues(alpha: 0.2),
+//       color: Theme.of(context).cardColor,
+//       // color: Colors.white.withValues(alpha: 0.15),
+//       borderRadius: BorderRadius.circular(5),
+//     ),
+//   );
+// }
+
+// Widget backgroundSingleSet = Container(
+//   decoration: BoxDecoration(
+//     // color: Colors.grey[500]!.withValues(alpha: 0.2),
+//     color: Theme.of(context).cardColor,
+//     // color: Colors.white.withValues(alpha: 0.15),
+//     borderRadius: BorderRadius.circular(5),
+//   ),
+// );
+
+void pr(Object? s) {
+  if (kDebugMode || kProfileMode) {
+    print(s);
+  }
+}
 
 Widget dataSingleSet(SingleSet set, Exercise exercise){
   return Padding(
@@ -78,7 +99,7 @@ Widget dataSingleSet(SingleSet set, Exercise exercise){
           ),
         ),
         Container(
-          color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withOpacity(0.3),//Colors.grey[900],
+          color: set.setType == 1? Colors.blue : set.setType == 2? Colors.green : Colors.white.withValues(alpha: 0.3),//Colors.grey[900],
           height: 1,
           width: 20,
         ),
@@ -146,6 +167,12 @@ const trailingArrow = Icon(
   color: Colors.grey,
 );
 
+const trailingArrowBack = Icon(
+  Icons.arrow_back_ios,
+  size: 14,
+  color: Colors.grey,
+);
+
 Widget trailingChoice({double size = 16, Color color = Colors.grey}){
  return Stack(
    alignment: Alignment.center,
@@ -193,7 +220,7 @@ Widget mySeparator({
         Container(
           height: height,
           width: width - minusWidth,
-            color: (color?? Colors.amber[900])!.withOpacity(opacity)
+            color: (color?? Colors.amber[900])!.withValues(alpha: opacity)
         ),
         Container(height: heightTop, color: Colors.transparent,),
       ],
@@ -208,35 +235,23 @@ Future openUrl(String url)async{
   }
 }
 
-Future<void> sendMail({required String subject}) async {
-  const email = "OneDayApp@icloud.com";
-  final String emailSubject = subject;
-  final Uri parsedMailto = Uri.parse("mailto:<$email>?subject=$emailSubject");
-  if (!await launchUrl(
-    parsedMailto,
-    mode: LaunchMode.externalApplication,
-  )) {
-    throw Exception('Could not send Mail');
-  }
-}
-
 Widget verticalGreySpacer = Container(
   height: double.maxFinite,
   width: 0.5,
-  color: Colors.grey[700]!.withOpacity(0.5),
+  color: Colors.grey[700]!.withValues(alpha: 0.5),
 );
 
 Widget horizontalGreySpacer = Container(
   height: 0.5,
   width: double.maxFinite,
-  color: Colors.grey[700]!.withOpacity(0.5),
+  color: Colors.grey[700]!.withValues(alpha: 0.5),
 );
 
 Widget panelTopBar = Container(
   height: 2,
   width: 40,
   decoration: BoxDecoration(
-      color: Colors.white.withOpacity(0.5),
+      color: Colors.white.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(2)
   ),
 );
@@ -491,136 +506,136 @@ Widget getSelectBodyWeightPercent({
   );
 }
 
-Widget getSet({
-  required int index,
-  required Exercise newEx,
-  required double width,
-  required Function onConfirm,
-  double height = 30,
-  required BuildContext context
-}){
-
-  // PullDownMenuItem rpePullDownMenuItem(SingleSet set, int value){
-  //   return PullDownMenuItem.selectable(
-  //     selected: set.setType == value+10,
-  //     title: 'RPE $value',
-  //     onTap: () {
-  //       HapticFeedback.selectionClick();
-  //       FocusManager.instance.primaryFocus?.unfocus();
-  //       Future.delayed(const Duration(milliseconds: 200), (){
-  //         set.setType = value+10;
-  //         // print(setType);
-  //         onConfirm();
-  //       });
-  //     },
-  //   );
-  // }
-
-  final SingleSet s = newEx.sets[index];
-  return SizedBox(
-    height: height,
-    child: PullDownButton(
-      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-      routeTheme: routeTheme,
-      itemBuilder: (context) {
-        return [
-          PullDownMenuItem.selectable(
-            selected: s.setType == 0,
-            title: 'Working Set',
-            onTap: () {
-              HapticFeedback.selectionClick();
-              FocusManager.instance.primaryFocus?.unfocus();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                s.setType = 0;
-                onConfirm();
-              });
-            },
-          ),
-          PullDownMenuItem.selectable(
-            selected: s.setType == 1,
-            title: 'Warm-Up Set',
-            icon: Icons.circle,
-            iconColor: Colors.blue,
-            onTap: () {
-              HapticFeedback.selectionClick();
-              FocusManager.instance.primaryFocus?.unfocus();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                s.setType = 1;
-                onConfirm();
-              });
-            },
-          ),
-          // const PullDownMenuDivider.large(),
-          // rpePullDownMenuItem(s, 1),
-          // rpePullDownMenuItem(s, 2),
-          // rpePullDownMenuItem(s, 3),
-          // rpePullDownMenuItem(s, 4),
-          // rpePullDownMenuItem(s, 5),
-          // rpePullDownMenuItem(s, 6),
-          // rpePullDownMenuItem(s, 7),
-          // rpePullDownMenuItem(s, 8),
-          // rpePullDownMenuItem(s, 9),
-          // rpePullDownMenuItem(s, 10)
-        ];
-      },
-      buttonBuilder: (context, showMenu) => CupertinoButton(
-        onPressed: (){
-          HapticFeedback.selectionClick();
-          FocusManager.instance.primaryFocus?.unfocus();
-          showMenu();
-        },
-        padding: EdgeInsets.zero,
-        child: SizedBox(
-          // color: Colors.red,
-          height: height,
-          width: width,
-          child: Stack(
-            // alignment: Alignment.center,
-            children: [
-              if(s.setType == 1)
-              Center(
-                child: Container(
-                  margin: const EdgeInsets.only(left: 1.5),
-                  width: height * (0.75 + (index + 1).toString().length/4),
-                  height: height,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(height/2),
-                    border: Border.all(
-                      color: Colors.blue,
-                      width: 0.8,
-                    ),
-                  ),
-                ),
-              ),
-              Center(
-                child: Text(
-                  textAlign: TextAlign.center,
-                  "${index +1 }",
-                  textScaler: const TextScaler.linear(1.2),
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-              if(s.setType != null && s.setType! > 10)
-                Align(
-                  alignment: Alignment.bottomRight,
-                  child:Padding(
-                    padding: EdgeInsets.only(right: index < 10? (s.setType == 20? 5 : 10) : (s.setType == 20? 0 : 5)),
-                    child: Text(
-                      "${s.setType!-10}",
-                      textScaler: const TextScaler.linear(0.7),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700
-                      ),
-                    ),
-                  )
-                )
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
-}
+// Widget getSet({
+//   required int index,
+//   required Exercise newEx,
+//   required double width,
+//   required Function onConfirm,
+//   double height = 30,
+//   required BuildContext context
+// }){
+//
+//   // PullDownMenuItem rpePullDownMenuItem(SingleSet set, int value){
+//   //   return PullDownMenuItem.selectable(
+//   //     selected: set.setType == value+10,
+//   //     title: 'RPE $value',
+//   //     onTap: () {
+//   //       HapticFeedback.selectionClick();
+//   //       FocusManager.instance.primaryFocus?.unfocus();
+//   //       Future.delayed(const Duration(milliseconds: 200), (){
+//   //         set.setType = value+10;
+//   //         // pr(setType);
+//   //         onConfirm();
+//   //       });
+//   //     },
+//   //   );
+//   // }
+//
+//   final SingleSet s = newEx.sets[index];
+//   return SizedBox(
+//     height: height,
+//     child: PullDownButton(
+//       onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+//       routeTheme: routeTheme,
+//       itemBuilder: (context) {
+//         return [
+//           PullDownMenuItem.selectable(
+//             selected: s.setType == 0,
+//             title: 'Working Set',
+//             onTap: () {
+//               HapticFeedback.selectionClick();
+//               FocusManager.instance.primaryFocus?.unfocus();
+//               Future.delayed(const Duration(milliseconds: 200), (){
+//                 s.setType = 0;
+//                 onConfirm();
+//               });
+//             },
+//           ),
+//           PullDownMenuItem.selectable(
+//             selected: s.setType == 1,
+//             title: 'Warm-Up Set',
+//             icon: Icons.circle,
+//             iconColor: Colors.blue,
+//             onTap: () {
+//               HapticFeedback.selectionClick();
+//               FocusManager.instance.primaryFocus?.unfocus();
+//               Future.delayed(const Duration(milliseconds: 200), (){
+//                 s.setType = 1;
+//                 onConfirm();
+//               });
+//             },
+//           ),
+//           // const PullDownMenuDivider.large(),
+//           // rpePullDownMenuItem(s, 1),
+//           // rpePullDownMenuItem(s, 2),
+//           // rpePullDownMenuItem(s, 3),
+//           // rpePullDownMenuItem(s, 4),
+//           // rpePullDownMenuItem(s, 5),
+//           // rpePullDownMenuItem(s, 6),
+//           // rpePullDownMenuItem(s, 7),
+//           // rpePullDownMenuItem(s, 8),
+//           // rpePullDownMenuItem(s, 9),
+//           // rpePullDownMenuItem(s, 10)
+//         ];
+//       },
+//       buttonBuilder: (context, showMenu) => CupertinoButton(
+//         onPressed: (){
+//           HapticFeedback.selectionClick();
+//           FocusManager.instance.primaryFocus?.unfocus();
+//           showMenu();
+//         },
+//         padding: EdgeInsets.zero,
+//         child: SizedBox(
+//           // color: Colors.red,
+//           height: height,
+//           width: width,
+//           child: Stack(
+//             // alignment: Alignment.center,
+//             children: [
+//               if(s.setType == 1)
+//               Center(
+//                 child: Container(
+//                   margin: const EdgeInsets.only(left: 1.5),
+//                   width: height * (0.75 + (index + 1).toString().length/4),
+//                   height: height,
+//                   decoration: BoxDecoration(
+//                     borderRadius: BorderRadius.circular(height/2),
+//                     border: Border.all(
+//                       color: Colors.blue,
+//                       width: 0.8,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               Center(
+//                 child: Text(
+//                   textAlign: TextAlign.center,
+//                   "${index +1 }",
+//                   textScaler: const TextScaler.linear(1.2),
+//                   style: const TextStyle(color: Colors.white),
+//                 ),
+//               ),
+//               if(s.setType != null && s.setType! > 10)
+//                 Align(
+//                   alignment: Alignment.bottomRight,
+//                   child:Padding(
+//                     padding: EdgeInsets.only(right: index < 10? (s.setType == 20? 5 : 10) : (s.setType == 20? 0 : 5)),
+//                     child: Text(
+//                       "${s.setType!-10}",
+//                       textScaler: const TextScaler.linear(0.7),
+//                       style: const TextStyle(
+//                         fontWeight: FontWeight.w700
+//                       ),
+//                     ),
+//                   )
+//                 )
+//             ],
+//           ),
+//         ),
+//       ),
+//     ),
+//   );
+// }
 
 Future notificationPopUp({
   required BuildContext context,
@@ -706,7 +721,7 @@ Widget myIconButton({required Icon icon, Function()? onPressed, Key? key}){
     child: SizedBox(
       height: 40,
       width: 40,
-      // color: Colors.grey.withOpacity(0.3),
+      // color: Colors.grey.withValues(alpha: 0.3),
       child: iconButton
     ),
   );
@@ -734,7 +749,7 @@ Widget OverflowSafeText(
   );
 }
 
-Future<bool> hasInternet()async{
+Future<bool> isOnline()async{
   final conRes = await Connectivity().checkConnectivity();
   List<ConnectivityResult> options = [
     ConnectivityResult.mobile,
@@ -795,7 +810,7 @@ Widget buildCalendarDialogButton({
   const colorAmberDark = Color(0xFF6D4919);
   const arrowSize = 15.0;
   const dayTextStyle = TextStyle(color: Colors.white, fontWeight: FontWeight.w700);
-  final weekendTextStyle = TextStyle(color: Colors.white.withOpacity(0.6), fontWeight: FontWeight.w600);
+  final weekendTextStyle = TextStyle(color: Colors.white.withValues(alpha: 0.6), fontWeight: FontWeight.w600);
   String translatedSickText = AppLocalizations.of(context)!.statisticsSick;
   final config = CalendarDatePicker2WithActionButtonsConfig(
     // cancelButton: justShow? Container() : null,
@@ -889,7 +904,7 @@ Widget buildCalendarDialogButton({
                     width: 40,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(100),
-                      color: colorAmber.withOpacity(0.2)
+                      color: colorAmber.withValues(alpha: 0.2)
                     ),
                   ),
                 Text(
@@ -1121,7 +1136,7 @@ Widget getCloudOptionsColumn({
           ),
           trailing: CupertinoSwitch(
               value: cnConfig.connectWithCloud,
-              activeColor: activeColor,
+              activeTrackColor: activeColor,
               onChanged: (value)async{
                 if(Platform.isAndroid){
                   HapticFeedback.selectionClick();
@@ -1181,87 +1196,84 @@ Widget getCloudOptionsColumn({
             ),
           ),
         ),
-        AnimatedCrossFade(
-            firstChild: Column(
-              children: [
-
-                /// Save Backup in Cloud
-                CupertinoListTile(
-                  leading: const Icon(
-                    Icons.cloud_upload,
-                    color: Colors.white,
-                  ),
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.saveBackupCloud,
-                      activeColor: activeColor,
-                      onChanged: (value) async{
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                          // if(!value){
-                          //   cnConfig.account = null;
-                          // }
-                        }
-                        cnConfig.setSaveBackupCloud(value);
-                        refresh();
-                      }
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: OverflowSafeText(
-                            maxLines: 1,
-                            Platform.isAndroid
-                                ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
-                                : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                /// Sync Multiple Devices
-                CupertinoListTile(
-                  leading: iconSyncMultipleDevices,
-                  trailing: CupertinoSwitch(
-                      value: cnConfig.syncMultipleDevices,
-                      activeColor: activeColor,
-                      onChanged: (value)async{
-                        if(Platform.isAndroid){
-                          HapticFeedback.selectionClick();
-                        }
-                        cnConfig.setSyncMultipleDevices(value);
-                        refresh();
-                      }
-                  ),
-                  title: Padding(
-                    padding: const EdgeInsets.only(right: 5),
-                    child: Row(
-                      // crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: OverflowSafeText(
-                            maxLines: 1,
-                            AppLocalizations.of(context)!.settingsSyncMultipleDevices,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            secondChild: const Row(),
-            crossFadeState: cnConfig.showMoreSettingCloud
-                ? CrossFadeState.showFirst
-                : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 300)
-        )
+        // AnimatedCrossFade(
+        //     firstChild: Column(
+        //       children: [
+        //
+        //         /// Save Backup in Cloud
+        //         CupertinoListTile(
+        //           leading: const Icon(
+        //             Icons.cloud_upload,
+        //             color: Colors.white,
+        //           ),
+        //           trailing: CupertinoSwitch(
+        //               value: cnConfig.saveBackupCloud,
+        //               activeTrackColor: activeColor,
+        //               onChanged: (value) async{
+        //                 if(Platform.isAndroid){
+        //                   HapticFeedback.selectionClick();
+        //                 }
+        //                 cnConfig.setSaveBackupCloud(value);
+        //                 refresh();
+        //               }
+        //           ),
+        //           title: Padding(
+        //             padding: const EdgeInsets.only(right: 5),
+        //             child: Row(
+        //               // crossAxisAlignment: CrossAxisAlignment.end,
+        //               children: [
+        //                 Expanded(
+        //                   child: OverflowSafeText(
+        //                     maxLines: 1,
+        //                     Platform.isAndroid
+        //                         ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
+        //                         : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
+        //                     style: const TextStyle(color: Colors.white),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //
+        //         /// Sync Multiple Devices
+        //         CupertinoListTile(
+        //           leading: iconSyncMultipleDevices,
+        //           trailing: CupertinoSwitch(
+        //               value: cnConfig.syncMultipleDevices,
+        //               activeTrackColor: activeColor,
+        //               onChanged: (value)async{
+        //                 if(Platform.isAndroid){
+        //                   HapticFeedback.selectionClick();
+        //                 }
+        //                 cnConfig.setSyncMultipleDevices(value);
+        //                 refresh();
+        //               }
+        //           ),
+        //           title: Padding(
+        //             padding: const EdgeInsets.only(right: 5),
+        //             child: Row(
+        //               // crossAxisAlignment: CrossAxisAlignment.end,
+        //               children: [
+        //                 Expanded(
+        //                   child: OverflowSafeText(
+        //                     maxLines: 1,
+        //                     AppLocalizations.of(context)!.settingsSyncMultipleDevices,
+        //                     style: const TextStyle(color: Colors.white),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //     secondChild: const Row(),
+        //     crossFadeState: cnConfig.showMoreSettingCloud
+        //         ? CrossFadeState.showFirst
+        //         : CrossFadeState.showSecond,
+        //     duration: const Duration(milliseconds: 300)
+        // )
       ],
     );
 }
@@ -1460,34 +1472,16 @@ Offset getWidgetPosition(GlobalKey key) {
   return position;
 }
 
-// Offset getWidgetPosition(GlobalKey key) {
-//   Offset position = const Offset(0, 0);
-//   // // WidgetsBinding.instance.addPostFrameCallback((_) {
-//   // final RenderBox? renderBox = key.currentContext?.findRenderObject() as RenderBox?;
-//   // if (renderBox != null) {
-//   //   position = renderBox.localToGlobal(Offset.zero);
-//   // }
-//   // // });
-//   // print(position);
-//   // return position;
-//   final renderObject = key.currentContext?.findRenderObject();
-//   final translation = renderObject?.getTransformTo(null).getTranslation();
-//   if(translation != null && renderObject?.paintBounds != null){
-//     position = Offset(translation.x, translation.y);
-//   }
-//   print(position);
-//   return position;
-// }
-
 Size getWidgetSize(GlobalKey key){
   Size size = const Size(0, 0);
-  // WidgetsBinding.instance.addPostFrameCallback((_) {
+  try{
     final RenderBox? renderBox =
     key.currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       size = renderBox.size;
     }
-  // });
+  }
+  catch (_) {}
   return size;
 }
 
@@ -1526,12 +1520,12 @@ Widget getRowButton({
   );
 }
 
-void blockUserInput(BuildContext context, {int duration = 1000}) {
+OverlayEntry? blockUserInput(BuildContext context, {int? duration = 1000}) {
   OverlayEntry overlayEntry = OverlayEntry(
     builder: (context) => Positioned.fill(
       child: AbsorbPointer(
         child: Container(
-          color: Colors.black.withOpacity(0.0),
+          color: Colors.black.withValues(alpha: 0.0),
         ),
       ),
     ),
@@ -1539,7 +1533,37 @@ void blockUserInput(BuildContext context, {int duration = 1000}) {
 
   Overlay.of(context).insert(overlayEntry);
 
-  Future.delayed(Duration(milliseconds: duration), () {
-    overlayEntry.remove();
+  if(duration != null){
+    Future.delayed(Duration(milliseconds: duration), () {
+      overlayEntry.remove();
+    });
+    return null;
+  }
+  else{
+    return overlayEntry;
+  }
+
+}
+
+Future<void> waitForNextFrame() {
+  final completer = Completer<void>();
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    completer.complete();
   });
+  return completer.future;
+}
+
+double mapValueClamped(
+    double value,
+    double fromMin,
+    double fromMax,
+    double toMin,
+    double toMax
+    ) {
+  double t = (value - fromMin) / (fromMax - fromMin);
+  double result = toMin + t * (toMax - toMin);
+
+  double lower = toMin < toMax ? toMin : toMax;
+  double upper = toMax > toMin ? toMax : toMin;
+  return result.clamp(lower, upper);
 }

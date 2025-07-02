@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 
-import '../screens/other_screens/screen_running_workout/stopwatch.dart';
+import '../screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
 
 class SpotifyProgressIndicator extends StatefulWidget {
   final PlayerState? data;
@@ -70,24 +70,26 @@ class _SpotifyProgressIndicatorState extends State<SpotifyProgressIndicator> {
   @override
   Widget build(BuildContext context) {
 
-    return LayoutBuilder(
-        builder: (context, constraints){
-
-          return Container(
-            height: _height,
-            width: constraints.maxWidth,
-            color: Colors.grey[350],
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: _currentWidthPercent != null
-                ?Container(
-                  height: _height,
-                  width: constraints.maxWidth * _currentWidthPercent!,
-                  color: Colors.amber[800])
-                :const SizedBox(),
-            ),
-          );
-        }
+    return RepaintBoundary(
+      child: LayoutBuilder(
+          builder: (context, constraints){
+      
+            return Container(
+              height: _height,
+              width: constraints.maxWidth,
+              color: Colors.grey[350],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _currentWidthPercent != null
+                  ?Container(
+                    height: _height,
+                    width: constraints.maxWidth * _currentWidthPercent!,
+                    color: Colors.amber[800])
+                  :const SizedBox(),
+              ),
+            );
+          }
+      ),
     );
   }
 }

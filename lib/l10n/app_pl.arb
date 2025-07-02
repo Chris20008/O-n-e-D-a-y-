@@ -28,6 +28,7 @@
   "template": "Szablon",
   "clear": "Wyczyść",
   "custom": "Niestandardowy",
+  "newExercise": "Nowe ćwiczenie",
   "woAlreadyRunning": "Trening {currentWorkoutName} już działa",
   "woAlreadyRunningDelete": "Czy chcesz zatrzymać bieżący trening i rozpocząć {newWorkoutName}?",
   "spotifyPleaseLogin": "Musisz być zalogowany na Spotify",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "Nie udało się utworzyć kopii zapasowej",
   "savedDataForSync": "Dane do synchronizacji zapisane",
   "accessDenied": "Dostęp odmówiony",
-  "accessDeniedHealth": "Dostęp do Twoich danych zdrowotnych został odmówiony. Możesz go włączyć w ustawieniach urządzenia w sekcji Zdrowie.",
+  "accessDeniedHealth": "Dostęp do Twoich danych zdrowotnych został odrzucony lub brak dostępnych danych. Możesz go włączyć w każdej chwili w ustawieniach urządzenia w sekcji Zdrowie. Jeśli jest już włączony, sprawdź, czy w aplikacji Zdrowie są dane.",
+  "other": "Inne",
 
   "settings": "Ustawienia",
   "settingsGeneral": "Ogólne",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Max. waga",
   "statisticsFilter": "Filtr",
-  "statisticsFilter1RM": "Pokaż 1RM",
-  "statisticsFilterSickDays": "Pokaż dni choroby",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Dni choroby",
   "statisticsWeight": "Waga",
   "statisticsSick": "Chory",
   "statisticsCurrentlyNotSupported": "Kategoria tego ćwiczenia nie jest obecnie obsługiwana w statystykach",

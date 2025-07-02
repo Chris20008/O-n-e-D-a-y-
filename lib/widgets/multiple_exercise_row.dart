@@ -3,6 +3,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
+import 'background_single_set.dart';
 
 class MultipleExerciseRow extends StatelessWidget {
   final List<Exercise> exercises;
@@ -26,7 +27,6 @@ class MultipleExerciseRow extends StatelessWidget {
   final double _width = 44;
   final double _topBottomPadding = 5;
   final double _iconSize = 13;
-  final double _leftRightPadding = 3;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +49,7 @@ class MultipleExerciseRow extends StatelessWidget {
                     SizedBox(
                         height: _height + (2*_topBottomPadding),
                         child: Padding(
-                          padding: EdgeInsets.only(top: _topBottomPadding, bottom: _topBottomPadding),
+                          padding: EdgeInsets.only(top: _topBottomPadding, bottom: _topBottomPadding-2),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
@@ -109,16 +109,17 @@ class MultipleExerciseRow extends StatelessWidget {
                               ),
                               Expanded(
                                 child: Align(
-                                    alignment: Alignment.centerLeft,
+                                    alignment: Alignment.topLeft,
                                     child: OverflowSafeText(
                                         ex.name,
                                         fontSize: fontSize,
-                                        minFontSize: 13,
-                                        maxLines: 2
+                                        minFontSize: fontSize,
+                                        // minFontSize: 13,
+                                        maxLines: 2,
                                     )
                                 ),
                               ),
-                              const SizedBox(height: 5,),
+                              const SizedBox(height: 3,),
                             ],
                           ),
                         )
@@ -157,7 +158,7 @@ class MultipleExerciseRow extends StatelessWidget {
                               begin: Alignment.centerLeft,
                               end: Alignment.centerRight,
                               colors: [
-                                colorFade!.withOpacity(0.0),
+                                colorFade!.withValues(alpha: 0.0),
                                 colorFade!,
                               ]
                           ),
@@ -178,7 +179,7 @@ class MultipleExerciseRow extends StatelessWidget {
                               end: Alignment.centerLeft,
                               begin: Alignment.centerRight,
                               colors: [
-                                colorFade!.withOpacity(0.0),
+                                colorFade!.withValues(alpha: 0.0),
                                 colorFade!,
                               ]
                           ),
@@ -196,37 +197,56 @@ class MultipleExerciseRow extends StatelessWidget {
   }
 
   List<Widget> getExerciseRows(){
+    int outerIndex = 0;
     List<Widget> children = [];
     Exercise? previousExercise;
+
     for(Exercise ex in exercises){
       List<Widget> sets = [];
+
       /// Remove empty sets in case the previous exercise had one
       /// Because from no on, we assume that all weights and amounts
       /// in previous workout are not null
-      previousExercise?.removeEmptySets();
+      // previousExercise?.removeEmptySets();
       ex.sets.forEachIndexed((index, set){
 
         /// Has weight or amount improved?
-        bool? weightImproved;
-        bool? amountImproved;
+        bool? weightImproved = true;
+        bool? amountImproved = true;
         if(comparePreviousExercise
             && previousExercise != null
             && previousExercise.sets.length > index
-            && set.weight != null
-            && set.amount != null
-            && set.setType != null
+            // && set.weight != null
+            // && set.amount != null
+            // && set.setType != null
         ){
-          if(previousExercise.sets[index].weight! < set.weight!){
+          final prevWeight = previousExercise.sets[index].weight;
+          final prevAmount = previousExercise.sets[index].amount;
+
+          if(prevWeight == null || prevAmount == null){
             weightImproved = true;
-          }
-          else if(previousExercise.sets[index].weight! > set.weight!){
-            weightImproved = false;
-          }
-          if(previousExercise.sets[index].amount! < set.amount!){
             amountImproved = true;
           }
-          else if(previousExercise.sets[index].amount! > set.amount!){
-            amountImproved = false;
+          else{
+            if(prevWeight < (set.weight?? 0)){
+              weightImproved = true;
+            }
+            else if(prevWeight > (set.weight?? 0)){
+              weightImproved = false;
+            }
+            else{
+              weightImproved = null;
+            }
+
+            if(prevAmount < (set.amount?? 0)){
+              amountImproved = true;
+            }
+            else if(prevAmount > (set.amount?? 0)){
+              amountImproved = false;
+            }
+            else{
+              amountImproved = null;
+            }
           }
         }
         /// null means no comparison with previous possible
@@ -236,11 +256,23 @@ class MultipleExerciseRow extends StatelessWidget {
         }
 
         if(set.weight == null || set.amount == null){
+          /// Check if next Exercise has this set, otherwise we set the color to transparent
+          final nextEx =  exercises.length - 1 >= outerIndex? exercises[outerIndex+1] : null;
+          final hasSet = nextEx != null && nextEx.sets.length-1 >= index;
           /// Create empty box as placeholder
           sets.add(
-              SizedBox(
-                  height: _height+ _topBottomPadding*2,
-                  width: _width + _leftRightPadding*2
+              Padding(
+                padding: EdgeInsets.only(
+                    left: set == ex.sets.first && colorFade != null? 15 : 3,
+                    right: set == ex.sets.last && colorFade != null? 30 : 3,
+                    top: _topBottomPadding,
+                    bottom: _topBottomPadding
+                ),
+                child: SizedBox(
+                  height: _height,
+                  width: _width,
+                  child: hasSet? const BackgroundSingleSet(color: Color(0x0dffffff)) : null,
+                ),
               )
           );
         }
@@ -263,7 +295,7 @@ class MultipleExerciseRow extends StatelessWidget {
                       children: [
 
                         /// Background of single set
-                        backgroundSingleSet,
+                        const BackgroundSingleSet(),
 
                         /// One Column for each set (weight / amount)
                         dataSingleSet(set, ex),

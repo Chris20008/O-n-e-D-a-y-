@@ -28,6 +28,7 @@
   "template": "Plantilla",
   "clear": "Limpiar",
   "custom": "Personalizado",
+  "newExercise": "Nuevo ejercicio",
   "woAlreadyRunning": "El entrenamiento {currentWorkoutName} ya está en curso",
   "woAlreadyRunningDelete": "¿Quieres detener el entrenamiento actual y empezar {newWorkoutName}?",
   "spotifyPleaseLogin": "Debes iniciar sesión en Spotify",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "No se pudo crear la copia de seguridad",
   "savedDataForSync": "Datos guardados para sincronizar",
   "accessDenied": "Acceso denegado",
-  "accessDeniedHealth": "El acceso a tus datos de salud ha sido denegado. Puedes activarlo en cualquier momento en la configuración del dispositivo bajo Salud.",
+  "accessDeniedHealth": "Se denegó el acceso a tus datos de salud o no hay datos disponibles. Puedes activarlo en cualquier momento en los ajustes del dispositivo, en Salud. Si ya está activado, comprueba si hay datos en la app Salud.",
+  "other": "Otros",
 
   "settings": "Configuraciones",
   "settingsGeneral": "General",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Peso máx.",
   "statisticsFilter": "Filtro",
-  "statisticsFilter1RM": "Mostrar 1RM",
-  "statisticsFilterSickDays": "Mostrar días de enfermedad",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Días de enfermedad",
   "statisticsWeight": "Peso",
   "statisticsSick": "Enfermo",
   "statisticsCurrentlyNotSupported": "La categoría de este ejercicio no es compatible con las estadísticas en este momento",

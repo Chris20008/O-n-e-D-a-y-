@@ -11,7 +11,7 @@ import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import '../screens/main_screens/screen_statistics/screen_statistics.dart';
 import '../screens/other_screens/screen_running_workout/screen_running_workout.dart';
 import '../screens/main_screens/screen_workout_history/screen_workout_history.dart';
-import '../screens/main_screens/screen_workouts/panels/new_workout_panel.dart';
+import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import '../util/config.dart';
 
@@ -82,8 +82,8 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
       curve: Curves.easeInOut,
       height: cnBottomMenu.height,
       decoration: BoxDecoration(
-        // color: Colors.black.withOpacity(0.4),
-        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? Theme.of(context).primaryColor : Colors.black.withOpacity(0.4),
+        // color: Colors.black.withValues(alpha: 0.4),
+        color: cnNewWorkout.minPanelHeight > 0 && cnBottomMenu.index != 2? Theme.of(context).primaryColor : Colors.black.withValues(alpha: 0.4),
       ),
       child: ClipRRect(
         child: BackdropFilter(
@@ -96,7 +96,7 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
           ),
           child: Theme(
             data: Theme.of(context).copyWith(
-              splashColor: Colors.amber[800]!.withOpacity(0.25),
+              splashColor: Colors.amber[800]!.withValues(alpha: 0.25),
               // focusColor: Colors.transparent,
               // hoverColor: Colors.transparent,
               highlightColor: Colors.transparent,
@@ -154,15 +154,20 @@ class _BottomMenuState extends State<BottomMenu> with WidgetsBindingObserver {
     }
     else if(index == 2) {
       cnScreenStatistics.refreshData(context);
+      // cnScreenStatistics.szController?.resetGraph();
       if(lastIndex == 2){
-        cnScreenStatistics.resetGraph(withKeyReset: false);
-        cnScreenStatistics.refresh();
+        cnScreenStatistics.szController?.resetGraph();
+      }
+      else{
+        cnScreenStatistics.szController?.spotManager.resetSpotDetailLevel();
+        cnScreenStatistics.szController?.spotManager.refreshSpots();
+        cnScreenStatistics.firstAnimationGraph = true;
       }
     }
     if(cnNewWorkout.minPanelHeight > 0 && index != 2){
-      SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+      // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     } else{
-      SystemChrome.setPreferredOrientations([]);
+      // SystemChrome.setPreferredOrientations([]);
     }
     cnHomepage.refresh();
   }
@@ -217,8 +222,11 @@ class CnBottomMenu extends ChangeNotifier {
   ///
   /// 1 = completely Visible
   void adjustHeight(double value){
-    positionYAxis = height * value;
-    refresh();
+    final newPositionYAxis = height * value;
+    if(newPositionYAxis != positionYAxis){
+      positionYAxis = newPositionYAxis;
+      refresh();
+    }
   }
 
   int get index => _selectedIndex;

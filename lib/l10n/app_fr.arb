@@ -28,6 +28,7 @@
   "template": "Modèle",
   "clear": "Effacer",
   "custom": "Personnalisé",
+  "newExercise": "Nouvel exercice",
   "woAlreadyRunning": "L'entraînement {currentWorkoutName} est déjà en cours",
   "woAlreadyRunningDelete": "Voulez-vous arrêter l'entraînement actuel et démarrer {newWorkoutName}?",
   "spotifyPleaseLogin": "Vous devez être connecté à Spotify",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "Impossible de créer une sauvegarde",
   "savedDataForSync": "Données enregistrées pour la synchronisation",
   "accessDenied": "Accès refusé",
-  "accessDeniedHealth": "L'accès à vos données de santé a été refusé. Vous pouvez l'activer à tout moment dans les paramètres de votre appareil sous Santé.",
+  "accessDeniedHealth": "L'accès à tes données de santé a été refusé ou aucune donnée n'est disponible. Tu peux l'activer à tout moment dans les réglages de l'appareil sous Santé. S'il est activé, vérifie s'il y a des données dans l'app Santé.",
+  "other": "Autre",
 
   "settings": "Paramètres",
   "settingsGeneral": "Général",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Poids max.",
   "statisticsFilter": "Filtre",
-  "statisticsFilter1RM": "Afficher 1RM",
-  "statisticsFilterSickDays": "Afficher les jours de maladie",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Les jours de maladie",
   "statisticsWeight": "Poids",
   "statisticsSick": "Malade",
   "statisticsCurrentlyNotSupported": "La catégorie de cet exercice n'est pas actuellement prise en charge pour les statistiques",

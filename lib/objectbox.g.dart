@@ -37,7 +37,8 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(2, 5921422946981106093),
             name: 'name',
             type: 9,
-            flags: 0),
+            flags: 2048,
+            indexId: const obx_int.IdUid(1, 2193436831628120648)),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(4, 587912730100271835),
             name: 'amounts',
@@ -89,7 +90,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(3, 6190945827968541021),
       name: 'ObWorkout',
-      lastPropertyId: const obx_int.IdUid(6, 8375506305716248786),
+      lastPropertyId: const obx_int.IdUid(10, 7911241795309993017),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -101,7 +102,8 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(2, 8119469040078393535),
             name: 'name',
             type: 9,
-            flags: 0),
+            flags: 2048,
+            indexId: const obx_int.IdUid(3, 5969643814802177194)),
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 8413082881233068640),
             name: 'date',
@@ -116,7 +118,23 @@ final _entities = <obx_int.ModelEntity>[
             id: const obx_int.IdUid(6, 8375506305716248786),
             name: 'linkedExercises',
             type: 30,
-            flags: 0)
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(7, 1523441836966544723),
+            name: 'uuid',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(8, 3469161128757874577),
+            name: 'lastUpdated',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(9, 5589418646293440542),
+            name: 'checksum',
+            type: 9,
+            flags: 2048,
+            indexId: const obx_int.IdUid(4, 6962687347187575557))
       ],
       relations: <obx_int.ModelRelation>[
         obx_int.ModelRelation(
@@ -128,7 +146,7 @@ final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
       id: const obx_int.IdUid(4, 3149227828482375570),
       name: 'ObSickDays',
-      lastPropertyId: const obx_int.IdUid(3, 2028011289927285168),
+      lastPropertyId: const obx_int.IdUid(6, 6067705989541804253),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
@@ -144,6 +162,22 @@ final _entities = <obx_int.ModelEntity>[
         obx_int.ModelProperty(
             id: const obx_int.IdUid(3, 2028011289927285168),
             name: 'endDate',
+            type: 10,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(4, 149128826393765486),
+            name: 'uuid',
+            type: 9,
+            flags: 0),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(5, 3871109737338301020),
+            name: 'checksum',
+            type: 9,
+            flags: 2048,
+            indexId: const obx_int.IdUid(2, 1686407197636823885)),
+        obx_int.ModelProperty(
+            id: const obx_int.IdUid(6, 6067705989541804253),
+            name: 'lastUpdated',
             type: 10,
             flags: 0)
       ],
@@ -187,7 +221,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
       lastEntityId: const obx_int.IdUid(4, 3149227828482375570),
-      lastIndexId: const obx_int.IdUid(0, 0),
+      lastIndexId: const obx_int.IdUid(4, 6962687347187575557),
       lastRelationId: const obx_int.IdUid(4, 6635772398473233360),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [4145133195816181644],
@@ -198,7 +232,8 @@ obx_int.ModelDefinition getObjectBoxModel() {
         5422671899604002301,
         425489130545911071,
         2715976310809358031,
-        2508751927511525074
+        2508751927511525074,
+        7911241795309993017
       ],
       retiredRelationUids: const [
         1856206922338472012,
@@ -298,20 +333,31 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final linkedExercisesOffset = fbb.writeList(object.linkedExercises
               .map(fbb.writeString)
               .toList(growable: false));
-          fbb.startTable(7);
+          final uuidOffset = fbb.writeString(object.uuid);
+          final checksumOffset = fbb.writeString(object.checksum);
+          fbb.startTable(11);
           fbb.addInt64(0, object.id);
           fbb.addOffset(1, nameOffset);
           fbb.addInt64(2, object.date.millisecondsSinceEpoch);
           fbb.addBool(3, object.isTemplate);
           fbb.addOffset(5, linkedExercisesOffset);
+          fbb.addOffset(6, uuidOffset);
+          fbb.addInt64(7, object.lastUpdated?.millisecondsSinceEpoch);
+          fbb.addOffset(8, checksumOffset);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
+          final lastUpdatedValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 18);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final uuidParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 16, '');
+          final checksumParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 20, '');
           final nameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 6, '');
           final dateParam = DateTime.fromMillisecondsSinceEpoch(
@@ -322,12 +368,18 @@ obx_int.ModelDefinition getObjectBoxModel() {
                   fb.StringReader(asciiOptimization: true),
                   lazy: false)
               .vTableGet(buffer, rootOffset, 14, []);
+          final lastUpdatedParam = lastUpdatedValue == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(lastUpdatedValue);
           final object = ObWorkout(
               id: idParam,
+              uuid: uuidParam,
+              checksum: checksumParam,
               name: nameParam,
               date: dateParam,
               isTemplate: isTemplateParam,
-              linkedExercises: linkedExercisesParam);
+              linkedExercises: linkedExercisesParam,
+              lastUpdated: lastUpdatedParam);
           obx_int.InternalToManyAccess.setRelInfo<ObWorkout>(object.exercises,
               store, obx_int.RelInfo<ObWorkout>.toMany(3, object.id));
           return object;
@@ -341,24 +393,43 @@ obx_int.ModelDefinition getObjectBoxModel() {
           object.id = id;
         },
         objectToFB: (ObSickDays object, fb.Builder fbb) {
-          fbb.startTable(4);
+          final uuidOffset = fbb.writeString(object.uuid);
+          final checksumOffset = fbb.writeString(object.checksum);
+          fbb.startTable(7);
           fbb.addInt64(0, object.id);
           fbb.addInt64(1, object.startDate.millisecondsSinceEpoch);
           fbb.addInt64(2, object.endDate.millisecondsSinceEpoch);
+          fbb.addOffset(3, uuidOffset);
+          fbb.addOffset(4, checksumOffset);
+          fbb.addInt64(5, object.lastUpdated?.millisecondsSinceEpoch);
           fbb.finish(fbb.endTable());
           return object.id;
         },
         objectFromFB: (obx.Store store, ByteData fbData) {
           final buffer = fb.BufferContext(fbData);
           final rootOffset = buffer.derefObject(0);
+          final lastUpdatedValue =
+              const fb.Int64Reader().vTableGetNullable(buffer, rootOffset, 14);
           final idParam =
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 4, 0);
+          final uuidParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 10, '');
+          final checksumParam = const fb.StringReader(asciiOptimization: true)
+              .vTableGet(buffer, rootOffset, 12, '');
           final startDateParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 6, 0));
           final endDateParam = DateTime.fromMillisecondsSinceEpoch(
               const fb.Int64Reader().vTableGet(buffer, rootOffset, 8, 0));
+          final lastUpdatedParam = lastUpdatedValue == null
+              ? null
+              : DateTime.fromMillisecondsSinceEpoch(lastUpdatedValue);
           final object = ObSickDays(
-              id: idParam, startDate: startDateParam, endDate: endDateParam);
+              id: idParam,
+              uuid: uuidParam,
+              checksum: checksumParam,
+              startDate: startDateParam,
+              endDate: endDateParam,
+              lastUpdated: lastUpdatedParam);
 
           return object;
         })
@@ -436,6 +507,18 @@ class ObWorkout_ {
   static final linkedExercises =
       obx.QueryStringVectorProperty<ObWorkout>(_entities[1].properties[4]);
 
+  /// see [ObWorkout.uuid]
+  static final uuid =
+      obx.QueryStringProperty<ObWorkout>(_entities[1].properties[5]);
+
+  /// see [ObWorkout.lastUpdated]
+  static final lastUpdated =
+      obx.QueryDateProperty<ObWorkout>(_entities[1].properties[6]);
+
+  /// see [ObWorkout.checksum]
+  static final checksum =
+      obx.QueryStringProperty<ObWorkout>(_entities[1].properties[7]);
+
   /// see [ObWorkout.exercises]
   static final exercises =
       obx.QueryRelationToMany<ObWorkout, ObExercise>(_entities[1].relations[0]);
@@ -454,4 +537,16 @@ class ObSickDays_ {
   /// see [ObSickDays.endDate]
   static final endDate =
       obx.QueryDateProperty<ObSickDays>(_entities[2].properties[2]);
+
+  /// see [ObSickDays.uuid]
+  static final uuid =
+      obx.QueryStringProperty<ObSickDays>(_entities[2].properties[3]);
+
+  /// see [ObSickDays.checksum]
+  static final checksum =
+      obx.QueryStringProperty<ObSickDays>(_entities[2].properties[4]);
+
+  /// see [ObSickDays.lastUpdated]
+  static final lastUpdated =
+      obx.QueryDateProperty<ObSickDays>(_entities[2].properties[5]);
 }

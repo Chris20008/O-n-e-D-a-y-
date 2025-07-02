@@ -1,4 +1,5 @@
 import 'package:fitness_app/util/constants.dart';
+import 'package:fitness_app/widgets/background_single_set.dart';
 import 'package:flutter/material.dart';
 import '../objects/exercise.dart';
 
@@ -12,6 +13,7 @@ class ExerciseRow extends StatelessWidget {
   final TextStyle? style;
   final EdgeInsetsGeometry? margin;
   final BorderRadius? borderRadius;
+  final bool shrinkWrap;
 
   const ExerciseRow({
     super.key,
@@ -23,7 +25,8 @@ class ExerciseRow extends StatelessWidget {
     this.flexRight = 7,
     this.style,
     this.margin,
-    this.borderRadius
+    this.borderRadius,
+    this.shrinkWrap = false
   });
 
   final double _widthOfField = 44;
@@ -32,7 +35,7 @@ class ExerciseRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      height: double.maxFinite,
+      // height: double.maxFinite,
       decoration: BoxDecoration(
         // color: Theme.of(context).cardColor,
         // color: Color(0x921c1001),
@@ -57,6 +60,7 @@ class ExerciseRow extends StatelessWidget {
           SizedBox(
             height: _height,
             child: ListView(
+              shrinkWrap: shrinkWrap,
                 physics: const BouncingScrollPhysics(),
                 scrollDirection: Axis.horizontal,
                 children: [
@@ -73,7 +77,7 @@ class ExerciseRow extends StatelessWidget {
                             children: [
 
                               /// Background of single set
-                              backgroundSingleSet,
+                              const BackgroundSingleSet(),
 
                               /// One Column for each set (weight / amount)
                               dataSingleSet(set, exercise)

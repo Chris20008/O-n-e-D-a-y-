@@ -1,0 +1,177 @@
+import 'package:flutter/cupertino.dart';
+
+class ScrollListener extends StatefulWidget {
+  final ScrollController controller;
+  final double minValue;
+  final double maxValue;
+  final double minOffset;
+  final double? maxOffset;
+  final bool inverted;
+  final Widget Function(BuildContext context, double value, double percent) builder;
+  final Curve? curve;
+  final bool withMinValueStop;
+
+  const ScrollListener({
+    super.key,
+    required this.controller,
+    required this.minValue,
+    required this.maxValue,
+    this.minOffset = 0,
+    this.maxOffset,
+    required this.builder,
+    this.inverted = false,
+    this.curve = Curves.linear,
+    this.withMinValueStop = false
+  }) :
+  // Ensure that the value range is valid
+        assert(minValue < maxValue,
+        'ScrollListener: minValue must be less than maxValue.'),
+
+  // Ensure minOffset is not negative
+        assert(minOffset >= 0,
+        'ScrollListener: minOffset must be greater than or equal to 0.'),
+
+  // Ensure that maxOffset (if provided) is greater than minOffset
+        assert(
+        maxOffset == null || minOffset < maxOffset,
+        'ScrollListener: minOffset must be less than maxOffset when maxOffset is provided.'),
+
+  // If maxOffset is null, ensure minOffset is still less than maxValue
+        assert(
+        maxOffset != null || minOffset < maxValue,
+        'ScrollListener: minOffset must be less than maxValue when maxOffset is not provided.'),
+
+  // Prevent division by zero in factor calculation
+        assert(
+        (maxOffset ?? maxValue) - minOffset != 0,
+        'ScrollListener: maxOffset - minOffset must not be 0 to avoid division by zero.');
+
+  @override
+  State<ScrollListener> createState() => _ScrollListenerState();
+}
+
+class _ScrollListenerState extends State<ScrollListener> {
+
+  late final _linearFactor = (widget.maxValue-widget.minValue) / ((widget.maxOffset?? widget.maxValue) - widget.minOffset);
+  late double value;
+  late double percent;
+  double nonClampedValue = 0;
+  double previousNonClampedValue = 0;
+  bool canJumpScrollUp = true;
+  bool canJumpScrollDown = true;
+  late final _area = widget.maxValue-widget.minValue;
+
+  @override
+  void initState() {
+    super.initState();
+    value = _calcCurrentValue();
+    percent = _calcPercent();
+    widget.controller.addListener(_listener);
+  }
+
+  void _listener(){
+    final newValue = _calcCurrentValue();
+
+    if(newValue != value){
+
+      setState(() {
+        value = newValue;
+        percent = _calcPercent();
+        _applyCurve();
+      });
+
+      _handleMinValueStop();
+    }
+    else{
+      canJumpScrollUp = true;
+      canJumpScrollDown = true;
+    }
+  }
+
+  void _handleMinValueStop(){
+    if(!widget.withMinValueStop || !widget.controller.hasClients){
+      return;
+    }
+
+    if(canJumpScrollDown && _doStopScrollDown()){
+      widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
+      canJumpScrollUp = false;
+      canJumpScrollDown = false;
+    }
+    else if(!canJumpScrollUp){
+      if(previousNonClampedValue > widget.minValue){
+        canJumpScrollUp = true;
+      }
+      return;
+    }
+    else if(!canJumpScrollDown){
+      if(previousNonClampedValue > widget.minValue){
+        canJumpScrollDown = true;
+      }
+      return;
+    }
+    else if(canJumpScrollUp && _doStopScrollUp()){
+      widget.controller.jumpTo(widget.maxOffset?? widget.maxValue);
+      canJumpScrollUp = false;
+      canJumpScrollDown = false;
+    }
+  }
+
+  bool _doStopScrollDown(){
+    if(widget.inverted){
+      return value == widget.maxValue;
+    }
+    return value == widget.minValue;
+  }
+
+  bool _doStopScrollUp(){
+    /// ToDo implement inverted
+    // if(widget.inverted){
+    //   return previousNonClampedValue > widget.maxValue  /// previous pos was bigger than max value means that the user is scrolling up
+    //       && widget.maxValue >= nonClampedValue;
+    // }
+    return previousNonClampedValue < widget.minValue    /// previous pos was bigger than max value means that the user is scrolling up
+        && widget.minValue < nonClampedValue;
+  }
+
+  void _applyCurve(){
+    if(widget.curve != Curves.linear){
+      percent = widget.inverted
+          ? widget.curve!.transform(percent)              /// value is already inverted
+          : widget.curve!.flipped.transform(percent);     /// invert again to revert invert
+      value = _area * percent;
+      value += widget.minValue;
+    }
+  }
+
+  double _calcCurrentValue(){
+    previousNonClampedValue = nonClampedValue;
+
+    /// either initialScrollOffset or current scrollPosition
+    final offset = widget.controller.hasClients
+        ? widget.controller.position.pixels
+        : widget.controller.initialScrollOffset;
+
+    final currPosition = (offset - widget.minOffset) * _linearFactor;
+    nonClampedValue = (widget.maxValue - currPosition);
+
+    final tempVal = nonClampedValue.clamp(widget.minValue, widget.maxValue);
+    return widget.inverted? widget.maxValue + widget.minValue - tempVal : tempVal;
+  }
+
+  double _calcPercent(){
+    final tempPercent = (value-widget.minValue) / (widget.maxValue - widget.minValue);
+    return tempPercent.clamp(0, 1);
+  }
+
+  @override
+  void dispose(){
+    widget.controller.removeListener(_listener);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.builder(context, value, percent);
+  }
+}

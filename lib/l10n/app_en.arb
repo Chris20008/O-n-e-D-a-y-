@@ -28,6 +28,7 @@
   "template": "Template",
   "clear": "Clear",
   "custom": "Custom",
+  "newExercise": "New Exercise",
   "woAlreadyRunning": "Workout {currentWorkoutName} is already Running",
   "woAlreadyRunningDelete": "Do you want to stop the current workout and start workout {newWorkoutName}?",
   "spotifyPleaseLogin": "Please Login to Spotify",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "Could not create a Backup",
   "savedDataForSync": "Saved data for sync.",
   "accessDenied": "Access denied",
-  "accessDeniedHealth": "Access to your health data was denied. You can enable it anytime in the device settings under Health.",
+  "accessDeniedHealth": "Access to your health data was denied or no data is available. You can enable it anytime in the device settings under Health. If it is enabled, check whether there is any data in the Health app.",
+  "other": "Other",
 
   "settings": "Settings",
   "settingsGeneral": "General",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Max Weight",
   "statisticsFilter": "Filter",
-  "statisticsFilter1RM": "Show 1RM",
-  "statisticsFilterSickDays": "Show sick days",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Sick days",
   "statisticsWeight": "Weight",
   "statisticsSick": "Sick",
   "statisticsCurrentlyNotSupported": "The category of this exercise is currently not supported for statistics.",

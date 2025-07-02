@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
 
 extension DateOnlyCompare on DateTime {
@@ -60,6 +62,58 @@ extension DateOnlyCompare on DateTime {
     return toDate().difference(DateTime(year, month, 1)).inDays + 1;
   }
 
+  DateTime getMidDayOfMonth(){
+    return DateTime(year, month, 15);
+  }
+
+  DateTime getMidDayOfWeek() {
+    int delta = DateTime.wednesday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  DateTime getFirstDayOfWeek() {
+    int delta = DateTime.monday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  DateTime getLastDayOfWeek() {
+    int delta = DateTime.sunday - weekday;
+
+    return addSafe(Duration(days: delta));
+  }
+
+  String formatAsFirstLastDayOfWeek(BuildContext context){
+    return "${DateFormat("d.MMM", Localizations.localeOf(context).languageCode).format(getFirstDayOfWeek())} - ${DateFormat("d.MMM", Localizations.localeOf(context).languageCode).format(getLastDayOfWeek())}";
+  }
+
+  Duration differenceSafe(DateTime other){
+    return toUtcSafe().difference(other.toUtcSafe());
+  }
+
+  DateTime addSafe(Duration d){
+    return toUtcSafe().add(d).toLocal();
+  }
+
+  DateTime subtractSafe(Duration d){
+    return toUtcSafe().subtract(d).toLocal();
+  }
+
+  DateTime round(){
+    DateTime current = toUtc();
+    if(current.hour > 12){
+      current = current.add(const Duration(hours: 13)).copyWith(hour: 0);
+    } else if(current.hour <= 12){
+      current = current.copyWith(hour: 0);
+    }
+    return current;
+  }
+
+  DateTime toUtcSafe(){
+    return DateTime.utc(year, month, day, hour, minute, second, millisecond, microsecond);
+  }
+
   int numOfDaysOfMonth(){
     return DateTime(year, month+1, 0).difference(DateTime(year, month, 1)).inDays + 1;
   }
@@ -88,15 +142,59 @@ extension DateOnlyCompare on DateTime {
     final result = List.generate(length.abs(), (index) => (DateTime(year, month, day).add(Duration(days: index * (length >= 0? 1 : -1), hours: 1)).toDate()));
     return result;
   }
+
+  String toStringDateTime(){
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+
+    return "${twoDigits(day)}."
+        "${twoDigits(month)}."
+        "$year  "
+        "${twoDigits(hour)}:"
+        "${twoDigits(minute)}";
+  }
 }
 
-extension List_E on List {
-  List getDuplicates(){
-    List dupes = List.from(this);
-    Set dupes2 = Set.from(this);
-    for (var element in dupes2) {
+extension ListExtension<T> on List<T> {
+  List<T> getDuplicates() {
+    List<T> dupes = List.from(this);
+    Set<T> unique = Set.from(this);
+    for (var element in unique) {
       dupes.remove(element);
     }
     return dupes;
+  }
+
+  List<T> without(List<T> l) {
+    return where((e) => !l.contains(e)).toList();
+  }
+}
+
+extension StringExtensions on String{
+  bool startsWithLatinLetter(){
+    if (length == 0) return false;
+
+    String char = this[0];
+
+    final normalized = char.toLowerCase().normalizeGermanUmlauts();
+
+    return normalized.codeUnitAt(0) >= 'a'.codeUnitAt(0) &&
+        normalized.codeUnitAt(0) <= 'z'.codeUnitAt(0);
+  }
+
+  String normalizeGermanUmlauts({bool trimmed = false}) {
+    if(trimmed){
+      return replaceAll('ä', 'a')
+          .replaceAll('ö', 'o')
+          .replaceAll('ü', 'u')
+          .replaceAll('Ä', 'A')
+          .replaceAll('Ö', 'O')
+          .replaceAll('Ü', 'U');
+    }
+    return replaceAll('ä', 'ae')
+        .replaceAll('ö', 'oe')
+        .replaceAll('ü', 'ue')
+        .replaceAll('Ä', 'Ae')
+        .replaceAll('Ö', 'Oe')
+        .replaceAll('Ü', 'Ue');
   }
 }

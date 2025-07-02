@@ -150,7 +150,7 @@ Future showNewFeaturesPopUp({
                                           ),
                                           trailing: CupertinoSwitch(
                                               value: cnConfig.useHealthData,
-                                              activeColor: activeColor,
+                                              activeTrackColor: activeColor,
                                               onChanged: (value) async{
                                                 setModalState(() {
                                                   if(Platform.isAndroid){

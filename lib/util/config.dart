@@ -1,11 +1,11 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/util/backup_functions.dart';
 import 'package:fitness_app/util/ios_channel.dart';
 import 'dart:io';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
+import 'backup_helper/google_drive/get_google_drive_account.dart';
 import 'custom_cache_manager.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
@@ -242,7 +242,7 @@ class CnConfig extends ChangeNotifier {
           toastLength: Toast.LENGTH_LONG,
           gravity: ToastGravity.SNACKBAR,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.grey[800]?.withOpacity(0.9),
+          backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
           textColor: Colors.white,
           fontSize: 16.0
       );
@@ -270,8 +270,8 @@ class CnConfig extends ChangeNotifier {
   bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
   bool get automaticBackups => config.settings["automaticBackups"]?? true;
   bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
-  bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
-  bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
+  // bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
+  // bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
   int? get countdownTime => config.settings["countdownTime"];
   bool get useSpotify => config.settings["useSpotify"]?? false;
   bool get useHealthData => config.settings["useHealthData"]?? false;

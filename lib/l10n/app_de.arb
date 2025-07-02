@@ -28,6 +28,7 @@
   "template": "Vorlage",
   "clear": "Löschen",
   "custom": "Benutzerdefiniert",
+  "newExercise": "Neue Übung",
   "woAlreadyRunning": "Workout {currentWorkoutName} läuft bereits",
   "woAlreadyRunningDelete": "Möchtest du das aktuelle Workout stoppen und dafür {newWorkoutName} starten?",
   "spotifyPleaseLogin": "Du musst bei Spotify eingeloggt sein",
@@ -42,7 +43,8 @@
   "createdBackupFailed": "Es konnte kein Backup erstellt werden",
   "savedDataForSync": "Daten für sync. gesichert",
   "accessDenied": "Zugriff verweigert",
-  "accessDeniedHealth": "Der Zugriff auf deine Gesundheitsdaten wurde verweigert. Du kannst ihn jederzeit in den Geräteeinstellungen unter Health aktivieren.",
+  "accessDeniedHealth": "Der Zugriff auf deine Gesundheitsdaten wurde verweigert oder es sind keine Daten vorhanden. Du kannst ihn jederzeit in den Geräteeinstellungen unter Health aktivieren. Falls er aktiviert ist, überprüfe ob in der Health App Daten vorhanden sind.",
+  "other": "Sonstiges",
 
   "settings": "Einstellungen",
   "settingsGeneral": "Generelles",
@@ -126,8 +128,8 @@
 
   "statisticsMaxWeight": "Max. Gewicht",
   "statisticsFilter": "Filter",
-  "statisticsFilter1RM": "1RM Anzeigen",
-  "statisticsFilterSickDays": "Krankheitstage anzeigen",
+  "statisticsFilter1RM": "1RM",
+  "statisticsFilterSickDays": "Krankheitstage",
   "statisticsWeight": "Gewicht",
   "statisticsSick": "Krank",
   "statisticsCurrentlyNotSupported": "Die Kategorie dieser Übung wird aktuell nicht für Statistiken unterstützt",

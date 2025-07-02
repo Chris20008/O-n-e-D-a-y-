@@ -16,6 +16,7 @@ class Exercise{
   int restInSeconds;
   int? seatLevel;
   int id;
+  String description;
 
   String? originalName;
   String? linkName;
@@ -34,12 +35,14 @@ class Exercise{
     this.linkName,
     this.category = 1,
     this.blockLink = false,
-    this.bodyWeightPercent = 0.0
+    this.bodyWeightPercent = 0.0,
+    this.description = ""
   }){
     if (sets.isEmpty){
       sets = [];
       addSet();
     }
+    originalName = originalName?? name;
   }
 
   Exercise.fromObExercise(ObExercise e):this(
@@ -54,7 +57,7 @@ class Exercise{
       bodyWeightPercent: e.bodyWeightPercent
   );
 
-  /// Don't clone the original name
+  /// Don't copy the original id
   Exercise.copy(Exercise ex): this(
       name: ex.name,
       sets: List.from(ex.sets.map((set) => SingleSet(weight: set.weight, amount: set.amount, setType: set.setType))),
@@ -63,7 +66,8 @@ class Exercise{
       linkName: ex.linkName,
       category: ex.category,
       blockLink: ex.blockLink,
-      bodyWeightPercent: ex.bodyWeightPercent
+      bodyWeightPercent: ex.bodyWeightPercent,
+      description: ex.description
   );
 
   Exercise.clone(Exercise ex): this(
@@ -75,10 +79,11 @@ class Exercise{
       linkName: ex.linkName,
       category: ex.category,
       blockLink: ex.blockLink,
-      bodyWeightPercent: ex.bodyWeightPercent
+      bodyWeightPercent: ex.bodyWeightPercent,
+      description: ex.description
   );
 
-  ObExercise toObExercise(){
+  ObExercise toObExercise({bool withId = false}){
     List<double> weights = [];
     List<int> amounts = [];
     List<int> setTypes = [];
@@ -89,6 +94,7 @@ class Exercise{
       setTypes.add(set.setType?? 0);
     }
     return ObExercise(
+        id: withId? id : 0,
         name: name,
         weights: weights,
         amounts: amounts,
@@ -168,6 +174,7 @@ class Exercise{
       restInSeconds: data["restInSeconds"],
       seatLevel: data["seatLevel"],
       originalName: data["originalName"],
+      // originalName: data["name"],
       linkName: data["linkName"],
       category: data["category"]?? 1,
       blockLink: data['blockLink']?? false,

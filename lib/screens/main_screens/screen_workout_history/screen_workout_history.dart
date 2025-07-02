@@ -17,7 +17,7 @@ import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
 import '../../other_screens/screen_running_workout/screen_running_workout.dart';
-import '../screen_workouts/panels/new_workout_panel.dart';
+import '../screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
@@ -285,14 +285,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
                                         ? 0.5 : index >= cnWorkoutHistory.indexOfWorkout.keys.length-3
                                         ? 0.3 :  0.1,
                                     curve: Curves.easeInOut
-                                ).then((value) {
-                                  // Future.delayed(const Duration(seconds: 1), (){
-                                  //   setState(() {
-                                  //     cnWorkoutHistory.opened[index!] = true;
-                                  //     print(cnWorkoutHistory.opened);
-                                  //   });
-                                  // });
-                                });
+                                );
                                 break;
                               }
                               else {
@@ -318,7 +311,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
         padding: const EdgeInsets.symmetric(horizontal: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
-          color: Colors.black.withOpacity(0.6),
+          color: Colors.black.withValues(alpha: 0.6),
         ),
         child: Text(
           "${AppLocalizations.of(context)!.historyWeek} $weekOfYear",
@@ -371,7 +364,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
       borderRadius: BorderRadius.circular(15),
       child: Container(
         width: double.maxFinite,
-        color: Colors.black.withOpacity(0.5),
+        color: Colors.black.withValues(alpha: 0.5),
         padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -406,10 +399,10 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
               padding: const EdgeInsets.only(right: 50),
               child: IconButton(
                   onPressed: () {
-                    cnNewWorkout.editWorkout(sickDays: sickDay);
+                    cnNewWorkout.editWorkout(sickDays: sickDay, context: context);
                   },
                   icon: Icon(Icons.edit,
-                    color: Colors.grey.withOpacity(0.4),
+                    color: Colors.grey.withValues(alpha: 0.4),
                   )
               ),
             ),

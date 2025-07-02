@@ -1,0 +1,40 @@
+import 'package:flutter/material.dart';
+import '../screen_statistics.dart';
+import '../widgets/filter_statistics/filter_statistics.dart';
+
+void openFilterPopUp({
+  required BuildContext context,
+  required CnScreenStatistics cnScreenStatistics
+}) async{
+
+  cnScreenStatistics.saveCurrentFilterState();
+
+  final result = await showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (context){
+        return const FilterStatistics();
+      }
+  );
+
+  if(result == true){
+
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    if(cnScreenStatistics.selectedWorkoutNameLast != cnScreenStatistics.selectedWorkoutName){
+      cnScreenStatistics.refreshData(context);
+      cnScreenStatistics.szController?.updateConfig(
+          minDate: cnScreenStatistics.minDate,
+          maxDate: cnScreenStatistics.maxDate
+      );
+      // cnScreenStatistics.szController?.resetGraph();
+    }
+
+    cnScreenStatistics.refresh();
+    cnScreenStatistics.cache();
+  } else{
+    cnScreenStatistics.restoreLastFilterState();
+  }
+
+}
