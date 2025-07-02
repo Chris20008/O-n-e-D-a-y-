@@ -63,8 +63,6 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
       ),
     );
 
-    // await Future.delayed(const Duration(milliseconds: 300));
-
     /// init Name is different from current und providersName was truly updated to current
     if(initExercise != selectedExerciseName && cnScreenStatistics.selectedExerciseName == selectedExerciseName){
       pr("Refresh After Selector");

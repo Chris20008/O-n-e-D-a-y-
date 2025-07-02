@@ -177,6 +177,7 @@ class _ExerciseLineChartState extends State<ExerciseLineChart> {
     });
     
     /// Set Spots Sick Days
+    sickDaysSpots.clear();
     for (ObSickDays sickDay in allSickDays){
       double xCoordinate = sickDay.startDate.toDate().differenceSafe(cnScreenStatistics.minDate.toDate().toDate()).inDays.toDouble();
       double percent = 5;
