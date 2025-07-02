@@ -354,6 +354,7 @@ Widget getSelectRestInSeconds({
   required BuildContext context
 }) {
   return PullDownButton(
+    useRootNavigator: true,
     buttonAnchor: PullDownMenuAnchor.start,
     routeTheme: routeTheme,
     itemBuilder: (context) {
@@ -396,6 +397,7 @@ Widget getSelectSeatLevel({
   required BuildContext context
 }) {
   return PullDownButton(
+    useRootNavigator: true,
     buttonAnchor: PullDownMenuAnchor.start,
     routeTheme: routeTheme,
     itemBuilder: (context) {
@@ -438,6 +440,7 @@ Widget getSelectCategory({
   required int currentCategory
 }) {
   return PullDownButton(
+    useRootNavigator: true,
     key: key,
     buttonAnchor: PullDownMenuAnchor.start,
     routeTheme: routeTheme,
@@ -476,6 +479,7 @@ Widget getSelectBodyWeightPercent({
   required double currentBodyWeightPercent
 }) {
   return PullDownButton(
+    useRootNavigator: true,
     key: key,
     buttonAnchor: PullDownMenuAnchor.start,
     routeTheme: routeTheme,

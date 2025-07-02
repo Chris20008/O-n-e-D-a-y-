@@ -7,9 +7,7 @@ import 'package:fitness_app/widgets/spotify_bar.dart';
 import 'package:fitness_app/widgets/standard_popup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import '../../../../main.dart';
 import '../../../../objects/exercise.dart';
 import '../../../../util/constants.dart';
@@ -158,43 +156,43 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
     );
   }
 
-  Widget getSelectLink({
-    Key? key,
-    required Widget child,
-    required Function(String category) onConfirm,
-    required BuildContext context,
-    required String currentLinkName
-  }) {
-    return PullDownButton(
-      key: key,
-      buttonAnchor: PullDownMenuAnchor.start,
-      routeTheme: routeTheme,
-      itemBuilder: (context) {
-        List linkNames = ["-"] + cnRunningWorkout.workout.linkedExercises;
-        List<PullDownMenuItem> linkNameWidgets = List.generate(linkNames.length, (index) => PullDownMenuItem.selectable(
-            selected: currentLinkName == linkNames[index],
-            title: linkNames[index],
-            onTap: () {
-              HapticFeedback.selectionClick();
-              FocusManager.instance.primaryFocus?.unfocus();
-              Future.delayed(const Duration(milliseconds: 200), (){
-                onConfirm(linkNames[index]);
-              });
-            })
-        );
-        return linkNameWidgets;
-      },
-      onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
-      buttonBuilder: (context, showMenu) => CupertinoButton(
-          onPressed: (){
-            HapticFeedback.selectionClick();
-            showMenu();
-          },
-          padding: EdgeInsets.zero,
-          child: child
-      ),
-    );
-  }
+  // Widget getSelectLink({
+  //   Key? key,
+  //   required Widget child,
+  //   required Function(String category) onConfirm,
+  //   required BuildContext context,
+  //   required String currentLinkName
+  // }) {
+  //   return PullDownButton(
+  //     key: key,
+  //     buttonAnchor: PullDownMenuAnchor.start,
+  //     routeTheme: routeTheme,
+  //     itemBuilder: (context) {
+  //       List linkNames = ["-"] + cnRunningWorkout.workout.linkedExercises;
+  //       List<PullDownMenuItem> linkNameWidgets = List.generate(linkNames.length, (index) => PullDownMenuItem.selectable(
+  //           selected: currentLinkName == linkNames[index],
+  //           title: linkNames[index],
+  //           onTap: () {
+  //             HapticFeedback.selectionClick();
+  //             FocusManager.instance.primaryFocus?.unfocus();
+  //             Future.delayed(const Duration(milliseconds: 200), (){
+  //               onConfirm(linkNames[index]);
+  //             });
+  //           })
+  //       );
+  //       return linkNameWidgets;
+  //     },
+  //     onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
+  //     buttonBuilder: (context, showMenu) => CupertinoButton(
+  //         onPressed: (){
+  //           HapticFeedback.selectionClick();
+  //           showMenu();
+  //         },
+  //         padding: EdgeInsets.zero,
+  //         child: child
+  //     ),
+  //   );
+  // }
 
   double getYPositionStopwatch(){
     final heightSpotifyBar = showSpotify? cnSpotifyBar.height + 1 : 0.0;

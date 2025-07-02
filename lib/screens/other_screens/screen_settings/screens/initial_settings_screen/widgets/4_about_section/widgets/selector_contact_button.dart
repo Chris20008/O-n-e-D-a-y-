@@ -24,6 +24,7 @@ class SelectorContactButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PullDownButton(
+      useRootNavigator: true,
       onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,
       itemBuilder: (context) {
