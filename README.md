@@ -2,7 +2,7 @@
 
 ## Installation
 
-- create dotenv.env file in root. Should contain keys ICLOUD_CONTAINER_ID and SPOTIFY_CLIENT_ID if you want to use iCloud Containers or Spotify, but can be left completely blank.
+- create dotenv.env file in root. Needs to contain keys ICLOUD_CONTAINER_ID and SPOTIFY_CLIENT_ID. If you want to use iCloud Containers or Spotify you have to create those IDs via spotify developer and your Apple developer Account, but can be filed with a default like 0000.
 
 - get google-service.json file from firebase console and save under root/android/app/google-services.json
 
