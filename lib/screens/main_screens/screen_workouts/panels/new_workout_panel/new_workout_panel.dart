@@ -384,10 +384,10 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     await openPanel(context);
     minPanelHeight = keepShowingPanelHeight;
     /// is needed to move spotifyBar higher when panel is opened
-    cnHomepage.refresh();
+    // cnHomepage.refresh();
     /// is needed to move addWorkout button higher when panel is opened
-    cnWorkouts.refresh();
-    cnWorkoutHistory.refresh();
+    // cnWorkouts.refresh();
+    // cnWorkoutHistory.refresh();
   }
 
   Future<void> openPanel(BuildContext context) async{
@@ -420,7 +420,7 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     CnBottomMenu cnBottomMenu = Provider.of<CnBottomMenu>(context, listen: false);
     CnNewExercisePanel cnNewExercisePanel = Provider.of<CnNewExercisePanel>(context, listen: false);
     vibrateCancel();
-    await closePanel(doClear: true, context: context);
+    await closePanel(doClear: true, context: context, withRefresh: false);
     cnNewExercisePanel.clear();
     formKey.currentState?.reset();
     if(panelController.panelPosition < 0.05){
@@ -692,7 +692,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
     orderExercises();
   }
 
-  Future closePanel({bool doClear = false, required BuildContext context})async{
+  Future closePanel({
+    bool doClear = false,
+    required BuildContext context,
+    bool withRefresh = true
+  })async{
     if(MediaQuery.of(context).viewInsets.bottom > 0){
       FocusManager.instance.primaryFocus?.unfocus();
       await Future.delayed(const Duration(milliseconds: 300));
@@ -714,9 +718,11 @@ class CnNewWorkOutPanel extends ChangeNotifier{
         }
       });
     });
-    cnHomepage.refresh();
-    cnWorkouts.refresh();
-    cnWorkoutHistory.refresh();
+    if(withRefresh){
+      cnHomepage.refresh();
+      cnWorkouts.refresh();
+      cnWorkoutHistory.refresh();
+    }
   }
 
   Future editWorkout({

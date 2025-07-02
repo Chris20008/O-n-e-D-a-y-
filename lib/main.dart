@@ -465,18 +465,23 @@ class _MyHomePageState extends State<MyHomePage>{
                                 ),
 
                                 if(cnConfig.useSpotify)
-                                  AnimatedContainer(
-                                    duration: const Duration(milliseconds: 300),
-                                    transform: Matrix4.translationValues(0, cnNewWorkout.minPanelHeight>0? -(cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0, 0),
-                                    curve: Curves.easeInOut,
-                                    child: const SafeArea(
-                                      top: false,
-                                      child: Hero(
-                                          transitionOnUserGestures: true,
-                                          tag: "SpotifyBar",
-                                          child: SpotifyBar()
-                                      ),
-                                    ),
+                                  Selector<CnNewWorkOutPanel, double>(
+                                    selector: (context , cn ) => cn.minPanelHeight,
+                                    builder: (context, minPanelHeight, _) {
+                                      return AnimatedContainer(
+                                        duration: const Duration(milliseconds: 300),
+                                        transform: Matrix4.translationValues(0, minPanelHeight>0? -(minPanelHeight-cnBottomMenu.height) : 0, 0),
+                                        curve: Curves.easeInOut,
+                                        child: const SafeArea(
+                                          top: false,
+                                          child: Hero(
+                                              transitionOnUserGestures: true,
+                                              tag: "SpotifyBar",
+                                              child: SpotifyBar()
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   ),
 
                                 const NewWorkOutPanel(),

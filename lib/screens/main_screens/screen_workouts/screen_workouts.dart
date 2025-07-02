@@ -111,57 +111,44 @@ class _ScreenWorkoutState extends State<ScreenWorkout> {
 
             SafeArea(
               bottom: true,
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                transform: Matrix4.translationValues(
-                    /// x
-                    -5,
-                    /// y
-                    -(cnConfig.useSpotify? cnSpotifyBar.height + 4 : 0) - (cnNewWorkout.minPanelHeight>0? (cnNewWorkout.minPanelHeight-cnBottomMenu.height) : 0),
-                    /// z
-                    0),
-                curve: Curves.easeInOut,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: SizedBox(
-                      width: 54,
-                      height: 54,
-                      child: IconButton(
-                          key: cnWorkouts.keyAddWorkout,
-                          iconSize: 25,
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+              child: Selector<CnNewWorkOutPanel, double>(
+                  selector: (context , cn ) => cn.minPanelHeight,
+                  builder: (context, minPanelHeight, _) {
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      transform: Matrix4.translationValues(
+                          /// x
+                          -2,
+                          /// y
+                          -(cnConfig.useSpotify? cnSpotifyBar.height + 4 : 0) - (minPanelHeight>0? (minPanelHeight-cnBottomMenu.height) : 0),
+                          /// z
+                          0),
+                      curve: Curves.easeInOut,
+                      child: Align(
+                        alignment: Alignment.bottomRight,
+                        child: SizedBox(
+                            width: cnSpotifyBar.heightOfButton,
+                            height: cnSpotifyBar.heightOfButton,
+                            child: IconButton(
+                                key: cnWorkouts.keyAddWorkout,
+                                iconSize: 25,
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(Colors.transparent),
+                                ),
+                                onPressed: () {
+                                  cnNewWorkout.openPanelAsTemplate(context);
+                                },
+                                icon: Icon(
+                                    Icons.add,
+                                  color: Colors.amber[800],
+                                )
+                            ),
                           ),
-                          onPressed: () {
-                            cnNewWorkout.openPanelAsTemplate(context);
-                          },
-                          icon: Icon(
-                              Icons.add,
-                            color: Colors.amber[800],
-                          )
                       ),
-                    ),
-                ),
+                    );
+                }
               ),
             ),
-
-            // Center(
-            //   child: ElevatedButton(
-            //     child: Text("Test"),
-            //     onPressed: ()async{
-            //       pushRoute();
-            //       // HapticFeedback.selectionClick();
-            //       // Future.delayed(const Duration(milliseconds: 1000), () async{
-            //       //   // final localFiles = await getLocalBackupFiles();
-            //       //   Navigator.push(
-            //       //       context,
-            //       //       MaterialPageRoute(
-            //       //           builder: (context) => const LocalFilePicker()
-            //       //       ));
-            //       // });
-            //     },
-            //   ),
-            // )
           ],
         ),
       ),
