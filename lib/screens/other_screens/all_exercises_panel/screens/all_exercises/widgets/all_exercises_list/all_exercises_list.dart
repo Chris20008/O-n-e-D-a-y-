@@ -67,8 +67,8 @@ class AllExercisesList extends StatelessWidget {
                         final tempEx = Exercise.copy(filteredExercises[index].exercise!);
                         tempEx.linkName = null;
                         tempEx.blockLink = false;
-                        /// set id to 0 instead of default -100, so that is exercise does not count as a template
-                        tempEx.id = 0;
+                        /// set id to -10 instead of default -100, so that is exercise does not count as a template
+                        tempEx.id = -10;
                         cnNewExercisePanel.setExercise(tempEx);
                         cnNewExercisePanel.linkedExercises = cnAllExercisesPanel.config.linkedExercises;
                         cnNewExercisePanel.onConfirm = cnAllExercisesPanel.config.onConfirm;

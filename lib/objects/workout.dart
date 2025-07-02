@@ -173,12 +173,16 @@ class Workout{
 
   void addOrUpdateExercise(Exercise exercise){
     List<String> existingExercises = exercises.map((e) => e.name).toList();
-    if(exercise.originalName != null && existingExercises.contains(exercise.originalName)){
+    /// id == -10 marks new exercise
+    if(exercise.originalName != null && existingExercises.contains(exercise.originalName) && exercise.id != -10){
       final index = existingExercises.indexOf(exercise.originalName!);
       exercises[index] = exercise;
       // List<String> existingExercises2 = exercises.map((e) => e.name).toList();
     }
     else{
+      if(exercise.id == -10){
+        exercise.id = 0;
+      }
       exercises.add(
           exercise
       );

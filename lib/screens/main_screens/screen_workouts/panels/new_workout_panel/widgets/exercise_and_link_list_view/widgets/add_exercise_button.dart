@@ -43,7 +43,6 @@ class AddExerciseButton extends StatelessWidget {
               return "Diese Übung existiert bereits in deinen Vorlagen";
             }
           }
-
           return null;
         },
         onConfirm: (Exercise exercise){
