@@ -348,7 +348,11 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
     for(Exercise ex in workout.exercises){
       /// A completely new exercises was added during runningWorkout
       if(!allExNamesTemplate.contains(ex.name)){
+        /// Add it as relevant exercises
         relevantExercises.add(ex);
+        /// And clear all sets in workoutTemplate to show in slid up screen,
+        /// that the sets are empty/ not existent in current workout template
+        workoutTemplate.exercises.firstWhereOrNull((e) => e.name == ex.name)?.resetSets(keepSetType: false);
         continue;
       }
       final tempEx = workoutTemplateNotModified.exercises.firstWhere((e) => ex.name == e.name);
@@ -361,8 +365,6 @@ class CnSelectorExerciseToUpdate extends ChangeNotifier {
     if(withRefresh){
       refresh();
     }
-
-    print("Final relevant exercises: $relevantExercises");
   }
 
   Future openPanel() async{

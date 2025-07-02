@@ -65,7 +65,7 @@ class _AnimatedColumnState extends State<AnimatedColumn> {
         // cnAnimatedColumn.newEx.name = _textController.text;
         exercise.blockLink = exercise.linkName == null;
         final templateEx = Exercise.copy(exercise);
-        exercise.sets = exercise.sets.map((set) => SingleSet()).toList();
+        exercise.sets = exercise.sets.map((set) => SingleSet(setType: set.setType)).toList();
         // exercise.linkName = null;
         double additionalScrollPosition = (cnStopwatchWidget.isOpened? cnStopwatchWidget.heightOfTimer : 0)
             + (cnSpotifyBar.isConnected && !cnSpotifyBar.justClosed? cnSpotifyBar.height : 0)
