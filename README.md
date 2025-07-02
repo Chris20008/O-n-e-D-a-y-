@@ -15,6 +15,9 @@
 - run: flutter pub run flutter_launcher_icons
 
 
+When having issues with build due to jdk/jbr/java version try: flutter config --jdk-dir "C:\Program Files\Java\jdk-17" after you have installed jdk 17 under the path.
+
+
 ## Documentation
 
 # 📁 `lib/screens/` – Tiefgehende, semantische Dokumentation
