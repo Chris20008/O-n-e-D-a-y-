@@ -61,7 +61,7 @@ class BackupOptions extends StatelessWidget {
 
         /// Share backup
         CupertinoListTile(
-          leading: Image.asset("lib/assets/pictures/share.png"),
+          leading: const SettingsIcon(iconPath: "share.png"),
           title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare, style: const TextStyle(color: Colors.white),),
           onTap: () async{
             await shareBackup(cnConfig: cnConfig);
