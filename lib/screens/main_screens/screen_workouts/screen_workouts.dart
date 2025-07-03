@@ -12,6 +12,7 @@ import '../../../util/objectbox/ob_workout.dart';
 import '../../../widgets/spotify_bar.dart';
 import '../../../widgets/workout_expansion_tile.dart';
 import '../../other_screens/screen_running_workout/screen_running_workout.dart';
+
 class ScreenWorkout extends StatefulWidget {
   const ScreenWorkout({super.key});
 

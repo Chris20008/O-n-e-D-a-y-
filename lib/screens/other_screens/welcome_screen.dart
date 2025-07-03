@@ -1,12 +1,13 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/panels/explain_backup_panel.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_health.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_spotify.dart';
 import 'package:fitness_app/util/language_config.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
-import 'package:fitness_app/widgets/slide_up_panel/my_slide_up_panel.dart';
 import 'package:fitness_app/widgets/selectors/select_language_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../util/config.dart';
 import '../../util/constants.dart';
 import 'dart:io';
@@ -35,22 +35,24 @@ class WelcomeScreen extends StatefulWidget {
 class _WelcomeScreenState extends State<WelcomeScreen> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
+  late CnSettings cnSettings =context.read<CnSettings>();
   late CnScreenStatistics cnScreenStatistics;
   late CnConfig cnConfig;
-  PanelController controllerExplainBackups = PanelController();
   final maxIndex = 4;
   int screenIndex = 0;
 
+
   @override
-  void initState() {
-    // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-    super.initState();
+  void dispose(){
+    super.dispose();
+    cnSettings.explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenSettings;
   }
 
   @override
   Widget build(BuildContext context) {
     cnConfig  = Provider.of<CnConfig>(context);
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+    cnSettings.explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenWelcome;
 
     return Stack(
       children: [
@@ -76,32 +78,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
         ),
-        MySlideUpPanel(
-          controller: controllerExplainBackups,
-          animationControllerName: AnimationControllerName.explainBackups,
-          descendantAnimationControllerName: AnimationControllerName.screenWelcome,
-          // backdropEnabled: false,
-          // backdropColor: Colors.blue,
-          // backdropOpacity: 1,
-          panelBuilder: (context, listView){
-            return Column(
-              children: [
-                const SizedBox(height: 10,),
-                // panelTopBar,
-                const SizedBox(height: 10,),
-                Expanded(
-                  child: listView(
-                    padding: EdgeInsets.zero,
-                    controller: ScrollController(),
-                    children: [
-                      getBackupDialogWelcomeScreen(context: context)
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+        const ExplainBackupPanel(),
       ],
     );
   }
@@ -440,11 +417,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     GestureDetector(
                       onTap: () async{
                         HapticFeedback.selectionClick();
-                        controllerExplainBackups.animatePanelToPosition(
-                            1,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.fastEaseInToSlowEaseOut
-                        );
+                        cnSettings.openPanelExplainBackups();
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 20),

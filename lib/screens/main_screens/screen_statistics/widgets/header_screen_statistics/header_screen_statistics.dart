@@ -49,7 +49,7 @@ class HeaderScreenStatistics extends StatelessWidget {
             IconButton(
               // color: Colors.amber[200]!,
                 color: Colors.white,
-                onPressed: () => cnSettings.openPanel(context),
+                onPressed: () => cnSettings.openPanelSettings(context),
                 icon: const Icon(
                   Icons.settings,
                 )

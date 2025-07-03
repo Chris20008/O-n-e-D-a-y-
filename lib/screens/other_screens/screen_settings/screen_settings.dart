@@ -39,7 +39,6 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   bool setOrientation = false;
   final settingsObserver = CustomNavigatorObserver();
 
-
   @override
   void initState() {
     super.initState();
@@ -67,8 +66,8 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   }
 
   void onPopInvoked(doPop, result){
-    if(cnSettings.controllerExplainBackups.panelPosition > 0.9){
-      cnSettings.controllerExplainBackups.close();
+    if(cnSettings.panelControllerExplainBackups.panelPosition > 0.9){
+      cnSettings.panelControllerExplainBackups.close();
     }
     else if(settingsObserver.currentRouteName != '/initialSettingsScreen'){
       cnSettings.navigatorKey.currentState?.pop();
@@ -94,6 +93,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
     cnConfig = Provider.of<CnConfig>(context);
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
     cnSettings = context.read<CnSettings>();
+    cnSettings.explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenSettings;
 
     pr("Rebuild Screen Settings");
 
@@ -174,11 +174,12 @@ class CnSettings extends ChangeNotifier{
   final ValueNotifier<int> _reloadLocalBackups = ValueNotifier(0);
   bool showLoadingIndicator = false;
   GlobalKey<NavigatorState> navigatorKey = GlobalKey();
-  PanelController controllerExplainBackups = PanelController();
+  PanelController panelControllerExplainBackups = PanelController();
   PanelController panelControllerSettings = PanelController();
   ScrollController scrollControllerSetting = ScrollController();
   ScrollController scrollControllerBackupsScreen = ScrollController();
   ScrollController scrollControllerExplainBackups = ScrollController();
+  AnimationControllerName explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenSettings;
   int refreshListViewInitialSettings = 0;
   final int animationTime = 500;
 
@@ -198,7 +199,7 @@ class CnSettings extends ChangeNotifier{
     refresh();
   }
 
-  Future openPanel(BuildContext context) async{
+  Future openPanelSettings(BuildContext context) async{
     OverlayEntry ov = blockUserInput(context, duration: null)!;
     showContent.value = true;
     await waitForNextFrame();
@@ -223,6 +224,15 @@ class CnSettings extends ChangeNotifier{
         curve: Curves.fastEaseInToSlowEaseOut
     );
     ov.remove();
+    return;
+  }
+
+  Future openPanelExplainBackups() async{
+    await panelControllerExplainBackups.animatePanelToPosition(
+        1,
+        duration: Duration(milliseconds: animationTime),
+        curve: Curves.fastEaseInToSlowEaseOut
+    );
     return;
   }
 

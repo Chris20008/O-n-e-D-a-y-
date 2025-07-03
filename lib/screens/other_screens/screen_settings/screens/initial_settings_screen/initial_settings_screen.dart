@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../../../../../widgets/slide_up_panel/panel_header.dart';
 import '../../screen_settings.dart';
 
 class InitialSettingsScreen extends StatelessWidget {
@@ -20,9 +21,7 @@ class InitialSettingsScreen extends StatelessWidget {
 
     return Column(
       children: [
-        const SizedBox(height: 10,),
-        Text(AppLocalizations.of(context)!.settings,textScaler: const TextScaler.linear(1.4)),
-        const SizedBox(height: 10),
+        PanelHeader(text: AppLocalizations.of(context)!.settings),
         Expanded(
           child: ListViewScope.of(context).listView(
             physics: const BouncingScrollPhysics(),
@@ -32,9 +31,6 @@ class InitialSettingsScreen extends StatelessWidget {
 
                 /// General
                 GeneralSettings(),
-
-                // /// Backup
-                // BackupOptions(),
 
                 /// Account
                 AccountSection(),

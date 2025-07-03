@@ -33,11 +33,7 @@ class BackupOptions extends StatelessWidget {
       footer: GestureDetector(
         onTap: () async{
           HapticFeedback.selectionClick();
-          cnSettings.controllerExplainBackups.animatePanelToPosition(
-              1,
-              duration: const Duration(milliseconds: 500),
-              curve: Curves.fastEaseInToSlowEaseOut
-          );
+          cnSettings.openPanelExplainBackups();
         },
         child: Padding(
           padding: const EdgeInsets.only(left: 10),
@@ -62,7 +58,7 @@ class BackupOptions extends StatelessWidget {
         /// Share backup
         CupertinoListTile(
           leading: const SettingsIcon(iconPath: "share.png"),
-          title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodShare, style: const TextStyle(color: Colors.white),),
+          title: Text(AppLocalizations.of(context)!.settingsShareBackup, style: const TextStyle(color: Colors.white),),
           onTap: () async{
             await shareBackup(cnConfig: cnConfig);
           },

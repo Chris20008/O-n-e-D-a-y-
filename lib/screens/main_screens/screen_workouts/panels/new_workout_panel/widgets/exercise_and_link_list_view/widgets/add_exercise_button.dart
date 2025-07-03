@@ -40,7 +40,7 @@ class AddExerciseButton extends StatelessWidget {
           else if(cnNewExercise.exercise.originalName != cnNewExercise.exercise.name){
             final bool nameExists = cnAllExercisesPanel.exercises.map((ex) => ex.name.toLowerCase()).contains(value.toLowerCase());
             if(nameExists){
-              return "Diese Übung existiert bereits in deinen Vorlagen";
+              return AppLocalizations.of(context)!.runningWorkoutExerciseAlreadyExistsInTemplates;
             }
           }
           return null;

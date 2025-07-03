@@ -5,6 +5,7 @@ import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../screen_settings.dart';
 
@@ -37,7 +38,7 @@ class AccountSection extends StatelessWidget {
              // leading: const Icon(Icons.logout, color: Colors.white),
             leading: const SettingsIcon(iconPath: "logout.png"),
              trailing: trailingArrow,
-             title:const Text("Logout", style: TextStyle(color: Colors.white)),
+             title: Text(AppLocalizations.of(context)!.settingsLogout, style: const TextStyle(color: Colors.white)),
            );
           }
 
@@ -46,9 +47,9 @@ class AccountSection extends StatelessWidget {
                 color: Theme.of(context).cardColor
             ),
             backgroundColor: Colors.transparent,
-            header: const Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text("Account", style: TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
+            header: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(AppLocalizations.of(context)!.settingsAccount, style: const TextStyle(color: Colors.grey, fontSize: 15, fontWeight: FontWeight.w300),),
             ),
             children: [
               CupertinoListTile(
@@ -56,7 +57,7 @@ class AccountSection extends StatelessWidget {
                 // leading: Icon(MyIcons.shield_alt, color: Colors.white),
                 leading: const SettingsIcon(iconPath: "backups.png"),
                 trailing: trailingArrow,
-                title:const Text("Backups", style: TextStyle(color: Colors.white)),
+                title: Text(AppLocalizations.of(context)!.settingsBackups, style: const TextStyle(color: Colors.white)),
               ),
               loginState
             ],
