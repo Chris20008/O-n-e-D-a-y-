@@ -55,6 +55,7 @@
   "settingsBackups": "Kopie zapasowe",
   "settingsAccount": "Konto",
   "settingsLogout": "Wyloguj się",
+  "settingsLastCreatedBackups": "Ostatnio utworzone kopie zapasowe",
   "settinsgExplainWhyBackups": "Nawet jeśli masz już konto w aplikacji, połączenie z {cloud} jest nadal przydatne do przechowywania kopii zapasowych. Zapewnia to maksymalne bezpieczeństwo: nawet w przypadku utraty urządzenia, odinstalowania aplikacji lub problemów technicznych z naszej strony możesz w każdej chwili w pełni przywrócić swoje dane.",
   "settingsBackupSaveManual": "Utwórz kopię ręcznie",
   "settingsConnectGoogleDriveExplanation": "Możesz połączyć konto Google Drive. Wszystkie przyszłe kopie będą zapisywane na Google Drive.",

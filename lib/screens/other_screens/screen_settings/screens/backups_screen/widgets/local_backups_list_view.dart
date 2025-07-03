@@ -131,7 +131,7 @@ class LocalBackupsListView extends StatelessWidget {
 
     return Column(
       children: [
-        const Text("Zuletzt erstellte Backups"),
+        Text(AppLocalizations.of(context)!.settingsLastCreatedBackups),
         const SizedBox(height: 30,),
         ValueListenableBuilder(
             valueListenable: cnSettings.reloadLocalBackups,

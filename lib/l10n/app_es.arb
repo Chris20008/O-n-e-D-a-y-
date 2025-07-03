@@ -55,6 +55,7 @@
   "settingsBackups": "Copias de seguridad",
   "settingsAccount": "Cuenta",
   "settingsLogout": "Cerrar sesión",
+  "settingsLastCreatedBackups": "Últimas copias de seguridad creadas",
   "settinsgExplainWhyBackups": "Aunque ya tengas una cuenta en la app, conectar con {cloud} sigue siendo útil para guardar tus copias de seguridad allí. Esto te brinda la máxima seguridad: incluso si pierdes el dispositivo, desinstalas la app o hay problemas técnicos por nuestra parte, podrás restaurar completamente tus datos en cualquier momento.",
   "settingsBackupSaveManual": "Crear copia manual",
   "settingsConnectGoogleDriveExplanation": "Puedes conectarte con tu cuenta de Google Drive. Todas las futuras copias se guardarán en Google Drive.",

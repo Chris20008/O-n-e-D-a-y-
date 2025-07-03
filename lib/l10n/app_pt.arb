@@ -55,6 +55,7 @@
   "settingsBackups": "Backups",
   "settingsAccount": "Conta",
   "settingsLogout": "Sair",
+  "settingsLastCreatedBackups": "Últimos backups criados",
   "settinsgExplainWhyBackups": "Mesmo que você já tenha uma conta no app, conectar com {cloud} ainda é útil para armazenar seus backups lá. Isso oferece máxima segurança: mesmo em caso de perda do dispositivo, desinstalação do aplicativo ou problemas técnicos do nosso lado, você pode restaurar completamente seus dados a qualquer momento.",
   "settingsBackupSaveManual": "Criar backup manual",
   "settingsConnectGoogleDriveExplanation": "Você pode conectar à sua conta do Google Drive. Todos os backups futuros serão salvos no Google Drive.",

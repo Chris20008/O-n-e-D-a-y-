@@ -55,6 +55,7 @@
   "settingsBackups": "Back‑ups",
   "settingsAccount": "Account",
   "settingsLogout": "Afmelden",
+  "settingsLastCreatedBackups": "Laatst gemaakte back‑ups",
   "settinsgExplainWhyBackups": "Ook als je al een account in de app hebt, is het nuttig om verbinding te maken met {cloud} om daar back‑ups op te slaan. Dit geeft je maximale veiligheid: zelfs bij verlies van je apparaat, verwijdering van de app of technische problemen van onze kant kun je je gegevens altijd volledig herstellen.",
   "settingsBackupSaveManual": "Handmatig back‑up maken",
   "settingsConnectGoogleDriveExplanation": "Je kunt verbinding maken met je Google Drive‑account. Alle toekomstige back‑ups worden opgeslagen op Google Drive.",

@@ -55,6 +55,7 @@
   "settingsBackups": "Sauvegardes",
   "settingsAccount": "Compte",
   "settingsLogout": "Se déconnecter",
+  "settingsLastCreatedBackups": "Dernières sauvegardes créées",
   "settinsgExplainWhyBackups": "Même si vous avez déjà un compte dans l'application, connecter {cloud} reste utile pour y enregistrer vos sauvegardes. Cela vous offre une sécurité maximale : même en cas de perte de l'appareil, de désinstallation de l'application ou de problème technique de notre part, vous pouvez restaurer vos données à tout moment.",
   "settingsBackupSaveManual": "Créer une sauvegarde manuelle",
   "settingsConnectGoogleDriveExplanation": "Vous pouvez vous connecter à votre compte Google Drive. Toutes les sauvegardes futures seront enregistrées sur Google Drive.",
