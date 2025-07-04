@@ -29,7 +29,7 @@ Future<dynamic> futureWithLoadingOverlay({
     builder: (context) => Positioned.fill(
       child: AbsorbPointer(
         child: Container(
-            color: Colors.black.withValues(alpha: 0.3),
+            color: Colors.black.withValues(alpha: 0.5),
             child: CupertinoActivityIndicator(
                 radius: 20.0,
                 color: Colors.amber[800]
