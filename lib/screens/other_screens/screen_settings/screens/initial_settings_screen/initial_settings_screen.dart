@@ -32,11 +32,11 @@ class InitialSettingsScreen extends StatelessWidget {
                 /// General
                 GeneralSettings(),
 
-                /// Account
-                AccountSection(),
-
                 /// About
                 AboutSection(),
+
+                /// Account
+                AccountSection(),
 
                 /// Spacer
                 SizedBox(height: 50,)

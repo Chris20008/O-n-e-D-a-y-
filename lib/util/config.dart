@@ -181,11 +181,7 @@ class CnConfig extends ChangeNotifier {
     showMoreSettingCloud = false;
   }
 
-  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics, {bool targetState = true})async{
-    if(!targetState){
-      await setHealth(false);
-      return false;
-    }
+  Future<bool> isHealthDataAccessAllowed(CnScreenStatistics cnScreenStatistics)async{
     bool? result = false;
     bool? permission = false;
     bool hadToWait = false;
@@ -233,11 +229,7 @@ class CnConfig extends ChangeNotifier {
     return finalResult;
   }
 
-  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context, bool targetState = false}) async{
-    if(!targetState){
-      await setSpotify(false);
-      return false;
-    }
+  Future<bool> isSpotifyInstalled({int delayMilliseconds = 0, int secondDelayMilliseconds = 1500, required BuildContext context}) async{
     isWaitingForSpotifyResponse = true;
     await Future.delayed(Duration(milliseconds: delayMilliseconds));
     final result = await canLaunchUrl(Uri.parse("spotify:"));

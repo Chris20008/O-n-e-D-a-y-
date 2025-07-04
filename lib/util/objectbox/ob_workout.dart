@@ -115,7 +115,7 @@ class ObWorkout with Checksum implements FirebaseObject{
   Future delete() async{
     deleteAllExercises();
     objectbox.workoutBox.remove(id);
-    await CnSyncManager.database?.deleteWorkout(wo: this);
+    await CnSyncManager.database?.deleteCollectionObject(object: this);
   }
 
   @override
@@ -136,7 +136,7 @@ class ObWorkout with Checksum implements FirebaseObject{
       pr("New Checksum ${newWorkout.checksum}");
       pr("");
       if(newWorkout.checksum != oldChecksum && !onlyLocal){
-        await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
+        await CnSyncManager.database?.addCollectionObject(object: newWorkout, oldChecksum: oldChecksum);
       }
     }
   }
@@ -159,7 +159,7 @@ class ObWorkout with Checksum implements FirebaseObject{
       pr("");
       if(newWorkout.checksum != oldChecksum){
         // await CnSyncManager.database?.addWorkout(wo: newWorkout, oldChecksum: oldChecksum);
-        await CnSyncManager.database?.addCollectionObject(ob: newWorkout, oldChecksum: oldChecksum);
+        await CnSyncManager.database?.addCollectionObject(object: newWorkout, oldChecksum: oldChecksum);
       }
     }
   }

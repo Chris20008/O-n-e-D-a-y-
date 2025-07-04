@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'constants.dart';
+import '../util/constants.dart';
 
 class CupertinoSwitchFuture extends StatefulWidget {
 
   final bool initialState;
-  final Future<bool> Function(bool targetState) future;
+  final Future<bool> Function() future;
 
   const CupertinoSwitchFuture({
     super.key,
@@ -30,7 +30,7 @@ class _CupertinoSwitchFutureState extends State<CupertinoSwitchFuture> {
   Widget build(BuildContext context) {
     return FutureBuilder(
         key: futureKey,
-        future: widget.future(targetState),
+        future: widget.future(),
         builder: (context, connected){
           if(!connected.hasData){
             return SizedBox(
@@ -44,14 +44,17 @@ class _CupertinoSwitchFutureState extends State<CupertinoSwitchFuture> {
               ),
             );
           }
-          if(connected.data == true && !currentState){
+          if(connected.data == true && !currentState && targetState){
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Future.delayed(const Duration(milliseconds: 50), (){
-                currentState = targetState;
-                setState(() {});
+                if(targetState){
+                  currentState = targetState;
+                  setState(() {});
+                }
               });
             });
-          } else if(connected.data == false && targetState){
+          }
+          else if(connected.data == false && targetState){
             currentState = false;
             targetState = false;
           }

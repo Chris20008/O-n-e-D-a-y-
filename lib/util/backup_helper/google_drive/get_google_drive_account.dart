@@ -3,13 +3,17 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
 
+import '../../constants.dart';
+
 Future<GoogleSignInAccount?> getGoogleDriveAccount() async {
   GoogleSignInAccount? account;
 
   GoogleSignIn googleSignIn = GoogleSignIn(scopes: [ga.DriveApi.driveFileScope]);
   try {
+    pr("WAIT SIGN IN");
     account = await googleSignIn.signIn();
   } catch (error) {
+    pr("ERROR DURING GOOGLE SIGN IN: $error");
     Fluttertoast.showToast(
         msg: error.toString(),
         toastLength: Toast.LENGTH_LONG,

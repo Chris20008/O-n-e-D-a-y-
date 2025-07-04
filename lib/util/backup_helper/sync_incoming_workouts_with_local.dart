@@ -129,7 +129,7 @@ Future<bool> syncIncomingWorkoutsWithLocal(List<ObWorkout> workouts, {CnHomepage
   objectbox.exerciseBox.removeMany(allCurrentWorkouts.map((w) => w.exercises).expand((element) => element).map((e) => e.id).toList());
   objectbox.workoutBox.removeMany(allCurrentWorkouts.map((w) => w.id).toList());
   for(ObWorkout wo in allCurrentWorkouts){
-    await CnSyncManager.database?.deleteWorkout(wo: wo);
+    await CnSyncManager.database?.deleteCollectionObject(object: wo);
   }
   if(cnHomepage != null){
     cnHomepage.finishSync();

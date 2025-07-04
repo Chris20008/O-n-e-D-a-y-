@@ -80,7 +80,7 @@ class ObSickDays with Checksum implements FirebaseObject {
       pr("New Checksum ${newSickDay.checksum}");
       pr("");
       if(newSickDay.checksum != oldChecksum && !onlyLocal){
-        await CnSyncManager.database?.addCollectionObject(ob: newSickDay, oldChecksum: oldChecksum);
+        await CnSyncManager.database?.addCollectionObject(object: newSickDay, oldChecksum: oldChecksum);
       }
     }
   }
@@ -95,7 +95,7 @@ class ObSickDays with Checksum implements FirebaseObject {
 
   Future delete() async{
     objectbox.sickDaysBox.remove(id);
-    await CnSyncManager.database?.deleteCollectionObject(ob: this);
+    await CnSyncManager.database?.deleteCollectionObject(object: this);
   }
 
   bool isNewSickDays(){

@@ -428,15 +428,6 @@ class CnScreenStatistics extends ChangeNotifier {
     selectedExerciseTemplate = null;
   }
 
-  // void openSettingsPanel(){
-  //   // HapticFeedback.selectionClick();
-  //   panelControllerSettings.animatePanelToPosition(
-  //       1,
-  //       duration: const Duration(milliseconds: 500),
-  //       curve: Curves.fastEaseInToSlowEaseOut
-  //   );
-  // }
-
   void saveCurrentFilterState(){
     selectedWorkoutNameLast = selectedWorkoutName;
     selectedWorkoutIndexLast = selectedWorkoutIndex;

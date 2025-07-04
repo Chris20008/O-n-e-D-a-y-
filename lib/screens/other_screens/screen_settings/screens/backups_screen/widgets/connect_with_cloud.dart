@@ -20,10 +20,6 @@ class ConnectWithCloud extends StatelessWidget {
     return StatefulBuilder(
         builder: (context, setModalState){
           return CupertinoListTile(
-            // leading: const Icon(
-            //     Icons.cloud_done,
-            //     color: Colors.white
-            // ),
             leading: const SettingsIcon(iconPath: "connect_icloud.png"),
             trailing: CupertinoSwitch(
                 value: cnConfig.connectWithCloud,

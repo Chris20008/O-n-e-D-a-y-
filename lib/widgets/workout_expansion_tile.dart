@@ -1,5 +1,5 @@
 import 'package:fitness_app/util/constants.dart';
-import 'package:fitness_app/widgets/TextScrollCustomized.dart';
+import 'package:fitness_app/widgets/text_scroll_customized.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -141,7 +141,7 @@ class CnSyncManager extends ChangeNotifier {
       /// so we add it to server backend
       if(objectToDelete.lastUpdated?.isAfter(serverLastUpdated) ?? false){
         pr("Object is missing on server side, but newer than last sync. Add it to Server");
-        await database?.addCollectionObject(ob: objectToDelete);
+        await database?.addCollectionObject(object: objectToDelete);
       }
 
       /// Workout was last Updated before the last server update

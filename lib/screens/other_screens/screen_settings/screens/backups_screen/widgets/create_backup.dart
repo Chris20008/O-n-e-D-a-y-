@@ -24,10 +24,6 @@ class CreateBackup extends StatelessWidget {
     final CnSettings cnSettings = context.read<CnSettings>();
 
     return CupertinoListTile(
-      // leading: const Icon(
-      //   Icons.upload,
-      //   color: Colors.white,
-      // ),
       leading: const SettingsIcon(iconPath: "create_backup.png"),
       title: Text(AppLocalizations.of(context)!.settingsBackupSaveManualMethodSave, style: const TextStyle(color: Colors.white),),
       onTap: () {

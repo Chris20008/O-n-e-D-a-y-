@@ -52,35 +52,18 @@ class DefaultFirebaseOptions {
 
   static FirebaseOptions android = FirebaseOptions(
     apiKey: dotenv.env["FIREBASE_API_KEY_ANDROID"]!,
-    appId: dotenv.env["FIREBASE_APP_ID_ANDROID"]!,
-    messagingSenderId: dotenv.env["FIREBASE_MESSAGING_SENDER_ID"]!,
-    projectId: dotenv.env["FIREBASE_PROJECT_ID"]!,
-    storageBucket: dotenv.env["FIREBASE_STORAGE_BUCKET"]!,
+    appId: '1:560140614397:android:b7c14344c8858cf2d05c94',
+    messagingSenderId: '560140614397',
+    projectId: 'oneday-37b90',
+    storageBucket: 'oneday-37b90.firebasestorage.app',
   );
 
   static FirebaseOptions ios = FirebaseOptions(
     apiKey: dotenv.env["FIREBASE_API_KEY_IOS"]!,
-    appId: dotenv.env["FIREBASE_APP_ID_IOS"]!,
-    messagingSenderId: dotenv.env["FIREBASE_MESSAGING_SENDER_ID"]!,
-    projectId: dotenv.env["FIREBASE_PROJECT_ID"]!,
-    storageBucket: dotenv.env["FIREBASE_STORAGE_BUCKET"]!,
-    iosBundleId: dotenv.env["FIREBASE_IOS_BUNDLE_ID"]!,
+    appId: '1:560140614397:ios:4f42efd92c794f59d05c94',
+    messagingSenderId: '560140614397',
+    projectId: 'oneday-37b90',
+    storageBucket: 'oneday-37b90.firebasestorage.app',
+    iosBundleId: 'christian.range.fitnessapp.fitnessApp11',
   );
-
-  // static const FirebaseOptions android = FirebaseOptions(
-  //   apiKey: 'AIzaSyD-yp0CPjFg2yfg7QJ34Tragihen4gckZM',
-  //   appId: '1:560140614397:android:b7c14344c8858cf2d05c94',
-  //   messagingSenderId: '560140614397',
-  //   projectId: 'oneday-37b90',
-  //   storageBucket: 'oneday-37b90.firebasestorage.app',
-  // );
-  //
-  // static const FirebaseOptions ios = FirebaseOptions(
-  //   apiKey: 'AIzaSyDaLuauKLmEO8X2oWKIe-FrwntuqCsTi60',
-  //   appId: '1:560140614397:ios:4f42efd92c794f59d05c94',
-  //   messagingSenderId: '560140614397',
-  //   projectId: 'oneday-37b90',
-  //   storageBucket: 'oneday-37b90.firebasestorage.app',
-  //   iosBundleId: 'christian.range.fitnessapp.fitnessApp11',
-  // );
 }

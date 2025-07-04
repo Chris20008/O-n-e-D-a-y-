@@ -1,3 +1,4 @@
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/3_Account/show_delete_account_dialog.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'dart:io';
 
+import '../../../../../../../util/sign_in_with_google_button.dart';
 import '../../../../screen_settings.dart';
 
 class AccountSection extends StatelessWidget {
@@ -22,24 +25,44 @@ class AccountSection extends StatelessWidget {
         builder: (context, setModalState) {
           final String? uid = authService.getUid();
 
-          Widget? loginState;
+          List<Widget> loginState;
 
           if(uid == null){
-            loginState = Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: SignInWithAppleButton(
+            late Widget button;
+            if(Platform.isAndroid){
+              button = SignInWithGoogleButton(
+                onPressed: () async {
+                  await authService.signInWithGoogle().then((_) => setModalState(() {}));
+                },
+              );
+            } else{
+              button = SignInWithAppleButton(
                   onPressed: () async => await authService.signInWithApple().then((_) => setModalState((){}))
-              ),
-            );
+              );
+            }
+
+            loginState = [
+              Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: button
+              )
+            ];
           }
           else{
-            loginState = CupertinoListTile(
-             onTap: () async => await authService.signOut().then((_) => setModalState((){})),
-             // leading: const Icon(Icons.logout, color: Colors.white),
-            leading: const SettingsIcon(iconPath: "logout.png"),
-             trailing: trailingArrow,
-             title: Text(AppLocalizations.of(context)!.settingsLogout, style: const TextStyle(color: Colors.white)),
-           );
+            loginState = [
+              CupertinoListTile(
+                onTap: () async => await authService.signOut().then((_) => setModalState((){})),
+                leading: const SettingsIcon(iconPath: "logout.png"),
+                trailing: trailingArrow,
+                title: Text(AppLocalizations.of(context)!.settingsLogout, style: const TextStyle(color: Colors.white)),
+              ),
+              CupertinoListTile(
+                onTap: () => showDeleteAccountDialog(context, setModalState),
+                leading: const SettingsIcon(iconPath: "delete_account.png"),
+                trailing: trailingArrow,
+                title: Text("Account löschen", style: const TextStyle(color: Colors.white)),
+              )
+            ];
           }
 
           Widget child = CupertinoListSection.insetGrouped(
@@ -59,7 +82,7 @@ class AccountSection extends StatelessWidget {
                 trailing: trailingArrow,
                 title: Text(AppLocalizations.of(context)!.settingsBackups, style: const TextStyle(color: Colors.white)),
               ),
-              loginState
+              ...loginState
             ],
           );
 

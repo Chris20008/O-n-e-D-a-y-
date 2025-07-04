@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:fitness_app/util/CupertinoSwitchFuture.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../../util/constants.dart';
+import '../../../../../../../../widgets/cupertino_switch_future.dart';
 import '../../../../../widgets/settings_icon.dart';
 
 class CupertinoListTileSwitchHealth extends StatefulWidget {
@@ -34,9 +34,9 @@ class _CupertinoListTileSwitchHealthState extends State<CupertinoListTileSwitchH
       title:  Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
       trailing: CupertinoSwitchFuture(
         initialState: cnConfig.useHealthData,
-        future: (targetState) async{
-          final result = await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics, targetState: targetState);
-          if(!result && targetState && context.mounted){
+        future: () async{
+          final result = await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+          if(!result && context.mounted){
             notificationPopUp(
                 context: context,
                 title: AppLocalizations.of(context)!.accessDenied,

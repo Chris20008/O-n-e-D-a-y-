@@ -53,7 +53,7 @@ int currentTutorialStep = 0;
 String pictureAssetPath = "lib/assets/pictures/";
 Color buttonTextColor = const Color(0xffdb7b01);
 
-String? androidDeveloperUid = "54671382937413";
+// String? androidDeveloperUid = "54671382937413";
 // const String? androidDeveloperUid = null;
 
 void main() async{
@@ -247,7 +247,7 @@ class _MyHomePageState extends State<MyHomePage>{
     await Future.wait(futures);
     
     await cnSyncManager.doSyncWithFireStore();
-    // await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 200));
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
       if(context.mounted){
@@ -335,7 +335,8 @@ class _MyHomePageState extends State<MyHomePage>{
           builder: (context, snapshot) {
 
             if(snapshot.connectionState == ConnectionState.active){
-              final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
+              // final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
+              final uid = snapshot.data?.uid;
               cnSyncManager.setUserId(uid);
               if(ObjectBox.initialized){
                 cnSyncManager.doSyncWithFireStore();
@@ -424,7 +425,8 @@ class _MyHomePageState extends State<MyHomePage>{
       builder: (context, snapshot) {
 
         if(snapshot.connectionState == ConnectionState.active){
-          final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
+          // final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
+          final uid = snapshot.data?.uid;
           cnSyncManager.setUserId(uid);
           if(ObjectBox.initialized){
             cnSyncManager.doSyncWithFireStore();

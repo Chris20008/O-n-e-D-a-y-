@@ -7,7 +7,7 @@ import '../../config.dart';
 import '../backup_constants.dart';
 import '../load_backup/load_backup_from_string.dart';
 import 'get_google_drive_folder_id.dart';
-import 'google_auth_clint.dart';
+import 'google_auth_client.dart';
 
 Future<bool> loadNewestDataGoogleDrive(CnConfig cnConfig, {CnHomepage? cnHomepage}) async{
   try {
