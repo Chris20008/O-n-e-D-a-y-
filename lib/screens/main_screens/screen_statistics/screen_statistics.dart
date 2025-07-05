@@ -451,6 +451,8 @@ class CnScreenStatistics extends ChangeNotifier {
     allExerciseNames = getAllExerciseNames(context);
     if(cnConfig.useHealthData){
       allExerciseNames.insert(0, AppLocalizations.of(context)!.statisticsWeight);
+    } else if(selectedExerciseName == AppLocalizations.of(context)!.statisticsWeight){
+      selectedExerciseName = allExerciseNames.firstOrNull;
     }
     calcMinMaxDates(context);
     allSickDays = objectbox.sickDaysBox.getAll();

@@ -84,6 +84,7 @@ class _ExerciseSelectorState extends State<ExerciseSelector> {
 
   @override
   Widget build(BuildContext context) {
+    pr("Refresh Exercise Selector");
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
 
     cnScreenStatistics.selectedExerciseName ??= cnScreenStatistics.allExerciseNames.firstOrNull;

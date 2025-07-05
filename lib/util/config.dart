@@ -225,7 +225,7 @@ class CnConfig extends ChangeNotifier {
     });
     isWaitingForHealthResponse = false;
     final finalResult = Platform.isIOS? gotData : (result?? false) || (permission?? false);
-    await setHealth(finalResult);
+    // await setHealth(finalResult);
     return finalResult;
   }
 
@@ -256,7 +256,8 @@ class CnConfig extends ChangeNotifier {
       failedSpotifyConnection = false;
       refresh();
     }
-    await setSpotify(result);
+    // await setSpotify(result);
+    print("USE SPOTIFY? $useSpotify");
     return result;
   }
 

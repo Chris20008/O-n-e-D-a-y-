@@ -34,6 +34,11 @@ class _CupertinoListTileSwitchHealthState extends State<CupertinoListTileSwitchH
       title:  Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
       trailing: CupertinoSwitchFuture(
         initialState: cnConfig.useHealthData,
+          onSwitch: (value){
+            cnConfig.setHealth(value);
+            cnScreenStatistics.refreshData(context);
+            cnScreenStatistics.refresh();
+          },
         future: () async{
           final result = await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
           if(!result && context.mounted){

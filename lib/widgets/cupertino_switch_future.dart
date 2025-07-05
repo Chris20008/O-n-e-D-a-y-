@@ -9,11 +9,15 @@ class CupertinoSwitchFuture extends StatefulWidget {
 
   final bool initialState;
   final Future<bool> Function() future;
+  final Function(bool) onSwitch;
+  final CupertinoSwitchFirstLoad futureOnFirstLoad;
 
   const CupertinoSwitchFuture({
     super.key,
     required this.initialState,
-    required this.future
+    required this.future,
+    required this.onSwitch,
+    this.futureOnFirstLoad = CupertinoSwitchFirstLoad.ifTrue
   });
 
   @override
@@ -25,12 +29,20 @@ class _CupertinoSwitchFutureState extends State<CupertinoSwitchFuture> {
   Key futureKey = UniqueKey();
   late bool currentState = widget.initialState;
   late bool targetState = currentState;
+  late bool doFuture = widget.futureOnFirstLoad == CupertinoSwitchFirstLoad.ifTrue && currentState
+      || widget.futureOnFirstLoad == CupertinoSwitchFirstLoad.ifFalse && !currentState
+      || widget.futureOnFirstLoad == CupertinoSwitchFirstLoad.always;
+
+  Future<bool> skipFutureFirstLoad() async{
+    doFuture = true;
+    return currentState;
+  }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         key: futureKey,
-        future: widget.future(),
+        future: doFuture? widget.future() : skipFutureFirstLoad(),
         builder: (context, connected){
           if(!connected.hasData){
             return SizedBox(
@@ -74,10 +86,19 @@ class _CupertinoSwitchFutureState extends State<CupertinoSwitchFuture> {
                 } else{
                   currentState = targetState;
                 }
+                widget.onSwitch(value);
                 setState(() {});
               }
           );
         }
     );
   }
+}
+
+
+enum CupertinoSwitchFirstLoad{
+  always,
+  none,
+  ifTrue,
+  ifFalse;
 }

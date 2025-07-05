@@ -32,9 +32,12 @@ class _CupertinoListTileSwitchSpotifyState extends State<CupertinoListTileSwitch
       title: Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
       trailing: CupertinoSwitchFuture(
         initialState: cnConfig.useSpotify,
+        onSwitch: (value){
+          cnConfig.setSpotify(value);
+        },
         future: () => cnConfig.isSpotifyInstalled(
             delayMilliseconds: delayMilliseconds,
-            context: context
+            context: context,
         )
       ),
     );
