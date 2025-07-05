@@ -83,6 +83,7 @@ dependencies:
   cloud_firestore: ^5.6.9
   crypto: ^3.0.6
   uuid: ^4.5.1
+  animate_do: ^4.2.0
 
 flutter_launcher_icons:
   image_path: "lib/assets/icon/ic_launcher.jpg"
