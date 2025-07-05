@@ -460,6 +460,7 @@ class CnNewExercisePanel extends ChangeNotifier {
     // required BuildContext context,
   }) {
     return PullDownButton(
+      useRootNavigator: true,
       key: key,
       buttonAnchor: PullDownMenuAnchor.start,
       routeTheme: routeTheme,

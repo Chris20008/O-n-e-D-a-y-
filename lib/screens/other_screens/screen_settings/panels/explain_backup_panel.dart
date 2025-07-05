@@ -13,8 +13,14 @@ import '../screen_settings.dart';
 import '../widgets/settings_icon.dart';
 
 class ExplainBackupPanel extends StatelessWidget {
+  final bool reducedView;
+  final Function(double value)? onPanelSlide;
 
-  const ExplainBackupPanel({super.key,});
+  const ExplainBackupPanel({
+    super.key,
+    this.reducedView = false,
+    this.onPanelSlide
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +28,7 @@ class ExplainBackupPanel extends StatelessWidget {
     final CnSettings cnSettings = context.read<CnSettings>();
 
     return MySlideUpPanel(
+      onPanelSlide: onPanelSlide,
       controller: cnSettings.panelControllerExplainBackups,
       animationControllerName: AnimationControllerName.explainBackups,
       descendantAnimationControllerName: cnSettings.explainBackupPanelDescendantAnimationControllerName,
@@ -39,70 +46,76 @@ class ExplainBackupPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
 
-                /// Create Backup
-                CupertinoListTile(
-                  leading: const SettingsIcon(iconPath: "create_backup.png"),
-                  title: OverflowSafeText(
-                      maxLines: 1,
-                      AppLocalizations.of(context)!.settingsBackupSaveManual,
-                      style: const TextStyle(color: Colors.white)
-                  ),
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: Text(AppLocalizations.of(context)!.settingsBackupSaveManualExplanation + (Platform.isAndroid
-                        ? AppLocalizations.of(context)!.saveGoogleDrive
-                        : AppLocalizations.of(context)!.saveICloud)
-                    )
-                ),
-                const SizedBox(height: 15),
+                if(!reducedView)
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      /// Create Backup
+                      CupertinoListTile(
+                        leading: const SettingsIcon(iconPath: "create_backup.png"),
+                        title: OverflowSafeText(
+                            maxLines: 1,
+                            AppLocalizations.of(context)!.settingsBackupSaveManual,
+                            style: const TextStyle(color: Colors.white)
+                        ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Text(AppLocalizations.of(context)!.settingsBackupSaveManualExplanation + (Platform.isAndroid
+                              ? AppLocalizations.of(context)!.saveGoogleDrive
+                              : AppLocalizations.of(context)!.saveICloud)
+                          )
+                      ),
+                      const SizedBox(height: 15),
 
-                /// Share Backup
-                CupertinoListTile(
-                  leading: const SettingsIcon(iconPath: "share.png"),
-                  title: OverflowSafeText(
-                      maxLines: 1,
-                      AppLocalizations.of(context)!.settingsShareBackup,
-                      style: const TextStyle(color: Colors.white)
-                  ),
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: Text(AppLocalizations.of(context)!.settingsShareBackupExplanation)
-                ),
-                const SizedBox(height: 15),
+                      /// Share Backup
+                      CupertinoListTile(
+                        leading: const SettingsIcon(iconPath: "share.png"),
+                        title: OverflowSafeText(
+                            maxLines: 1,
+                            AppLocalizations.of(context)!.settingsShareBackup,
+                            style: const TextStyle(color: Colors.white)
+                        ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Text(AppLocalizations.of(context)!.settingsShareBackupExplanation)
+                      ),
+                      const SizedBox(height: 15),
 
-                /// Load Backup External
-                CupertinoListTile(
-                  leading: const SettingsIcon(iconPath: "backup_from_cloud.png"),
-                  title: Text(AppLocalizations.of(context)!.settingsBackupLoadExternal, style: const TextStyle(color: Colors.white)),
-                ),
-                Padding(padding: const EdgeInsets.only(left: 30, right: 30),child: Text(AppLocalizations.of(context)!.settingsBackupLoadExplanation)),
-                const SizedBox(height: 15),
+                      /// Load Backup External
+                      CupertinoListTile(
+                        leading: const SettingsIcon(iconPath: "backup_from_cloud.png"),
+                        title: Text(AppLocalizations.of(context)!.settingsBackupLoadExternal, style: const TextStyle(color: Colors.white)),
+                      ),
+                      Padding(padding: const EdgeInsets.only(left: 30, right: 30),child: Text(AppLocalizations.of(context)!.settingsBackupLoadExplanation)),
+                      const SizedBox(height: 15),
 
-                /// Save Backup Automatic
-                CupertinoListTile(
-                  leading: const SettingsIcon(iconPath: "sync_with_cloud.png"),
-                  title: OverflowSafeText(
-                      maxLines: 1,
-                      AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
-                      style: const TextStyle(color: Colors.white)
+                      /// Save Backup Automatic
+                      CupertinoListTile(
+                        leading: const SettingsIcon(iconPath: "sync_with_cloud.png"),
+                        title: OverflowSafeText(
+                            maxLines: 1,
+                            AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
+                            style: const TextStyle(color: Colors.white)
+                        ),
+                      ),
+                      Padding(
+                          padding: const EdgeInsets.only(left: 30, right: 30),
+                          child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation + (
+                              Platform.isAndroid
+                                  ? AppLocalizations.of(context)!.saveGoogleDrive
+                                  : AppLocalizations.of(context)!.saveICloud
+                          )
+                          )
+                      ),
+                      const SizedBox(height: 15),
+                    ],
                   ),
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(left: 30, right: 30),
-                    child: Text(AppLocalizations.of(context)!.settingsBackupSaveAutomaticExplanation + (
-                    Platform.isAndroid
-                        ? AppLocalizations.of(context)!.saveGoogleDrive
-                        : AppLocalizations.of(context)!.saveICloud
-                    )
-                    )
-                ),
-                const SizedBox(height: 15),
 
                 /// Connect with Cloud
                 CupertinoListTile(
-                  leading: const SettingsIcon(iconPath: "connect_icloud.png"),
+                  leading: SettingsIcon(iconPath: Platform.isAndroid? "google_drive.png" : "connect_icloud.png"),
                   title: OverflowSafeText(
                       maxLines: 1,
                       Platform.isAndroid

@@ -181,7 +181,6 @@ class DatabaseService{
   /// -------------------------------------------------------------------------------------
 
   Future<void> deleteAllData() async{
-    print("DELETE ALL DATA FROM UID: $uid");
     final database =  CnSyncManager.database;
     if(database == null){
       return;

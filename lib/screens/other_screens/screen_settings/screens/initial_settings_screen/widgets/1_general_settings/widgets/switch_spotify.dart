@@ -8,7 +8,13 @@ import '../../../../../../../../assets/custom_icons/my_icons_icons.dart';
 import '../../../../../../../../widgets/cupertino_switch_future.dart';
 
 class CupertinoListTileSwitchSpotify extends StatefulWidget {
-  const CupertinoListTileSwitchSpotify({super.key});
+
+  final int delay;
+
+  const CupertinoListTileSwitchSpotify({
+    super.key,
+    this.delay = 300
+  });
 
   @override
   State<CupertinoListTileSwitchSpotify> createState() => _CupertinoListTileSwitchSpotifyState();
@@ -17,29 +23,34 @@ class CupertinoListTileSwitchSpotify extends StatefulWidget {
 class _CupertinoListTileSwitchSpotifyState extends State<CupertinoListTileSwitchSpotify> {
 
   late CnConfig cnConfig;
-  int delayMilliseconds = 300;
 
   @override
   Widget build(BuildContext context) {
 
     cnConfig = context.read<CnConfig>();
 
-    return CupertinoListTile(
-      leading: const Icon(
-          MyIcons.spotify,
-          color: Color(0xff1ed560)
-      ),
-      title: Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
-      trailing: CupertinoSwitchFuture(
-        initialState: cnConfig.useSpotify,
-        onSwitch: (value){
-          cnConfig.setSpotify(value);
-        },
-        future: () => cnConfig.isSpotifyInstalled(
-            delayMilliseconds: delayMilliseconds,
-            context: context,
-        )
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CupertinoListTile(
+          leading: const Icon(
+              MyIcons.spotify,
+              color: Color(0xff1ed560)
+          ),
+          title: Text(AppLocalizations.of(context)!.settingsConnectSpotify, style: const TextStyle(color: Colors.white)),
+          trailing: CupertinoSwitchFuture(
+            initialState: cnConfig.useSpotify,
+            onSwitch: (value){
+              cnConfig.setSpotify(value);
+            },
+            future: () => cnConfig.isSpotifyInstalled(
+                delayMilliseconds: widget.delay,
+                context: context,
+            )
+          ),
+        ),
+      ],
     );
   }
 }

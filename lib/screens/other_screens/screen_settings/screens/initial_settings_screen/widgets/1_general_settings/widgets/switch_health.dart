@@ -29,28 +29,34 @@ class _CupertinoListTileSwitchHealthState extends State<CupertinoListTileSwitchH
     cnConfig = context.read<CnConfig>();
     cnScreenStatistics = context.read<CnScreenStatistics>();
 
-    return CupertinoListTile(
-      leading: const SettingsIcon(iconPath: "apple_health.png"),
-      title:  Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
-      trailing: CupertinoSwitchFuture(
-        initialState: cnConfig.useHealthData,
-          onSwitch: (value){
-            cnConfig.setHealth(value);
-            cnScreenStatistics.refreshData(context);
-            cnScreenStatistics.refresh();
-          },
-        future: () async{
-          final result = await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
-          if(!result && context.mounted){
-            notificationPopUp(
-                context: context,
-                title: AppLocalizations.of(context)!.accessDenied,
-                message: AppLocalizations.of(context)!.accessDeniedHealth
-            );
-          }
-          return result;
-        }
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        CupertinoListTile(
+          leading: const SettingsIcon(iconPath: "apple_health.png"),
+          title:  Text(Platform.isIOS? "Apple Health" : "Health", style: const TextStyle(color: Colors.white)),
+          trailing: CupertinoSwitchFuture(
+            initialState: cnConfig.useHealthData,
+              onSwitch: (value){
+                cnConfig.setHealth(value);
+                cnScreenStatistics.refreshData(context);
+                cnScreenStatistics.refresh();
+              },
+            future: () async{
+              final result = await cnConfig.isHealthDataAccessAllowed(cnScreenStatistics);
+              if(!result && context.mounted){
+                notificationPopUp(
+                    context: context,
+                    title: AppLocalizations.of(context)!.accessDenied,
+                    message: AppLocalizations.of(context)!.accessDeniedHealth
+                );
+              }
+              return result;
+            }
+          ),
+        ),
+      ],
     );
   }
 }

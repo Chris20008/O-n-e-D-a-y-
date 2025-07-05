@@ -69,6 +69,17 @@ class CnConfig extends ChangeNotifier {
   String? folderIdGoogleDrive;
   String? currentDataIdGoogleDrive;
 
+  String? get languageCode => config.settings["languageCode"];
+  bool get tutorial => config.settings["tutorial"]?? true;
+  bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
+  bool get automaticBackups => config.settings["automaticBackups"]?? true;
+  bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
+  int? get countdownTime => config.settings["countdownTime"];
+  bool get useSpotify => config.settings["useSpotify"]?? false;
+  bool get useHealthData => config.settings["useHealthData"]?? false;
+  int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
+  String get version => config.settings["version"]?? "";
+
   Future initData() async{
     cache = CustomCacheManager();
 
@@ -135,7 +146,7 @@ class CnConfig extends ChangeNotifier {
     return isICloudAvailable?? false;
   }
 
-  Future<bool> signInGoogleDrive({int delayMilliseconds = 1000}) async {
+  Future<bool> signInGoogleDrive({int delayMilliseconds = 200}) async {
     while(isWaitingForCloudResponse){
       await Future.delayed(const Duration(milliseconds: 200));
       if(!isWaitingForCloudResponse){
@@ -154,15 +165,15 @@ class CnConfig extends ChangeNotifier {
       if(account == null && !isWaitingForCloudResponse){
         await setConnectWithCloud(false);
         showMoreSettingCloud = false;
-        Future.delayed(const Duration(seconds: 1), ()async{
-          refresh();
-        });
+        // Future.delayed(const Duration(seconds: 1), ()async{
+        //   refresh();
+        // });
       }
-      else{
-        Future.delayed(const Duration(milliseconds: 100), ()async{
-          refresh();
-        });
-      }
+      // else{
+        // Future.delayed(const Duration(milliseconds: 100), ()async{
+        //   refresh();
+        // });
+      // }
     }
     return account != null;
   }
@@ -257,7 +268,6 @@ class CnConfig extends ChangeNotifier {
       refresh();
     }
     // await setSpotify(result);
-    print("USE SPOTIFY? $useSpotify");
     return result;
   }
 
@@ -268,19 +278,6 @@ class CnConfig extends ChangeNotifier {
   void refresh(){
     notifyListeners();
   }
-
-  String? get languageCode => config.settings["languageCode"];
-  bool get tutorial => config.settings["tutorial"]?? true;
-  bool get welcomeScreen => config.settings["welcomeScreen"]?? true;
-  bool get automaticBackups => config.settings["automaticBackups"]?? true;
-  bool get connectWithCloud => config.settings["connectWithCloud"]?? false;
-  // bool get saveBackupCloud => (config.settings["saveBackupCloud"]?? true) && connectWithCloud;
-  // bool get syncMultipleDevices => (config.settings["syncMultipleDevices"]?? true) && connectWithCloud;
-  int? get countdownTime => config.settings["countdownTime"];
-  bool get useSpotify => config.settings["useSpotify"]?? false;
-  bool get useHealthData => config.settings["useHealthData"]?? false;
-  int get currentTutorialStep => config.settings["currentTutorialStep"]?? 0;
-  String get version => config.settings["version"]?? "";
 
   Future setVersion(String version) async{
     config.settings["version"] = version;

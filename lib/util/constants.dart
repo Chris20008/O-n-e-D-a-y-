@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:collection/collection.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/objects/exercise.dart';
-import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -1124,163 +1122,163 @@ Widget iconSyncMultipleDevices = const Stack(
     ]
 );
 
-Widget getCloudOptionsColumn({
-  required CnConfig cnConfig,
-  required BuildContext context,
-  required Function refresh
-}){
-  return
-    Column(
-      children: [
-        /// Connect with Cloud
-        CupertinoListTile(
-          leading: const Icon(
-            Icons.cloud_done,
-            color: Colors.white
-          ),
-          trailing: CupertinoSwitch(
-              value: cnConfig.connectWithCloud,
-              activeTrackColor: activeColor,
-              onChanged: (value)async{
-                if(Platform.isAndroid){
-                  HapticFeedback.selectionClick();
-                }
-                if(!value){
-                  await cnConfig.revokeConnectCloud();
-                }
-                cnConfig.setConnectWithCloud(value);
-                refresh();
-              }
-          ),
-          title: Padding(
-            padding: const EdgeInsets.only(right: 5),
-            child: Row(
-              // crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Expanded(
-                  child: OverflowSafeText(
-                    maxLines: 1,
-                    Platform.isAndroid
-                        ? AppLocalizations.of(context)!.settingsConnectGoogleDrive
-                        : AppLocalizations.of(context)!.settingsConnectiCloud,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-                if(!cnConfig.connectWithCloud)
-                  const SizedBox(width: 15),
-                if(cnConfig.connectWithCloud)
-                  FutureBuilder(
-                      future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
-                      builder: (context, connected){
-                        if(!connected.hasData){
-                          return Center(
-                            child: SizedBox(
-                                height: 15,
-                                width: 15,
-                                child: CupertinoActivityIndicator(
-                                    radius: 8.0,
-                                    color: Colors.amber[800]
-                                ),
-                                // child: CircularProgressIndicator(strokeWidth: 2,)
-                            ),
-                          );
-                        }
-                        return Icon(
-                          cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
-                              ? Icons.check_circle
-                              : Icons.close,
-                          size: 15,
-                          color: cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
-                              ? Colors.green
-                              : Colors.red,
-                        );
-                      }
-                  )
-              ],
-            ),
-          ),
-        ),
-        // AnimatedCrossFade(
-        //     firstChild: Column(
-        //       children: [
-        //
-        //         /// Save Backup in Cloud
-        //         CupertinoListTile(
-        //           leading: const Icon(
-        //             Icons.cloud_upload,
-        //             color: Colors.white,
-        //           ),
-        //           trailing: CupertinoSwitch(
-        //               value: cnConfig.saveBackupCloud,
-        //               activeTrackColor: activeColor,
-        //               onChanged: (value) async{
-        //                 if(Platform.isAndroid){
-        //                   HapticFeedback.selectionClick();
-        //                 }
-        //                 cnConfig.setSaveBackupCloud(value);
-        //                 refresh();
-        //               }
-        //           ),
-        //           title: Padding(
-        //             padding: const EdgeInsets.only(right: 5),
-        //             child: Row(
-        //               // crossAxisAlignment: CrossAxisAlignment.end,
-        //               children: [
-        //                 Expanded(
-        //                   child: OverflowSafeText(
-        //                     maxLines: 1,
-        //                     Platform.isAndroid
-        //                         ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
-        //                         : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
-        //                     style: const TextStyle(color: Colors.white),
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //
-        //         /// Sync Multiple Devices
-        //         CupertinoListTile(
-        //           leading: iconSyncMultipleDevices,
-        //           trailing: CupertinoSwitch(
-        //               value: cnConfig.syncMultipleDevices,
-        //               activeTrackColor: activeColor,
-        //               onChanged: (value)async{
-        //                 if(Platform.isAndroid){
-        //                   HapticFeedback.selectionClick();
-        //                 }
-        //                 cnConfig.setSyncMultipleDevices(value);
-        //                 refresh();
-        //               }
-        //           ),
-        //           title: Padding(
-        //             padding: const EdgeInsets.only(right: 5),
-        //             child: Row(
-        //               // crossAxisAlignment: CrossAxisAlignment.end,
-        //               children: [
-        //                 Expanded(
-        //                   child: OverflowSafeText(
-        //                     maxLines: 1,
-        //                     AppLocalizations.of(context)!.settingsSyncMultipleDevices,
-        //                     style: const TextStyle(color: Colors.white),
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //     secondChild: const Row(),
-        //     crossFadeState: cnConfig.showMoreSettingCloud
-        //         ? CrossFadeState.showFirst
-        //         : CrossFadeState.showSecond,
-        //     duration: const Duration(milliseconds: 300)
-        // )
-      ],
-    );
-}
+// Widget getCloudOptionsColumn({
+//   required CnConfig cnConfig,
+//   required BuildContext context,
+//   required Function refresh
+// }){
+//   return
+//     Column(
+//       children: [
+//         /// Connect with Cloud
+//         CupertinoListTile(
+//           leading: const Icon(
+//             Icons.cloud_done,
+//             color: Colors.white
+//           ),
+//           trailing: CupertinoSwitch(
+//               value: cnConfig.connectWithCloud,
+//               activeTrackColor: activeColor,
+//               onChanged: (value)async{
+//                 if(Platform.isAndroid){
+//                   HapticFeedback.selectionClick();
+//                 }
+//                 if(!value){
+//                   await cnConfig.revokeConnectCloud();
+//                 }
+//                 cnConfig.setConnectWithCloud(value);
+//                 refresh();
+//               }
+//           ),
+//           title: Padding(
+//             padding: const EdgeInsets.only(right: 5),
+//             child: Row(
+//               // crossAxisAlignment: CrossAxisAlignment.end,
+//               children: [
+//                 Expanded(
+//                   child: OverflowSafeText(
+//                     maxLines: 1,
+//                     Platform.isAndroid
+//                         ? AppLocalizations.of(context)!.settingsConnectGoogleDrive
+//                         : AppLocalizations.of(context)!.settingsConnectiCloud,
+//                     style: const TextStyle(color: Colors.white),
+//                   ),
+//                 ),
+//                 if(!cnConfig.connectWithCloud)
+//                   const SizedBox(width: 15),
+//                 if(cnConfig.connectWithCloud)
+//                   FutureBuilder(
+//                       future: Platform.isAndroid? cnConfig.signInGoogleDrive() : cnConfig.checkIfICloudAvailable(),
+//                       builder: (context, connected){
+//                         if(!connected.hasData){
+//                           return Center(
+//                             child: SizedBox(
+//                                 height: 15,
+//                                 width: 15,
+//                                 child: CupertinoActivityIndicator(
+//                                     radius: 8.0,
+//                                     color: Colors.amber[800]
+//                                 ),
+//                                 // child: CircularProgressIndicator(strokeWidth: 2,)
+//                             ),
+//                           );
+//                         }
+//                         return Icon(
+//                           cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
+//                               ? Icons.check_circle
+//                               : Icons.close,
+//                           size: 15,
+//                           color: cnConfig.account != null || (cnConfig.isICloudAvailable?? false)
+//                               ? Colors.green
+//                               : Colors.red,
+//                         );
+//                       }
+//                   )
+//               ],
+//             ),
+//           ),
+//         ),
+//         // AnimatedCrossFade(
+//         //     firstChild: Column(
+//         //       children: [
+//         //
+//         //         /// Save Backup in Cloud
+//         //         CupertinoListTile(
+//         //           leading: const Icon(
+//         //             Icons.cloud_upload,
+//         //             color: Colors.white,
+//         //           ),
+//         //           trailing: CupertinoSwitch(
+//         //               value: cnConfig.saveBackupCloud,
+//         //               activeTrackColor: activeColor,
+//         //               onChanged: (value) async{
+//         //                 if(Platform.isAndroid){
+//         //                   HapticFeedback.selectionClick();
+//         //                 }
+//         //                 cnConfig.setSaveBackupCloud(value);
+//         //                 refresh();
+//         //               }
+//         //           ),
+//         //           title: Padding(
+//         //             padding: const EdgeInsets.only(right: 5),
+//         //             child: Row(
+//         //               // crossAxisAlignment: CrossAxisAlignment.end,
+//         //               children: [
+//         //                 Expanded(
+//         //                   child: OverflowSafeText(
+//         //                     maxLines: 1,
+//         //                     Platform.isAndroid
+//         //                         ? AppLocalizations.of(context)!.settingsSaveBackupsGoogleDrive
+//         //                         : AppLocalizations.of(context)!.settingsSaveBackupsiCloud,
+//         //                     style: const TextStyle(color: Colors.white),
+//         //                   ),
+//         //                 ),
+//         //               ],
+//         //             ),
+//         //           ),
+//         //         ),
+//         //
+//         //         /// Sync Multiple Devices
+//         //         CupertinoListTile(
+//         //           leading: iconSyncMultipleDevices,
+//         //           trailing: CupertinoSwitch(
+//         //               value: cnConfig.syncMultipleDevices,
+//         //               activeTrackColor: activeColor,
+//         //               onChanged: (value)async{
+//         //                 if(Platform.isAndroid){
+//         //                   HapticFeedback.selectionClick();
+//         //                 }
+//         //                 cnConfig.setSyncMultipleDevices(value);
+//         //                 refresh();
+//         //               }
+//         //           ),
+//         //           title: Padding(
+//         //             padding: const EdgeInsets.only(right: 5),
+//         //             child: Row(
+//         //               // crossAxisAlignment: CrossAxisAlignment.end,
+//         //               children: [
+//         //                 Expanded(
+//         //                   child: OverflowSafeText(
+//         //                     maxLines: 1,
+//         //                     AppLocalizations.of(context)!.settingsSyncMultipleDevices,
+//         //                     style: const TextStyle(color: Colors.white),
+//         //                   ),
+//         //                 ),
+//         //               ],
+//         //             ),
+//         //           ),
+//         //         ),
+//         //       ],
+//         //     ),
+//         //     secondChild: const Row(),
+//         //     crossFadeState: cnConfig.showMoreSettingCloud
+//         //         ? CrossFadeState.showFirst
+//         //         : CrossFadeState.showSecond,
+//         //     duration: const Duration(milliseconds: 300)
+//         // )
+//       ],
+//     );
+// }
 
 Widget getActionSheetCancelButton (BuildContext context, {String? text, Function? onPressed}){
   onPressed = onPressed?? (){};

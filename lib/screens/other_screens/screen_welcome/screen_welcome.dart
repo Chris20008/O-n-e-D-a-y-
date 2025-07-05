@@ -1,38 +1,39 @@
 import 'package:fitness_app/assets/custom_icons/my_icons_icons.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
-import 'package:fitness_app/screens/other_screens/screen_settings/panels/explain_backup_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/backups_screen/widgets/connect_with_cloud.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_health.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_spotify.dart';
-import 'package:fitness_app/util/language_config.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screens/cloud_connect.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screens/connect_health.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screens/connect_spotify.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screens/language.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
-import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
-import 'package:fitness_app/widgets/selectors/select_language_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:pull_down_button/pull_down_button.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../../util/config.dart';
-import '../../util/constants.dart';
+import '../../../util/config.dart';
+import '../../../util/constants.dart';
 import 'dart:io';
 
-import '../../widgets/slide_up_panel/animation_controller_name.dart';
+import '../../../widgets/custom_navigator_observer.dart';
+import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 
-class WelcomeScreen extends StatefulWidget {
+class ScreenWelcome extends StatefulWidget {
   final Function(bool) onFinish;
-  const WelcomeScreen({
+  const ScreenWelcome({
     required this.onFinish,
     super.key,
   });
 
   @override
-  State<WelcomeScreen> createState() => _WelcomeScreenState();
+  State<ScreenWelcome> createState() => _ScreenWelcomeState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen> {
+class _ScreenWelcomeState extends State<ScreenWelcome> {
 
   late CnWorkouts cnWorkouts = Provider.of<CnWorkouts>(context, listen: false);
   late CnSettings cnSettings =context.read<CnSettings>();
@@ -40,6 +41,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   late CnConfig cnConfig;
   final maxIndex = 4;
   int screenIndex = 0;
+  final settingsObserver = CustomNavigatorObserver();
+  GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
 
   @override
@@ -48,38 +51,53 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     cnSettings.explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenSettings;
   }
 
+  void onPopInvoked(_, __){
+    if(cnSettings.panelControllerExplainBackups.panelPosition > 0.9){
+      cnSettings.panelControllerExplainBackups.close();
+    }
+    else if(settingsObserver.currentRouteName != '/welcomeLanguage'){
+      navigatorKey.currentState?.pop();
+    }
+    // else if(!cnSettings.showLoadingIndicator){
+    //   cnSettings.panelControllerSettings.animatePanelToPosition(
+    //       0,
+    //       duration: const Duration(milliseconds: 350),
+    //       curve: Curves.decelerate
+    //   );
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     cnConfig  = Provider.of<CnConfig>(context);
     cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
     cnSettings.explainBackupPanelDescendantAnimationControllerName = AnimationControllerName.screenWelcome;
 
-    return Stack(
-      children: [
-        InitialAnimatedScreen(
-          decoration: null,
-          animationControllerName: AnimationControllerName.screenWelcome,
-          child: Container(
-            color: Theme.of(context).primaryColor,
-            child: Stack(
-                children: [
-                  animatedScreen(0, screenOne()),
-                  animatedScreen(1, screenTwo()),
-                  animatedScreen(2, screenThree()),
-                  animatedScreen(3, screenFour()),
-                  animatedScreen(4, screenFive()),
-                  bottomBar(),
-                  // if(screenIndex < maxIndex)
-                  //   nextButton(),
-                  // if(screenIndex > 0)
-                  //   backButton(),
-                  imprintButton(),
-                ]
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: onPopInvoked,
+      child: Navigator(
+        key: navigatorKey,
+        observers: [settingsObserver],
+        initialRoute: '/welcomeLanguage',
+        onGenerateRoute: (RouteSettings settings) {
+          final routes = <String, WidgetBuilder>{
+            '/welcomeLanguage': (_) => const PopScope(
+                canPop: false,
+                child: ScreenLanguage()
             ),
-          ),
-        ),
-        const ExplainBackupPanel(),
-      ],
+            '/connectCloud': (_) => const ConnectCloud(),
+            '/connectSpotify': (_) => const ConnectSpotify(),
+            '/connectHealth': (_) => ConnectHealth(onFinish: widget.onFinish),
+          };
+
+          final builder = routes[settings.name];
+          if (builder != null) {
+            return MaterialPageRoute(builder: builder, settings: settings);
+          }
+          return null;
+        },
+      ),
     );
   }
 
@@ -192,126 +210,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  // Widget getSelectLanguageButton() {
-  //   return PullDownButton(
-  //     buttonAnchor: PullDownMenuAnchor.start,
-  //     routeTheme: routeTheme,
-  //     itemBuilder: (context) {
-  //       final currentLanguage = getLanguageAsString(context);
-  //       final List<String> lanAsStrings = languagesAsString.keys.toList();
-  //       List<PullDownMenuItem> buttons = List.generate(lanAsStrings.length, (index) {
-  //         return PullDownMenuItem.selectable(
-  //           selected: currentLanguage == lanAsStrings[index],
-  //           title: lanAsStrings[index],
-  //           onTap: () {
-  //             HapticFeedback.selectionClick();
-  //             Future.delayed(const Duration(milliseconds: 200), (){
-  //               MyApp.of(context)?.setLocale(languageCode: languagesAsString[lanAsStrings[index]], config: cnConfig);
-  //             });
-  //           },
-  //         );
-  //       });
-  //       return buttons;
-  //     },
-  //     buttonBuilder: (context, showMenu) => CupertinoButton(
-  //       onPressed: (){
-  //         HapticFeedback.selectionClick();
-  //         showMenu();
-  //       },
-  //       padding: EdgeInsets.zero,
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.start,
-  //         children: [
-  //           Text(
-  //             getLanguageAsString(context),
-  //             style: const TextStyle(
-  //                 color: Color(0xFFC16A03),
-  //                 fontSize: 16
-  //             ),
-  //           ),
-  //           const SizedBox(width: 6,),
-  //           trailingChoice(
-  //             color: activeColor
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 
-  /// Screen One
-  Widget screenOne(){
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          flex: 3,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Text(
-                "👋 Hey Gymrat!",
-                textScaler: TextScaler.linear(1.8),
-              ),
-              const SizedBox(height: 10,),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    AppLocalizations.of(context)!.welcome,
-                    textScaler: const TextScaler.linear(1.8),
-                  ),
-                  const Text(
-                      "O̶n̶e̶D̶a̶y̶",
-                      textScaler: TextScaler.linear(1.8),
-                      style: TextStyle(decoration: TextDecoration.lineThrough)
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        SizedBox(
-          width: MediaQuery.of(context).size.width/1.5,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.welcomeSelectLanguage,
-                textScaler: const TextScaler.linear(1.1),
-              ),
-              SelectLanguageButton(
-                  cnConfig: cnConfig,
-                  buttonAnchor: PullDownMenuAnchor.start,
-                  buttonChild: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        getLanguageAsString(context),
-                        style: const TextStyle(
-                            color: Color(0xFFC16A03),
-                            fontSize: 16
-                        ),
-                      ),
-                      const SizedBox(width: 6,),
-                      trailingChoice(
-                          color: activeColor
-                      )
-                    ],
-                  )
-              ),
-            ],
-          ),
-        ),
-
-        const Spacer(flex: 1),
-      ],
-    );
-  }
 
   /// Screen Two
   Widget screenTwo(){
@@ -382,37 +281,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    /// Save Backup Automatic
-                    CupertinoListTile(
-                      leading: const Icon(
-                        Icons.sync,
-                        color: Colors.white,
-                      ),
-                      title: OverflowSafeText(
-                          maxLines: 1,
-                          AppLocalizations.of(context)!.settingsBackupSaveAutomatic,
-                          style: const TextStyle(color: Colors.white)
-                      ),
-                      trailing: CupertinoSwitch(
-                          value: cnConfig.automaticBackups,
-                          activeTrackColor: activeColor,
-                          onChanged: (value){
-                            setState(() {
-                              if(Platform.isAndroid){
-                                HapticFeedback.selectionClick();
-                              }
-                              cnConfig.setAutomaticBackups(value);
-                            });
-                          }
-                      ),
-                    ),
 
                     /// Sync with iCloud
-                    getCloudOptionsColumn(
-                        cnConfig: cnConfig,
-                        context: context,
-                        refresh: () => setState(() {})
-                    ),
+                    const ConnectWithCloud(),
 
                     GestureDetector(
                       onTap: () async{

@@ -22,7 +22,9 @@ class SelectLanguageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PullDownButton(
+      animationAlignmentOverride: Alignment.topCenter,
       useRootNavigator: true,
+      position: PullDownMenuPosition.over,
       buttonAnchor: buttonAnchor,
       onCanceled: () => FocusManager.instance.primaryFocus?.unfocus(),
       routeTheme: routeTheme,

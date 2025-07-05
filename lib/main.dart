@@ -9,6 +9,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/all_exercises_panel/all_exercises_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screen_welcome.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:fitness_app/service/sync_manager.dart';
 import 'package:fitness_app/util/backup_helper/google_drive/load_newest_data_google_drive.dart';
@@ -19,7 +20,6 @@ import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/selector_exercises_to_update.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/stopwatch.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/wrapper_screen_running_workout.dart';
-import 'package:fitness_app/screens/other_screens/welcome_screen.dart';
 import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:fitness_app/util/language_config.dart';
@@ -508,7 +508,7 @@ class _MyHomePageState extends State<MyHomePage>{
                           if(showWelcomeScreen)
                             AnimatedCrossFade(
                               duration: const Duration(milliseconds: 500),
-                              firstChild: WelcomeScreen(
+                              firstChild: ScreenWelcome(
                                 onFinish: onFinishWelcomeScreen
                               ),
                               /// Use transparent Container instead of SizedBox to prevent user inputs
