@@ -187,10 +187,10 @@ class CnScreenStatistics extends ChangeNotifier {
   }
 
   Future<bool> refreshHealthData() async{
-    if(!cnConfig.useHealthData){
+    // if(!cnConfig.useHealthData){
       healthData.clear();
-      return false;
-    }
+    //   return false;
+    // }
     var now = DateTime.now();
     DateTime startTime = DateTime(2000, 1, 1);
     try{
