@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/main_screens/screen_workout_history/screen_w
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/panels/explain_backup_panel.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/backups_screen/backups_screen.dart';
+import 'package:fitness_app/screens/other_screens/screen_settings/screens/profile_screen/profile_screen.dart';
 import 'package:fitness_app/widgets/custom_navigator_observer.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/initial_settings_screen.dart';
 import 'package:fitness_app/widgets/bottom_menu.dart';
@@ -128,6 +129,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                               child: InitialSettingsScreen()
                           ),
                           '/backupScreen': (_) => const BackupsScreen(),
+                          '/profileScreen': (_) => const ProfileScreen(),
                         };
 
                         final builder = routes[settings.name];

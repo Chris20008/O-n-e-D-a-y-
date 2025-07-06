@@ -1,12 +1,9 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-import '../../../../../../../service/auth_service.dart';
-import '../../../../../../../util/cupertino_alert_dialog_custom.dart';
-import '../../../../../../../util/loading_overlay.dart';
+import '../../../../../../service/auth_service.dart';
+import '../../../../../../util/cupertino_alert_dialog_custom.dart';
+import '../../../../../../util/loading_overlay.dart';
 
 showDeleteAccountDialog(BuildContext context, Function refresh){
   String deleteString = "LÖSCHEN";

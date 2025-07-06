@@ -1,4 +1,3 @@
-import 'package:fitness_app/screens/other_screens/screen_settings/screens/initial_settings_screen/widgets/3_Account/show_delete_account_dialog.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -25,7 +24,7 @@ class AccountSection extends StatelessWidget {
         builder: (context, setModalState) {
           final String? uid = authService.getUid();
 
-          List<Widget> loginState;
+          Widget loginState;
 
           if(uid == null){
             late Widget button;
@@ -41,31 +40,24 @@ class AccountSection extends StatelessWidget {
               );
             }
 
-            loginState = [
-              Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: button
-              )
-            ];
+            loginState = Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: button
+            );
           }
           else{
-            loginState = [
-              CupertinoListTile(
-                onTap: () async => await authService.signOut().then((_) => setModalState((){})),
-                leading: const SettingsIcon(iconPath: "logout.png"),
-                trailing: trailingArrow,
-                title: Text(AppLocalizations.of(context)!.settingsLogout, style: const TextStyle(color: Colors.white)),
-              ),
-              CupertinoListTile(
-                onTap: () => showDeleteAccountDialog(context, setModalState),
-                leading: const SettingsIcon(iconPath: "delete_account.png"),
-                trailing: trailingArrow,
-                title: Text("Account löschen", style: const TextStyle(color: Colors.white)),
-              )
-            ];
+            loginState = CupertinoListTile(
+              onTap: () => cnSettings.navigatorKey.currentState?.pushNamed("/profileScreen").then((_){
+                cnSettings.doRefreshListViewInitialSettings();
+                setModalState((){});
+              }),
+              leading: const SettingsIcon(iconPath: "profile.png"),
+              trailing: trailingArrow,
+              title: const Text("Profil", style: TextStyle(color: Colors.white)),
+            );
           }
 
-          Widget child = CupertinoListSection.insetGrouped(
+          return CupertinoListSection.insetGrouped(
             decoration: BoxDecoration(
                 color: Theme.of(context).cardColor
             ),
@@ -77,16 +69,13 @@ class AccountSection extends StatelessWidget {
             children: [
               CupertinoListTile(
                 onTap: () => cnSettings.navigatorKey.currentState?.pushNamed("/backupScreen").then((_) => cnSettings.doRefreshListViewInitialSettings()),
-                // leading: Icon(MyIcons.shield_alt, color: Colors.white),
                 leading: const SettingsIcon(iconPath: "backups.png"),
                 trailing: trailingArrow,
                 title: Text(AppLocalizations.of(context)!.settingsBackups, style: const TextStyle(color: Colors.white)),
               ),
-              ...loginState
+              loginState
             ],
           );
-
-          return child;
       }
     );
   }

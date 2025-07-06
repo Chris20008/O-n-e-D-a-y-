@@ -208,7 +208,7 @@ class CnConfig extends ChangeNotifier {
       return await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types)?? false;
     }
     isWaitingForHealthResponse = true;
-    await Future.delayed(const Duration(milliseconds: 300), ()async{
+    await Future.delayed(const Duration(milliseconds: 150), ()async{
       permission = await cnScreenStatistics.health.hasPermissions(cnScreenStatistics.types);
       if(permission != true){
         result = await cnScreenStatistics.health.requestAuthorization(cnScreenStatistics.types);
