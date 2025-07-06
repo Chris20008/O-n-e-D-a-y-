@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
