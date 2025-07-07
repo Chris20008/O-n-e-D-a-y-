@@ -2,6 +2,7 @@ import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart'
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../widgets/custom_navigator.dart';
 import '../../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_spotify.dart';
 
@@ -77,7 +78,7 @@ class ConnectSpotify extends StatelessWidget {
                         ),
 
                         CupertinoButton(
-                            onPressed: () => Navigator.pushNamed(context, "/connectHealth"),
+                            onPressed: () => CustomNavigator.pushNamed(context, "/connectHealth"),
                             child: Container(
                               height: buttonHeight,
                               width: buttonWidth,

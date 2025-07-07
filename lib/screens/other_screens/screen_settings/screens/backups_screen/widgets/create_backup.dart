@@ -11,6 +11,7 @@ import '../../../../../../util/backup_helper/save_backup.dart';
 import '../../../../../../util/backup_helper/save_current_data.dart';
 import '../../../../../../util/config.dart';
 import '../../../../../../util/constants.dart';
+import '../../../../../../widgets/custom_navigator.dart';
 import '../../../screen_settings.dart';
 import '../../../widgets/settings_icon.dart';
 
@@ -34,7 +35,7 @@ class CreateBackup extends StatelessWidget {
           await saveCurrentData(cnConfig);
           cnSettings.refreshLocalBackups();
           cnSettings.setLoadingIndicator(false);
-          final currentContext = cnSettings.navigatorKey.currentContext?? context;
+          final currentContext = CustomNavigator.of(context).navigatorKey.currentContext?? context;
           if(!currentContext.mounted){
             return;
           }

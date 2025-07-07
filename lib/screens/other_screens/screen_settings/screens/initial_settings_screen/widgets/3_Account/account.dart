@@ -9,6 +9,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'dart:io';
 
 import '../../../../../../../util/sign_in_with_google_button.dart';
+import '../../../../../../../widgets/custom_navigator.dart';
 import '../../../../screen_settings.dart';
 
 class AccountSection extends StatelessWidget {
@@ -47,7 +48,7 @@ class AccountSection extends StatelessWidget {
           }
           else{
             loginState = CupertinoListTile(
-              onTap: () => cnSettings.navigatorKey.currentState?.pushNamed("/profileScreen").then((_){
+              onTap: () => CustomNavigator.pushNamed(context, "/profileScreen")?.then((_){
                 cnSettings.doRefreshListViewInitialSettings();
                 setModalState((){});
               }),
@@ -68,7 +69,7 @@ class AccountSection extends StatelessWidget {
             ),
             children: [
               CupertinoListTile(
-                onTap: () => cnSettings.navigatorKey.currentState?.pushNamed("/backupScreen").then((_) => cnSettings.doRefreshListViewInitialSettings()),
+                onTap: () => CustomNavigator.pushNamed(context, "/backupScreen")?.then((_) => cnSettings.doRefreshListViewInitialSettings()),
                 leading: const SettingsIcon(iconPath: "backups.png"),
                 trailing: trailingArrow,
                 title: Text(AppLocalizations.of(context)!.settingsBackups, style: const TextStyle(color: Colors.white)),

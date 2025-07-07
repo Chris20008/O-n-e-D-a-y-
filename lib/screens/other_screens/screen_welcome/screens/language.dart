@@ -7,6 +7,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 import '../../../../util/config.dart';
 import '../../../../util/constants.dart';
 import '../../../../util/language_config.dart';
+import '../../../../widgets/custom_navigator.dart';
 import '../../../../widgets/selectors/select_language_button.dart';
 
 class ScreenLanguage extends StatelessWidget {
@@ -95,7 +96,7 @@ class ScreenLanguage extends StatelessWidget {
                   ),
 
                   CupertinoButton(
-                      onPressed: () => Navigator.pushNamed(context, "/connectCloud"),
+                      onPressed: () => CustomNavigator.pushNamed(context, "/connectCloud"),
                       child: Container(
                         height: buttonHeight,
                         width: buttonWidth,

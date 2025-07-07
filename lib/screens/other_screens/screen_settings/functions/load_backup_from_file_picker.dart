@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../../util/backup_helper/load_backup/load_backup_from_file.dart';
 import '../../../../util/backup_helper/save_current_data.dart';
+import '../../../../widgets/custom_navigator.dart';
 import '../screen_settings.dart';
 
 Future<bool> loadBackupFromFilePicker({
@@ -48,7 +49,7 @@ Future<bool> loadBackupFromFilePicker({
   );
 
   if(confirm){
-    final ov = blockUserInput(cnSettings.navigatorKey.currentContext!, duration: null);
+    final ov = blockUserInput(CustomNavigator.of(context).navigatorKey.currentContext!, duration: null);
     setLoadingIndicator(true);
     try{
       await loadBackupFromFile(file, cnHomepage: cnHomepage);

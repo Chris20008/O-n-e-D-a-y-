@@ -6,21 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../service/auth_service.dart';
-import '../../../screen_settings.dart';
+import '../../../../../../widgets/custom_navigator.dart';
 import '../widgets/logout_options_button.dart';
 
-Future chooseLogoutOption(BuildContext context) async{
+Future chooseLogoutOption(BuildContext parentContext) async{
 
   final authService = AuthService();
-  final CnSettings cnSettings = context.read<CnSettings>();
-  final CnScreenStatistics cnScreenStatistics = context.read<CnScreenStatistics>();
+  final CnScreenStatistics cnScreenStatistics = parentContext.read<CnScreenStatistics>();
 
   await showModalBottomSheet(
       useRootNavigator: true,
       constraints: null,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      context: context,
+      context: parentContext,
       builder: (context){
         return ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
@@ -37,7 +36,7 @@ Future chooseLogoutOption(BuildContext context) async{
                     height: 180,
                     child: Image.asset("lib/assets/pictures/welcome_brogy.png")
                 ),
-                SizedBox(height: 40,),
+                const SizedBox(height: 40,),
                 LogoutOptionsButton(
                   header: "Nur Verbindung trennen",
                   description: "Behalte deine Daten lokal, entferne nur die Account-Verbindung.",
@@ -45,12 +44,11 @@ Future chooseLogoutOption(BuildContext context) async{
                   buttonColor: Colors.white12,
                   onPressed: () async{
                     await authService.signOut().then((_) => Navigator.pop(context));
-                    await Future.delayed(const Duration(milliseconds: 300), () async{
-                      cnSettings.navigatorKey.currentState?.pop();
-                    });
+
+                    await Future.delayed(const Duration(milliseconds: 300), () => CustomNavigator.pop(parentContext));
                   },
                 ),
-                SizedBox(height: 20,),
+                const SizedBox(height: 20,),
                 LogoutOptionsButton(
                     header: "Komplett abmelden",
                     description: "Alle lokalen Daten und die Account-Verbindung werden entfernt.",
@@ -63,11 +61,11 @@ Future chooseLogoutOption(BuildContext context) async{
                         objectbox.sickDaysBox.removeAll();
                         cnScreenStatistics.refreshData(context);
                         cnScreenStatistics.refresh();
+                        /// Pop the logout options popUp context
                         Navigator.pop(context);
                       });
-                      await Future.delayed(const Duration(milliseconds: 300), () async{
-                        cnSettings.navigatorKey.currentState?.pop();
-                      });
+                      /// Pop the Profile screen
+                      await Future.delayed(const Duration(milliseconds: 300), () => CustomNavigator.pop(parentContext));
                     },
                 ),
 

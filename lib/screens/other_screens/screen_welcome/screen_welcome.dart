@@ -19,6 +19,7 @@ import '../../../util/config.dart';
 import '../../../util/constants.dart';
 import 'dart:io';
 
+import '../../../widgets/custom_navigator.dart';
 import '../../../widgets/custom_navigator_observer.dart';
 import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 
@@ -76,9 +77,9 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: onPopInvoked,
-      child: Navigator(
-        key: navigatorKey,
-        observers: [settingsObserver],
+      child: CustomNavigator(
+        navigatorKey: navigatorKey,
+        observer: settingsObserver,
         initialRoute: '/welcomeLanguage',
         onGenerateRoute: (RouteSettings settings) {
           final routes = <String, WidgetBuilder>{

@@ -246,7 +246,7 @@ class _MyHomePageState extends State<MyHomePage>{
     futures.add(ObjectBox.fillMissingObjectBoxFields(objectbox.workoutBox, objectbox.sickDaysBox));
     await Future.wait(futures);
     
-    await cnSyncManager.doSyncWithFireStore();
+    await cnSyncManager.doSyncWithFireStore(context);
     await Future.delayed(const Duration(milliseconds: 200));
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
@@ -339,7 +339,7 @@ class _MyHomePageState extends State<MyHomePage>{
               final uid = snapshot.data?.uid;
               cnSyncManager.setUserId(uid);
               if(ObjectBox.initialized){
-                cnSyncManager.doSyncWithFireStore();
+                cnSyncManager.doSyncWithFireStore(context);
               }
             } else{
               pr("Set UID NULL");
@@ -429,7 +429,7 @@ class _MyHomePageState extends State<MyHomePage>{
           final uid = snapshot.data?.uid;
           cnSyncManager.setUserId(uid);
           if(ObjectBox.initialized){
-            cnSyncManager.doSyncWithFireStore();
+            cnSyncManager.doSyncWithFireStore(context);
           }
         } else{
           pr("Set UID NULL");

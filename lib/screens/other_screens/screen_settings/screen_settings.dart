@@ -16,6 +16,7 @@ import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../main.dart';
 import '../../../util/config.dart';
 import '../../../util/constants.dart';
+import '../../../widgets/custom_navigator.dart';
 import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 
 class SettingsPanel extends StatefulWidget {
@@ -39,6 +40,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
   late CnConfig cnConfig;
   bool setOrientation = false;
   final settingsObserver = CustomNavigatorObserver();
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
   @override
   void initState() {
@@ -71,7 +73,7 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
       cnSettings.panelControllerExplainBackups.close();
     }
     else if(settingsObserver.currentRouteName != '/initialSettingsScreen'){
-      cnSettings.navigatorKey.currentState?.pop();
+      navigatorKey.currentState?.pop();
     }
     else if(!cnSettings.showLoadingIndicator){
       cnSettings.panelControllerSettings.animatePanelToPosition(
@@ -118,10 +120,10 @@ class _SettingsPanelState extends State<SettingsPanel> with WidgetsBindingObserv
                   /// Use panelBuilder in Order to get a ScrollController which enables closing the panel
                   /// when swiping down in  ListView
                   panelBuilder: (context, listView){
-                    return Navigator(
-                      key: cnSettings.navigatorKey,
+                    return CustomNavigator(
+                      navigatorKey: navigatorKey,
                       initialRoute: '/initialSettingsScreen',
-                      observers: [settingsObserver],
+                      observer: settingsObserver,
                       onGenerateRoute: (RouteSettings settings) {
                         final routes = <String, WidgetBuilder>{
                           '/initialSettingsScreen': (_) => const PopScope(
@@ -175,7 +177,6 @@ class CnSettings extends ChangeNotifier{
   ValueNotifier<bool> showContent = ValueNotifier(false);
   final ValueNotifier<int> _reloadLocalBackups = ValueNotifier(0);
   bool showLoadingIndicator = false;
-  GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   PanelController panelControllerExplainBackups = PanelController();
   PanelController panelControllerSettings = PanelController();
   ScrollController scrollControllerSetting = ScrollController();

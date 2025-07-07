@@ -68,6 +68,7 @@ class _ScreenWorkoutHistoryState extends State<ScreenWorkoutHistory> {
 
   @override
   Widget build(BuildContext context) {
+    pr("Workout History");
     cnWorkoutHistory = Provider.of<CnWorkoutHistory>(context);
 
     final size = MediaQuery.of(context).size;

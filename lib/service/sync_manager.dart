@@ -4,6 +4,7 @@ import 'package:fitness_app/util/backup_helper/save_current_data.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:fitness_app/util/objectbox/ob_workout.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main.dart';
@@ -46,7 +47,7 @@ class CnSyncManager extends ChangeNotifier {
     }
   }
 
-  Future doSyncWithFireStore() async{
+  Future doSyncWithFireStore(BuildContext context) async{
     if(database == null || _isSyncing){
       return;
     }
@@ -62,6 +63,40 @@ class CnSyncManager extends ChangeNotifier {
       final localChecksumsSickDays = objectbox.sickDaysBox.getAll().map((s) => s.checksum).toList();
       final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
+      OverlayEntry overlayEntry = OverlayEntry(
+        builder: (context) => Align(
+          alignment: Alignment.topCenter,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Material(
+                color: Colors.black.withAlpha(100),
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                          "Loading Account Data  ",
+                          style: TextStyle(color: CupertinoColors.white)
+                      ),
+                      CupertinoActivityIndicator(
+                          radius: 8.0,
+                          color: Colors.amber[800]
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      Overlay.of(context).insert(overlayEntry);
+
       await _syncChecksums(
           serverChecksums: serverChecksums.workoutChecksums,
           serverLastUpdated: serverChecksums.workoutChecksumsLastUpdated,
@@ -69,12 +104,10 @@ class CnSyncManager extends ChangeNotifier {
           collection: Collection.workouts,
           localChecksums: localChecksumsWorkouts,
           getLocalObjectByChecksum: (String checksum) => objectbox.workoutBox.query(ObWorkout_.checksum.equals(checksum)).build().findFirst(),
-          refresh: (){
-            cnWorkouts.refreshAllWorkouts();
-            cnWorkoutHistory.refreshAllWorkouts();
+          refresh: () async {
+            await cnWorkouts.refreshAllWorkouts();
+            await cnWorkoutHistory.refreshAllWorkouts();
             cnNewWorkout.refreshAllWorkoutDays();
-            cnWorkouts.refresh();
-            cnWorkoutHistory.refresh();
           },
           box: objectbox.workoutBox
       );
@@ -86,15 +119,15 @@ class CnSyncManager extends ChangeNotifier {
           collection: Collection.sickDays,
           localChecksums: localChecksumsSickDays,
           getLocalObjectByChecksum: (String checksum) => objectbox.sickDaysBox.query(ObSickDays_.checksum.equals(checksum)).build().findFirst(),
-          refresh: (){
-            cnWorkouts.refreshAllWorkouts();
-            cnWorkoutHistory.refreshAllWorkouts();
+          refresh: () async {
+            await cnWorkouts.refreshAllWorkouts();
+            await cnWorkoutHistory.refreshAllWorkouts();
             cnNewWorkout.refreshAllWorkoutDays();
-            cnWorkouts.refresh();
-            cnWorkoutHistory.refresh();
           },
           box: objectbox.sickDaysBox
       );
+
+      overlayEntry.remove();
     }
     catch(e){
       pr("Error during Sync with Firestore");
@@ -112,7 +145,7 @@ class CnSyncManager extends ChangeNotifier {
     required Collection collection,
     required FirebaseObject? Function(Map<String, dynamic>) constructorFromMap,
     required FirebaseObject? Function(String) getLocalObjectByChecksum,
-    required Function refresh,
+    required Future Function() refresh,
     required Box box
   }) async {
     pr("");
@@ -167,7 +200,7 @@ class CnSyncManager extends ChangeNotifier {
           foundChecksums.add(objectMap["checksum"]);
           counter += 1;
           if (counter % 10 == 0){
-            refresh();
+            await refresh();
           }
         }
         /// ToDo: when newObject is null, the map couldn't be parsed
@@ -182,7 +215,7 @@ class CnSyncManager extends ChangeNotifier {
         await database?.deleteChecksum(checksum, collection: collection);
       }
 
-      refresh();
+      await refresh();
       saveCurrentData(cnConfig);
     }
   }

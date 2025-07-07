@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../widgets/custom_navigator.dart';
 import '../../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../screen_settings/panels/explain_backup_panel.dart';
 import '../../screen_settings/screens/backups_screen/widgets/connect_with_cloud.dart';
@@ -83,7 +84,7 @@ class ConnectCloud extends StatelessWidget {
                         ),
 
                         CupertinoButton(
-                            onPressed: () => Navigator.pushNamed(context, "/connectSpotify"),
+                            onPressed: () => CustomNavigator.pushNamed(context, "/connectSpotify"),
                             child: Container(
                               height: buttonHeight,
                               width: buttonWidth,

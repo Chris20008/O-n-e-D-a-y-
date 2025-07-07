@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../../../util/constants.dart';
+import '../../../../../widgets/custom_navigator.dart';
 import '../../../../../widgets/slide_up_panel/my_slide_up_panel.dart';
 import '../../../../../widgets/slide_up_panel/panel_header.dart';
-import '../../screen_settings.dart';
 import '../../widgets/settings_icon.dart';
 import 'functions/show_delete_account_dialog.dart';
 import 'functions/choose_logout_option.dart';
@@ -16,8 +15,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    final CnSettings cnSettings = context.read<CnSettings>();
 
     return Container(
       color: Theme.of(context).primaryColor,
@@ -46,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
                     title: Text(AppLocalizations.of(context)!.settingsLogout, style: const TextStyle(color: Colors.white)),
                   ),
                   CupertinoListTile(
-                    onTap: () => showDeleteAccountDialog(context, () => cnSettings.navigatorKey.currentState?.pop),
+                    onTap: () => showDeleteAccountDialog(context, () => CustomNavigator.pop(context)),
                     leading: const SettingsIcon(iconPath: "delete_account.png"),
                     trailing: trailingArrow,
                     title: Text("Account löschen", style: const TextStyle(color: Colors.white)),
