@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import '../../../../widgets/custom_navigator.dart';
 import '../../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_spotify.dart';
+import '../screen_welcome.dart';
+import 'brogy_hero.dart';
 
 class ConnectSpotify extends StatelessWidget {
   const ConnectSpotify({super.key});
@@ -31,10 +33,11 @@ class ConnectSpotify extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 100,),
-                    SizedBox(
-                        height: 180,
-                        child: Image.asset("lib/assets/pictures/brogy_spotify.png")
-                    ),
+                    // SizedBox(
+                    //     height: 180,
+                    //     child: Image.asset("lib/assets/pictures/brogy_spotify.png")
+                    // ),
+                    BrogyHero(),
                     SizedBox(height: 20,),
                     SizedBox(
                       width: 300,
@@ -78,7 +81,7 @@ class ConnectSpotify extends StatelessWidget {
                         ),
 
                         CupertinoButton(
-                            onPressed: () => CustomNavigator.pushNamed(context, "/connectHealth"),
+                            onPressed: () => CustomNavigator.pushNamed(context, WelcomeRoute.connectHealth.value),
                             child: Container(
                               height: buttonHeight,
                               width: buttonWidth,

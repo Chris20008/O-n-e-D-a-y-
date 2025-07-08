@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../screen_settings/screens/initial_settings_screen/widgets/1_general_settings/widgets/switch_health.dart';
+import 'brogy_hero.dart';
 
 class ConnectHealth extends StatelessWidget {
   final Function(bool) onFinish;
@@ -31,10 +32,11 @@ class ConnectHealth extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const SizedBox(height: 100,),
-                    SizedBox(
-                        height: 180,
-                        child: Image.asset("lib/assets/pictures/brogy_health.png")
-                    ),
+                    // SizedBox(
+                    //     height: 180,
+                    //     child: Image.asset("lib/assets/pictures/brogy_health.png")
+                    // ),
+                    BrogyHero(),
                     SizedBox(height: 30,),
                     SizedBox(
                       width: 300,
@@ -79,6 +81,7 @@ class ConnectHealth extends StatelessWidget {
 
                         CupertinoButton(
                             onPressed: () => onFinish(false),
+                            // onPressed: () {},
                             child: Container(
                               height: buttonHeight,
                               width: buttonWidth,

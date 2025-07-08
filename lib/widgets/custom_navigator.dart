@@ -4,6 +4,7 @@ import 'custom_navigator_observer.dart';
 
 class CustomNavigator extends StatelessWidget {
   final CustomNavigatorObserver observer;
+  final List<NavigatorObserver> additionalObserver;
   final GlobalKey<NavigatorState> navigatorKey;
   final String? initialRoute;
   final Route<dynamic>? Function(RouteSettings) onGenerateRoute;
@@ -13,6 +14,7 @@ class CustomNavigator extends StatelessWidget {
     required this.navigatorKey,
     required this.initialRoute,
     required this.onGenerateRoute,
+    this.additionalObserver = const [],
     super.key,
   });
 
@@ -37,7 +39,7 @@ class CustomNavigator extends StatelessWidget {
       observer: observer,
       child: Navigator(
         key: navigatorKey,
-        observers: [observer],
+        observers: [observer, ...additionalObserver],
         initialRoute: initialRoute,
         onGenerateRoute: onGenerateRoute,
       ),

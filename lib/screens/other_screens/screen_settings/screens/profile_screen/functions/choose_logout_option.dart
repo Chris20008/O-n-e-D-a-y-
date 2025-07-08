@@ -29,7 +29,7 @@ Future chooseLogoutOption(BuildContext parentContext) async{
             color: Theme.of(context).primaryColor,
             child: Column(
               children: [
-                SizedBox(
+                const SizedBox(
                   height: 30,
                 ),
                 SizedBox(

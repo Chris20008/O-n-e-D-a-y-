@@ -9,6 +9,8 @@ import '../../../../util/constants.dart';
 import '../../../../util/language_config.dart';
 import '../../../../widgets/custom_navigator.dart';
 import '../../../../widgets/selectors/select_language_button.dart';
+import '../screen_welcome.dart';
+import 'brogy_hero.dart';
 
 class ScreenLanguage extends StatelessWidget {
   const ScreenLanguage({super.key});
@@ -30,10 +32,11 @@ class ScreenLanguage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 100,),
-              SizedBox(
-                  height: 180,
-                  child: Image.asset("lib/assets/pictures/welcome_brogy.png")
-              ),
+              BrogyHero(),
+              // SizedBox(
+              //     height: 180,
+              //     child: Image.asset("lib/assets/pictures/welcome_brogy.png")
+              // ),
               SizedBox(height: 50,),
               const Text(
                 "Hey Gymrat!",
@@ -96,7 +99,7 @@ class ScreenLanguage extends StatelessWidget {
                   ),
 
                   CupertinoButton(
-                      onPressed: () => CustomNavigator.pushNamed(context, "/connectCloud"),
+                      onPressed: () => CustomNavigator.pushNamed(context, WelcomeRoute.connectCloud.value),
                       child: Container(
                         height: buttonHeight,
                         width: buttonWidth,
