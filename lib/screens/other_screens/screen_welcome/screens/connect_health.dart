@@ -31,11 +31,7 @@ class ConnectHealth extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 100,),
-                    // SizedBox(
-                    //     height: 180,
-                    //     child: Image.asset("lib/assets/pictures/brogy_health.png")
-                    // ),
+                    const SizedBox(height: 130,),
                     BrogyHero(),
                     SizedBox(height: 30,),
                     SizedBox(

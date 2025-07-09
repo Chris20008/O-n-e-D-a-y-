@@ -31,13 +31,9 @@ class ScreenLanguage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 100,),
-              BrogyHero(),
-              // SizedBox(
-              //     height: 180,
-              //     child: Image.asset("lib/assets/pictures/welcome_brogy.png")
-              // ),
-              SizedBox(height: 50,),
+              const SizedBox(height: 130,),
+              const BrogyHero(),
+              const SizedBox(height: 50,),
               const Text(
                 "Hey Gymrat!",
                 textScaler: TextScaler.linear(1.8),

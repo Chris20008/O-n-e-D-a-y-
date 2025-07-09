@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/functions/load_backup_from_file_picker.dart';
 import 'package:fitness_app/util/backup_helper/delete_local_backup_file.dart';
 import 'package:fitness_app/util/extensions.dart';
@@ -40,92 +41,96 @@ class LocalBackupsListView extends StatelessWidget {
       String filename = localFiles[index].path.split("/").last;
       bool automatic = filename.contains("Auto");
       DateTime date = getDateFromFileName(filename);
-      return Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: mySeparator(heightTop: 0, heightBottom: 0),
-          ),
-          CupertinoButton(
-            sizeStyle: CupertinoButtonSize.small,
-            padding: EdgeInsets.zero,
-            onLongPress: () async{
-              bool confirm = false;
-              await showCupertinoModalPopup<void>(
-                context: context,
-                builder: (BuildContext context) => CupertinoActionSheet(
-                  cancelButton: getActionSheetCancelButton(context),
-                  title: Text("Backup löschen"),
-                  message: Text("Möchtest du das Backup wirklich entgültig löschen?"),
-                  actions: <Widget>[
-                    CupertinoActionSheetAction(
-                      /// This parameter indicates the action would perform
-                      /// a destructive action such as delete or exit and turns
-                      /// the action's text color to red.
-                      isDestructiveAction: true,
-                      onPressed: ()async{
-                        Navigator.of(context).pop();
-                        confirm = true;
-                      },
-                      child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
+      return FadeInRight(
+        delay: Duration(milliseconds: (index * 80 + 250).clamp(380, 1100)),
+        duration: const Duration(milliseconds: 300),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: mySeparator(heightTop: 0, heightBottom: 0),
+            ),
+            CupertinoButton(
+              sizeStyle: CupertinoButtonSize.small,
+              padding: EdgeInsets.zero,
+              onLongPress: () async{
+                bool confirm = false;
+                await showCupertinoModalPopup<void>(
+                  context: context,
+                  builder: (BuildContext context) => CupertinoActionSheet(
+                    cancelButton: getActionSheetCancelButton(context),
+                    title: Text("Backup löschen"),
+                    message: Text("Möchtest du das Backup wirklich entgültig löschen?"),
+                    actions: <Widget>[
+                      CupertinoActionSheetAction(
+                        /// This parameter indicates the action would perform
+                        /// a destructive action such as delete or exit and turns
+                        /// the action's text color to red.
+                        isDestructiveAction: true,
+                        onPressed: ()async{
+                          Navigator.of(context).pop();
+                          confirm = true;
+                        },
+                        child: Text(AppLocalizations.of(context)!.yes, style: cupButtonTextStyleOnlyFontSize),
+                      ),
+                    ],
+                  ),
+                );
+
+                if(confirm){
+                  final success = await deleteLocalBackupFile(file: localFiles[index]);
+                  if(success){
+                    Future.delayed(const Duration(milliseconds: 100), (){
+                      cnSettings.refreshLocalBackups();
+                    });
+                  }
+                }
+              },
+              onPressed: () async{
+                File file = File(localFiles[index].path);
+
+                await loadBackupFromFilePicker(
+                    context: context,
+                    setLoadingIndicator: cnSettings.setLoadingIndicator,
+                    cnHomepage: cnHomepage,
+                    cnConfig: cnConfig,
+                    cnScreenStatistics: cnScreenStatistics,
+                    file: file,
+                    cnSettings: cnSettings
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 30),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                height: 60,
+                color: Colors.transparent,
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Backup${automatic? " (${AppLocalizations.of(context)!.automatic})" : " (${AppLocalizations.of(context)!.manual})"}",
+                          textScaler: const TextScaler.linear(1.1),
+                          style: const TextStyle(color: CupertinoColors.white)
+                        ),
+                        const SizedBox(height: 4,),
+                        getFileSizeText(fileSize)
+                      ],
+                    ),
+                    const Spacer(),
+                    Text(
+                      date.toStringDateTime(),
+                      style: const TextStyle(color: CupertinoColors.white),
+                      textScaler: const TextScaler.linear(1.1),
                     ),
                   ],
                 ),
-              );
-
-              if(confirm){
-                final success = await deleteLocalBackupFile(file: localFiles[index]);
-                if(success){
-                  Future.delayed(const Duration(milliseconds: 100), (){
-                    cnSettings.refreshLocalBackups();
-                  });
-                }
-              }
-            },
-            onPressed: () async{
-              File file = File(localFiles[index].path);
-
-              await loadBackupFromFilePicker(
-                  context: context,
-                  setLoadingIndicator: cnSettings.setLoadingIndicator,
-                  cnHomepage: cnHomepage,
-                  cnConfig: cnConfig,
-                  cnScreenStatistics: cnScreenStatistics,
-                  file: file,
-                  cnSettings: cnSettings
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 30),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              height: 60,
-              color: Colors.transparent,
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Backup${automatic? " (${AppLocalizations.of(context)!.automatic})" : " (${AppLocalizations.of(context)!.manual})"}",
-                        textScaler: const TextScaler.linear(1.1),
-                        style: const TextStyle(color: CupertinoColors.white)
-                      ),
-                      const SizedBox(height: 4,),
-                      getFileSizeText(fileSize)
-                    ],
-                  ),
-                  const Spacer(),
-                  Text(
-                    date.toStringDateTime(),
-                    style: const TextStyle(color: CupertinoColors.white),
-                    textScaler: const TextScaler.linear(1.1),
-                  ),
-                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     }
 

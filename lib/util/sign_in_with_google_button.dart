@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 /// The scale based on the height of the button
 const _googleIconSizeScale = 28 / 44;
+const double signInButtonHeight = 44;
 
 /// A `Sign in with Google` button
 class SignInWithGoogleButton extends StatelessWidget {
@@ -10,7 +11,7 @@ class SignInWithGoogleButton extends StatelessWidget {
     super.key,
     required this.onPressed,
     this.text = 'Sign in with Google',
-    this.height = 44,
+    this.height = signInButtonHeight,
     this.style = SignInWithGoogleButtonStyle.black,
     this.borderRadius = const BorderRadius.all(Radius.circular(8.0)),
     this.iconAlignment = IconAlignment.center,

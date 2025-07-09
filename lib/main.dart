@@ -12,8 +12,6 @@ import 'package:fitness_app/screens/other_screens/screen_settings/screen_setting
 import 'package:fitness_app/screens/other_screens/screen_welcome/screen_welcome.dart';
 import 'package:fitness_app/service/auth_service.dart';
 import 'package:fitness_app/service/sync_manager.dart';
-import 'package:fitness_app/util/backup_helper/google_drive/load_newest_data_google_drive.dart';
-import 'package:fitness_app/util/backup_helper/icloud/load_newset_data_icloud.dart';
 import 'package:fitness_app/widgets/sync_with_cloud_bar.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/widgets/animated_column.dart';
 import 'package:fitness_app/screens/other_screens/screen_running_workout/screen_running_workout.dart';
@@ -38,11 +36,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl_standalone.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:io';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -235,6 +231,9 @@ class _MyHomePageState extends State<MyHomePage>{
   }
 
   void initMain() async{
+
+    Future startScreenMinTime = Future.delayed(const Duration(milliseconds: 300));
+
     objectbox = await ObjectBox.create();
 
     /// Parallelize futures
@@ -247,7 +246,6 @@ class _MyHomePageState extends State<MyHomePage>{
     await Future.wait(futures);
     
     await cnSyncManager.doSyncWithFireStore(context);
-    await Future.delayed(const Duration(milliseconds: 200));
     if(cnConfig.config.settings["languageCode"] == null){
       final res = await findSystemLocale();
       if(context.mounted){
@@ -289,9 +287,11 @@ class _MyHomePageState extends State<MyHomePage>{
 
     /// sign in and sync with cloud
     await cnConfig.signInCloud();
-    if(!showWelcomeScreen && cnConfig.connectWithCloud){
-      trySyncWithCloud();
-    }
+    // if(!showWelcomeScreen && cnConfig.connectWithCloud){
+    //   trySyncWithCloud();
+    // }
+
+    await startScreenMinTime;
 
     setState(() {
       mainIsInitialized = true;
@@ -338,7 +338,7 @@ class _MyHomePageState extends State<MyHomePage>{
               // final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
               final uid = snapshot.data?.uid;
               cnSyncManager.setUserId(uid);
-              if(ObjectBox.initialized){
+              if(ObjectBox.initialized && !showWelcomeScreen){
                 cnSyncManager.doSyncWithFireStore(context);
               }
             } else{
@@ -428,7 +428,7 @@ class _MyHomePageState extends State<MyHomePage>{
           // final uid = Platform.isAndroid? androidDeveloperUid : snapshot.data?.uid;
           final uid = snapshot.data?.uid;
           cnSyncManager.setUserId(uid);
-          if(ObjectBox.initialized){
+          if(ObjectBox.initialized && !showWelcomeScreen){
             cnSyncManager.doSyncWithFireStore(context);
           }
         } else{
@@ -560,48 +560,48 @@ class _MyHomePageState extends State<MyHomePage>{
     );
   }
 
-  Future<void> trySyncWithCloud() async{
-    cnHomepage.isSyncingWithCloud = true;
-    cnHomepage.msg = "Sync with Google Drive";
-    if(Platform.isAndroid){
-      if(await isOnline()){
-        cnHomepage.refresh();
-        await loadNewestDataGoogleDrive(
-            cnConfig,
-            cnHomepage: cnHomepage
-        ).then((needRefresh) {
-          if(needRefresh){
-            cnWorkouts.refreshAllWorkouts();
-            cnWorkoutHistory.refreshAllWorkouts();
-          }
-        });
-      }
-      else{
-        cnHomepage.isSyncingWithCloud = false;
-        cnHomepage.msg = "";
-        Fluttertoast.showToast(
-            msg: "No Internet - Sync with Cloud not possible",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
-            textColor: Colors.white,
-            fontSize: 16.0
-        );
-      }
-    }
-    else{
-      cnHomepage.isSyncingWithCloud = true;
-      cnHomepage.msg = "Sync with iCloud";
-      cnHomepage.refresh();
-      await loadNewestDataiCloud(cnHomepage: cnHomepage).then((needRefresh) {
-        if(needRefresh){
-          cnWorkouts.refreshAllWorkouts();
-          cnWorkoutHistory.refreshAllWorkouts();
-        }
-      });
-    }
-  }
+  // Future<void> trySyncWithCloud() async{
+  //   cnHomepage.isSyncingWithCloud = true;
+  //   cnHomepage.msg = "Sync with Google Drive";
+  //   if(Platform.isAndroid){
+  //     if(await isOnline()){
+  //       cnHomepage.refresh();
+  //       await loadNewestDataGoogleDrive(
+  //           cnConfig,
+  //           cnHomepage: cnHomepage
+  //       ).then((needRefresh) {
+  //         if(needRefresh){
+  //           cnWorkouts.refreshAllWorkouts();
+  //           cnWorkoutHistory.refreshAllWorkouts();
+  //         }
+  //       });
+  //     }
+  //     else{
+  //       cnHomepage.isSyncingWithCloud = false;
+  //       cnHomepage.msg = "";
+  //       Fluttertoast.showToast(
+  //           msg: "No Internet - Sync with Cloud not possible",
+  //           toastLength: Toast.LENGTH_LONG,
+  //           gravity: ToastGravity.TOP,
+  //           timeInSecForIosWeb: 2,
+  //           backgroundColor: Colors.grey[800]?.withValues(alpha: 0.9),
+  //           textColor: Colors.white,
+  //           fontSize: 16.0
+  //       );
+  //     }
+  //   }
+  //   else{
+  //     cnHomepage.isSyncingWithCloud = true;
+  //     cnHomepage.msg = "Sync with iCloud";
+  //     cnHomepage.refresh();
+  //     await loadNewestDataiCloud(cnHomepage: cnHomepage).then((needRefresh) {
+  //       if(needRefresh){
+  //         cnWorkouts.refreshAllWorkouts();
+  //         cnWorkoutHistory.refreshAllWorkouts();
+  //       }
+  //     });
+  //   }
+  // }
 
   void onFinishWelcomeScreen(bool doShowTutorial) {
     cnConfig.setWelcomeScreen(false);
@@ -621,9 +621,10 @@ class _MyHomePageState extends State<MyHomePage>{
         }
         showWelcomeScreen = false;
       });
-      if(cnConfig.connectWithCloud /*&& !doShowTutorial*/){
-        trySyncWithCloud();
-      }
+      cnSyncManager.doSyncWithFireStore(context);
+      // if(cnConfig.connectWithCloud /*&& !doShowTutorial*/){
+      //   trySyncWithCloud();
+      // }
     });
   }
 }

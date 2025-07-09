@@ -1,7 +1,7 @@
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/screen_settings.dart';
-import 'package:fitness_app/screens/other_screens/screen_welcome/screens/cloud_connect.dart';
+import 'package:fitness_app/screens/other_screens/screen_welcome/screens/cloud_connect/cloud_connect.dart';
 import 'package:fitness_app/screens/other_screens/screen_welcome/screens/connect_health.dart';
 import 'package:fitness_app/screens/other_screens/screen_welcome/screens/connect_spotify.dart';
 import 'package:fitness_app/screens/other_screens/screen_welcome/screens/language.dart';
@@ -22,6 +22,11 @@ class ScreenWelcome extends StatefulWidget {
 
   @override
   State<ScreenWelcome> createState() => _ScreenWelcomeState();
+
+  static const buttonWidthPercent = 0.8;
+  static const buttonHeight = 50.0;
+  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(vertical: 16, horizontal: 20);
+  static const int defaultDuration = 500;
 }
 
 class _ScreenWelcomeState extends State<ScreenWelcome> {
@@ -117,6 +122,7 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
 enum WelcomeRoute{
   welcomeLanguage ("/welcomeLanguage"),
   connectCloud ("/connectCloud"),
+  connectCloudWithoutAccount ("/connectCloudWithoutAccount"),
   connectSpotify ("/connectSpotify"),
   connectHealth ("/connectHealth");
 

@@ -26,7 +26,7 @@ class DatabaseService{
   /// -------------------------------------- Getter ---------------------------------------
   /// -------------------------------------------------------------------------------------
 
-  Future<ServerChecksums> getServerChecksums() async{
+  Future<ServerChecksums> getServerChecksums({bool reversed = true}) async{
     final DocumentSnapshot dc = await userCollection.doc(uid).get();
     final data = dc.data() as Map<String, dynamic>?;
     if (data != null && data.containsKey("workoutChecksums") && data.containsKey("sickDayChecksums")) {
@@ -40,9 +40,15 @@ class DatabaseService{
           && sickDayChecksums is List
           && sickDayChecksumsLastUpdated is Timestamp
       ) {
+        List<String> workoutChecksumsList = List<String>.from(workoutChecksums);
+        List<String> sickDayChecksumsList = List<String>.from(sickDayChecksums);
+        if(reversed){
+          workoutChecksumsList = workoutChecksumsList.reversed.toList();
+          sickDayChecksumsList = sickDayChecksumsList.reversed.toList();
+        }
         return ServerChecksums(
-            workoutChecksums: List<String>.from(workoutChecksums),
-            sickDayChecksums: List<String>.from(sickDayChecksums),
+            workoutChecksums: workoutChecksumsList,
+            sickDayChecksums: sickDayChecksumsList,
             workoutChecksumsLastUpdated: workoutChecksumsLastUpdated.toDate(),
             sickDayChecksumsLastUpdated: sickDayChecksumsLastUpdated.toDate()
         );
@@ -81,58 +87,6 @@ class DatabaseService{
 
     return allSickDays;
   }
-
-  /// -------------------------------------------------------------------------------------
-  /// -------------------------------------- Workout --------------------------------------
-  /// -------------------------------------------------------------------------------------
-
-  // Future<void> addWorkout({required ObWorkout wo, String? oldChecksum}) async{
-  //   final workoutData = wo.asMap(withChecksum: true);
-  //
-  //   await writeBatch.set(workoutCollection.doc(wo.uuid), workoutData);
-  //
-  //   await _addWorkoutChecksum(wo.checksum, batch: writeBatch);
-  //   if(oldChecksum != null){
-  //     await deleteWorkoutChecksum(oldChecksum, batch: writeBatch);
-  //   }
-  // }
-  //
-  // Future<void> _addWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async{
-  //   if(batch != null){
-  //     await batch.set(userDocument, {
-  //       "workoutChecksums": FieldValue.arrayUnion([checksum]),
-  //       "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
-  //     }, SetOptions(merge: true));
-  //   }
-  //   else{
-  //     await userDocument
-  //         .set({
-  //       "workoutChecksums": FieldValue.arrayUnion([checksum]),
-  //       "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
-  //     }, SetOptions(merge: true));
-  //   }
-  // }
-  //
-  // Future<void> deleteWorkout({required ObWorkout wo}) async {
-  //   await writeBatch.delete(workoutCollection.doc(wo.uuid));
-  //   await deleteWorkoutChecksum(wo.currentChecksum, batch: writeBatch);
-  // }
-  //
-  // Future<void> deleteWorkoutChecksum(String checksum, {AutoCommitBatch? batch}) async {
-  //   if(batch != null){
-  //     await batch.set(userDocument, {
-  //       "workoutChecksums": FieldValue.arrayRemove([checksum]),
-  //       "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
-  //     }, SetOptions(merge: true));
-  //   }
-  //   else{
-  //     await userDocument
-  //         .set({
-  //       "workoutChecksums": FieldValue.arrayRemove([checksum]),
-  //       "workoutChecksumsLastUpdated": Timestamp.fromDate(DateTime.now())
-  //     }, SetOptions(merge: true));
-  //   }
-  // }
 
   /// -------------------------------------------------------------------------------------
   /// --------------------------- Handle Collection Objects -------------------------------

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fitness_app/screens/main_screens/screen_statistics/widgets/exercises_list/widgets/month_exercise_list/month_exercise_list.dart';
 import 'package:fitness_app/util/extensions.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,8 @@ class ExercisesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     late CnScreenStatistics cnScreenStatistics = Provider.of<CnScreenStatistics>(context);
+    bool doAnimate = true;
+    Timer? timer = Timer(const Duration(milliseconds: 300), () => doAnimate = false);
 
     List<ExerciseWithDate> exercises = (cnScreenStatistics.getSelectedExerciseHistory()?? {}).entries
         .map((entry) => ExerciseWithDate(
@@ -31,27 +35,28 @@ class ExercisesList extends StatelessWidget {
     }
     
     return Expanded(
-      child: Container(
-        // color: Theme.of(context).cardColor,
-        child: ListView.builder(
-            physics: const BouncingScrollPhysics(),
-            controller: cnScreenStatistics.scrollController.controller,
-            itemCount: groupedExercises.length + 1,
-            itemBuilder: (context, index){
-              if (index == 0){
-                return ScrollListener(
-                    minValue: 0,
-                    maxValue: cnScreenStatistics.heightExerciseLineChartMax,
-                    controller: cnScreenStatistics.scrollController.controller,
-                    inverted: true,
-                    builder: (context, value, percent) {
-                      return SizedBox(height: value);
-                    }
-                );
-              }
-              return MonthExerciseList(groupedExercises: groupedExercises[index-1]);
+      child: ListView.builder(
+          physics: const BouncingScrollPhysics(),
+          controller: cnScreenStatistics.scrollController.controller,
+          itemCount: groupedExercises.length + 1,
+          itemBuilder: (context, index){
+            if (index == 0){
+              return ScrollListener(
+                  minValue: 0,
+                  maxValue: cnScreenStatistics.heightExerciseLineChartMax,
+                  controller: cnScreenStatistics.scrollController.controller,
+                  inverted: true,
+                  builder: (context, value, percent) {
+                    return SizedBox(height: value);
+                  }
+              );
             }
-        ),
+            return MonthExerciseList(
+                groupedExercises: groupedExercises[index-1],
+                index: index,
+                doAnimate: doAnimate
+            );
+          }
       ),
     );
   }

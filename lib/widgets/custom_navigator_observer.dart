@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:fitness_app/util/extensions.dart';
 
 class CustomNavigatorObserver extends NavigatorObserver {
   String? currentRouteName;
   String? previousRouteName;
   final List<String> _routeStack = [];
   final List<VoidCallback> _listeners = [];
+  final Map<String?, String> overwrittenRouteNames = {};
 
   String? get parentRouteName {
     if(_routeStack.length <= 1){
@@ -18,10 +20,13 @@ class CustomNavigatorObserver extends NavigatorObserver {
   void didPush(Route route, Route? previousRoute) {
     previousRouteName = currentRouteName;
     final newRouteName = route.settings.name;
-    if(newRouteName != null){
-      _routeStack.add(newRouteName);
-    }
     currentRouteName = newRouteName;
+
+    _applyOverwrittenRouteNames();
+
+    if(currentRouteName != null){
+      _routeStack.add(currentRouteName!);
+    }
     _callListeners();
   }
 
@@ -30,6 +35,8 @@ class CustomNavigatorObserver extends NavigatorObserver {
     previousRouteName = currentRouteName;
     currentRouteName = previousRoute?.settings.name;
     _routeStack.removeLast();
+    _checkOverwrittenRouteNames();
+    _applyOverwrittenRouteNames();
     _callListeners();
   }
 
@@ -39,8 +46,38 @@ class CustomNavigatorObserver extends NavigatorObserver {
     }
   }
 
+  void overwriteCurrentRouteName(String route){
+    overwrittenRouteNames.remove(currentRouteName);
+
+    overwrittenRouteNames[currentRouteName] = route;
+    currentRouteName = route;
+    _applyOverwrittenRouteNames();
+    _routeStack.removeLast();
+    _routeStack.add(route);
+  }
+
+  void _applyOverwrittenRouteNames(){
+    for(String s in overwrittenRouteNames.keys.whereType<String>()){
+      if(currentRouteName == s){
+        currentRouteName = overwrittenRouteNames[s];
+      }
+      if(previousRouteName == s){
+        previousRouteName = overwrittenRouteNames[s];
+      }
+    }
+  }
+
+  void _checkOverwrittenRouteNames(){
+    final List<String> valsToRemove = overwrittenRouteNames.values.whereType<String>().toList().without(_routeStack);
+    for (var val in valsToRemove) {
+      overwrittenRouteNames.removeWhere((key, value) => value == val);
+    }
+  }
+
   void addListener(VoidCallback function){
-    _listeners.add(function);
+    if (!_listeners.contains(function)) {
+      _listeners.add(function);
+    }
   }
 
   void removeListener(VoidCallback callback) {

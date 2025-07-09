@@ -51,6 +51,41 @@ class CnSyncManager extends ChangeNotifier {
     if(database == null || _isSyncing){
       return;
     }
+
+    bool insertedOverlay = false;
+
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Align(
+        alignment: Alignment.topCenter,
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Material(
+              color: Colors.black.withAlpha(100),
+              borderRadius: BorderRadius.circular(20),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                        "Loading Account Data  ",
+                        style: TextStyle(color: CupertinoColors.white)
+                    ),
+                    CupertinoActivityIndicator(
+                        radius: 8.0,
+                        color: Colors.amber[800]
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
     try{
       _isSyncing = true;
       if(await isOnline()){
@@ -63,39 +98,8 @@ class CnSyncManager extends ChangeNotifier {
       final localChecksumsSickDays = objectbox.sickDaysBox.getAll().map((s) => s.checksum).toList();
       final ServerChecksums serverChecksums = await serverChecksumsFuture;
 
-      OverlayEntry overlayEntry = OverlayEntry(
-        builder: (context) => Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Material(
-                color: Colors.black.withAlpha(100),
-                borderRadius: BorderRadius.circular(20),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                          "Loading Account Data  ",
-                          style: TextStyle(color: CupertinoColors.white)
-                      ),
-                      CupertinoActivityIndicator(
-                          radius: 8.0,
-                          color: Colors.amber[800]
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-
       Overlay.of(context).insert(overlayEntry);
+      insertedOverlay = true;
 
       await _syncChecksums(
           serverChecksums: serverChecksums.workoutChecksums,
@@ -126,14 +130,15 @@ class CnSyncManager extends ChangeNotifier {
           },
           box: objectbox.sickDaysBox
       );
-
-      overlayEntry.remove();
     }
     catch(e){
       pr("Error during Sync with Firestore");
       pr(e);
     }
     finally{
+      if(insertedOverlay){
+        overlayEntry.remove();
+      }
       _isSyncing = false;
     }
   }
@@ -164,6 +169,9 @@ class CnSyncManager extends ChangeNotifier {
     /// Remove local workouts that are not on server db
     /// when the lastUpdated is larger than the workouts timestamp
     for (String checksum in missingServer) {
+      if(database == null){
+        return;
+      }
       final FirebaseObject? objectToDelete = getLocalObjectByChecksum(checksum);
 
       if(objectToDelete == null){
@@ -186,6 +194,9 @@ class CnSyncManager extends ChangeNotifier {
     }
 
     if(missingLocal.isNotEmpty){
+      if(database == null){
+        return;
+      }
       /// Add missing SickDays from Server to local db
       List<Map<String, dynamic>> missingLocalMaps = await database!.getMultipleEntriesByChecksums(checksums: missingLocal, collection: collection);
       List<String> foundChecksums = [];
@@ -193,13 +204,16 @@ class CnSyncManager extends ChangeNotifier {
       int counter = 0;
 
       for(Map<String, dynamic> objectMap in missingLocalMaps){
+        if(database == null){
+          return;
+        }
         final FirebaseObject? newObject = constructorFromMap(objectMap);
         if(newObject != null && objectMap["checksum"] != null){
           pr("Object was found on server, add it to client");
           await newObject.save();
           foundChecksums.add(objectMap["checksum"]);
           counter += 1;
-          if (counter % 10 == 0){
+          if (counter % 5 == 0){
             await refresh();
           }
         }
@@ -211,6 +225,9 @@ class CnSyncManager extends ChangeNotifier {
       }
 
       for(String checksum in missingLocal.without(foundChecksums)){
+        if(database == null){
+          return;
+        }
         pr("Checksum $checksum was not found on server, remove it");
         await database?.deleteChecksum(checksum, collection: collection);
       }

@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -6,10 +7,14 @@ import 'single_day.dart';
 
 class MonthExerciseList extends StatelessWidget {
   final MonthGroupedExercises groupedExercises;
+  final int index;
+  final bool doAnimate;
 
   const MonthExerciseList({
     super.key,
-    required this.groupedExercises
+    required this.groupedExercises,
+    required this.index,
+    required this.doAnimate
   });
 
   @override
@@ -19,20 +24,7 @@ class MonthExerciseList extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          // color: Theme.of(context).cardColor,
           color: Colors.black.withValues(alpha: 0.5),
-          // gradient: LinearGradient(
-          //     begin: Alignment.bottomLeft,
-          //     end: Alignment.topRight,
-          //     colors: [
-          //       Theme.of(context).primaryColor,
-          //       Theme.of(context).cardColor,
-          //     ]
-          //     // colors: [
-          //     //   Color(0xff2a1a0a),
-          //     //   Color(0xff633e14),
-          //     // ]
-          // )
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,10 +36,18 @@ class MonthExerciseList extends StatelessWidget {
               textScaler: const TextScaler.linear(1.1),
             ),
           ),
-          for(ExerciseWithDate ex in groupedExercises.exercises)
-            SingleDay(
-                exercise: ex
-            )
+          for(int i in List.generate(groupedExercises.exercises.length, (i) => i))
+            FadeInRight(
+                delay: Duration(milliseconds: doAnimate? (i * 75) : 0),
+                duration: Duration(milliseconds: doAnimate? 300 : 0),
+                child:SingleDay(
+                    exercise: groupedExercises.exercises[i]
+                )
+            ),
+          // for(ExerciseWithDate ex in groupedExercises.exercises)
+          //   SingleDay(
+          //       exercise: ex
+          //   )
         ],
       ),
     );

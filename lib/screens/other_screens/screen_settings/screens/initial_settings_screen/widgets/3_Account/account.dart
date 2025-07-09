@@ -1,14 +1,12 @@
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 import 'package:fitness_app/service/auth_service.dart';
+import 'package:fitness_app/widgets/login_button_dynamic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'dart:io';
 
-import '../../../../../../../util/sign_in_with_google_button.dart';
 import '../../../../../../../widgets/custom_navigator.dart';
 import '../../../../screen_settings.dart';
 
@@ -28,22 +26,9 @@ class AccountSection extends StatelessWidget {
           Widget loginState;
 
           if(uid == null){
-            late Widget button;
-            if(Platform.isAndroid){
-              button = SignInWithGoogleButton(
-                onPressed: () async {
-                  await authService.signInWithGoogle().then((_) => setModalState(() {}));
-                },
-              );
-            } else{
-              button = SignInWithAppleButton(
-                  onPressed: () async => await authService.signInWithApple().then((_) => setModalState((){}))
-              );
-            }
-
             loginState = Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: button
+                child: LoginButtonDynamic(onLogin: () => setModalState((){}))
             );
           }
           else{
