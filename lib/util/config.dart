@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'backup_helper/google_drive/get_google_drive_account.dart';
 import 'custom_cache_manager.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:googleapis/drive/v3.dart' as ga;
 
 class Config{

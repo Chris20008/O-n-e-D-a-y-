@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 import '../functions/open_confirm_name_change_pop_up.dart';
 

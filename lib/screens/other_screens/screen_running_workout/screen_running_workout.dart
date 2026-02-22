@@ -23,7 +23,7 @@ import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../main_screens/screen_workouts/screen_workouts.dart';
 import '../all_exercises_panel/all_exercises_panel.dart';
 import 'widgets/animated_column.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class ScreenRunningWorkout extends StatefulWidget {
   const ScreenRunningWorkout({

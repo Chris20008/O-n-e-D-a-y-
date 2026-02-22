@@ -15,7 +15,7 @@ import '../screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'banner_running_workout.dart';
 import 'bottom_menu.dart';
 import 'multiple_exercise_row.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class WorkoutExpansionTile extends StatefulWidget {
   final Function? onExpansionChange;

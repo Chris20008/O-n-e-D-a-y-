@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../../../../../../objects/exercise.dart';
 import '../../../../../../../other_screens/all_exercises_panel/all_exercises_panel.dart';
 import '../../../../new_exercise_panel/new_exercise_panel.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class AddExerciseButton extends StatelessWidget {
   final bool tutorialIsRunning;

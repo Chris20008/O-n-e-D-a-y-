@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 import '../../../../../widgets/slide_up_panel/my_slide_up_panel.dart';
 import '../../../../../widgets/slide_up_panel/panel_header.dart';

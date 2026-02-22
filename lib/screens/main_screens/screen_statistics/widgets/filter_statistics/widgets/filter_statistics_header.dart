@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/widgets/cupertino_button_text.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class FilterStatisticsHeader extends StatelessWidget {
   const FilterStatisticsHeader({super.key});

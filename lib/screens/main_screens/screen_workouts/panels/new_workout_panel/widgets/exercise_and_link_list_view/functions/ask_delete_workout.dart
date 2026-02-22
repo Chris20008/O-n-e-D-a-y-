@@ -1,6 +1,6 @@
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 import 'delete_workout.dart';
 

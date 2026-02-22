@@ -12,7 +12,7 @@ import '../../../../util/config.dart';
 import '../../../../widgets/standard_popup.dart';
 import '../screen_running_workout.dart';
 import 'animated_column.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class StopwatchWidget extends StatefulWidget {
   const StopwatchWidget({super.key});

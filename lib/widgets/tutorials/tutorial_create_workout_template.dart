@@ -9,7 +9,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_work
 import 'package:fitness_app/screens/main_screens/screen_workouts/screen_workouts.dart';
 import 'package:flutter/material.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:page_indicator_plus/page_indicator_plus.dart';
 
 List<TargetFocus> targets = [];

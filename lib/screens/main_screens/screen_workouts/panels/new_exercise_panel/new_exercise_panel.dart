@@ -12,7 +12,7 @@ import 'package:pull_down_button/pull_down_button.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../../objects/exercise.dart';
 import '../../../../../util/constants.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 import '../../../../../widgets/bottom_menu.dart';
 import '../../../../../widgets/exercise_context_id.dart';

@@ -10,7 +10,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import '../../../../../../util/constants.dart';
 import '../../../../../../widgets/scroll_listener.dart';
 import '../../../screen_statistics.dart';

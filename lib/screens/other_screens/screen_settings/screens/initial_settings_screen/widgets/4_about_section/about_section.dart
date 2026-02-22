@@ -2,7 +2,7 @@ import 'package:fitness_app/screens/other_screens/screen_settings/screens/initia
 import 'package:flutter/cupertino.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 
 class AboutSection extends StatelessWidget {

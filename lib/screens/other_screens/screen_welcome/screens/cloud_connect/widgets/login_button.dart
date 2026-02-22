@@ -4,7 +4,7 @@ import 'package:fitness_app/widgets/login_button_dynamic.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 import '../../../../../../service/auth_service.dart';
 import '../../../../../../util/constants.dart';

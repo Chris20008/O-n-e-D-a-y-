@@ -9,7 +9,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../util/backup_helper/helper_functions/get_local_backup_files.dart';

@@ -2,7 +2,7 @@ import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/new_exercise_panel.dart';
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exercise_panel/widgets/header/widgets/exercise_name_field/functions/on_exercise_name_field_submitted.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class ExerciseNameField extends StatelessWidget {

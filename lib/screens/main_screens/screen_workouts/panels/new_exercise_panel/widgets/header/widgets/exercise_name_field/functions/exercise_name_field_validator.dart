@@ -2,7 +2,7 @@ import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_exer
 import 'package:fitness_app/screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 String? exerciseNameFieldValidator ({
   required BuildContext context,

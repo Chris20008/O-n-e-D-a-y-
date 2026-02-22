@@ -5,7 +5,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../../../util/backup_helper/load_backup/load_backup_from_file.dart';

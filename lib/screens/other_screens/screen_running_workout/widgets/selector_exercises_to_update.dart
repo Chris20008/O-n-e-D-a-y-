@@ -13,7 +13,7 @@ import 'package:quiver/iterables.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../../../../objects/exercise.dart';
 import '../../../../objects/workout.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'dart:io';
 
 import '../../../../widgets/slide_up_panel/animation_controller_name.dart';

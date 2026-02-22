@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:quiver/iterables.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import '../util/objectbox/ob_exercise.dart';
 
 Map categoryMapping = {

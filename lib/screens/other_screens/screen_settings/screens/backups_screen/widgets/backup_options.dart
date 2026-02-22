@@ -5,7 +5,7 @@ import 'package:fitness_app/util/config.dart';
 import 'package:fitness_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:fitness_app/screens/other_screens/screen_settings/widgets/settings_icon.dart';
 

@@ -18,7 +18,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../objectbox.g.dart';
 import '../objects/workout.dart';
 import '../screens/main_screens/screen_workouts/panels/new_workout_panel/new_workout_panel.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 List<Color> linkColors = [
   const Color(0xFF5F9561),

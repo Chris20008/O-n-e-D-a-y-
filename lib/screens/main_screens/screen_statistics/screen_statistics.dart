@@ -23,7 +23,7 @@ import '../../../util/persistent_scroll_controller.dart';
 import '../../../widgets/slide_up_panel/animation_controller_name.dart';
 import '../../../widgets/standard_popup.dart';
 import '../../other_screens/screen_settings/screen_settings.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 
 class ScreenStatistics extends StatefulWidget {
   const ScreenStatistics({super.key});
