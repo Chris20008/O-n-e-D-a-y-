@@ -1,3 +1,4 @@
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +35,13 @@ class ConnectSpotify extends StatelessWidget {
                   children: [
                     const SizedBox(height: 130,),
                     BrogyHero(),
-                    SizedBox(height: 20,),
+                    const SizedBox(height: 20,),
                     SizedBox(
                       width: 300,
-                      child: const Text(
-                        "Deine Musik, direkt im Training",
-                        textScaler: TextScaler.linear(2.2),
+                      child: Text(
+                        AppLocalizations.of(context)!.connectSpotify1,
+                        textScaler: const TextScaler.linear(2.2),
                         textAlign: TextAlign.center,
-                        // style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
                     const SizedBox(height: 30,),
@@ -50,7 +50,7 @@ class ConnectSpotify extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
-                          "Steuere Spotify direkt in der App - kein App-Wechsel mehr nötig.",
+                          AppLocalizations.of(context)!.connectSpotify2,
                           textScaler: const TextScaler.linear(1.1),
                           textAlign: TextAlign.center,
                         ),
@@ -85,14 +85,14 @@ class ConnectSpotify extends StatelessWidget {
                                   color: const Color(0xFFFF9A19),
                                   borderRadius: BorderRadius.circular(15)
                               ),
-                              child: const Center(
+                              child: Center(
                                   child: Text(
-                                      "Weiter",
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!.welcomeNext,
+                                      style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600
                                       ),
-                                      textScaler: TextScaler.linear(1.1)
+                                      textScaler: const TextScaler.linear(1.1)
                                   )
                               ),
                             )

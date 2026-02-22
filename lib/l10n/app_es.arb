@@ -216,5 +216,33 @@
   "new10": "El peso corporal solo se tendrá en cuenta si permites el acceso a tu peso en la aplicación Health.",
   "new11": "Entrenamiento en curso",
   "new12": "Ahora puedes agregar directamente un ejercicio a un grupo dentro de un entrenamiento en curso. Además, puedes establecer el tiempo de descanso, la altura del asiento, la categoría y el peso corporal movido.",
-  "new13": "Las consultas para actualizar la plantilla de entrenamiento y realizar un seguimiento dentro de un grupo ya no son ventanas emergentes, sino una nueva pantalla que se desliza desde abajo hacia arriba. Esto proporciona más espacio y hace que la selección sea más clara."
+  "new13": "Las consultas para actualizar la plantilla de entrenamiento y realizar un seguimiento dentro de un grupo ya no son ventanas emergentes, sino una nueva pantalla que se desliza desde abajo hacia arriba. Esto proporciona más espacio y hace que la selección sea más clara.",
+
+  "welcomeScreen1": "Empecemos",
+  "connectHealth1": "Conectar Salud",
+  "connectHealth2": "Para que pueda tener en cuenta correctamente tu peso corporal en los ejercicios.",
+  "connectHealth3": "Listo",
+  "connectSpotify1": "Tu música, directamente en tu entrenamiento",
+  "connectSpotify2": "Controla Spotify directamente en la app — sin cambiar de aplicación.",
+
+  "connectCloud1": "Tus datos. Siempre seguros",
+  "connectCloud2Android": "Con o sin cuenta — guarda automáticamente tu progreso en Google Drive.",
+  "connectCloud2IOS": "Con o sin cuenta — guarda automáticamente tu progreso en iCloud.",
+  "connectCloud3": "Continuar sin cuenta",
+  "connectCloud4": "Crear cuenta",
+  "connectCloud5": "Continuar sin cuenta",
+  "connectCloud6": "Crear una cuenta",
+  "connectCloud7": "Sincroniza tus datos entre dispositivos y accede a tu progreso desde cualquier lugar.",
+
+  "deleteAccount1": "Eliminar cuenta",
+  "deleteAccount2": "Por favor escribe ELIMINAR para confirmar la eliminación de tu cuenta",
+  "deleteString": "ELIMINAR",
+
+  "logout1": "Solo desconectar",
+  "logout2": "Mantén tus datos localmente, solo elimina la conexión con la cuenta.",
+  "logout3": "Cerrar sesión completamente",
+  "logout4": "Todos los datos locales y la conexión con la cuenta serán eliminados.",
+  "logout5": "Tus datos de cuenta en nuestro servidor permanecerán. La eliminación completa solo es posible a través de \"Eliminar cuenta\".",
+
+  "profile": "Perfil"
 }

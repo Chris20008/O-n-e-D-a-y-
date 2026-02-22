@@ -216,5 +216,33 @@
   "new10": "Masa ciała będzie brana pod uwagę tylko wtedy, gdy udzielisz dostępu do swoich danych w aplikacji Zdrowie.",
   "new11": "Trening w toku",
   "new12": "Teraz możesz dodać ćwiczenie do grupy bezpośrednio w trakcie trwającego treningu. Ponadto możesz ustawić czas odpoczynku, wysokość siedziska, kategorię i masę ciała przenoszoną podczas ćwiczenia.",
-  "new13": "Zapytania dotyczące aktualizacji szablonu treningu oraz śledzenia w grupie nie są już wyskakującymi oknami, ale nowym ekranem przesuwanym od dołu do góry. Dzięki temu dostępna jest większa przestrzeń i lepsza przejrzystość wyboru."
+  "new13": "Zapytania dotyczące aktualizacji szablonu treningu oraz śledzenia w grupie nie są już wyskakującymi oknami, ale nowym ekranem przesuwanym od dołu do góry. Dzięki temu dostępna jest większa przestrzeń i lepsza przejrzystość wyboru.",
+
+  "welcomeScreen1": "Zaczynajmy",
+  "connectHealth1": "Połącz Zdrowie",
+  "connectHealth2": "Abym mógł poprawnie uwzględniać Twoją masę ciała podczas ćwiczeń.",
+  "connectHealth3": "Gotowe",
+  "connectSpotify1": "Twoja muzyka bezpośrednio w treningu",
+  "connectSpotify2": "Steruj Spotify bezpośrednio w aplikacji — bez przełączania aplikacji.",
+
+  "connectCloud1": "Twoje dane. Zawsze bezpieczne",
+  "connectCloud2Android": "Z kontem lub bez — automatycznie zapisuj postępy w Google Drive.",
+  "connectCloud2IOS": "Z kontem lub bez — automatycznie zapisuj postępy w iCloud.",
+  "connectCloud3": "Kontynuuj bez konta",
+  "connectCloud4": "Utwórz konto",
+  "connectCloud5": "Kontynuuj bez konta",
+  "connectCloud6": "Utwórz konto",
+  "connectCloud7": "Synchronizuj dane między urządzeniami i uzyskaj dostęp do swoich postępów z dowolnego miejsca.",
+
+  "deleteAccount1": "Usuń konto",
+  "deleteAccount2": "Wpisz USUŃ, aby potwierdzić usunięcie swojego konta",
+  "deleteString": "USUŃ",
+
+  "logout1": "Tylko rozłącz",
+  "logout2": "Zachowaj dane lokalnie, usuń tylko połączenie z kontem.",
+  "logout3": "Wyloguj całkowicie",
+  "logout4": "Wszystkie dane lokalne oraz połączenie z kontem zostaną usunięte.",
+  "logout5": "Dane Twojego konta na naszym serwerze pozostaną. Pełne usunięcie jest możliwe tylko przez \"Usuń konto\".",
+
+  "profile": "Profil"
 }

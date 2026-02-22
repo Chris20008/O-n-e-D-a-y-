@@ -35,6 +35,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>spotify</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -43,6 +47,12 @@
 	<true/>
 	<key>NSDocumentsFolderUsageDescription</key>
 	<string>Access to devices storage is necessary to create a backup.</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>We will sync your data with the Apple Health app to give you better insights</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>We will sync your data with the Apple Health app to give you better insights</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app doe not require access to the photo library.</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.christian.range.OneDay</key>
@@ -55,8 +65,8 @@
 			<string>Any</string>
 			<key>NSUbiquitousContainerSupportedServices</key>
 			<array>
-            <string>CloudDocuments</string>
-            </array>
+				<string>CloudDocuments</string>
+			</array>
 		</dict>
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -82,16 +92,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>LSApplicationQueriesSchemes</key>
-    <array>
-         <string>spotify</string>
-    </array>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>This app doe not require access to the photo library.</string>
-    <key>NSHealthShareUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights</string>
-    <key>NSHealthUpdateUsageDescription</key>
-    <string>We will sync your data with the Apple Health app to give you better insights</string>
-
 </dict>
 </plist>

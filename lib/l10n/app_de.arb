@@ -216,5 +216,33 @@
   "new10": "Das Körpergewicht wird nur mit einbezogen, wenn du Zugriff auf dein Körpergewicht von der Health App zulässt.",
   "new11": "Laufendes Workout",
   "new12": "Du kannst eine Übung die du innerhalb eines laufenden Workouts hinzufügst jetzt auch direkt einer Gruppe hinzufügen. Außerdem kannst du direkt die Pausenzeit, die Sitzhöhe, die Kategorie und das bewegte Körpergewicht angeben.",
-  "new13": "Die Abfrage zum aktualisieren von der Workoutvorlage sowie des tracken innerhalb einer Gruppe sind keine PopUps mehr, sondern ein neuer Screen der sich von unten nach oben bewegt. Dadurch steht mehr Platz zur Verfügung und die Auswahl ist übersichtlicher."
+  "new13": "Die Abfrage zum aktualisieren von der Workoutvorlage sowie des tracken innerhalb einer Gruppe sind keine PopUps mehr, sondern ein neuer Screen der sich von unten nach oben bewegt. Dadurch steht mehr Platz zur Verfügung und die Auswahl ist übersichtlicher.",
+
+  "welcomeScreen1": "Los geht's",
+  "connectHealth1": "Health verbinden",
+  "connectHealth2": "Damit ich dein Körpergewicht bei Übungen korrekt berücksichtigen kann.",
+  "connectHealth3": "Fertig",
+  "connectSpotify1": "Deine Musik, direkt im Training",
+  "connectSpotify2": "Steuere Spotify direkt in der App - kein App-Wechsel mehr nötig.",
+
+  "connectCloud1": "Deine Daten. Immer sicher",
+  "connectCloud2Android": "Ob mit oder ohne Account - sichere deine Fortschritte automatisch in Google Drive.",
+  "connectCloud2IOS": "Ob mit oder ohne Account - sichere deine Fortschritte automatisch in iCloud.",
+  "connectCloud3": "Weiter ohne Account",
+  "connectCloud4": "Account erstellen",
+  "connectCloud5": "Ohne Account fortfahren",
+  "connectCloud6": "Erstelle einen Account",
+  "connectCloud7": "Synchronisiere deine Daten zwischen Geräten und greife von überall auf deinen Fortschritt zu.",
+
+  "deleteAccount1": "Account löschen",
+  "deleteAccount2": "Bitte gib LÖSCHEN ein, um das Löschen deines Accounts zu bestätigen",
+  "deleteString": "LÖSCHEN",
+
+  "logout1": "Nur Verbindung trennen",
+  "logout2": "Behalte deine Daten lokal, entferne nur die Account-Verbindung.",
+  "logout3": "Komplett abmelden",
+  "logout4": "Alle lokalen Daten und die Account-Verbindung werden entfernt.",
+  "logout5": "Deine Account Daten bei uns auf dem Server bleiben erhalten. Eine vollständige Löschung erfolgt nur über \\\"Account löschen\\\".",
+
+  "profile": "Profil"
 }

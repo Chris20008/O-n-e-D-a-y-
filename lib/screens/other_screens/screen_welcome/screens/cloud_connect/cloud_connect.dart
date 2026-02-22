@@ -74,8 +74,8 @@ class _ConnectCloudState extends State<ConnectCloud> {
                                 SizedBox(height: 20,),
                                 SizedBox(
                                   width: 300,
-                                  child: const Text(
-                                    "Deine Daten. Immer sicher",
+                                  child: Text(
+                                    AppLocalizations.of(context)!.connectCloud1,
                                     textScaler: TextScaler.linear(2.2),
                                     textAlign: TextAlign.center,
                                   ),
@@ -86,7 +86,7 @@ class _ConnectCloudState extends State<ConnectCloud> {
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                     child: Text(
-                                      "Ob mit oder ohne Account - sichere deine Fortschritte automatisch in Google Drive.",
+                                      Platform.isAndroid? AppLocalizations.of(context)!.connectCloud2Android : AppLocalizations.of(context)!.connectCloud2IOS,
                                       textScaler: const TextScaler.linear(1.1),
                                       textAlign: TextAlign.center,
                                     ),
@@ -139,9 +139,9 @@ class _ConnectCloudState extends State<ConnectCloud> {
                                               // color: Colors.white12,
                                               borderRadius: BorderRadius.circular(15)
                                           ),
-                                          child: const Center(
+                                          child: Center(
                                               child: Text(
-                                                  "Weiter ohne Account",
+                                                  AppLocalizations.of(context)!.connectCloud3,
                                                   style: TextStyle(
                                                       color: Colors.white,
                                                       // fontWeight: FontWeight.w600
@@ -391,7 +391,7 @@ class _ConnectCloudState extends State<ConnectCloud> {
                                   height: buttonHeight,
                                   child: Center(
                                     child: Text(
-                                        "Account erstellen",
+                                        AppLocalizations.of(context)!.connectCloud4,
                                         style: TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.w600
@@ -414,7 +414,7 @@ class _ConnectCloudState extends State<ConnectCloud> {
                                   height: buttonHeight,
                                   child: Center(
                                     child: Text(
-                                        "Ohne Account fortfahren",
+                                        AppLocalizations.of(context)!.connectCloud5,
                                         style: TextStyle(
                                             color: Colors.white38,
                                             fontWeight: FontWeight.w400

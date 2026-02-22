@@ -216,5 +216,33 @@
   "new10": "Il peso corporeo verrà preso in considerazione solo se consenti l'accesso al tuo peso nell'app Salute.",
   "new11": "Allenamento in corso",
   "new12": "Ora puoi aggiungere direttamente un esercizio a un gruppo all'interno di un allenamento in corso. Inoltre, puoi impostare il tempo di riposo, l'altezza del sedile, la categoria e il peso corporeo sollevato.",
-  "new13": "Le richieste per aggiornare il modello di allenamento e tenere traccia di un gruppo non sono più popup, ma una nuova schermata che scorre dal basso verso l'alto. Questo offre più spazio e rende la selezione più chiara."
+  "new13": "Le richieste per aggiornare il modello di allenamento e tenere traccia di un gruppo non sono più popup, ma una nuova schermata che scorre dal basso verso l'alto. Questo offre più spazio e rende la selezione più chiara.",
+
+  "welcomeScreen1": "Iniziamo",
+  "connectHealth1": "Collega Salute",
+  "connectHealth2": "Così posso considerare correttamente il tuo peso corporeo durante gli esercizi.",
+  "connectHealth3": "Fatto",
+  "connectSpotify1": "La tua musica, direttamente nell'allenamento",
+  "connectSpotify2": "Controlla Spotify direttamente nell'app — senza cambiare applicazione.",
+
+  "connectCloud1": "I tuoi dati. Sempre al sicuro",
+  "connectCloud2Android": "Con o senza account — salva automaticamente i tuoi progressi su Google Drive.",
+  "connectCloud2IOS": "Con o senza account — salva automaticamente i tuoi progressi su iCloud.",
+  "connectCloud3": "Continua senza account",
+  "connectCloud4": "Crea account",
+  "connectCloud5": "Continua senza account",
+  "connectCloud6": "Crea un account",
+  "connectCloud7": "Sincronizza i tuoi dati tra dispositivi e accedi ai tuoi progressi ovunque.",
+
+  "deleteAccount1": "Elimina account",
+  "deleteAccount2": "Digita ELIMINA per confermare l'eliminazione del tuo account",
+  "deleteString": "ELIMINA",
+
+  "logout1": "Disconnetti solo",
+  "logout2": "Mantieni i tuoi dati localmente, rimuovi solo la connessione dell'account.",
+  "logout3": "Disconnetti completamente",
+  "logout4": "Tutti i dati locali e la connessione dell'account verranno rimossi.",
+  "logout5": "I dati del tuo account sui nostri server rimarranno. La cancellazione completa è possibile solo tramite \"Elimina account\".",
+
+  "profile": "Profilo"
 }

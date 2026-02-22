@@ -216,5 +216,33 @@
   "new10": "Le poids corporel ne sera pris en compte que si vous autorisez l'accès à votre poids dans l'application Santé.",
   "new11": "Entraînement en cours",
   "new12": "Vous pouvez désormais ajouter directement un exercice à un groupe dans un entraînement en cours. De plus, vous pouvez définir le temps de repos, la hauteur du siège, la catégorie et le poids corporel déplacé.",
-  "new13": "Les requêtes pour mettre à jour le modèle d'entraînement et suivre un groupe ne sont plus des pop-ups, mais un nouvel écran qui glisse du bas vers le haut. Cela offre plus d'espace et rend la sélection plus claire."
+  "new13": "Les requêtes pour mettre à jour le modèle d'entraînement et suivre un groupe ne sont plus des pop-ups, mais un nouvel écran qui glisse du bas vers le haut. Cela offre plus d'espace et rend la sélection plus claire.",
+
+  "welcomeScreen1": "C'est parti",
+  "connectHealth1": "Connecter Santé",
+  "connectHealth2": "Pour que je puisse prendre correctement en compte ton poids corporel pendant les exercices.",
+  "connectHealth3": "Terminé",
+  "connectSpotify1": "Ta musique, directement dans ton entraînement",
+  "connectSpotify2": "Contrôle Spotify directement dans l'application — plus besoin de changer d'app.",
+
+  "connectCloud1": "Tes données. Toujours sécurisées",
+  "connectCloud2Android": "Avec ou sans compte — sauvegarde automatiquement tes progrès sur Google Drive.",
+  "connectCloud2IOS": "Avec ou sans compte — sauvegarde automatiquement tes progrès sur iCloud.",
+  "connectCloud3": "Continuer sans compte",
+  "connectCloud4": "Créer un compte",
+  "connectCloud5": "Continuer sans compte",
+  "connectCloud6": "Créer un compte",
+  "connectCloud7": "Synchronise tes données entre appareils et accède à tes progrès depuis n'importe où.",
+
+  "deleteAccount1": "Supprimer le compte",
+  "deleteAccount2": "Veuillez saisir SUPPRIMER pour confirmer la suppression de votre compte",
+  "deleteString": "SUPPRIMER",
+
+  "logout1": "Déconnecter uniquement",
+  "logout2": "Conservez vos données localement, supprimez uniquement la connexion au compte.",
+  "logout3": "Se déconnecter complètement",
+  "logout4": "Toutes les données locales et la connexion au compte seront supprimées.",
+  "logout5": "Vos données de compte sur notre serveur resteront conservées. Une suppression complète est uniquement possible via \"Supprimer le compte\".",
+
+  "profile": "Profil"
 }

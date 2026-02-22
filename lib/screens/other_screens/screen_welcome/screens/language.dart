@@ -103,14 +103,14 @@ class ScreenLanguage extends StatelessWidget {
                             color: const Color(0xFFFF9A19),
                             borderRadius: BorderRadius.circular(15)
                         ),
-                        child: const Center(
+                        child: Center(
                             child: Text(
-                                "Los geht's",
-                                style: TextStyle(
+                                AppLocalizations.of(context)!.welcomeScreen1,
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w600
                                 ),
-                                textScaler: TextScaler.linear(1.1)
+                                textScaler: const TextScaler.linear(1.1)
                             )
                         ),
                       )

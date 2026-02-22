@@ -39,7 +39,7 @@ class AccountSection extends StatelessWidget {
               }),
               leading: const SettingsIcon(iconPath: "profile.png"),
               trailing: trailingArrow,
-              title: const Text("Profil", style: TextStyle(color: Colors.white)),
+              title: Text(AppLocalizations.of(context)!.profile, style: TextStyle(color: Colors.white)),
             );
           }
 

@@ -20,7 +20,7 @@ class ProfileScreen extends StatelessWidget {
       color: Theme.of(context).primaryColor,
       child: Column(
         children: [
-          PanelHeader(text: "Profil"),
+          PanelHeader(text: AppLocalizations.of(context)!.profile),
           Expanded(
             child: ListViewScope.of(context).listView(
               physics: const BouncingScrollPhysics(),
@@ -46,7 +46,7 @@ class ProfileScreen extends StatelessWidget {
                     onTap: () => showDeleteAccountDialog(context, () => CustomNavigator.pop(context)),
                     leading: const SettingsIcon(iconPath: "delete_account.png"),
                     trailing: trailingArrow,
-                    title: Text("Account löschen", style: const TextStyle(color: Colors.white)),
+                    title: Text(AppLocalizations.of(context)!.deleteAccount1, style: const TextStyle(color: Colors.white)),
                   )
                 ],
               )

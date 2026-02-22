@@ -1,3 +1,4 @@
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/widgets/slide_up_panel/initial_animated_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -36,8 +37,8 @@ class ConnectHealth extends StatelessWidget {
                     SizedBox(height: 30,),
                     SizedBox(
                       width: 300,
-                      child: const Text(
-                        "Health verbinden",
+                      child: Text(
+                        AppLocalizations.of(context)!.connectHealth1,
                         textScaler: TextScaler.linear(2.2),
                         textAlign: TextAlign.center,
                         // style: TextStyle(fontWeight: FontWeight.w500),
@@ -49,7 +50,7 @@ class ConnectHealth extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: Text(
-                          "Damit ich dein Körpergewicht bei Übungen korrekt berücksichtigen kann.",
+                          AppLocalizations.of(context)!.connectHealth2,
                           textScaler: const TextScaler.linear(1.1),
                           textAlign: TextAlign.center,
                         ),
@@ -85,10 +86,10 @@ class ConnectHealth extends StatelessWidget {
                                   color: const Color(0xFFFF9A19),
                                   borderRadius: BorderRadius.circular(15)
                               ),
-                              child: const Center(
+                              child: Center(
                                   child: Text(
-                                      "Fertig",
-                                      style: TextStyle(
+                                      AppLocalizations.of(context)!.connectHealth3,
+                                      style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.w600
                                       ),

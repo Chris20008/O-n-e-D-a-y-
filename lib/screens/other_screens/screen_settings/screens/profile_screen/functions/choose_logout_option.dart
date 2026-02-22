@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/main.dart';
 import 'package:fitness_app/screens/main_screens/screen_statistics/screen_statistics.dart';
 import 'package:flutter/material.dart';
@@ -46,8 +47,8 @@ Future chooseLogoutOption(BuildContext parentContext) async{
                   duration: const Duration(milliseconds: 300),
                   from: 50,
                   child: LogoutOptionsButton(
-                    header: "Nur Verbindung trennen",
-                    description: "Behalte deine Daten lokal, entferne nur die Account-Verbindung.",
+                    header: AppLocalizations.of(context)!.logout1,
+                    description: AppLocalizations.of(context)!.logout2,
                     leadingIcon: Icon(Icons.lock),
                     buttonColor: Colors.white12,
                     onPressed: () async{
@@ -64,8 +65,8 @@ Future chooseLogoutOption(BuildContext parentContext) async{
                   duration: const Duration(milliseconds: 300),
                   from: 50,
                   child: LogoutOptionsButton(
-                      header: "Komplett abmelden",
-                      description: "Alle lokalen Daten und die Account-Verbindung werden entfernt.",
+                      header: AppLocalizations.of(context)!.logout3,
+                      description: AppLocalizations.of(context)!.logout4,
                       leadingIcon: Icon(Icons.lock),
                       buttonColor: const Color(0xFFFF9A19),
                       onPressed: () async{
@@ -93,10 +94,10 @@ Future chooseLogoutOption(BuildContext parentContext) async{
                   from: 50,
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
-                    child: const Row(
+                    child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
+                        const Padding(
                           padding: EdgeInsets.only(left: 4, top: 2, right: 4),
                           child: Icon(
                             Icons.info,
@@ -107,12 +108,12 @@ Future chooseLogoutOption(BuildContext parentContext) async{
                         // SizedBox(width: 4),
                         Expanded(
                           child: Text(
-                              "Deine Account Daten bei uns auf dem Server bleiben erhalten. Eine vollständige Löschung erfolgt nur über \"Account löschen\".",
-                              style: TextStyle(
+                              AppLocalizations.of(context)!.logout5,
+                              style: const TextStyle(
                                 color: Colors.white54,
                                 // fontWeight: FontWeight.w
                               ),
-                              textScaler: TextScaler.linear(0.8)
+                              textScaler: const TextScaler.linear(0.8)
                           ),
                         ),
                       ],

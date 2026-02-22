@@ -216,5 +216,33 @@
   "new10": "O peso corporal só será considerado se conceder acesso ao seu peso no aplicativo Saúde.",
   "new11": "Treino em andamento",
   "new12": "Agora é possível adicionar um exercício diretamente a um grupo dentro de um treino em andamento. Além disso, pode definir o tempo de descanso, a altura do assento, a categoria e o peso corporal movido.",
-  "new13": "As solicitações para atualizar o modelo de treino e acompanhar um grupo não são mais pop-ups, mas sim uma nova tela que desliza de baixo para cima. Isso proporciona mais espaço e torna a seleção mais clara."
+  "new13": "As solicitações para atualizar o modelo de treino e acompanhar um grupo não são mais pop-ups, mas sim uma nova tela que desliza de baixo para cima. Isso proporciona mais espaço e torna a seleção mais clara.",
+
+  "welcomeScreen1": "Vamos começar",
+  "connectHealth1": "Conectar Saúde",
+  "connectHealth2": "Para que eu possa considerar corretamente o seu peso corporal durante os exercícios.",
+  "connectHealth3": "Concluído",
+  "connectSpotify1": "Sua música, direto no treino",
+  "connectSpotify2": "Controle o Spotify diretamente no app — sem precisar trocar de aplicativo.",
+
+  "connectCloud1": "Seus dados. Sempre seguros",
+  "connectCloud2Android": "Com ou sem conta — salve automaticamente seu progresso no Google Drive.",
+  "connectCloud2IOS": "Com ou sem conta — salve automaticamente seu progresso no iCloud.",
+  "connectCloud3": "Continuar sem conta",
+  "connectCloud4": "Criar conta",
+  "connectCloud5": "Continuar sem conta",
+  "connectCloud6": "Criar uma conta",
+  "connectCloud7": "Sincronize seus dados entre dispositivos e acesse seu progresso de qualquer lugar.",
+
+  "deleteAccount1": "Excluir conta",
+  "deleteAccount2": "Digite EXCLUIR para confirmar a exclusão da sua conta",
+  "deleteString": "EXCLUIR",
+
+  "logout1": "Apenas desconectar",
+  "logout2": "Mantenha seus dados localmente, remova apenas a conexão com a conta.",
+  "logout3": "Sair completamente",
+  "logout4": "Todos os dados locais e a conexão com a conta serão removidos.",
+  "logout5": "Os dados da sua conta em nosso servidor permanecerão. A exclusão completa só é possível através de \"Excluir conta\".",
+
+  "profile": "Perfil"
 }

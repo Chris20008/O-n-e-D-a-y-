@@ -6,7 +6,7 @@ import '../../../../../../util/cupertino_alert_dialog_custom.dart';
 import '../../../../../../util/loading_overlay.dart';
 
 showDeleteAccountDialog(BuildContext context, Function refresh){
-  String deleteString = "LÖSCHEN";
+  String deleteString = AppLocalizations.of(context)!.deleteString;
   bool valid = true;
   TextEditingController controller = TextEditingController();
   cupertinoAlertDialogCustom(
@@ -20,12 +20,12 @@ showDeleteAccountDialog(BuildContext context, Function refresh){
       // setModalState((){});
       refresh((){});
     },
-    header: 'Account löschen',
+    header: AppLocalizations.of(context)!.deleteAccount1,
     cancel: AppLocalizations.of(context)!.cancel,
     destructive: AppLocalizations.of(context)!.delete,
     body: Column(
       children: [
-        const Text("Bitte gib LÖSCHEN ein, um das Löschen deines Accounts zu bestätigen.", textAlign: TextAlign.center, textScaler: TextScaler.linear(0.8)),
+        Text(AppLocalizations.of(context)!.deleteAccount2, textAlign: TextAlign.center, textScaler: TextScaler.linear(0.8)),
         SizedBox(height: 15,),
         Container(
           height: 35,

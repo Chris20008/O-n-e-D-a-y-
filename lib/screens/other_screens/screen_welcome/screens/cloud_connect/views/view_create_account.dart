@@ -1,3 +1,4 @@
+import 'package:fitness_app/l10n/app_localizations.dart';
 import 'package:fitness_app/screens/other_screens/screen_welcome/screens/cloud_connect/widgets/login_button.dart';
 import 'package:flutter/material.dart';
 import '../../../screen_welcome.dart';
@@ -48,8 +49,8 @@ class ViewCreateAccount extends StatelessWidget {
                   SizedBox(height: 20,),
                   SizedBox(
                     width: 300,
-                    child: const Text(
-                      "Erstelle einen Account",
+                    child: Text(
+                      AppLocalizations.of(context)!.connectCloud6,
                       textScaler: TextScaler.linear(2.2),
                       textAlign: TextAlign.center,
                     ),
@@ -60,7 +61,7 @@ class ViewCreateAccount extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
-                        "Synchronisiere deine Daten zwischen Geräten und greife von überall auf deinen Fortschritt zu.",
+                        AppLocalizations.of(context)!.connectCloud7,
                         textScaler: const TextScaler.linear(1.1),
                         textAlign: TextAlign.center,
                       ),

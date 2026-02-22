@@ -216,7 +216,35 @@
   "new10": "Body weight is only included in the calculation if you grant access to your body weight data from the Health app.",
   "new11": "Ongoing workout",
   "new12": "When adding an exercise during an ongoing workout, you can now directly assign it to a group. Additionally, you can set the rest time, seat height, category, and moved body weight immediately.",
-  "new13": "The prompts for updating the workout template and tracking within a group are no longer pop-ups but a new screen that slides up from the bottom. This provides more space and makes the selection clearer."
+  "new13": "The prompts for updating the workout template and tracking within a group are no longer pop-ups but a new screen that slides up from the bottom. This provides more space and makes the selection clearer.",
+
+  "welcomeScreen1": "Let's get started",
+  "connectHealth1": "Connect Health",
+  "connectHealth2": "So I can correctly take your body weight into account during exercises.",
+  "connectHealth3": "Done",
+  "connectSpotify1": "Your music, right in your workout",
+  "connectSpotify2": "Control Spotify directly in the app — no more switching apps.",
+
+  "connectCloud1": "Your data. Always secure",
+  "connectCloud2Android": "With or without an account — automatically back up your progress to Google Drive.",
+  "connectCloud2IOS": "With or without an account — automatically back up your progress to iCloud.",
+  "connectCloud3": "Continue without account",
+  "connectCloud4": "Create account",
+  "connectCloud5": "Continue without account",
+  "connectCloud6": "Create an account",
+  "connectCloud7": "Sync your data across devices and access your progress from anywhere.",
+
+  "deleteAccount1": "Delete account",
+  "deleteAccount2": "Please type DELETE to confirm the deletion of your account",
+  "deleteString": "DELETE",
+
+  "logout1": "Disconnect only",
+  "logout2": "Keep your data locally, only remove the account connection.",
+  "logout3": "Log out completely",
+  "logout4": "All local data and the account connection will be removed.",
+  "logout5": "Your account data on our server will remain. A full deletion is only possible via \"Delete account\".",
+
+  "profile": "Profile"
 }
 
 

@@ -216,5 +216,33 @@
   "new10": "Het lichaamsgewicht wordt alleen meegenomen als je toegang verleent tot je gewicht in de Gezondheid-app.",
   "new11": "Lopende training",
   "new12": "Je kunt nu direct een oefening aan een groep toevoegen binnen een lopende training. Daarnaast kun je de rusttijd, zithoogte, categorie en het verplaatste lichaamsgewicht instellen.",
-  "new13": "De verzoeken om een trainingssjabloon bij te werken en binnen een groep bij te houden, zijn geen pop-ups meer, maar een nieuw scherm dat van onder naar boven schuift. Dit biedt meer ruimte en maakt de selectie overzichtelijker."
+  "new13": "De verzoeken om een trainingssjabloon bij te werken en binnen een groep bij te houden, zijn geen pop-ups meer, maar een nieuw scherm dat van onder naar boven schuift. Dit biedt meer ruimte en maakt de selectie overzichtelijker.",
+
+  "welcomeScreen1": "Laten we beginnen",
+  "connectHealth1": "Verbind Gezondheid",
+  "connectHealth2": "Zodat ik je lichaamsgewicht correct kan meenemen tijdens oefeningen.",
+  "connectHealth3": "Klaar",
+  "connectSpotify1": "Jouw muziek, direct in je training",
+  "connectSpotify2": "Bedien Spotify direct in de app — geen app-wissel meer nodig.",
+
+  "connectCloud1": "Jouw gegevens. Altijd veilig",
+  "connectCloud2Android": "Met of zonder account — maak automatisch een back-up van je voortgang in Google Drive.",
+  "connectCloud2IOS": "Met of zonder account — maak automatisch een back-up van je voortgang in iCloud.",
+  "connectCloud3": "Doorgaan zonder account",
+  "connectCloud4": "Account aanmaken",
+  "connectCloud5": "Doorgaan zonder account",
+  "connectCloud6": "Een account aanmaken",
+  "connectCloud7": "Synchroniseer je gegevens tussen apparaten en krijg overal toegang tot je voortgang.",
+
+  "deleteAccount1": "Account verwijderen",
+  "deleteAccount2": "Typ VERWIJDEREN om het verwijderen van je account te bevestigen",
+  "deleteString": "VERWIJDEREN",
+
+  "logout1": "Alleen verbinding verbreken",
+  "logout2": "Behoud je gegevens lokaal, verwijder alleen de accountverbinding.",
+  "logout3": "Volledig uitloggen",
+  "logout4": "Alle lokale gegevens en de accountverbinding worden verwijderd.",
+  "logout5": "Je accountgegevens op onze server blijven behouden. Volledige verwijdering is alleen mogelijk via \"Account verwijderen\".",
+
+  "profile": "Profiel"
 }

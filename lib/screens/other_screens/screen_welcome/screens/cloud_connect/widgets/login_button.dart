@@ -101,14 +101,13 @@ class _LoginStateState extends State<LoginState> {
                     color: const Color(0xFFFF9A19),
                     borderRadius: BorderRadius.circular(15)
                 ),
-                child: const Center(
+                child: Center(
                     child: Text(
-                        "Weiter",
-                        style: TextStyle(
+                        AppLocalizations.of(context)!.welcomeNext,
+                        style: const TextStyle(
                           color: Colors.white,
-                          // fontWeight: FontWeight.w600
                         ),
-                        textScaler: TextScaler.linear(1.1)
+                        textScaler: const TextScaler.linear(1.1)
                     )
                 ),
               )
